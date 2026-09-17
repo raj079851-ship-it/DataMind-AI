@@ -48,3 +48,10 @@ Desktop.ini
 # Temporary / Scratch
 scratch/
 *.log
+
+# Security stores & audit logs
+.users_store.json
+.api_keys_store.json
+.audit_log.jsonl
+tenants/
+

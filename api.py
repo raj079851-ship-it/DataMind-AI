@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File
+from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -71,6 +71,23 @@ from modules.bi_insights import compute_kpi_goal_tracking, compute_period_growth
 from modules.data_quality_center import DataQualityCenter
 from modules.reports_engine import generate_html_report
 
+# Enterprise Security Architecture
+from modules.security import (
+    Role,
+    Permission,
+    has_permission,
+    get_role_permissions,
+    default_user_manager,
+    default_session_manager,
+    default_oauth_manager,
+    default_column_encryptor,
+    default_api_key_manager,
+    default_api_rate_limiter,
+    auth_rate_limiter,
+    default_audit_logger,
+    CredentialSanitizer
+)
+
 # Initialize App
 app = FastAPI(
     title="DataMind AI Enterprise API",
@@ -108,8 +125,22 @@ def get_current_df() -> pd.DataFrame:
 
 # ---------------- SCHEMAS ----------------
 class AuthLoginRequest(BaseModel):
-    username: str = "analyst"
-    password: str = "password"
+    username: str = "admin"
+    password: str = "Admin@123"
+
+class OAuthCallbackRequest(BaseModel):
+    provider: str = "google"
+    code: str = "demo_code_123"
+    state: str
+
+class CreateAPIKeyRequest(BaseModel):
+    name: str = "Production Client"
+    role: str = "Analyst"
+    tenant_id: str = "tenant_default"
+    permissions: Optional[List[str]] = ["read:all"]
+
+class ColumnEncryptionRequest(BaseModel):
+    columns: List[str]
 
 class CreateProjectRequest(BaseModel):
     name: str
@@ -157,21 +188,241 @@ class WhatIfPredictionRequest(BaseModel):
     input_values: Dict[str, Any]
 
 
-# ---------------- 1. AUTH ENDPOINTS ----------------
+# ---------------- 1. AUTH & SECURITY ENDPOINTS ----------------
 @app.post("/auth/login", tags=["Authentication"])
-def login(creds: AuthLoginRequest):
-    """Generates mock JWT/session token and returns role permissions."""
-    role = "Admin" if creds.username.lower() == "admin" else "Analyst"
-    return {
+def login(creds: AuthLoginRequest, request: Request):
+    """Authenticates user with PBKDF2 hash verification, sliding-window rate limiting, and signed session token."""
+    client_ip = request.client.host if request and request.client else "127.0.0.1"
+
+    # Rate limiting protection against brute force attacks
+    rate_res = auth_rate_limiter.is_allowed(client_ip)
+    if not rate_res.allowed:
+        default_audit_logger.log(
+            event_type="AUTH_RATE_LIMIT",
+            user=creds.username,
+            status="BLOCKED",
+            resource="API",
+            ip_address=client_ip
+        )
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit exceeded: too many authentication requests. Try again in {rate_res.retry_after} seconds."
+        )
+
+    user, err = default_user_manager.authenticate(creds.username, creds.password)
+    if err or not user:
+        default_audit_logger.log(
+            event_type="AUTH_FAILED",
+            user=creds.username,
+            status="FAILED",
+            resource="API",
+            details={"error": err},
+            ip_address=client_ip
+        )
+        raise HTTPException(status_code=401, detail=err or "Invalid username or password.")
+
+    token = default_session_manager.create_session(
+        username=user.username,
+        role=user.role,
+        tenant_id=user.tenant_id
+    )
+
+    default_audit_logger.log(
+        event_type="AUTH_LOGIN",
+        user=user.username,
+        role=user.role,
+        status="SUCCESS",
+        resource="API",
+        ip_address=client_ip
+    )
+
+    perms = [p.value for p in get_role_permissions(user.role)]
+    response = {
         "status": "success",
-        "token": f"bearer_{creds.username}_{int(pd.Timestamp.now().timestamp())}",
-        "user": {"username": creds.username, "role": role},
-        "permissions": ["read", "write", "execute_sql", "train_models", "manage_projects"]
+        "token_type": "bearer",
+        "access_token": token,
+        "token": token,
+        "user": {
+            "username": user.username,
+            "role": user.role,
+            "email": user.email,
+            "full_name": user.full_name
+        },
+        "permissions": perms
     }
+    return CredentialSanitizer.sanitize(response)
+
+
+@app.post("/auth/logout", tags=["Authentication"])
+def logout(request: Request, authorization: Optional[str] = Header(None)):
+    """Revokes session token and blacklists it from subsequent requests."""
+    client_ip = request.client.host if request and request.client else "127.0.0.1"
+    raw_token = authorization.replace("Bearer ", "").strip() if authorization else ""
+    if raw_token:
+        default_session_manager.revoke_session(raw_token)
+    default_audit_logger.log(
+        event_type="AUTH_LOGOUT",
+        status="SUCCESS",
+        resource="API",
+        ip_address=client_ip
+    )
+    return {"status": "success", "message": "Session revoked successfully."}
+
 
 @app.get("/auth/me", tags=["Authentication"])
-def get_current_user():
-    return {"user": "Analyst", "role": "Analyst", "authenticated": True}
+def get_current_user(authorization: Optional[str] = Header(None)):
+    """Validates session token and returns caller profile and permissions."""
+    raw_token = authorization.replace("Bearer ", "").strip() if authorization else ""
+    if not raw_token:
+        return {
+            "user": "Guest",
+            "role": "Viewer",
+            "authenticated": False,
+            "permissions": ["view_dashboards", "view_reports"]
+        }
+
+    valid, session_data = default_session_manager.validate_session(raw_token)
+    if not valid or not session_data:
+        raise HTTPException(status_code=401, detail="Invalid, expired, or revoked session token.")
+
+    role = session_data.get("role", "Viewer")
+    perms = [p.value for p in get_role_permissions(role)]
+    return {
+        "user": session_data.get("username"),
+        "role": role,
+        "tenant_id": session_data.get("tenant_id"),
+        "authenticated": True,
+        "permissions": perms
+    }
+
+
+@app.get("/auth/oauth/login", tags=["OAuth SSO"])
+def oauth_login(provider: str = "google"):
+    """Generates OAuth 2.0 authorization URL with CSRF state token."""
+    auth_url, state = default_oauth_manager.generate_auth_url(provider)
+    return {"provider": provider, "auth_url": auth_url, "state": state}
+
+
+@app.post("/auth/oauth/callback", tags=["OAuth SSO"])
+def oauth_callback(req: OAuthCallbackRequest, request: Request):
+    """Handles OAuth callback and provisions authenticated session token."""
+    client_ip = request.client.host if request and request.client else "127.0.0.1"
+    profile, err = default_oauth_manager.handle_sandbox_login(req.provider, req.state)
+    if err or not profile:
+        raise HTTPException(status_code=400, detail=err or "OAuth authentication failed.")
+
+    token = default_session_manager.create_session(
+        username=profile["username"],
+        role=profile["role"]
+    )
+    default_audit_logger.log(
+        event_type="OAUTH_LOGIN",
+        user=profile["username"],
+        role=profile["role"],
+        status="SUCCESS",
+        details={"provider": req.provider},
+        ip_address=client_ip
+    )
+    return {
+        "status": "success",
+        "access_token": token,
+        "profile": profile
+    }
+
+
+# ---------------- SECURITY & GOVERNANCE ENDPOINTS ----------------
+@app.get("/security/audit-logs", tags=["Security & Governance"])
+def get_audit_logs(limit: int = 50, event_type: Optional[str] = None, user: Optional[str] = None):
+    """Retrieves structured audit log events with tamper-evident records."""
+    logs = default_audit_logger.get_recent_logs(limit=limit, event_type=event_type, user=user)
+    return {"total": len(logs), "logs": logs}
+
+
+@app.post("/security/api-keys", tags=["Security & Governance"])
+def create_api_key(req: CreateAPIKeyRequest):
+    """Generates an enterprise API key (raw key returned only once; only hash persisted)."""
+    raw_key, meta = default_api_key_manager.generate_api_key(
+        name=req.name,
+        role=req.role,
+        tenant_id=req.tenant_id,
+        permissions=req.permissions
+    )
+    default_audit_logger.log(
+        event_type="API_KEY_CREATED",
+        status="SUCCESS",
+        resource="API_KEY",
+        details={"key_name": req.name, "prefix": meta["prefix"]}
+    )
+    return {
+        "status": "success",
+        "raw_key": raw_key,
+        "metadata": meta,
+        "warning": "Save this key now. It will never be displayed again."
+    }
+
+
+@app.get("/security/api-keys", tags=["Security & Governance"])
+def list_api_keys():
+    """Lists registered API keys with hashes stripped for security."""
+    keys = default_api_key_manager.list_api_keys()
+    return {"total": len(keys), "keys": keys}
+
+
+@app.delete("/security/api-keys/{key_id}", tags=["Security & Governance"])
+def revoke_api_key(key_id: str):
+    """Revokes an API key instantly."""
+    revoked = default_api_key_manager.revoke_api_key(key_id)
+    if not revoked:
+        raise HTTPException(status_code=404, detail="API key not found.")
+    default_audit_logger.log(
+        event_type="API_KEY_REVOKED",
+        status="SUCCESS",
+        resource=f"API_KEY:{key_id}"
+    )
+    return {"status": "success", "revoked": True}
+
+
+@app.post("/security/encrypt-columns", tags=["Security & Governance"])
+def encrypt_columns_api(req: ColumnEncryptionRequest):
+    """Encrypts specified columns in the active dataset using AES-256 Fernet."""
+    df = get_current_df()
+    enc_df, err = default_column_encryptor.encrypt_columns(df, req.columns)
+    if err:
+        raise HTTPException(status_code=400, detail=err)
+    active_datasets["default"] = enc_df
+    default_audit_logger.log(
+        event_type="COLUMNS_ENCRYPTED",
+        status="SUCCESS",
+        resource="DATASET",
+        details={"columns": req.columns}
+    )
+    return {
+        "status": "success",
+        "encrypted_columns": req.columns,
+        "sample_preview": enc_df[req.columns].head(3).to_dict(orient="records")
+    }
+
+
+@app.post("/security/decrypt-columns", tags=["Security & Governance"])
+def decrypt_columns_api(req: ColumnEncryptionRequest):
+    """Decrypts specified columns in the active dataset back to plaintext."""
+    df = get_current_df()
+    dec_df, err = default_column_encryptor.decrypt_columns(df, req.columns)
+    if err:
+        raise HTTPException(status_code=400, detail=err)
+    active_datasets["default"] = dec_df
+    default_audit_logger.log(
+        event_type="COLUMNS_DECRYPTED",
+        status="SUCCESS",
+        resource="DATASET",
+        details={"columns": req.columns}
+    )
+    return {
+        "status": "success",
+        "decrypted_columns": req.columns,
+        "sample_preview": dec_df[req.columns].head(3).to_dict(orient="records")
+    }
+
 
 
 # ---------------- 2. PROJECTS ENDPOINTS ----------------

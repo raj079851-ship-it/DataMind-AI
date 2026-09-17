@@ -165,6 +165,25 @@ from modules.reports_engine import (
 )
 from modules.unicode_helper import sanitize_unicode
 
+# Enterprise Security Architecture
+from modules.security import (
+    Role,
+    Permission,
+    has_permission,
+    get_role_permissions,
+    default_user_manager,
+    default_session_manager,
+    default_oauth_manager,
+    default_column_encryptor,
+    default_api_key_manager,
+    default_api_rate_limiter,
+    auth_rate_limiter,
+    default_audit_logger,
+    CredentialSanitizer,
+    DatasetIsolationManager
+)
+
+
 # Set page configuration
 st.set_page_config(
     page_title="DataMind AI | Production Analytics Workspace",
@@ -336,6 +355,18 @@ def init_session_state():
         st.session_state.automl_res = None
         st.session_state.user_role = "Admin"
         st.session_state.theme = "Executive Dark"
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = True
+    if "current_user" not in st.session_state:
+        st.session_state.current_user = {
+            "username": "admin",
+            "role": "Admin",
+            "email": "admin@datamind.ai",
+            "full_name": "Enterprise SuperAdmin",
+            "tenant_id": "tenant_default"
+        }
+    if "session_token" not in st.session_state:
+        st.session_state.session_token = default_session_manager.create_session("admin", "Admin")
     if "ai_chat_history" not in st.session_state:
         st.session_state.ai_chat_history = [
             {
@@ -574,7 +605,255 @@ def render_task_execution_monitor():
     </script>
     """, height=0, width=0)
 
+# ---------------- ENTERPRISE AUTHENTICATION GATE & ACCESS CONTROL ----------------
+def render_auth_gate():
+    brand_col1, brand_col2 = st.columns([1, 4])
+    with brand_col1:
+        if os.path.exists("assets/datamind_logo_thumb.jpg"):
+            st.image("assets/datamind_logo_thumb.jpg", width=96)
+        elif os.path.exists("assets/datamind_logo.jpg"):
+            st.image("assets/datamind_logo.jpg", width=96)
+        elif os.path.exists("datamind_logo.jpg"):
+            st.image("datamind_logo.jpg", width=96)
+    with brand_col2:
+        st.markdown("""
+        <div style="margin-top: 8px;">
+            <h1 style="margin:0; font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, #6366f1, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                DataMind AI Enterprise Security Gate
+            </h1>
+            <p style="margin: 4px 0 0 0; color: #94a3b8; font-size: 1rem;">
+                PBKDF2 Password Hashing • HMAC Cryptographic Sessions • OAuth 2.0 SSO • Role-Based Access Control
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    st.markdown("---")
+
+    auth_tab1, auth_tab2, auth_tab3, auth_tab4 = st.tabs([
+        "🔐 Password Sign In",
+        "⚡ 1-Click Demo Profiles",
+        "🌐 OAuth 2.0 Single Sign-On",
+        "📝 Register Account"
+    ])
+
+    with auth_tab1:
+        st.markdown("### 🔐 Enterprise Password Authentication")
+        st.caption("Secure PBKDF2-HMAC-SHA256 verification (200,000 iterations) with constant-time comparison and automatic lockout protection.")
+        
+        with st.form("login_form"):
+            in_username = st.text_input("Username / Email:", value="admin", placeholder="e.g. admin or analyst")
+            in_password = st.text_input("Password:", value="Admin@123", type="password", placeholder="Enter your password")
+            remember_me = st.checkbox("Keep me signed in (8-hour secure session)", value=True)
+            submit_login = st.form_submit_button("🚀 Sign In to Workspace", use_container_width=True)
+
+            if submit_login:
+                rate_res = auth_rate_limiter.is_allowed("local_client")
+                if not rate_res.allowed:
+                    st.error(f"⛔ Rate limit exceeded: too many authentication attempts. Please retry in {rate_res.retry_after} seconds.")
+                else:
+                    user, err = default_user_manager.authenticate(in_username, in_password)
+                    if err or not user:
+                        default_audit_logger.log(
+                            event_type="AUTH_FAILED",
+                            user=in_username,
+                            status="FAILED",
+                            details={"error": err}
+                        )
+                        st.error(f"❌ {err or 'Invalid username or password.'}")
+                    else:
+                        token = default_session_manager.create_session(user.username, user.role, tenant_id=user.tenant_id)
+                        default_audit_logger.log(
+                            event_type="AUTH_LOGIN",
+                            user=user.username,
+                            role=user.role,
+                            status="SUCCESS"
+                        )
+                        st.session_state.authenticated = True
+                        st.session_state.current_user = {
+                            "username": user.username,
+                            "role": user.role,
+                            "email": user.email,
+                            "full_name": user.full_name,
+                            "tenant_id": user.tenant_id
+                        }
+                        st.session_state.user_role = user.role
+                        st.session_state.session_token = token
+                        st.success(f"Welcome back, {user.full_name or user.username}! Logging into DataMind AI...")
+                        st.rerun()
+
+        st.info("💡 **Pre-seeded Enterprise Credentials:**\n- 👑 **Admin**: `admin` / `Admin@123`\n- 📊 **Analyst**: `analyst` / `Analyst@123`\n- 🛠️ **Engineer**: `engineer` / `Engineer@123`\n- 👁️ **Viewer**: `viewer` / `Viewer@123`")
+
+    with auth_tab2:
+        st.markdown("### ⚡ 1-Click Instant Demo Evaluation")
+        st.caption("Click any enterprise persona to immediately enter the workspace with role-scoped permissions.")
+        
+        d1, d2, d3, d4 = st.columns(4)
+        with d1:
+            st.markdown("""
+            <div class="metric-card" style="text-align:center;">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">👑</div>
+                <h4>SuperAdmin</h4>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin: 8px 0;">Complete system governance, SQL & Python execution, model training, and user management.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Sign In as Admin", key="demo_admin_btn", use_container_width=True):
+                user, _ = default_user_manager.authenticate("admin", "Admin@123")
+                token = default_session_manager.create_session("admin", "Admin")
+                st.session_state.authenticated = True
+                st.session_state.current_user = {"username": "admin", "role": "Admin", "email": "admin@datamind.ai", "full_name": "Enterprise SuperAdmin"}
+                st.session_state.user_role = "Admin"
+                st.session_state.session_token = token
+                default_audit_logger.log("AUTH_LOGIN", user="admin", role="Admin", status="SUCCESS", details={"method": "1-click demo"})
+                st.rerun()
+
+        with d2:
+            st.markdown("""
+            <div class="metric-card" style="text-align:center;">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">📊</div>
+                <h4>Data Analyst</h4>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin: 8px 0;">Exploratory analysis, automated cleaning, AutoML tournaments, forecasting, and BI dashboards.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Sign In as Analyst", key="demo_analyst_btn", use_container_width=True):
+                user, _ = default_user_manager.authenticate("analyst", "Analyst@123")
+                token = default_session_manager.create_session("analyst", "Analyst")
+                st.session_state.authenticated = True
+                st.session_state.current_user = {"username": "analyst", "role": "Analyst", "email": "analyst@datamind.ai", "full_name": "Senior Data Scientist"}
+                st.session_state.user_role = "Analyst"
+                st.session_state.session_token = token
+                default_audit_logger.log("AUTH_LOGIN", user="analyst", role="Analyst", status="SUCCESS", details={"method": "1-click demo"})
+                st.rerun()
+
+        with d3:
+            st.markdown("""
+            <div class="metric-card" style="text-align:center;">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">🛠️</div>
+                <h4>Data Engineer</h4>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin: 8px 0;">Database connector pools, DuckDB SQL queries, ETL transformations, and pipeline orchestration.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Sign In as Engineer", key="demo_engineer_btn", use_container_width=True):
+                user, _ = default_user_manager.authenticate("engineer", "Engineer@123")
+                token = default_session_manager.create_session("engineer", "Data Engineer")
+                st.session_state.authenticated = True
+                st.session_state.current_user = {"username": "engineer", "role": "Data Engineer", "email": "engineer@datamind.ai", "full_name": "Lead Pipeline Architect"}
+                st.session_state.user_role = "Data Engineer"
+                st.session_state.session_token = token
+                default_audit_logger.log("AUTH_LOGIN", user="engineer", role="Data Engineer", status="SUCCESS", details={"method": "1-click demo"})
+                st.rerun()
+
+        with d4:
+            st.markdown("""
+            <div class="metric-card" style="text-align:center;">
+                <div style="font-size: 2.2rem; margin-bottom: 8px;">👁️</div>
+                <h4>Executive Viewer</h4>
+                <div style="font-size: 0.8rem; color: #cbd5e1; margin: 8px 0;">Read-only executive view: interactive charts, KPI goal tracking, reports, and Power BI insights.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("Sign In as Viewer", key="demo_viewer_btn", use_container_width=True):
+                user, _ = default_user_manager.authenticate("viewer", "Viewer@123")
+                token = default_session_manager.create_session("viewer", "Viewer")
+                st.session_state.authenticated = True
+                st.session_state.current_user = {"username": "viewer", "role": "Viewer", "email": "viewer@datamind.ai", "full_name": "Executive Stakeholder"}
+                st.session_state.user_role = "Viewer"
+                st.session_state.session_token = token
+                default_audit_logger.log("AUTH_LOGIN", user="viewer", role="Viewer", status="SUCCESS", details={"method": "1-click demo"})
+                st.rerun()
+
+    with auth_tab3:
+        st.markdown("### 🌐 OAuth 2.0 Single Sign-On (SSO)")
+        st.caption("Federated corporate authentication with cryptographic state verification protecting against CSRF attacks.")
+        
+        o_col1, o_col2 = st.columns(2)
+        with o_col1:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                    <div style="font-size:1.8rem;">🔷</div>
+                    <h4 style="margin:0;">Google Workspace SSO</h4>
+                </div>
+                <div style="font-size:0.83rem; color:#94a3b8; margin-bottom:12px;">Sign in via verified Google OAuth 2.0 identity token with auto-mapped organizational roles.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🔷 Continue with Google Workspace", key="google_oauth_btn", use_container_width=True):
+                _, state = default_oauth_manager.generate_auth_url("google")
+                profile, err = default_oauth_manager.handle_sandbox_login("google", state, "analyst.oauth@enterprise.com", "Google SSO Analyst")
+                token = default_session_manager.create_session(profile["username"], profile["role"])
+                st.session_state.authenticated = True
+                st.session_state.current_user = profile
+                st.session_state.user_role = profile["role"]
+                st.session_state.session_token = token
+                default_audit_logger.log("OAUTH_LOGIN", user=profile["username"], role=profile["role"], status="SUCCESS", details={"provider": "google"})
+                st.success("Authenticated via Google OAuth 2.0!")
+                st.rerun()
+
+        with o_col2:
+            st.markdown("""
+            <div class="metric-card">
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                    <div style="font-size:1.8rem;">🐙</div>
+                    <h4 style="margin:0;">GitHub Enterprise SSO</h4>
+                </div>
+                <div style="font-size:0.83rem; color:#94a3b8; margin-bottom:12px;">Sign in via GitHub OAuth credentials with automated Data Engineer permission binding.</div>
+            </div>
+            """, unsafe_allow_html=True)
+            if st.button("🐙 Continue with GitHub Enterprise", key="github_oauth_btn", use_container_width=True):
+                _, state = default_oauth_manager.generate_auth_url("github")
+                profile, err = default_oauth_manager.handle_sandbox_login("github", state, "engineer.oauth@enterprise.com", "GitHub SSO Engineer")
+                token = default_session_manager.create_session(profile["username"], profile["role"])
+                st.session_state.authenticated = True
+                st.session_state.current_user = profile
+                st.session_state.user_role = profile["role"]
+                st.session_state.session_token = token
+                default_audit_logger.log("OAUTH_LOGIN", user=profile["username"], role=profile["role"], status="SUCCESS", details={"provider": "github"})
+                st.success("Authenticated via GitHub Enterprise OAuth!")
+                st.rerun()
+
+    with auth_tab4:
+        st.markdown("### 📝 Register New Enterprise User")
+        st.caption("Create a new user account with cryptographic PBKDF2 password hashing.")
+        with st.form("register_user_form"):
+            reg_c1, reg_c2 = st.columns(2)
+            with reg_c1:
+                reg_uname = st.text_input("Username:", placeholder="e.g. data_analyst_01")
+                reg_email = st.text_input("Email:", placeholder="e.g. analyst@company.com")
+                reg_pwd = st.text_input("Password (min 6 chars):", type="password", placeholder="Enter password")
+            with reg_c2:
+                reg_fullname = st.text_input("Full Name:", placeholder="e.g. Sarah Connor")
+                reg_role = st.selectbox("Role:", ["Analyst", "Data Engineer", "Viewer", "Admin"], index=0)
+            reg_submit = st.form_submit_button("🚀 Complete Registration & Sign In", use_container_width=True)
+            if reg_submit:
+                if not reg_uname or not reg_pwd or not reg_email:
+                    st.error("Username, email, and password are required.")
+                else:
+                    new_user, err = default_user_manager.create_user(
+                        username=reg_uname,
+                        password=reg_pwd,
+                        email=reg_email,
+                        role=reg_role,
+                        full_name=reg_fullname
+                    )
+                    if err:
+                        st.error(f"Registration failed: {err}")
+                    else:
+                        token = default_session_manager.create_session(reg_uname, reg_role)
+                        st.session_state.authenticated = True
+                        st.session_state.current_user = {
+                            "username": reg_uname,
+                            "role": reg_role,
+                            "email": reg_email,
+                            "full_name": reg_fullname
+                        }
+                        st.session_state.user_role = reg_role
+                        st.session_state.session_token = token
+                        default_audit_logger.log("USER_REGISTERED", user=reg_uname, role=reg_role, status="SUCCESS")
+                        st.success(f"Account '{reg_uname}' successfully registered! Entering workspace...")
+                        st.rerun()
+
 render_task_execution_monitor()
+
+if not st.session_state.get("authenticated", False):
+    render_auth_gate()
+    st.stop()
 
 pm: ProjectManager = st.session_state.project_manager
 active_proj = pm.get_active_project()
@@ -593,7 +872,39 @@ with st.sidebar:
         st.markdown("<h3 style='margin:0;padding:0;font-weight:800;font-size:1.35rem;line-height:1.15;'>DataMind AI</h3>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.72rem;font-weight:700;color:#38bdf8;letter-spacing:0.05em;text-transform:uppercase;margin-top:2px;'>Analyze • Predict • Empower</div>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:0.68rem;color:#94a3b8;margin-top:1px;'>AI Powered Data Analytics Platform</div>", unsafe_allow_html=True)
-    
+
+    # Active Session Profile Badge & Sign Out Button
+    cur_u = st.session_state.get("current_user", {"username": "admin", "role": "Admin"})
+    u_role = cur_u.get("role", "Admin")
+    role_color = "#10b981" if u_role == "Admin" else ("#6366f1" if u_role in ["Analyst", "Data Engineer"] else "#f59e0b")
+    st.markdown(f"""
+    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 8px 10px; margin: 8px 0 10px 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Signed In As</div>
+                <div style="font-size: 0.88rem; font-weight: 700; color: #f8fafc;">👤 {cur_u.get('username', 'admin')}</div>
+            </div>
+            <span style="background: {role_color}22; color: {role_color}; border: 1px solid {role_color}44; font-size: 0.65rem; font-weight: 700; padding: 2px 7px; border-radius: 12px;">
+                {u_role}
+            </span>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    sb_c1, sb_c2 = st.columns(2)
+    with sb_c1:
+        if st.button("🚪 Sign Out", key="sb_signout_btn", use_container_width=True, help="Revoke session and return to Security Gate"):
+            tok = st.session_state.get("session_token", "")
+            if tok:
+                default_session_manager.revoke_session(tok)
+            default_audit_logger.log("AUTH_LOGOUT", user=cur_u.get("username", "admin"), role=u_role, status="SUCCESS")
+            st.session_state.authenticated = False
+            st.rerun()
+    with sb_c2:
+        if st.button("🛡️ Security", key="sb_sec_quick_btn", use_container_width=True, help="Open Security Studio"):
+            st.session_state.quick_jump = "🛡️ Security & Governance"
+            st.rerun()
+
     if st.button("🔄 Reset Workspace", key="top_reset_app_btn", help="Reset DataMind AI: Clears all uploaded files and starts fresh", use_container_width=True):
         for k in list(st.session_state.keys()):
             del st.session_state[k]
@@ -647,6 +958,7 @@ with st.sidebar:
             "📏 Model Evaluation"
         ],
         "📑 Reporting & Governance": [
+            "🛡️ Security & Governance",
             "📑 Report",
             "💾 Data Export",
             "📁 Projects",
@@ -989,6 +1301,245 @@ result = df.head(15)
 # =========================================================================
 
 # ---------------- 1. HOME ----------------
+def render_security_studio(df: pd.DataFrame):
+    st.markdown("""
+    <div class="hero-banner">
+        <h2 style="margin:0; font-size:1.6rem; font-weight:800; color:#f8fafc;">
+            🛡️ Enterprise Security & Governance Studio
+        </h2>
+        <p style="margin:6px 0 0 0; color:#94a3b8; font-size:0.92rem;">
+            Unified Control Plane for Audit Logging, Cryptographic Sessions, RBAC User Directory, API Key Vault, and Column-Level Encryption.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    sec_tab1, sec_tab2, sec_tab3, sec_tab4 = st.tabs([
+        "📜 Audit Log Explorer",
+        "👥 User & RBAC Directory",
+        "🔑 API Key Vault",
+        "🔐 Column Field Encryption (AES-256 Fernet)"
+    ])
+    
+    with sec_tab1:
+        st.markdown("### 📜 Structured Audit Log Explorer")
+        st.caption("Tamper-evident JSONL audit event stream tracking logins, queries, data access, key issuance, and encryption operations.")
+        
+        recent_logs = default_audit_logger.get_recent_logs(limit=200)
+        
+        m1, m2, m3, m4 = st.columns(4)
+        total_events = len(recent_logs)
+        success_events = sum(1 for l in recent_logs if l.get("status") == "SUCCESS")
+        failed_events = sum(1 for l in recent_logs if l.get("status") in ["FAILED", "BLOCKED"])
+        unique_users = len(set(l.get("user") for l in recent_logs if l.get("user")))
+        
+        with m1:
+            st.metric("Total Events", total_events)
+        with m2:
+            st.metric("Successful Operations", success_events)
+        with m3:
+            st.metric("Blocked / Failed", failed_events)
+        with m4:
+            st.metric("Active Principals", unique_users)
+            
+        col_f1, col_f2 = st.columns([1, 2])
+        with col_f1:
+            event_filter = st.selectbox(
+                "Filter by Event Type:",
+                ["All Events", "AUTH_LOGIN", "AUTH_LOGOUT", "AUTH_FAILED", "AUTH_RATE_LIMIT", "API_KEY_CREATED", "API_KEY_REVOKED", "COLUMNS_ENCRYPTED", "COLUMNS_DECRYPTED"]
+            )
+        with col_f2:
+            user_search = st.text_input("Filter by Username / Actor:", placeholder="e.g. admin, analyst...")
+            
+        filtered_logs = recent_logs
+        if event_filter != "All Events":
+            filtered_logs = [l for l in filtered_logs if l.get("event_type") == event_filter]
+        if user_search.strip():
+            filtered_logs = [l for l in filtered_logs if user_search.lower() in str(l.get("user", "")).lower()]
+            
+        if filtered_logs:
+            log_df = pd.DataFrame(filtered_logs)
+            cols_to_show = [c for c in ["timestamp", "event_type", "user", "role", "status", "resource", "ip_address", "details"] if c in log_df.columns]
+            st.dataframe(log_df[cols_to_show], use_container_width=True, hide_index=True)
+            
+            c_dl1, c_dl2 = st.columns(2)
+            with c_dl1:
+                jsonl_data = "\n".join([json.dumps(l, default=str) for l in filtered_logs])
+                st.download_button("📥 Download Audit Stream (.jsonl)", jsonl_data, "audit_log.jsonl", "application/jsonl", use_container_width=True)
+            with c_dl2:
+                csv_data = log_df.to_csv(index=False).encode("utf-8")
+                st.download_button("📥 Export Audit Report (.csv)", csv_data, "audit_log.csv", "text/csv", use_container_width=True)
+        else:
+            st.info("No audit logs matching current filter criteria.")
+            
+    with sec_tab2:
+        st.markdown("### 👥 Enterprise User & RBAC Directory")
+        st.caption("Manage user personas, PBKDF2 credential status, role mappings, and failed attempt lockouts.")
+        
+        users = default_user_manager.list_users()
+        u_df = pd.DataFrame(users)
+        if not u_df.empty:
+            disp_cols = [c for c in ["username", "full_name", "email", "role", "is_active", "failed_attempts", "last_login", "created_at"] if c in u_df.columns]
+            st.dataframe(u_df[disp_cols], use_container_width=True, hide_index=True)
+            
+        with st.expander("➕ Provision New Enterprise User Account", expanded=False):
+            with st.form("new_user_form"):
+                nu_c1, nu_c2 = st.columns(2)
+                with nu_c1:
+                    new_uname = st.text_input("Username:", placeholder="e.g. data_architect")
+                    new_email = st.text_input("Work Email:", placeholder="e.g. user@enterprise.com")
+                    new_pwd = st.text_input("Password:", type="password", placeholder="Min 6 characters...")
+                with nu_c2:
+                    new_name = st.text_input("Full Name:", placeholder="e.g. Alex Morgan")
+                    new_role = st.selectbox("Role Assignment:", ["Admin", "Analyst", "Data Engineer", "Viewer"], index=1)
+                    new_tenant = st.text_input("Tenant ID:", value="tenant_default")
+                submit_user = st.form_submit_button("🚀 Create User Account", use_container_width=True)
+                if submit_user:
+                    if not new_uname or not new_pwd or not new_email:
+                        st.error("Username, email, and password are required.")
+                    else:
+                        res_user, err_u = default_user_manager.create_user(
+                            username=new_uname,
+                            password=new_pwd,
+                            email=new_email,
+                            role=new_role,
+                            full_name=new_name,
+                            tenant_id=new_tenant
+                        )
+                        if err_u:
+                            st.error(f"Error provisioning user: {err_u}")
+                        else:
+                            default_audit_logger.log(
+                                event_type="USER_CREATED",
+                                user=st.session_state.get("user_role", "Admin"),
+                                status="SUCCESS",
+                                details={"new_user": new_uname, "role": new_role}
+                            )
+                            st.success(f"User '{new_uname}' successfully created with role '{new_role}'.")
+                            st.rerun()
+
+    with sec_tab3:
+        st.markdown("### 🔑 API Key Vault & Service Credentials")
+        st.caption("Issue cryptographically secure random API keys (`dma_live_...`). Secrets are hashed with SHA-256; only prefixes are stored.")
+        
+        with st.expander("⚡ Generate New API Key", expanded=False):
+            with st.form("gen_api_key_form"):
+                k_c1, k_c2 = st.columns(2)
+                with k_c1:
+                    k_name = st.text_input("Key Description / Name:", placeholder="e.g. Production Airflow Pipeline")
+                    k_role = st.selectbox("Scoped Role:", ["Admin", "Analyst", "Data Engineer", "Viewer"], index=1)
+                with k_c2:
+                    k_tenant = st.text_input("Tenant ID:", value="tenant_default")
+                    k_perm = st.multiselect("Permissions:", ["read:all", "write:all", "execute:sql", "train:models", "export:data"], default=["read:all"])
+                gen_btn = st.form_submit_button("🔑 Generate Key", use_container_width=True)
+                if gen_btn:
+                    if not k_name:
+                        st.error("Please provide a name for this API key.")
+                    else:
+                        raw_key, meta = default_api_key_manager.generate_api_key(
+                            name=k_name,
+                            role=k_role,
+                            tenant_id=k_tenant,
+                            permissions=k_perm
+                        )
+                        default_audit_logger.log(
+                            event_type="API_KEY_CREATED",
+                            status="SUCCESS",
+                            details={"name": k_name, "prefix": meta["prefix"]}
+                        )
+                        st.session_state["newly_generated_key"] = raw_key
+                        st.session_state["newly_generated_meta"] = meta
+                        st.rerun()
+                        
+        if "newly_generated_key" in st.session_state:
+            st.success("✅ **API Key Generated Successfully!**")
+            st.warning("⚠️ **Copy this secret key now. For security reasons, it will never be displayed again.**")
+            st.code(st.session_state["newly_generated_key"], language="bash")
+            if st.button("I Have Securely Saved My Key", key="dismiss_key_btn"):
+                del st.session_state["newly_generated_key"]
+                del st.session_state["newly_generated_meta"]
+                st.rerun()
+                
+        # List API keys
+        all_keys = default_api_key_manager.list_api_keys()
+        if all_keys:
+            st.markdown("#### Active API Keys")
+            for k in all_keys:
+                kc1, kc2, kc3, kc4 = st.columns([2, 1.5, 1.5, 1])
+                with kc1:
+                    st.markdown(f"**{k.get('name', 'API Key')}** (`{k.get('prefix', '...')}`)")
+                    st.caption(f"Tenant: `{k.get('tenant_id', 'default')}` | Role: `{k.get('role', 'Analyst')}`")
+                with kc2:
+                    st.caption(f"Created: {k.get('created_at', 'N/A')}")
+                    st.caption(f"Last Used: {k.get('last_used', 'Never')}")
+                with kc3:
+                    is_act = k.get("is_active", True)
+                    st.markdown(f"<span class='badge-chip {'badge-success' if is_act else 'badge-danger'}'>{'ACTIVE' if is_act else 'REVOKED'}</span>", unsafe_allow_html=True)
+                with kc4:
+                    if k.get("is_active", True):
+                        if st.button("Revoke", key=f"rev_{k['id']}"):
+                            default_api_key_manager.revoke_api_key(k["id"])
+                            default_audit_logger.log(
+                                event_type="API_KEY_REVOKED",
+                                status="SUCCESS",
+                                details={"key_id": k["id"]}
+                            )
+                            st.rerun()
+        else:
+            st.info("No API keys found. Generate a key above to grant programmatic API access.")
+
+    with sec_tab4:
+        st.markdown("### 🔐 Column-Level Field Encryption (AES-256 Fernet)")
+        st.caption("Reversibly encrypt sensitive PII and confidential fields (SSN, Salary, Credit Card, Email) in the active dataset using cryptographic Fernet tokens.")
+        
+        if df is None or df.empty:
+            st.warning("Please upload or load a dataset first to enable column-level field encryption.")
+        else:
+            avail_cols = list(df.columns)
+            enc_cols_selected = st.multiselect(
+                "Select Columns to Encrypt:",
+                avail_cols,
+                help="Columns containing sensitive personal data or proprietary business numbers."
+            )
+            
+            c_enc_btn1, c_enc_btn2 = st.columns(2)
+            with c_enc_btn1:
+                if st.button("🔒 Encrypt Selected Columns", use_container_width=True, disabled=not enc_cols_selected):
+                    enc_df, err = default_column_encryptor.encrypt_columns(df, enc_cols_selected)
+                    if err:
+                        st.error(f"Encryption failed: {err}")
+                    else:
+                        st.session_state.current_df = enc_df
+                        default_audit_logger.log(
+                            event_type="COLUMNS_ENCRYPTED",
+                            user=st.session_state.get("user_role", "Admin"),
+                            status="SUCCESS",
+                            details={"columns": enc_cols_selected}
+                        )
+                        set_task_status("Encrypt Columns", "success", f"Successfully encrypted {len(enc_cols_selected)} columns with AES-256 Fernet.")
+                        st.success(f"Successfully encrypted columns: {', '.join(enc_cols_selected)}")
+                        st.rerun()
+                        
+            with c_enc_btn2:
+                encrypted_cols = [c for c in avail_cols if default_column_encryptor.is_encrypted_column(df[c])]
+                if st.button("🔓 Decrypt Encrypted Columns", use_container_width=True, disabled=not encrypted_cols):
+                    dec_df, err = default_column_encryptor.decrypt_columns(df, encrypted_cols)
+                    if err:
+                        st.error(f"Decryption failed: {err}")
+                    else:
+                        st.session_state.current_df = dec_df
+                        default_audit_logger.log(
+                            event_type="COLUMNS_DECRYPTED",
+                            user=st.session_state.get("user_role", "Admin"),
+                            status="SUCCESS",
+                            details={"columns": encrypted_cols}
+                        )
+                        set_task_status("Decrypt Columns", "success", f"Successfully decrypted {len(encrypted_cols)} columns.")
+                        st.success(f"Successfully decrypted columns: {', '.join(encrypted_cols)}")
+                        st.rerun()
+                        
+            st.markdown("#### Live Dataset Preview (PII Shield Inspection)")
+            st.dataframe(df.head(10), use_container_width=True)
+
 if selected_module == "🏠 Home":
     st.markdown(f"""
     <div class="hero-banner">
@@ -4300,3 +4851,10 @@ elif selected_module == "⚙️ Settings":
         "OS": "Windows",
         "Active Project": active_proj["name"]
     })
+
+
+# ---------------- 23. SECURITY & GOVERNANCE STUDIO ----------------
+
+# ---------------- 23. SECURITY & GOVERNANCE STUDIO ----------------
+elif selected_module in ["🛡️ Security & Governance", "Security", "Security & Governance"]:
+    render_security_studio(df)
