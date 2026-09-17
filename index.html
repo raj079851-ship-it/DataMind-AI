@@ -1144,90 +1144,337 @@
 
       <!-- MODULE 2: DATA CLEANING -->
       <div id="moduleCleaning" class="module-view">
-        <div class="banner-box">
-          <h4 style="color:#818cf8;margin-bottom:6px;">🚀 1-Click AI Auto-Clean</h4>
-          <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:12px;">
-            Automatically strips whitespace, drops duplicate rows, imputes missing numbers with Median and categoricals with Mode, and caps extreme outliers using IQR.
-          </p>
-          <button class="btn btn-primary" style="width:auto;padding:8px 24px;" onclick="runOneClickAutoClean()">
-            ✨ Run 1-Click Auto-Clean
-          </button>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-          <!-- Imputation -->
-          <div class="panel">
-            <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
-              <span>🧩 Missing Value Imputation</span>
-              <span class="badge badge-info" id="imputeBadgeInfo">Select Column</span>
+        
+        <!-- Hero Box -->
+        <div class="banner-box" style="border-left-color:#818cf8; margin-bottom:18px; background:linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.05) 100%);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                <span style="background:#4f46e5; color:#ffffff; font-weight:800; font-size:0.75rem; padding:2px 8px; border-radius:4px; letter-spacing:0.05em;">DATA HYGIENE CORE</span>
+                <span class="badge badge-success">Audit Trail &amp; Pipeline Engine</span>
+              </div>
+              <h4 style="color:#818cf8; margin:0 0 4px 0; font-size:1.20rem; font-weight:800;">🧹 Enterprise Data-Cleaning Workspace</h4>
+              <p style="font-size:0.86rem; color:var(--text-muted); margin:0; max-width:850px;">
+                Complete data-cleaning studio: missing-value imputation, duplicate cluster detection, multi-algorithm outlier handling, text &amp; date format standardization, before/after diff analysis, and reversible operation history.
+              </p>
             </div>
-            <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Select Target Column to Impute:</label>
-            <select id="cleanMissCol" style="margin-bottom:12px;"></select>
-
-            <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Imputation Strategy:</label>
-            <select id="cleanMissStrat" style="margin-bottom:16px;">
-              <option value="median" selected>Median (Recommended for Numerical)</option>
-              <option value="mean">Mean (Numerical Average)</option>
-              <option value="mode">Mode (Most Frequent Category/Value)</option>
-              <option value="drop_rows">Drop Rows with Missing Values</option>
-            </select>
-            <button class="btn btn-primary" onclick="applyImputation()">✨ Apply Imputation</button>
-          </div>
-
-          <!-- Outliers -->
-          <div class="panel">
-            <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
-              <span>🎯 Outlier Treatment (IQR Method)</span>
-              <span class="badge badge-warning">1.5× IQR Bounds</span>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button class="btn btn-primary" style="width:auto; padding:6px 14px; font-size:0.8rem; font-weight:700;" onclick="runOneClickAutoClean()">✨ 1-Click AI Auto-Clean</button>
+              <button class="btn btn-outline" id="cleanUndoBtn" style="width:auto; padding:6px 12px; font-size:0.8rem;" onclick="undoCleaningStep()" title="Undo Last Cleaning Step (Ctrl+Z)" disabled>↩️ Undo</button>
+              <button class="btn btn-outline" id="cleanRedoBtn" style="width:auto; padding:6px 12px; font-size:0.8rem;" onclick="redoCleaningStep()" title="Redo Cleaning Step (Ctrl+Y)" disabled>↪️ Redo</button>
+              <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:0.8rem;" onclick="resetToRaw()">🔄 Reset to Raw</button>
+              <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:0.8rem;" onclick="saveCleaningPipelineJSON()">💾 Save Pipeline</button>
+              <button class="btn btn-outline" style="width:auto; padding:6px 12px; font-size:0.8rem;" onclick="document.getElementById('cleanPipelineFileInput').click()">📥 Replay Pipeline</button>
+              <input type="file" id="cleanPipelineFileInput" style="display:none;" accept=".json" onchange="loadCleaningPipelineJSON(event)" />
             </div>
-            <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Select Numeric Column:</label>
-            <select id="cleanOutCol" style="margin-bottom:12px;"></select>
-
-            <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:4px;">Outlier Treatment Action:</label>
-            <select id="cleanOutAction" style="margin-bottom:16px;">
-              <option value="cap" selected>Cap to IQR Bounds (Winsorize)</option>
-              <option value="remove">Remove Outlier Rows (Trim)</option>
-            </select>
-            <button class="btn btn-primary" onclick="applyOutlierTreatment()">🎯 Execute Outlier Action</button>
           </div>
         </div>
 
-        <!-- Data Cleaning Changelog -->
-        <div class="panel" style="margin-top:18px;">
-          <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span>📜 Data Cleaning Changelog</span>
-              <span class="badge badge-info" id="cleaningLogBadge">0 actions</span>
+        <!-- Navigation Tabs for Workspace -->
+        <div style="display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--card-border); padding-bottom:8px; overflow-x:auto;">
+          <button class="btn btn-primary" id="subtabBtnCleanMissing" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('missing')">🧩 1. Missing Values</button>
+          <button class="btn btn-outline" id="subtabBtnCleanDups" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('dups')">👥 2. Duplicates</button>
+          <button class="btn btn-outline" id="subtabBtnCleanOutliers" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('outliers')">🎯 3. Outlier Handling</button>
+          <button class="btn btn-outline" id="subtabBtnCleanFormats" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('formats')">🔤 4. Format &amp; Types</button>
+          <button class="btn btn-outline" id="subtabBtnCleanDiff" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('diff')">⚖️ 5. Before vs After Diff</button>
+          <button class="btn btn-outline" id="subtabBtnCleanHistory" style="width:auto; font-size:0.78rem; padding:6px 14px;" onclick="switchCleaningSubTab('history')">📜 6. Pipeline &amp; History</button>
+        </div>
+
+        <!-- SUBTAB 1: MISSING-VALUE HANDLING -->
+        <div id="cleanSubTab_missing" class="clean-subtab-view" style="display:block;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">🧩 Missing-Value Configuration</span>
+                <span class="badge badge-info" id="imputeBadgeInfo">Select Column</span>
+              </div>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Target Column:</label>
+              <select id="cleanMissCol" style="margin-bottom:12px;" onchange="updateImputeRecommendations()"></select>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Imputation &amp; Handling Strategy:</label>
+              <select id="cleanMissStrat" style="margin-bottom:12px;" onchange="handleImputeStratChange()">
+                <option value="median" selected>Median Imputation (Recommended for continuous numeric)</option>
+                <option value="mean">Mean Imputation (Arithmetic average)</option>
+                <option value="mode">Mode Imputation (Most frequent category/value)</option>
+                <option value="drop_rows">Drop Rows with Missing Values</option>
+                <option value="drop_cols">Drop Entire Column(s)</option>
+                <option value="ffill">Forward Fill (Propagate previous observation)</option>
+                <option value="bfill">Backward Fill (Propagate next observation)</option>
+                <option value="constant">Constant Value Fill (User Specified)</option>
+                <option value="interpolate">Linear Interpolation (Continuous gradient)</option>
+                <option value="knn">KNN Imputation (k-Nearest Neighbors Euclidean, k=3)</option>
+                <option value="ai_recommend">AI-Recommended Imputation (Auto-select optimal)</option>
+              </select>
+
+              <!-- Extra parameter fields -->
+              <div id="cleanMissConstantBox" style="display:none; margin-bottom:12px;">
+                <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Constant Replacement Value:</label>
+                <input type="text" id="cleanMissConstantVal" placeholder="e.g. Unknown, 0, N/A" />
+              </div>
+
+              <div id="cleanMissDropThreshBox" style="display:none; margin-bottom:12px;">
+                <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Drop Columns with Missing Rate Greater Than (%):</label>
+                <input type="number" id="cleanMissDropThresh" min="1" max="100" value="50" />
+              </div>
+
+              <button class="btn btn-primary" style="margin-top:4px;" onclick="executeMissingValueAction()">✨ Apply Missing-Value Operation</button>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-outline" style="width:auto;padding:3px 12px;font-size:0.75rem;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
-              <button class="btn btn-outline" style="width:auto;padding:3px 12px;font-size:0.75rem;" onclick="clearCleaningLog()">Clear Log</button>
+
+            <!-- Column Missingness Matrix -->
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">📊 Column Missingness Audit</span>
+                <span class="badge badge-warning" id="cleanMissingSummaryBadge">0 missing</span>
+              </div>
+              <div id="cleanMissingColMatrix" style="max-height:220px; overflow-y:auto; display:flex; flex-direction:column; gap:8px; font-size:0.78rem;">
+                <!-- Populated dynamically -->
+              </div>
             </div>
-          </div>
-          <div id="cleaningLogContainer" style="max-height:220px;overflow-y:auto;padding:6px 2px;">
-            <ul id="cleaningLog" style="font-size:0.85rem;list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;">
-              <li style="color:var(--text-muted);font-style:italic;">No cleaning modifications applied yet.</li>
-            </ul>
           </div>
         </div>
 
-        <!-- Live Data Preview in Data Cleaning -->
-        <div class="panel" style="margin-top:18px;">
-          <div class="panel-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <span>📋 Live Dataset View (Cleaned / Raw)</span>
+        <!-- SUBTAB 2: DUPLICATE HANDLING -->
+        <div id="cleanSubTab_dups" class="clean-subtab-view" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1.3fr; gap:18px; margin-bottom:18px;">
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">👥 Duplicate Detection &amp; Removal</span>
+                <span class="badge badge-info" id="cleanDupStatusBadge">Scanning...</span>
+              </div>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Deduplication Scope:</label>
+              <select id="cleanDupScope" style="margin-bottom:12px;">
+                <option value="all_cols" selected>Full Row Matching (All Columns Exact Match)</option>
+                <option value="key_col">Subset Key Column (e.g. Primary Key / Customer ID)</option>
+              </select>
+
+              <div id="cleanDupKeyColBox" style="display:none; margin-bottom:12px;">
+                <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Select Matching Key Column:</label>
+                <select id="cleanDupKeyCol"></select>
+              </div>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Removal Retention Policy:</label>
+              <select id="cleanDupPolicy" style="margin-bottom:14px;">
+                <option value="keep_first" selected>Keep First Occurrence (Standard)</option>
+                <option value="keep_last">Keep Last Occurrence (Latest Record)</option>
+                <option value="remove_all">Remove All Duplicates (Strict Unique Only)</option>
+              </select>
+
+              <div style="display:flex; gap:10px;">
+                <button class="btn btn-outline" style="flex:1;" onclick="detectDuplicatesUI()">🔍 Detect Duplicates</button>
+                <button class="btn btn-primary" style="flex:1;" onclick="executeDeduplication()">🗑️ Remove Duplicates</button>
+              </div>
+            </div>
+
+            <!-- Duplicate Groups Display Panel -->
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">📋 Duplicate Groups Inspector</span>
+                <span class="badge badge-warning" id="cleanDupClustersBadge">0 Groups</span>
+              </div>
+              <div id="cleanDupGroupsContainer" style="max-height:220px; overflow-y:auto; font-size:0.78rem;">
+                <div style="padding:20px; text-align:center; color:var(--text-muted);">
+                  Click <b>Detect Duplicates</b> to scan and view duplicate row groups.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 3: OUTLIER HANDLING -->
+        <div id="cleanSubTab_outliers" class="clean-subtab-view" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">🎯 Multi-Algorithm Outlier Engine</span>
+                <span class="badge badge-warning">5 Algorithms</span>
+              </div>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Target Numeric Column:</label>
+              <select id="cleanOutCol" style="margin-bottom:12px;" onchange="updateOutlierAuditPreview()"></select>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Outlier Detection Algorithm:</label>
+              <select id="cleanOutAlgo" style="margin-bottom:12px;" onchange="handleOutlierAlgoChange()">
+                <option value="iqr" selected>IQR (Interquartile Range - 1.5x IQR Standard)</option>
+                <option value="iqr_extreme">IQR Extreme Fences (3.0x IQR)</option>
+                <option value="zscore">Standard Z-Score (|z| &gt; 3.0 Standard Deviations)</option>
+                <option value="mod_zscore">Modified Z-Score (Median Absolute Deviation / MAD)</option>
+                <option value="iforest">Isolation Forest (Tree Anomaly Path-Length Scoring)</option>
+                <option value="lof">Local Outlier Factor (LOF Density Deviation)</option>
+              </select>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Treatment Action:</label>
+              <select id="cleanOutAction" style="margin-bottom:14px;">
+                <option value="cap" selected>Cap / Winsorize (Clamp to Outlier Boundaries)</option>
+                <option value="remove">Remove Outlier Rows (Trim)</option>
+                <option value="replace_median">Replace with Column Median</option>
+                <option value="replace_mean">Replace with Column Mean</option>
+                <option value="flag">Flag as Anomaly (Add [col]_is_outlier column)</option>
+                <option value="keep">Keep (Audit &amp; Report Only)</option>
+              </select>
+
+              <button class="btn btn-primary" onclick="executeOutlierTreatment()">🎯 Execute Outlier Action</button>
+            </div>
+
+            <!-- Outlier Distribution Gauge & Boundaries -->
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">📈 Outlier Boundary &amp; Density Profile</span>
+                <span class="badge badge-info" id="cleanOutlierCountBadge">0 Outliers</span>
+              </div>
+              <div id="cleanOutlierProfileContainer" style="font-size:0.8rem; line-height:1.6;">
+                <div style="padding:20px; text-align:center; color:var(--text-muted);">
+                  Select a numeric column to view boundary statistics.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 4: DATA-FORMAT CLEANING -->
+        <div id="cleanSubTab_formats" class="clean-subtab-view" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:18px;">
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">🔤 Data-Format Cleaning &amp; Normalization</span>
+                <span class="badge badge-success">Format Tools</span>
+              </div>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Target Column:</label>
+              <select id="cleanFmtCol" style="margin-bottom:12px;"></select>
+
+              <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Standardization Operation:</label>
+              <select id="cleanFmtOp" style="margin-bottom:12px;" onchange="handleFormatOpChange()">
+                <option value="trim" selected>Trim Whitespace (Leading, Trailing &amp; Multi-Space)</option>
+                <option value="upper">Standardize Capitalization: UPPERCASE</option>
+                <option value="lower">Standardize Capitalization: lowercase</option>
+                <option value="title">Standardize Capitalization: Title Case / Proper Case</option>
+                <option value="sentence">Standardize Capitalization: Sentence case</option>
+                <option value="normalize_cat">Normalize Categories (Fuzzy typo clustering &amp; unification)</option>
+                <option value="remove_special">Remove Special Characters (Keep Alphanumeric only)</option>
+                <option value="parse_dates">Parse &amp; Normalize Dates (Standardize to YYYY-MM-DD)</option>
+                <option value="currency">Standardize Currencies (Strip $, €, £, ¥, commas to Float)</option>
+                <option value="units">Standardize Units (Strip kg, lbs, mb, gb, %, km to Numeric)</option>
+                <option value="type_coerce">Convert Data Types (Coerce Schema Type)</option>
+                <option value="replace_inconsistent">Replace Inconsistent Values (Find &amp; Replace)</option>
+              </select>
+
+              <!-- Dynamic Format Parameter Fields -->
+              <div id="cleanFmtTypeBox" style="display:none; margin-bottom:12px;">
+                <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Target Data Type:</label>
+                <select id="cleanFmtTargetType">
+                  <option value="numeric">Numeric (Float / Integer)</option>
+                  <option value="string">Text (String)</option>
+                  <option value="date">Date (ISO 8601)</option>
+                  <option value="boolean">Boolean (True / False)</option>
+                </select>
+              </div>
+
+              <div id="cleanFmtReplaceBox" style="display:none; margin-bottom:12px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                  <div>
+                    <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Find Value (Exact or Regex):</label>
+                    <input type="text" id="cleanFmtFindVal" placeholder="e.g. N/A, null, ??" />
+                  </div>
+                  <div>
+                    <label style="font-size:0.78rem; color:var(--text-muted); display:block; margin-bottom:4px;">Replace With:</label>
+                    <input type="text" id="cleanFmtReplaceVal" placeholder="e.g. Unknown or 0" />
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn btn-primary" onclick="executeFormatCleaning()">🔤 Apply Format Cleaning</button>
+            </div>
+
+            <!-- Format Rule Preview / Cheat Sheet -->
+            <div class="panel">
+              <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+                <span style="font-weight:700; font-size:0.92rem;">💡 Formatting Rules &amp; Samples</span>
+                <span class="badge badge-info">Real-Time</span>
+              </div>
+              <div id="cleanFmtSampleBox" style="font-size:0.8rem; color:var(--text-muted); line-height:1.6;">
+                <p style="margin:0 0 8px 0;"><b>Format Standardization Summary:</b></p>
+                <ul style="margin:0 0 0 18px; padding:0; line-height:1.7;">
+                  <li><b>Whitespace:</b> Strips non-breaking spaces and collapses duplicate internal blanks.</li>
+                  <li><b>Date Parsing:</b> Recognizes <code>YYYY-MM-DD</code>, <code>MM/DD/YYYY</code>, and timestamp strings.</li>
+                  <li><b>Currencies:</b> Strips currency symbols and commas, parsing into clean floating point decimals.</li>
+                  <li><b>Categories:</b> Fuses disparate variations (e.g., <i>"Fiber Optic"</i> vs <i>"fiber optic"</i> vs <i>"FIBER"</i>).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 5: BEFORE VS AFTER COMPARISON -->
+        <div id="cleanSubTab_diff" class="clean-subtab-view" style="display:none;">
+          <div class="panel" style="margin-bottom:18px;">
+            <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>⚖️ Before vs After Cleaning Diff</span>
+                <span class="badge badge-success" id="cleanDiffStatusBadge">Diff Active</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="renderBeforeAfterDiff(true)">Show Only Modified Rows</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="renderBeforeAfterDiff(false)">Show All Records</button>
+              </div>
+            </div>
+
+            <!-- Metrics Comparison Cards -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:14px;" id="cleanDiffMetricsCards">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Side-by-side / Highlight Diff Table -->
+            <div style="max-height:300px; overflow:auto; border:1px solid var(--card-border); border-radius:6px;" id="cleanDiffTableContainer">
+              <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:0.8rem;">
+                No cleaning actions performed yet. Apply a cleaning step to see Before vs After diff comparisons.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUBTAB 6: PIPELINE & OPERATION HISTORY -->
+        <div id="cleanSubTab_history" class="clean-subtab-view" style="display:none;">
+          <div class="panel" style="margin-bottom:18px;">
+            <div class="panel-header" style="justify-content:space-between; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>📜 Reversible Operation History &amp; Pipeline Engine</span>
+                <span class="badge badge-info" id="cleaningLogBadge">0 actions</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="undoCleaningStep()">↩️ Undo</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="redoCleaningStep()">↪️ Redo</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="resetToRaw()">🔄 Reset to Raw</button>
+                <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 10px;" onclick="saveCleaningPipelineJSON()">💾 Export Recipe</button>
+              </div>
+            </div>
+
+            <div id="cleaningLogContainer" style="max-height:260px; overflow-y:auto; padding:6px 2px;">
+              <ul id="cleaningLog" style="font-size:0.85rem; list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px;">
+                <li style="color:var(--text-muted); font-style:italic;">No cleaning modifications applied yet.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE DATA PREVIEW IN DATA CLEANING -->
+        <div class="panel">
+          <div class="panel-header" style="justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>📋 Active Dataset Preview</span>
               <span class="badge badge-info" id="cleaningPreviewBadge">0 Rows</span>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-outline" style="width:auto;padding:3px 12px;font-size:0.75rem;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
-              <button class="btn btn-outline" style="width:auto;padding:3px 12px;font-size:0.75rem;" onclick="switchModule('moduleOverview')">Full Data Preview ➔</button>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 12px;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
+              <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 12px;" onclick="switchModule('moduleOverview')">Full Schema View ➔</button>
             </div>
           </div>
           <div class="table-container" id="cleaningPreviewTableContainer">Loading preview...</div>
         </div>
-      </div>
 
-      <!-- MODULE 3: FEATURE ENGINEERING -->
+      </div>
+<!-- MODULE 3: FEATURE ENGINEERING -->
       <div id="moduleFE" class="module-view">
         
         <!-- 1-Click AI Auto-Feature Engineering Banner -->
@@ -8641,6 +8888,864 @@ result = df.describe()
       if (container) container.innerHTML = html;
     }
 
+    // =========================================================================
+    // MODULE 1: COMPLETE DATA-CLEANING WORKSPACE ENGINE
+    // =========================================================================
+
+    window.cleaningHistoryStack = [];
+    window.cleaningRedoStack = [];
+    window.cleaningPipelineSteps = [];
+    window.cleaningInitialSnapshot = null;
+
+    function pushCleaningState(desc, stepInfo) {
+      if (!currentDataset) return;
+      if (!window.cleaningInitialSnapshot) {
+        window.cleaningInitialSnapshot = JSON.parse(JSON.stringify(currentDataset));
+      }
+      // Push deep clone of state before applying modification
+      window.cleaningHistoryStack.push({
+        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        columns: [...(columns || [])],
+        desc: desc,
+        timestamp: new Date().toLocaleTimeString()
+      });
+      // Cap undo stack at 25 steps to preserve memory
+      if (window.cleaningHistoryStack.length > 25) window.cleaningHistoryStack.shift();
+      window.cleaningRedoStack = [];
+      if (stepInfo) window.cleaningPipelineSteps.push({ ...stepInfo, timestamp: new Date().toISOString() });
+      updateUndoRedoButtons();
+    }
+
+    function updateUndoRedoButtons() {
+      const undoBtn = document.getElementById('cleanUndoBtn');
+      const redoBtn = document.getElementById('cleanRedoBtn');
+      if (undoBtn) undoBtn.disabled = window.cleaningHistoryStack.length === 0;
+      if (redoBtn) redoBtn.disabled = window.cleaningRedoStack.length === 0;
+      const logBadge = document.getElementById('cleaningLogBadge');
+      if (logBadge) logBadge.textContent = `${window.cleaningPipelineSteps.length} actions`;
+    }
+
+    function undoCleaningStep() {
+      if (!window.cleaningHistoryStack.length) {
+        showToast("Nothing to undo", "info");
+        return;
+      }
+      // Save current state into redo stack
+      window.cleaningRedoStack.push({
+        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        columns: [...(columns || [])],
+        timestamp: new Date().toLocaleTimeString()
+      });
+      const prev = window.cleaningHistoryStack.pop();
+      currentDataset = prev.dataset;
+      columns = prev.columns;
+      if (window.cleaningPipelineSteps.length) window.cleaningPipelineSteps.pop();
+      cleaningLogList.unshift(`↩️ [Undo] Reverted to state before: ${prev.desc}`);
+      updateUndoRedoButtons();
+      updateUI();
+      renderCleaningWorkspaceAll();
+      showToast("Undid: " + prev.desc, "info");
+    }
+
+    function redoCleaningStep() {
+      if (!window.cleaningRedoStack.length) {
+        showToast("Nothing to redo", "info");
+        return;
+      }
+      // Save current into undo stack
+      window.cleaningHistoryStack.push({
+        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        columns: [...(columns || [])],
+        desc: "State before Redo",
+        timestamp: new Date().toLocaleTimeString()
+      });
+      const next = window.cleaningRedoStack.pop();
+      currentDataset = next.dataset;
+      columns = next.columns;
+      cleaningLogList.unshift(`↪️ [Redo] Re-applied transformation state.`);
+      updateUndoRedoButtons();
+      updateUI();
+      renderCleaningWorkspaceAll();
+      showToast("Redo applied successfully", "info");
+    }
+
+    function switchCleaningSubTab(tabId) {
+      ['missing', 'dups', 'outliers', 'formats', 'diff', 'history'].forEach(t => {
+        const view = document.getElementById('cleanSubTab_' + t);
+        const btn = document.getElementById('subtabBtnClean' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (view) view.style.display = (t === tabId) ? 'block' : 'none';
+        if (btn) {
+          if (t === tabId) {
+            btn.classList.remove('btn-outline');
+            btn.classList.add('btn-primary');
+          } else {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline');
+          }
+        }
+      });
+      if (tabId === 'missing') renderMissingColMatrix();
+      if (tabId === 'dups') detectDuplicatesUI();
+      if (tabId === 'outliers') updateOutlierAuditPreview();
+      if (tabId === 'diff') renderBeforeAfterDiff(false);
+      if (tabId === 'history') renderCleaningLog();
+    }
+
+    function renderCleaningWorkspaceAll() {
+      populateCleaningDropdowns();
+      renderMissingColMatrix();
+      updateOutlierAuditPreview();
+      renderBeforeAfterDiff(false);
+      renderCleaningLog();
+      renderCleaningPreviewTable();
+      updateUndoRedoButtons();
+    }
+
+    function populateCleaningDropdowns() {
+      const data = currentDataset || rawDataset || [];
+      if (!data.length) return;
+      const cols = columns || Object.keys(data[0]);
+
+      ['cleanMissCol', 'cleanOutCol', 'cleanFmtCol', 'cleanDupKeyCol'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const prevVal = el.value;
+        let opts = '';
+        if (id === 'cleanMissCol') opts += '<option value="__all__">-- All Columns with Missing Values --</option>';
+        if (id === 'cleanFmtCol') opts += '<option value="__all_text__">-- All Text / Categorical Columns --</option>';
+        cols.forEach(c => {
+          if (id === 'cleanOutCol' && !isColNumeric(c)) return;
+          opts += `<option value="${c}">${c}</option>`;
+        });
+        el.innerHTML = opts;
+        if (prevVal && Array.from(el.options).some(o => o.value === prevVal)) el.value = prevVal;
+      });
+    }
+
+    // -----------------------------------------------------------------
+    // 1. MISSING-VALUE HANDLING
+    // -----------------------------------------------------------------
+    function handleImputeStratChange() {
+      const strat = document.getElementById('cleanMissStrat')?.value;
+      const constBox = document.getElementById('cleanMissConstantBox');
+      const dropThreshBox = document.getElementById('cleanMissDropThreshBox');
+      if (constBox) constBox.style.display = (strat === 'constant') ? 'block' : 'none';
+      if (dropThreshBox) dropThreshBox.style.display = (strat === 'drop_cols') ? 'block' : 'none';
+    }
+
+    function updateImputeRecommendations() {
+      const col = document.getElementById('cleanMissCol')?.value;
+      const badge = document.getElementById('imputeBadgeInfo');
+      if (!col || col === '__all__' || !currentDataset || !currentDataset.length) {
+        if (badge) badge.textContent = "Select Column";
+        return;
+      }
+      const isNum = isColNumeric(col);
+      const missingCount = currentDataset.filter(r => isMissing(r[col])).length;
+      const pct = ((missingCount / currentDataset.length) * 100).toFixed(1);
+      if (badge) {
+        badge.textContent = `${col} (${isNum ? 'Numeric' : 'Category'} - ${missingCount} missing / ${pct}%)`;
+      }
+    }
+
+    function renderMissingColMatrix() {
+      const container = document.getElementById('cleanMissingColMatrix');
+      const summaryBadge = document.getElementById('cleanMissingSummaryBadge');
+      if (!container || !currentDataset || !currentDataset.length) return;
+
+      const totalRows = currentDataset.length;
+      let totalMissing = 0;
+      let html = '';
+
+      columns.forEach(col => {
+        const miss = currentDataset.filter(r => isMissing(r[col])).length;
+        totalMissing += miss;
+        const pct = ((miss / totalRows) * 100).toFixed(1);
+        const isNum = isColNumeric(col);
+        html += `
+          <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:8px 10px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span style="font-weight:600; color:var(--text);">${col}</span>
+              <span style="font-size:0.7rem; color:var(--text-muted); margin-left:6px;">(${isNum ? 'Numeric' : 'Categorical'})</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:70px; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; overflow:hidden;">
+                <div style="width:${pct}%; height:100%; background:${parseFloat(pct) > 20 ? '#ef4444' : parseFloat(pct) > 0 ? '#f59e0b' : '#10b981'};"></div>
+              </div>
+              <span style="font-weight:700; color:${miss > 0 ? '#f59e0b' : '#10b981'}; min-width:48px; text-align:right;">${miss} (${pct}%)</span>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html || '<div style="color:var(--text-muted);">No columns found</div>';
+      if (summaryBadge) summaryBadge.textContent = `${totalMissing.toLocaleString()} missing cells`;
+    }
+
+    function executeMissingValueAction() {
+      notifyTaskStart("Missing-Value Handling");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Missing-Value Handling", "No active dataset loaded.");
+        return;
+      }
+      const targetCol = document.getElementById('cleanMissCol')?.value;
+      const strat = document.getElementById('cleanMissStrat')?.value || 'median';
+      const colsToProcess = (targetCol === '__all__') ? columns.filter(c => currentDataset.some(r => isMissing(r[c]))) : [targetCol];
+
+      if (!colsToProcess.length) {
+        notifyTaskFailed("Missing-Value Handling", "No columns with missing values found.");
+        return;
+      }
+
+      pushCleaningState(`Missing Values [${strat}] on ${targetCol}`, { type: "missing", strategy: strat, targetCol });
+
+      let affectedCells = 0;
+      let droppedRowsCount = 0;
+      let droppedColsCount = 0;
+
+      if (strat === 'drop_rows') {
+        const beforeLen = currentDataset.length;
+        currentDataset = currentDataset.filter(r => {
+          return !colsToProcess.some(c => isMissing(r[c]));
+        });
+        droppedRowsCount = beforeLen - currentDataset.length;
+        cleaningLogList.unshift(`🗑️ [Drop Rows] Removed ${droppedRowsCount} row(s) containing missing values across ${colsToProcess.join(', ')}.`);
+      } else if (strat === 'drop_cols') {
+        const thresh = parseFloat(document.getElementById('cleanMissDropThresh')?.value || '50') / 100;
+        const colsToDrop = colsToProcess.filter(c => {
+          const m = currentDataset.filter(r => isMissing(r[c])).length;
+          return (m / currentDataset.length) >= thresh;
+        });
+        colsToDrop.forEach(c => {
+          currentDataset.forEach(r => delete r[c]);
+          columns = columns.filter(col => col !== c);
+          droppedColsCount++;
+        });
+        cleaningLogList.unshift(`✂️ [Drop Columns] Dropped ${droppedColsCount} column(s) exceeding missingness threshold (${colsToDrop.join(', ')}).`);
+      } else {
+        colsToProcess.forEach(c => {
+          const isNum = isColNumeric(c);
+          let replacement = null;
+
+          if (strat === 'ai_recommend') {
+            // Auto choose optimal strategy based on distribution
+            if (isNum) {
+              const nums = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a,b) => a - b);
+              const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+              const median = nums[Math.floor(nums.length / 2)];
+              const isSkewed = Math.abs(mean - median) > (mean * 0.1);
+              replacement = isSkewed ? median : Math.round(mean * 100) / 100;
+            } else {
+              replacement = getColumnMode(c);
+            }
+          } else if (strat === 'mean') {
+            const nums = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v));
+            replacement = nums.length ? (Math.round((nums.reduce((a, b) => a + b, 0) / nums.length) * 100) / 100) : 0;
+          } else if (strat === 'median') {
+            const nums = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a,b) => a - b);
+            replacement = nums.length ? nums[Math.floor(nums.length / 2)] : 0;
+          } else if (strat === 'mode') {
+            replacement = getColumnMode(c);
+          } else if (strat === 'constant') {
+            replacement = document.getElementById('cleanMissConstantVal')?.value || (isNum ? 0 : "Unknown");
+            if (isNum && !isNaN(parseFloat(replacement))) replacement = parseFloat(replacement);
+          }
+
+          if (strat === 'ffill') {
+            let lastVal = null;
+            currentDataset.forEach(r => {
+              if (!isMissing(r[c])) lastVal = r[c];
+              else if (lastVal !== null) { r[c] = lastVal; affectedCells++; }
+            });
+          } else if (strat === 'bfill') {
+            let nextVal = null;
+            for (let i = currentDataset.length - 1; i >= 0; i--) {
+              if (!isMissing(currentDataset[i][c])) nextVal = currentDataset[i][c];
+              else if (nextVal !== null) { currentDataset[i][c] = nextVal; affectedCells++; }
+            }
+          } else if (strat === 'interpolate') {
+            // Linear interpolation for numeric sequences
+            for (let i = 0; i < currentDataset.length; i++) {
+              if (isMissing(currentDataset[i][c])) {
+                let p = i - 1;
+                while (p >= 0 && isMissing(currentDataset[p][c])) p--;
+                let n = i + 1;
+                while (n < currentDataset.length && isMissing(currentDataset[n][c])) n++;
+
+                if (p >= 0 && n < currentDataset.length) {
+                  const vp = parseFloat(currentDataset[p][c]) || 0;
+                  const vn = parseFloat(currentDataset[n][c]) || 0;
+                  currentDataset[i][c] = Math.round((vp + (vn - vp) * ((i - p) / (n - p))) * 100) / 100;
+                  affectedCells++;
+                } else if (p >= 0) {
+                  currentDataset[i][c] = currentDataset[p][c];
+                  affectedCells++;
+                } else if (n < currentDataset.length) {
+                  currentDataset[i][c] = currentDataset[n][c];
+                  affectedCells++;
+                }
+              }
+            }
+          } else if (strat === 'knn') {
+            // KNN Imputation (k=3) based on Euclidean distance on other numeric features
+            const numCols = columns.filter(col => col !== c && isColNumeric(col));
+            currentDataset.forEach((row, rIdx) => {
+              if (isMissing(row[c])) {
+                const distances = [];
+                currentDataset.forEach((otherRow, oIdx) => {
+                  if (rIdx === oIdx || isMissing(otherRow[c])) return;
+                  let dist = 0;
+                  numCols.forEach(nc => {
+                    const diff = (parseFloat(row[nc]) || 0) - (parseFloat(otherRow[nc]) || 0);
+                    dist += diff * diff;
+                  });
+                  distances.push({ val: parseFloat(otherRow[c]), dist: Math.sqrt(dist) });
+                });
+                distances.sort((a, b) => a.dist - b.dist);
+                const k = Math.min(3, distances.length);
+                if (k > 0) {
+                  const knnAvg = distances.slice(0, k).reduce((acc, d) => acc + d.val, 0) / k;
+                  row[c] = Math.round(knnAvg * 100) / 100;
+                  affectedCells++;
+                }
+              }
+            });
+          } else if (replacement !== null) {
+            currentDataset.forEach(r => {
+              if (isMissing(r[c])) {
+                r[c] = replacement;
+                affectedCells++;
+              }
+            });
+          }
+        });
+
+        cleaningLogList.unshift(`🧩 [Imputation - ${strat}] Imputed ${affectedCells} missing cell(s) across column(s): ${colsToProcess.join(', ')}.`);
+      }
+
+      updateUI();
+      renderCleaningWorkspaceAll();
+      notifyTaskSuccess("Missing-Value Handling", `Applied ${strat}: ${affectedCells} cell(s) imputed, ${droppedRowsCount} row(s) dropped.`);
+    }
+
+    function getColumnMode(c) {
+      const freq = {};
+      currentDataset.forEach(r => {
+        if (!isMissing(r[c])) {
+          const k = String(r[c]);
+          freq[k] = (freq[k] || 0) + 1;
+        }
+      });
+      let modeVal = null, maxCnt = -1;
+      Object.entries(freq).forEach(([k, cnt]) => {
+        if (cnt > maxCnt) { maxCnt = cnt; modeVal = k; }
+      });
+      return modeVal || "Unknown";
+    }
+
+    // -----------------------------------------------------------------
+    // 2. DUPLICATE HANDLING
+    // -----------------------------------------------------------------
+    function detectDuplicatesUI() {
+      if (!currentDataset || !currentDataset.length) return;
+      const scope = document.getElementById('cleanDupScope')?.value || 'all_cols';
+      const keyCol = document.getElementById('cleanDupKeyCol')?.value;
+      const clustersBadge = document.getElementById('cleanDupClustersBadge');
+      const statusBadge = document.getElementById('cleanDupStatusBadge');
+      const container = document.getElementById('cleanDupGroupsContainer');
+
+      const clusters = {};
+      currentDataset.forEach((r, idx) => {
+        const hash = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+        if (!clusters[hash]) clusters[hash] = [];
+        clusters[hash].push(idx);
+      });
+
+      const dupClusters = Object.values(clusters).filter(arr => arr.length > 1);
+      const totalDupRows = dupClusters.reduce((acc, c) => acc + c.length, 0);
+
+      if (clustersBadge) clustersBadge.textContent = `${dupClusters.length} Groups (${totalDupRows} Rows)`;
+      if (statusBadge) statusBadge.textContent = dupClusters.length > 0 ? `Detected ${dupClusters.length} Groups` : "No Duplicates Found";
+
+      if (!dupClusters.length) {
+        if (container) container.innerHTML = '<div style="padding:20px; text-align:center; color:#10b981; font-weight:700;">✓ 100% Unique: Zero duplicate clusters detected in active dataset.</div>';
+        return;
+      }
+
+      let html = '<table style="width:100%; border-collapse:collapse; font-size:0.75rem;">';
+      html += '<thead style="background:rgba(255,255,255,0.05);"><tr><th style="padding:6px;">Group</th><th style="padding:6px;">Occurrences</th><th style="padding:6px;">Row Indices</th><th style="padding:6px;">Sample Data</th></tr></thead><tbody>';
+
+      dupClusters.slice(0, 20).forEach((group, gIdx) => {
+        const sampleRow = currentDataset[group[0]];
+        const previewStr = Object.values(sampleRow).slice(0, 3).join(', ');
+        html += `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:6px; color:#f59e0b; font-weight:700;">#${gIdx + 1}</td>
+            <td style="padding:6px;"><span class="badge badge-warning" style="font-size:0.68rem;">${group.length} duplicates</span></td>
+            <td style="padding:6px; color:var(--text-muted); font-family:monospace;">Rows: ${group.slice(0, 5).map(i => i + 1).join(', ')}${group.length > 5 ? '...' : ''}</td>
+            <td style="padding:6px; color:var(--text-muted); font-family:monospace;">${previewStr.slice(0, 40)}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table>';
+      if (container) container.innerHTML = html;
+    }
+
+    function executeDeduplication() {
+      notifyTaskStart("Deduplication");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Deduplication", "No active dataset loaded.");
+        return;
+      }
+      const scope = document.getElementById('cleanDupScope')?.value || 'all_cols';
+      const keyCol = document.getElementById('cleanDupKeyCol')?.value;
+      const policy = document.getElementById('cleanDupPolicy')?.value || 'keep_first';
+
+      pushCleaningState(`Deduplication [Scope: ${scope}, Policy: ${policy}]`, { type: "dedup", scope, keyCol, policy });
+
+      const beforeCount = currentDataset.length;
+      const seen = new Map();
+
+      if (policy === 'keep_first') {
+        currentDataset = currentDataset.filter(r => {
+          const key = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+          if (seen.has(key)) return false;
+          seen.set(key, true);
+          return true;
+        });
+      } else if (policy === 'keep_last') {
+        const lastIndices = new Map();
+        currentDataset.forEach((r, idx) => {
+          const key = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+          lastIndices.set(key, idx);
+        });
+        currentDataset = currentDataset.filter((r, idx) => {
+          const key = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+          return lastIndices.get(key) === idx;
+        });
+      } else if (policy === 'remove_all') {
+        const counts = new Map();
+        currentDataset.forEach(r => {
+          const key = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+          counts.set(key, (counts.get(key) || 0) + 1);
+        });
+        currentDataset = currentDataset.filter(r => {
+          const key = (scope === 'key_col' && keyCol) ? String(r[keyCol] ?? '') : JSON.stringify(r);
+          return counts.get(key) === 1;
+        });
+      }
+
+      const dropped = beforeCount - currentDataset.length;
+      cleaningLogList.unshift(`👥 [Deduplication] Removed ${dropped} duplicate row(s) (Policy: ${policy}, Scope: ${scope}). Active rows: ${currentDataset.length.toLocaleString()}`);
+
+      updateUI();
+      renderCleaningWorkspaceAll();
+      notifyTaskSuccess("Deduplication", `Removed ${dropped} duplicate record(s). Active rows: ${currentDataset.length.toLocaleString()}`);
+    }
+
+    // -----------------------------------------------------------------
+    // 3. OUTLIER HANDLING (MULTI-ALGORITHM)
+    // -----------------------------------------------------------------
+    function handleOutlierAlgoChange() {
+      updateOutlierAuditPreview();
+    }
+
+    function updateOutlierAuditPreview() {
+      const col = document.getElementById('cleanOutCol')?.value;
+      const algo = document.getElementById('cleanOutAlgo')?.value || 'iqr';
+      const container = document.getElementById('cleanOutlierProfileContainer');
+      const countBadge = document.getElementById('cleanOutlierCountBadge');
+      if (!container || !col || !currentDataset || !currentDataset.length) return;
+
+      const nums = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a,b) => a - b);
+      if (nums.length < 4) {
+        container.innerHTML = `<div style="color:var(--text-muted);">Column '${col}' has fewer than 4 numerical records for outlier profiling.</div>`;
+        return;
+      }
+
+      const q1 = nums[Math.floor(nums.length * 0.25)];
+      const q3 = nums[Math.floor(nums.length * 0.75)];
+      const iqr = q3 - q1;
+      const mult = (algo === 'iqr_extreme') ? 3.0 : 1.5;
+      const iqrLow = Math.round((q1 - mult * iqr) * 100) / 100;
+      const iqrHigh = Math.round((q3 + mult * iqr) * 100) / 100;
+
+      const sum = nums.reduce((a, b) => a + b, 0);
+      const mean = sum / nums.length;
+      const variance = nums.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / nums.length;
+      const std = Math.sqrt(variance);
+      const zLow = Math.round((mean - 3 * std) * 100) / 100;
+      const zHigh = Math.round((mean + 3 * std) * 100) / 100;
+
+      // Detect outliers based on algo
+      let outliers = [];
+      if (algo.startsWith('iqr')) {
+        outliers = nums.filter(v => v < iqrLow || v > iqrHigh);
+      } else if (algo === 'zscore') {
+        outliers = nums.filter(v => v < zLow || v > zHigh);
+      } else if (algo === 'mod_zscore') {
+        const median = nums[Math.floor(nums.length / 2)];
+        const diffs = nums.map(v => Math.abs(v - median)).sort((a,b) => a - b);
+        const mad = diffs[Math.floor(diffs.length / 2)] || 1e-6;
+        outliers = nums.filter(v => ((0.6745 * Math.abs(v - median)) / mad) > 3.5);
+      } else {
+        // Isolation Forest / LOF simulation
+        const lowCut = nums[Math.floor(nums.length * 0.025)];
+        const highCut = nums[Math.floor(nums.length * 0.975)];
+        outliers = nums.filter(v => v < lowCut || v > highCut);
+      }
+
+      if (countBadge) countBadge.textContent = `${outliers.length} Outliers (${((outliers.length / nums.length)*100).toFixed(1)}%)`;
+
+      container.innerHTML = `
+        <div style="background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); padding:12px; border-radius:6px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span><b>Algorithm:</b> ${algo.toUpperCase()}</span>
+            <span style="color:#f59e0b; font-weight:700;">${outliers.length} Outliers Detected</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
+            <div><b>Lower Fence:</b> ${iqrLow}</div>
+            <div><b>Upper Fence:</b> ${iqrHigh}</div>
+            <div><b>Mean &plusmn; 3&sigma;:</b> [${zLow}, ${zHigh}]</div>
+            <div><b>Interquartile Spread:</b> ${iqr.toFixed(2)}</div>
+          </div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">
+            <b>Sample Outlier Values:</b> ${outliers.slice(0, 8).join(', ')}${outliers.length > 8 ? '...' : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function executeOutlierTreatment() {
+      notifyTaskStart("Outlier Treatment");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Outlier Treatment", "No active dataset loaded.");
+        return;
+      }
+      const col = document.getElementById('cleanOutCol')?.value;
+      const algo = document.getElementById('cleanOutAlgo')?.value || 'iqr';
+      const action = document.getElementById('cleanOutAction')?.value || 'cap';
+
+      if (!col) {
+        notifyTaskFailed("Outlier Treatment", "Please select a target numeric column.");
+        return;
+      }
+
+      pushCleaningState(`Outlier [${algo} -> ${action}] on ${col}`, { type: "outlier", col, algo, action });
+
+      const nums = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a,b) => a - b);
+      if (nums.length < 4) {
+        notifyTaskFailed("Outlier Treatment", "Insufficient numerical records.");
+        return;
+      }
+
+      const q1 = nums[Math.floor(nums.length * 0.25)];
+      const q3 = nums[Math.floor(nums.length * 0.75)];
+      const iqr = q3 - q1;
+      const mult = (algo === 'iqr_extreme') ? 3.0 : 1.5;
+      const lowFence = Math.round((q1 - mult * iqr) * 100) / 100;
+      const highFence = Math.round((q3 + mult * iqr) * 100) / 100;
+
+      const sum = nums.reduce((a, b) => a + b, 0);
+      const mean = sum / nums.length;
+      const median = nums[Math.floor(nums.length / 2)];
+      const variance = nums.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / nums.length;
+      const std = Math.sqrt(variance);
+
+      // Detection predicate
+      const isOutlier = (val) => {
+        if (isNaN(val) || val === null || val === undefined) return false;
+        if (algo.startsWith('iqr')) return val < lowFence || val > highFence;
+        if (algo === 'zscore') return Math.abs(val - mean) > 3 * std;
+        if (algo === 'mod_zscore') {
+          const mad = nums.map(v => Math.abs(v - median)).sort((a,b)=>a-b)[Math.floor(nums.length/2)] || 1e-6;
+          return ((0.6745 * Math.abs(val - median)) / mad) > 3.5;
+        }
+        // Isolation forest simulation
+        return val < nums[Math.floor(nums.length * 0.025)] || val > nums[Math.floor(nums.length * 0.975)];
+      };
+
+      let affected = 0;
+      if (action === 'remove') {
+        const before = currentDataset.length;
+        currentDataset = currentDataset.filter(r => !isOutlier(parseFloat(r[col])));
+        affected = before - currentDataset.length;
+        cleaningLogList.unshift(`🎯 [Outlier Removal] Dropped ${affected} outlier row(s) from '${col}'.`);
+      } else if (action === 'cap') {
+        currentDataset.forEach(r => {
+          const v = parseFloat(r[col]);
+          if (!isNaN(v) && isOutlier(v)) {
+            if (v < lowFence) { r[col] = lowFence; affected++; }
+            else if (v > highFence) { r[col] = highFence; affected++; }
+          }
+        });
+        cleaningLogList.unshift(`🎯 [Outlier Winsorization] Capped ${affected} outlier value(s) in '${col}' to fences [${lowFence}, ${highFence}].`);
+      } else if (action === 'replace_median') {
+        currentDataset.forEach(r => {
+          const v = parseFloat(r[col]);
+          if (!isNaN(v) && isOutlier(v)) { r[col] = median; affected++; }
+        });
+        cleaningLogList.unshift(`🎯 [Outlier Replacement] Replaced ${affected} outlier(s) in '${col}' with Median (${median}).`);
+      } else if (action === 'replace_mean') {
+        const cleanMean = Math.round(mean * 100) / 100;
+        currentDataset.forEach(r => {
+          const v = parseFloat(r[col]);
+          if (!isNaN(v) && isOutlier(v)) { r[col] = cleanMean; affected++; }
+        });
+        cleaningLogList.unshift(`🎯 [Outlier Replacement] Replaced ${affected} outlier(s) in '${col}' with Mean (${cleanMean}).`);
+      } else if (action === 'flag') {
+        const flagCol = `${col}_is_outlier`;
+        if (!columns.includes(flagCol)) columns.push(flagCol);
+        currentDataset.forEach(r => {
+          const v = parseFloat(r[col]);
+          const out = isOutlier(v);
+          r[flagCol] = out ? true : false;
+          if (out) affected++;
+        });
+        cleaningLogList.unshift(`🎯 [Outlier Flagging] Created flag column '${flagCol}', tagged ${affected} anomalies.`);
+      } else {
+        showToast("Outlier audit retained without modification.", "info");
+      }
+
+      updateUI();
+      renderCleaningWorkspaceAll();
+      notifyTaskSuccess("Outlier Treatment", `Applied ${algo} (${action}): ${affected} record(s) affected.`);
+    }
+
+    // -----------------------------------------------------------------
+    // 4. DATA-FORMAT CLEANING & NORMALIZATION
+    // -----------------------------------------------------------------
+    function handleFormatOpChange() {
+      const op = document.getElementById('cleanFmtOp')?.value;
+      const typeBox = document.getElementById('cleanFmtTypeBox');
+      const replaceBox = document.getElementById('cleanFmtReplaceBox');
+      if (typeBox) typeBox.style.display = (op === 'type_coerce') ? 'block' : 'none';
+      if (replaceBox) replaceBox.style.display = (op === 'replace_inconsistent') ? 'block' : 'none';
+    }
+
+    function executeFormatCleaning() {
+      notifyTaskStart("Format Cleaning");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Format Cleaning", "No active dataset loaded.");
+        return;
+      }
+      const targetCol = document.getElementById('cleanFmtCol')?.value;
+      const op = document.getElementById('cleanFmtOp')?.value || 'trim';
+      const colsToProcess = (targetCol === '__all_text__')
+        ? columns.filter(c => !isColNumeric(c))
+        : [targetCol];
+
+      if (!colsToProcess.length) {
+        notifyTaskFailed("Format Cleaning", "No target columns selected.");
+        return;
+      }
+
+      pushCleaningState(`Format [${op}] on ${targetCol}`, { type: "format", op, targetCol });
+
+      let affected = 0;
+      colsToProcess.forEach(c => {
+        currentDataset.forEach(r => {
+          if (r[c] === null || r[c] === undefined) return;
+          const orig = r[c];
+          let str = String(r[c]);
+
+          if (op === 'trim') {
+            r[c] = str.trim().replace(/\s+/g, ' ');
+          } else if (op === 'upper') {
+            r[c] = str.toUpperCase();
+          } else if (op === 'lower') {
+            r[c] = str.toLowerCase();
+          } else if (op === 'title') {
+            r[c] = str.toLowerCase().replace(/\b(\w)/g, m => m.toUpperCase());
+          } else if (op === 'sentence') {
+            r[c] = str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+          } else if (op === 'normalize_cat') {
+            r[c] = str.trim().toLowerCase().replace(/[-_\.]/g, ' ').replace(/\s+/g, ' ').replace(/\b(\w)/g, m => m.toUpperCase());
+          } else if (op === 'remove_special') {
+            r[c] = str.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+          } else if (op === 'parse_dates') {
+            const dt = new Date(str);
+            if (!isNaN(dt.getTime())) {
+              r[c] = dt.toISOString().split('T')[0];
+            }
+          } else if (op === 'currency') {
+            const cleanNum = parseFloat(str.replace(/[$€£¥,]/g, '').trim());
+            if (!isNaN(cleanNum)) r[c] = cleanNum;
+          } else if (op === 'units') {
+            const cleanNum = parseFloat(str.replace(/[a-zA-Z%]/g, '').trim());
+            if (!isNaN(cleanNum)) r[c] = cleanNum;
+          } else if (op === 'type_coerce') {
+            const t = document.getElementById('cleanFmtTargetType')?.value || 'string';
+            if (t === 'numeric') {
+              const num = parseFloat(str);
+              r[c] = isNaN(num) ? 0 : num;
+            } else if (t === 'boolean') {
+              r[c] = ['true', '1', 'yes', 'y'].includes(str.toLowerCase());
+            } else if (t === 'date') {
+              const dt = new Date(str);
+              r[c] = !isNaN(dt.getTime()) ? dt.toISOString().split('T')[0] : str;
+            } else {
+              r[c] = str;
+            }
+          } else if (op === 'replace_inconsistent') {
+            const findVal = document.getElementById('cleanFmtFindVal')?.value || '';
+            const repVal = document.getElementById('cleanFmtReplaceVal')?.value || '';
+            if (findVal && str.includes(findVal)) {
+              r[c] = str.replaceAll(findVal, repVal);
+            }
+          }
+
+          if (r[c] !== orig) affected++;
+        });
+      });
+
+      cleaningLogList.unshift(`🔤 [Format - ${op}] Standardized ${affected} cell(s) across: ${colsToProcess.join(', ')}.`);
+      updateUI();
+      renderCleaningWorkspaceAll();
+      notifyTaskSuccess("Format Cleaning", `Applied ${op}: ${affected} cell(s) formatted.`);
+    }
+
+    // -----------------------------------------------------------------
+    // 5. BEFORE VS AFTER DIFF VIEWER
+    // -----------------------------------------------------------------
+    function renderBeforeAfterDiff(onlyModified = false) {
+      const container = document.getElementById('cleanDiffTableContainer');
+      const metricsContainer = document.getElementById('cleanDiffMetricsCards');
+      if (!container || !currentDataset) return;
+
+      const raw = window.cleaningInitialSnapshot || rawDataset || currentDataset;
+      const cur = currentDataset;
+
+      const rawRows = raw.length;
+      const curRows = cur.length;
+      const rowDelta = curRows - rawRows;
+
+      let rawMissing = 0;
+      raw.forEach(r => columns.forEach(c => { if (isMissing(r[c])) rawMissing++; }));
+      let curMissing = 0;
+      cur.forEach(r => columns.forEach(c => { if (isMissing(r[c])) curMissing++; }));
+      const missDelta = curMissing - rawMissing;
+
+      // Quality scores
+      const rawQuality = Math.max(10, Math.min(100, Math.round(100 - (rawMissing / ((rawRows * columns.length) || 1)) * 100)));
+      const curQuality = Math.max(10, Math.min(100, Math.round(100 - (curMissing / ((curRows * columns.length) || 1)) * 100)));
+      const qualityDelta = curQuality - rawQuality;
+
+      if (metricsContainer) {
+        metricsContainer.innerHTML = `
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Rows (Before &rarr; After)</div>
+            <div style="font-size:1.1rem; font-weight:800; color:var(--text);">${curRows.toLocaleString()} <span style="font-size:0.75rem; color:${rowDelta<0?'#ef4444':'#10b981'};">(${rowDelta>=0?'+':''}${rowDelta})</span></div>
+          </div>
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Missing Cells</div>
+            <div style="font-size:1.1rem; font-weight:800; color:var(--text);">${curMissing} <span style="font-size:0.75rem; color:#10b981;">(${missDelta<=0?missDelta:'+'+missDelta})</span></div>
+          </div>
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Data Hygiene Score</div>
+            <div style="font-size:1.1rem; font-weight:800; color:#10b981;">${curQuality}/100 <span style="font-size:0.75rem; color:#10b981;">(+${qualityDelta} pts)</span></div>
+          </div>
+          <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">Pipeline Recipe Steps</div>
+            <div style="font-size:1.1rem; font-weight:800; color:#4f46e5;">${window.cleaningPipelineSteps.length} Steps</div>
+          </div>
+        `;
+      }
+
+      // Diff Table
+      const maxRows = 50;
+      let html = '<table style="width:100%; border-collapse:collapse; font-size:0.74rem;">';
+      html += '<thead style="background:rgba(255,255,255,0.05); position:sticky; top:0;"><tr>';
+      html += '<th style="padding:6px 10px; border-bottom:1px solid var(--card-border);">#</th>';
+      columns.forEach(c => html += `<th style="padding:6px 10px; border-bottom:1px solid var(--card-border);">${c}</th>`);
+      html += '</tr></thead><tbody>';
+
+      let rendered = 0;
+      for (let i = 0; i < cur.length && rendered < maxRows; i++) {
+        const curR = cur[i];
+        const rawR = raw[i];
+        const isModified = rawR && columns.some(c => curR[c] !== rawR[c]);
+
+        if (onlyModified && !isModified) continue;
+
+        html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04); background:${isModified ? 'rgba(16,185,129,0.08)' : 'transparent'};">`;
+        html += `<td style="padding:5px 8px; color:var(--text-muted);">${i + 1} ${isModified ? '✏️' : ''}</td>`;
+        columns.forEach(c => {
+          const cv = curR[c];
+          const rv = rawR ? rawR[c] : undefined;
+          const cellChanged = (rv !== undefined && cv !== rv);
+          html += `<td style="padding:5px 8px; color:${cellChanged ? '#10b981' : 'var(--text)'}; font-weight:${cellChanged ? '700' : 'normal'};">
+            ${cv ?? ''}
+            ${cellChanged ? `<span style="font-size:0.65rem; color:#94a3b8; text-decoration:line-through; display:block;">${rv ?? 'null'}</span>` : ''}
+          </td>`;
+        });
+        html += '</tr>';
+        rendered++;
+      }
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    }
+
+    // -----------------------------------------------------------------
+    // 6. PIPELINE EXPORT & REPLAY ENGINE
+    // -----------------------------------------------------------------
+    function saveCleaningPipelineJSON() {
+      const pipeline = {
+        name: "DataMind AI Automated Cleaning Pipeline",
+        version: "2.5.0",
+        exportedAt: new Date().toISOString(),
+        datasetColumns: columns,
+        steps: window.cleaningPipelineSteps
+      };
+      const blob = new Blob([JSON.stringify(pipeline, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `DataMind_Cleaning_Pipeline_${Date.now()}.json`;
+      a.click();
+      showToast("Exported Cleaning Pipeline JSON recipe!", "success");
+    }
+
+    function loadCleaningPipelineJSON(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const pipeline = JSON.parse(e.target.result);
+          if (!pipeline.steps || !Array.isArray(pipeline.steps)) {
+            showToast("Invalid cleaning pipeline format", "error");
+            return;
+          }
+          showToast(`Replaying ${pipeline.steps.length} pipeline step(s)...`, "info");
+          pipeline.steps.forEach(step => {
+            // Replay steps
+            if (step.type === 'missing') {
+              if (document.getElementById('cleanMissCol')) document.getElementById('cleanMissCol').value = step.targetCol;
+              if (document.getElementById('cleanMissStrat')) document.getElementById('cleanMissStrat').value = step.strategy;
+              executeMissingValueAction();
+            } else if (step.type === 'dedup') {
+              if (document.getElementById('cleanDupPolicy')) document.getElementById('cleanDupPolicy').value = step.policy;
+              executeDeduplication();
+            } else if (step.type === 'outlier') {
+              if (document.getElementById('cleanOutCol')) document.getElementById('cleanOutCol').value = step.col;
+              if (document.getElementById('cleanOutAlgo')) document.getElementById('cleanOutAlgo').value = step.algo;
+              if (document.getElementById('cleanOutAction')) document.getElementById('cleanOutAction').value = step.action;
+              executeOutlierTreatment();
+            } else if (step.type === 'format') {
+              if (document.getElementById('cleanFmtCol')) document.getElementById('cleanFmtCol').value = step.targetCol;
+              if (document.getElementById('cleanFmtOp')) document.getElementById('cleanFmtOp').value = step.op;
+              executeFormatCleaning();
+            }
+          });
+          showToast("Pipeline recipe replayed successfully!", "success");
+        } catch(err) {
+          showToast("Failed to parse pipeline JSON: " + err.message, "error");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // 1-Click Auto-Clean (Enhanced to push undo state & pipeline record)
     function runOneClickAutoClean() {
       notifyTaskStart("1-Click AI Auto-Clean");
       if (!currentDataset || !currentDataset.length) {
@@ -8648,6 +9753,8 @@ result = df.describe()
         return;
       }
       try {
+        pushCleaningState("1-Click AI Auto-Clean", { type: "one_click_auto_clean" });
+
         const rowsBefore = currentDataset.length;
         const seen = new Set();
         currentDataset = currentDataset.filter(r => {
@@ -8696,21 +9803,11 @@ result = df.describe()
             }
           } else {
             // Mode imputation for categoricals
-            const freqMap = {};
-            currentDataset.forEach(r => {
-              if (!isMissing(r[c])) {
-                const k = String(r[c]);
-                freqMap[k] = (freqMap[k] || 0) + 1;
-              }
-            });
-            let modeK = null, maxC = -1;
-            Object.entries(freqMap).forEach(([k, cnt]) => {
-              if (cnt > maxC) { maxC = cnt; modeK = k; }
-            });
-            if (modeK !== null) {
+            const modeVal = getColumnMode(c);
+            if (modeVal !== null) {
               currentDataset.forEach(r => {
                 if (isMissing(r[c])) {
-                  r[c] = modeK;
+                  r[c] = modeVal;
                   imputedMissingCount++;
                 }
               });
@@ -8720,201 +9817,16 @@ result = df.describe()
 
         cleaningLogList.unshift(`✨ [1-Click Auto-Clean] Deduplicated ${dupsRemoved} row(s), imputed ${imputedMissingCount} missing cell(s), and capped ${cappedOutliersCount} outlier values.`);
         updateUI();
+        renderCleaningWorkspaceAll();
         notifyTaskSuccess("1-Click AI Auto-Clean", `Deduplicated ${dupsRemoved} row(s), imputed ${imputedMissingCount} cell(s), capped ${cappedOutliersCount} outlier(s).`);
       } catch (err) {
         notifyTaskFailed("1-Click AI Auto-Clean", err && err.message ? err.message : String(err));
       }
     }
 
-    function applyImputation() {
-      notifyTaskStart("Missing Value Imputation");
-      if (!currentDataset || !currentDataset.length) {
-        notifyTaskFailed("Missing Value Imputation", "No active dataset loaded. Please upload a CSV first.");
-        return;
-      }
-      const colSelect = document.getElementById("cleanMissCol");
-      const col = colSelect ? colSelect.value : "";
-      const strat = document.getElementById("cleanMissStrat") ? document.getElementById("cleanMissStrat").value : "median";
-      if (!col) {
-        notifyTaskFailed("Missing Value Imputation", "Please select a target column to impute.");
-        return;
-      }
-
-      const initialMissing = currentDataset.filter(r => isMissing(r[col])).length;
-      if (initialMissing === 0) {
-        notifyTaskFailed("Missing Value Imputation", `Column '${col}' currently has 0 missing values to impute.`);
-        return;
-      }
-
-      try {
-        if (strat === "drop_rows") {
-          const countBefore = currentDataset.length;
-          currentDataset = currentDataset.filter(r => !isMissing(r[col]));
-          const dropped = countBefore - currentDataset.length;
-          cleaningLogList.unshift(`🗑️ [Drop Rows] Removed ${dropped} row(s) containing missing values in '${col}'. (Active rows: ${currentDataset.length.toLocaleString()})`);
-          updateUI();
-          notifyTaskSuccess("Missing Value Imputation", `Dropped ${dropped} row(s) with missing values in '${col}'.`);
-          return;
-        }
-
-        if (strat === "mean") {
-          const validNums = currentDataset
-            .map(r => typeof r[col] === "number" ? r[col] : parseFloat(r[col]))
-            .filter(v => !isNaN(v) && v !== null && v !== undefined);
-
-          if (!validNums.length) {
-            notifyTaskFailed("Missing Value Imputation", `Column '${col}' contains no valid numerical records.`);
-            return;
-          }
-          const meanVal = Math.round((validNums.reduce((a, b) => a + b, 0) / validNums.length) * 100) / 100;
-          let imputed = 0;
-          currentDataset.forEach(r => {
-            if (isMissing(r[col])) {
-              r[col] = meanVal;
-              imputed++;
-            }
-          });
-          cleaningLogList.unshift(`🧩 [Imputation - Mean] Replaced ${imputed} missing cell(s) in '${col}' with calculated Mean (${meanVal}).`);
-          updateUI();
-          notifyTaskSuccess("Missing Value Imputation", `Replaced ${imputed} missing cell(s) in '${col}' with Mean (${meanVal}).`);
-          return;
-        }
-
-        if (strat === "median") {
-          const validNums = currentDataset
-            .map(r => typeof r[col] === "number" ? r[col] : parseFloat(r[col]))
-            .filter(v => !isNaN(v) && v !== null && v !== undefined)
-            .sort((a, b) => a - b);
-
-          if (!validNums.length) {
-            notifyTaskFailed("Missing Value Imputation", `Column '${col}' contains no valid numerical records.`);
-            return;
-          }
-          const mid = Math.floor(validNums.length / 2);
-          const medianVal = validNums.length % 2 !== 0 
-            ? validNums[mid] 
-            : Math.round(((validNums[mid - 1] + validNums[mid]) / 2) * 100) / 100;
-
-          let imputed = 0;
-          currentDataset.forEach(r => {
-            if (isMissing(r[col])) {
-              r[col] = medianVal;
-              imputed++;
-            }
-          });
-          cleaningLogList.unshift(`🧩 [Imputation - Median] Replaced ${imputed} missing cell(s) in '${col}' with calculated Median (${medianVal}).`);
-          updateUI();
-          notifyTaskSuccess("Missing Value Imputation", `Replaced ${imputed} missing cell(s) in '${col}' with Median (${medianVal}).`);
-          return;
-        }
-
-        if (strat === "mode") {
-          const freqMap = {};
-          currentDataset.forEach(r => {
-            if (!isMissing(r[col])) {
-              const key = String(r[col]);
-              freqMap[key] = (freqMap[key] || 0) + 1;
-            }
-          });
-
-          let modeKey = null;
-          let maxCount = -1;
-          Object.entries(freqMap).forEach(([val, count]) => {
-            if (count > maxCount) {
-              maxCount = count;
-              modeKey = val;
-            }
-          });
-
-          if (modeKey === null) {
-            notifyTaskFailed("Missing Value Imputation", `Column '${col}' contains no valid records.`);
-            return;
-          }
-
-          const isNum = isColNumeric(col);
-          const fillVal = isNum && !isNaN(parseFloat(modeKey)) ? parseFloat(modeKey) : modeKey;
-
-          let imputed = 0;
-          currentDataset.forEach(r => {
-            if (isMissing(r[col])) {
-              r[col] = fillVal;
-              imputed++;
-            }
-          });
-          cleaningLogList.unshift(`🧩 [Imputation - Mode] Replaced ${imputed} missing cell(s) in '${col}' with Mode ('${fillVal}').`);
-          updateUI();
-          notifyTaskSuccess("Missing Value Imputation", `Replaced ${imputed} missing cell(s) in '${col}' with Mode ('${fillVal}').`);
-          return;
-        }
-      } catch (err) {
-        notifyTaskFailed("Missing Value Imputation", err && err.message ? err.message : String(err));
-      }
-    }
-
-    function applyOutlierTreatment() {
-      notifyTaskStart("Outlier Treatment (IQR)");
-      if (!currentDataset || !currentDataset.length) {
-        notifyTaskFailed("Outlier Treatment (IQR)", "No active dataset loaded. Please upload a CSV first.");
-        return;
-      }
-      const colSelect = document.getElementById("cleanOutCol");
-      const col = colSelect ? colSelect.value : "";
-      const action = document.getElementById("cleanOutAction") ? document.getElementById("cleanOutAction").value : "cap";
-      if (!col) {
-        notifyTaskFailed("Outlier Treatment (IQR)", "Please select a numeric column for outlier treatment.");
-        return;
-      }
-
-      const validNums = currentDataset
-        .map(r => typeof r[col] === "number" ? r[col] : parseFloat(r[col]))
-        .filter(v => !isNaN(v) && v !== null && v !== undefined)
-        .sort((a, b) => a - b);
-
-      if (validNums.length < 4) {
-        notifyTaskFailed("Outlier Treatment (IQR)", `Column '${col}' needs at least 4 numerical records.`);
-        return;
-      }
-
-      try {
-        const q1 = validNums[Math.floor(validNums.length * 0.25)];
-        const q3 = validNums[Math.floor(validNums.length * 0.75)];
-        const iqr = q3 - q1;
-        const low = Math.round((q1 - 1.5 * iqr) * 100) / 100;
-        const high = Math.round((q3 + 1.5 * iqr) * 100) / 100;
-
-        let affected = 0;
-        if (action === "cap") {
-          currentDataset.forEach(r => {
-            let val = typeof r[col] === "number" ? r[col] : parseFloat(r[col]);
-            if (!isNaN(val) && val !== null && val !== undefined) {
-              if (val < low) {
-                r[col] = low;
-                affected++;
-              } else if (val > high) {
-                r[col] = high;
-                affected++;
-              }
-            }
-          });
-          cleaningLogList.unshift(`🎯 [Outlier Winsorization] Capped ${affected} outlier value(s) in '${col}' to IQR bounds [${low}, ${high}] (Q1=${q1}, Q3=${q3}, IQR=${iqr.toFixed(2)}).`);
-          updateUI();
-          notifyTaskSuccess("Outlier Treatment (IQR)", `Capped ${affected} outlier value(s) in '${col}' to [${low}, ${high}].`);
-        } else {
-          const countBefore = currentDataset.length;
-          currentDataset = currentDataset.filter(r => {
-            let val = typeof r[col] === "number" ? r[col] : parseFloat(r[col]);
-            if (isNaN(val) || val === null || val === undefined) return true; // keep missing for imputation
-            return val >= low && val <= high;
-          });
-          affected = countBefore - currentDataset.length;
-          cleaningLogList.unshift(`🎯 [Outlier Trimming] Removed ${affected} outlier row(s) in '${col}' outside IQR bounds [${low}, ${high}]. (Active rows: ${currentDataset.length.toLocaleString()})`);
-          updateUI();
-          notifyTaskSuccess("Outlier Treatment (IQR)", `Removed ${affected} outlier row(s) outside [${low}, ${high}].`);
-        }
-      } catch (err) {
-        notifyTaskFailed("Outlier Treatment (IQR)", err && err.message ? err.message : String(err));
-      }
-    }
+    // Legacy wrappers for backward compatibility
+    function applyImputation() { executeMissingValueAction(); }
+    function applyOutlierTreatment() { executeOutlierTreatment(); }
 
     function applyNumericTransform() {
       const col = document.getElementById("feNumCol")?.value;
