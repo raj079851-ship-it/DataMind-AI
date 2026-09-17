@@ -2173,7 +2173,17 @@
               <!-- Add Widget Dropdown -->
                             <!-- Manual Custom Chart Button -->
               <button class="btn btn-primary" onclick="dbOpenCustomChartModal()" style="background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-color:#2563eb; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
-                <span>📊 Custom Chart Between Columns</span>
+                <span>📊 Custom Chart</span>
+              </button>
+
+              <!-- Manual Custom KPI Button -->
+              <button class="btn btn-primary" onclick="dbOpenCustomKpiModal()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); border-color:#059669; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+                <span>🎯 Custom KPI Card</span>
+              </button>
+
+              <!-- Manual Slicer / Filter Button -->
+              <button class="btn btn-primary" onclick="dbOpenCustomSlicerModal()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color:#d97706; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+                <span>🎛️ Add Slicer / Filter</span>
               </button>
 
               <div style="position:relative; display:inline-block;">
@@ -2183,6 +2193,12 @@
                 <div id="dbAddWidgetDropdown" style="display:none; position:absolute; right:0; top:105%; z-index:100; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); min-width:200px; padding:6px 0;">
                                     <a href="javascript:void(0)" onclick="dbOpenCustomChartModal()" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:#38bdf8; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.06);" onmouseover="this.style.background='rgba(56,189,248,0.1)'" onmouseout="this.style.background='transparent'">
                     <span>📊</span> <span>Manual Chart Between Columns...</span>
+                  </a>
+                                    <a href="javascript:void(0)" onclick="dbOpenCustomKpiModal()" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:#10b981; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.06);" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background='transparent'">
+                    <span>🎯</span> <span>Manual Custom KPI Card...</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbOpenCustomSlicerModal()" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:#f59e0b; font-weight:700; text-decoration:none; border-bottom:1px solid rgba(255,255,255,0.06);" onmouseover="this.style.background='rgba(245,158,11,0.1)'" onmouseout="this.style.background='transparent'">
+                    <span>🎛️</span> <span>Add Slicer / Filter...</span>
                   </a>
                   <a href="javascript:void(0)" onclick="dbAddWidget('kpi')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
                     <span>🎯</span> <span>KPI Metric Card</span>
@@ -2472,6 +2488,153 @@
             <button class="btn btn-secondary" onclick="dbCloseCustomChartModal()">Cancel</button>
             <button class="btn btn-primary" onclick="dbSubmitCustomChart()" style="background:linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-color:#8b5cf6; font-weight:700;">
               ➕ Add Chart to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: MANUAL CUSTOM KPI BUILDER -->
+      <div id="dbCustomKpiModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:10001; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid #10b981; border-radius:12px; width:92%; max-width:580px; max-height:90vh; padding:22px; box-shadow:0 20px 40px rgba(0,0,0,0.7); display:flex; flex-direction:column; gap:14px; overflow-y:auto;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.3rem;">🎯</span>
+              <div>
+                <h4 style="margin:0; font-size:1.15rem; color:var(--text-primary); font-weight:700;">Manual KPI Card Builder</h4>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+                  Configure custom metric, aggregation, formatting, icon, and colors with live preview.
+                </div>
+              </div>
+            </div>
+            <button onclick="dbCloseCustomKpiModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer;">✕</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#38bdf8; margin-bottom:4px;">1. Target Metric Column:</label>
+              <select id="dbManualKpiCol" onchange="dbOnManualKpiChanged()" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;"></select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; font-weight:700; color:#818cf8; margin-bottom:4px;">2. Aggregation:</label>
+              <select id="dbManualKpiAgg" onchange="dbUpdateCustomKpiPreview()" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;">
+                <option value="sum">Sum (Total)</option>
+                <option value="mean">Average (Mean)</option>
+                <option value="count">Count of Records</option>
+                <option value="max">Max Value</option>
+                <option value="min">Min Value</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Format Style:</label>
+              <select id="dbManualKpiFormat" onchange="dbUpdateCustomKpiPreview()" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;">
+                <option value="compact">Compact (12.5M / 4.2K)</option>
+                <option value="currency">Currency ($)</option>
+                <option value="percentage">Percentage (%)</option>
+                <option value="decimal">Standard Decimal (0.00)</option>
+                <option value="integer">Integer Count</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Icon:</label>
+              <select id="dbManualKpiIcon" onchange="dbUpdateCustomKpiPreview()" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;">
+                <option value="💰">💰 Money / Revenue</option>
+                <option value="📈">📈 Growth / Trend</option>
+                <option value="🎯">🎯 Target / KPI</option>
+                <option value="👥">👥 Customers / Users</option>
+                <option value="📦">📦 Orders / Units</option>
+                <option value="⚡">⚡ Efficiency / Speed</option>
+                <option value="🏆">🏆 Leader / Top</option>
+                <option value="💎">💎 High Value</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Color Theme:</label>
+              <select id="dbManualKpiColor" onchange="dbUpdateCustomKpiPreview()" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;">
+                <option value="#38bdf8">Cyan Blue</option>
+                <option value="#10b981">Emerald Green</option>
+                <option value="#818cf8">Indigo Velvet</option>
+                <option value="#f59e0b">Amber Gold</option>
+                <option value="#ec4899">Neon Pink</option>
+                <option value="#a855f7">Royal Purple</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Grid Width Span:</label>
+              <select id="dbManualKpiSpan" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;">
+                <option value="3" selected>Quarter Width (3/12)</option>
+                <option value="4">Third Width (4/12)</option>
+                <option value="6">Half Width (6/12)</option>
+                <option value="12">Full Width (12/12)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">KPI Title:</label>
+            <input type="text" id="dbManualKpiTitle" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;" />
+          </div>
+
+          <!-- Live KPI Card Preview -->
+          <div>
+            <span style="font-size:0.75rem; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Live Card Preview:</span>
+            <div id="dbCustomKpiPreviewBox" class="panel" style="margin-bottom:0; padding:16px; border:1px solid var(--card-border); background:rgba(15,23,42,0.7);">
+              <!-- Rendered via dbUpdateCustomKpiPreview -->
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px; padding-top:6px; border-top:1px solid var(--card-border);">
+            <button class="btn btn-secondary" onclick="dbCloseCustomKpiModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="dbSubmitCustomKpi()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); border-color:#059669; font-weight:700;">
+              ➕ Add KPI to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+
+<!-- MODAL: MANUAL CUSTOM SLICER BUILDER -->
+      <div id="dbCustomSlicerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:10001; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid #f59e0b; border-radius:12px; width:92%; max-width:520px; padding:22px; box-shadow:0 20px 40px rgba(0,0,0,0.7); display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--card-border); padding-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.3rem;">🎛️</span>
+              <div>
+                <h4 style="margin:0; font-size:1.15rem; color:var(--text-primary); font-weight:700;">Manual Slicer / Filter Builder</h4>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+                  Add an interactive category slicer to cross-filter all widgets across the canvas.
+                </div>
+              </div>
+            </div>
+            <button onclick="dbCloseCustomSlicerModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer;">✕</button>
+          </div>
+
+          <div>
+            <label style="display:block; font-size:0.75rem; font-weight:700; color:#f59e0b; margin-bottom:4px;">Select Filter Dimension Column:</label>
+            <select id="dbManualSlicerDim" onchange="document.getElementById('dbManualSlicerTitle').value = 'Filter by ' + this.value;" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;"></select>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Grid Width Span:</label>
+              <select id="dbManualSlicerSpan" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;">
+                <option value="4">Third Width (4/12)</option>
+                <option value="6" selected>Half Width (6/12)</option>
+                <option value="8">Two-Thirds (8/12)</option>
+                <option value="12">Full Width (12/12)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Slicer Title:</label>
+              <input type="text" id="dbManualSlicerTitle" value="Filter by Category" style="width:100%; padding:6px 10px; font-size:0.8rem; border-radius:6px;" />
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px; padding-top:6px; border-top:1px solid var(--card-border);">
+            <button class="btn btn-secondary" onclick="dbCloseCustomSlicerModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="dbSubmitCustomSlicer()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color:#d97706; font-weight:700;">
+              ➕ Add Slicer to Canvas
             </button>
           </div>
         </div>
@@ -24659,16 +24822,44 @@ result = df.describe()
         else if (w.agg === 'max') val = vals.length ? Math.max(...vals) : 0;
         else if (w.agg === 'min') val = vals.length ? Math.min(...vals) : 0;
 
-        const formatted = (val >= 1e6) ? (val/1e6).toFixed(1) + "M" : (val >= 1e3 ? (val/1e3).toFixed(1) + "K" : Number(val).toFixed(1));
+        const fmt = w.format || 'compact';
+        let formatted = "";
+        if (fmt === 'currency') formatted = "$" + Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        else if (fmt === 'percentage') formatted = Number(val).toFixed(1) + "%";
+        else if (fmt === 'integer') formatted = Math.round(val).toLocaleString();
+        else if (fmt === 'decimal') formatted = Number(val).toFixed(2);
+        else formatted = (val >= 1e6) ? (val/1e6).toFixed(1) + "M" : (val >= 1e3 ? (val/1e3).toFixed(1) + "K" : Number(val).toFixed(1));
+
+        const kpiColor = w.color || '#38bdf8';
         container.innerHTML = `
-          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0;">
+          <!-- Inline KPI Column & Aggregation Swapper -->
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px; padding:2px 4px; background:rgba(255,255,255,0.03); border-radius:4px; font-size:0.7rem;">
+            <span style="color:var(--text-muted);">Metric:</span>
+            <select onchange="dbUpdateWidgetColumn('${w.id}', 'metric', this.value)" style="padding:2px 4px; font-size:0.7rem; border-radius:4px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border); max-width:110px;" title="Change Target Metric Column">
+              ${columns.map(c => `<option value="${c}" ${c === w.metric ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+            <select onchange="dbUpdateWidgetColumn('${w.id}', 'agg', this.value)" style="padding:2px 4px; font-size:0.7rem; border-radius:4px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);" title="Change Aggregation">
+              <option value="sum" ${w.agg==='sum'?'selected':''}>Sum</option>
+              <option value="mean" ${w.agg==='mean'?'selected':''}>Avg</option>
+              <option value="count" ${w.agg==='count'?'selected':''}>Count</option>
+              <option value="max" ${w.agg==='max'?'selected':''}>Max</option>
+              <option value="min" ${w.agg==='min'?'selected':''}>Min</option>
+            </select>
+            <select onchange="dbUpdateWidgetColumn('${w.id}', 'format', this.value)" style="padding:2px 4px; font-size:0.7rem; border-radius:4px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);" title="Format Type">
+              <option value="compact" ${fmt==='compact'?'selected':''}>Compact</option>
+              <option value="currency" ${fmt==='currency'?'selected':''}>$ USD</option>
+              <option value="percentage" ${fmt==='percentage'?'selected':''}>% Pct</option>
+              <option value="integer" ${fmt==='integer'?'selected':''}>Int</option>
+            </select>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:4px 0;">
             <div>
-              <div style="font-size:1.8rem; font-weight:800; color:#38bdf8; line-height:1.2;">${formatted}</div>
+              <div style="font-size:2rem; font-weight:800; color:${kpiColor}; line-height:1.2;">${formatted}</div>
               <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">
-                ${w.agg.toUpperCase()} of <code>${w.metric}</code> • ${data.length} rows
+                ${(w.agg||'sum').toUpperCase()} of <code>${w.metric}</code> • ${data.length} active records
               </div>
             </div>
-            <div style="font-size:2.2rem; opacity:0.8;">${w.icon || '🎯'}</div>
+            <div style="font-size:2.4rem; opacity:0.85;">${w.icon || '🎯'}</div>
           </div>
         `;
       } else if (w.type.startsWith('chart_')) {
@@ -24712,23 +24903,35 @@ result = df.describe()
           dbDrawChart(canvasId, w, data);
         }, 10);
       } else if (w.type === 'slicer') {
-        const dim = w.dim;
+        const dim = w.dim || columns[0];
+        // Calculate category counts from currentDataset (so unselected categories remain clickable)
         const counts = {};
-        data.forEach(r => {
+        (currentDataset || []).forEach(r => {
           const k = String(r[dim] || "Unknown").trim();
           counts[k] = (counts[k] || 0) + 1;
         });
-        const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+        const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0, 14);
+        const isFilterActive = window.dbState.crossFilter.col === dim && !!window.dbState.crossFilter.val;
+
         container.innerHTML = `
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:4px 0;">
-            <button onclick="dbClearCrossFilter()" style="padding:4px 10px; font-size:0.74rem; border-radius:14px; border:1px solid var(--card-border); background:${!window.dbState.crossFilter.val ? '#8b5cf6' : 'rgba(255,255,255,0.05)'}; color:#fff; cursor:pointer;">
-              All (${data.length})
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; padding:2px 4px; background:rgba(255,255,255,0.03); border-radius:4px; font-size:0.7rem;">
+            <div style="display:flex; align-items:center; gap:4px;">
+              <span style="color:var(--text-muted);">Filter Dimension:</span>
+              <select onchange="dbUpdateWidgetColumn('${w.id}', 'dim', this.value)" style="padding:2px 4px; font-size:0.7rem; border-radius:4px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border); max-width:130px;" title="Change Slicer Dimension Column">
+                ${columns.map(c => `<option value="${c}" ${c === dim ? 'selected' : ''}>${c}</option>`).join('')}
+              </select>
+            </div>
+            <span style="color:var(--text-muted); font-size:0.68rem;">${entries.length} segments</span>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:2px 0;">
+            <button onclick="dbClearCrossFilter()" style="padding:4px 10px; font-size:0.74rem; font-weight:700; border-radius:14px; border:1px solid ${!isFilterActive ? '#10b981' : 'var(--card-border)'}; background:${!isFilterActive ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'rgba(255,255,255,0.06)'}; color:${!isFilterActive ? '#fff' : 'var(--text-muted)'}; cursor:pointer; box-shadow:${!isFilterActive ? '0 2px 8px rgba(16,185,129,0.3)' : 'none'};">
+              ✓ All (${currentDataset ? currentDataset.length : 0})
             </button>
             ${entries.map(([label, cnt]) => {
               const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === label;
               return `
-                <button onclick="dbApplyCrossFilter('${dim}', '${label}')" style="padding:4px 10px; font-size:0.74rem; border-radius:14px; border:1px solid ${isSelected ? '#8b5cf6' : 'var(--card-border)'}; background:${isSelected ? '#8b5cf6' : 'rgba(255,255,255,0.05)'}; color:${isSelected ? '#fff' : 'var(--text-muted)'}; cursor:pointer;">
-                  ${label} <span style="opacity:0.7; font-size:0.68rem;">(${cnt})</span>
+                <button onclick="dbApplyCrossFilter('${dim}', '${label}')" style="padding:4px 10px; font-size:0.74rem; font-weight:${isSelected ? '700' : '500'}; border-radius:14px; border:1px solid ${isSelected ? '#8b5cf6' : 'var(--card-border)'}; background:${isSelected ? 'linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%)' : 'rgba(255,255,255,0.04)'}; color:${isSelected ? '#ffffff' : 'var(--text-primary)'}; cursor:pointer; transition:all 0.15s ease; box-shadow:${isSelected ? '0 2px 10px rgba(139,92,246,0.4)' : 'none'};">
+                  ${label} <span style="opacity:0.75; font-size:0.68rem; margin-left:2px;">(${cnt})</span>
                 </button>
               `;
             }).join('')}
@@ -24762,15 +24965,204 @@ result = df.describe()
       }
     }
 
+    // -------------------------------------------------------------------------
+    // 1. MANUAL CUSTOM KPI CARD BUILDER
+    // -------------------------------------------------------------------------
+    function dbOpenCustomKpiModal() {
+      if (!currentDataset || !currentDataset.length) {
+        showToast("Please load a dataset before building custom KPI cards.", "warning");
+        return;
+      }
+      const numCols = columns.filter(c => isColNumeric(c));
+      const colSelect = document.getElementById('dbManualKpiCol');
+      if (colSelect) {
+        colSelect.innerHTML = columns.map(c => {
+          const isNum = numCols.includes(c);
+          return `<option value="${c}">${c} (${isNum ? '123' : 'Aa'})</option>`;
+        }).join('');
+        colSelect.value = numCols.length ? numCols[0] : columns[0];
+      }
+      dbOnManualKpiChanged();
+
+      const modal = document.getElementById('dbCustomKpiModal');
+      if (modal) modal.style.display = 'flex';
+      const menu = document.getElementById('dbAddWidgetDropdown');
+      if (menu) menu.style.display = 'none';
+    }
+
+    function dbCloseCustomKpiModal() {
+      const modal = document.getElementById('dbCustomKpiModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dbOnManualKpiChanged() {
+      const col = document.getElementById('dbManualKpiCol')?.value || "";
+      const agg = document.getElementById('dbManualKpiAgg')?.value || "sum";
+      const titleInput = document.getElementById('dbManualKpiTitle');
+      if (titleInput) {
+        titleInput.value = `${agg === 'mean' ? 'Average' : (agg === 'sum' ? 'Total' : agg.toUpperCase())} ${col}`;
+      }
+      dbUpdateCustomKpiPreview();
+    }
+
+    function dbUpdateCustomKpiPreview() {
+      const col = document.getElementById('dbManualKpiCol')?.value;
+      const agg = document.getElementById('dbManualKpiAgg')?.value || "sum";
+      const fmt = document.getElementById('dbManualKpiFormat')?.value || "compact";
+      const icon = document.getElementById('dbManualKpiIcon')?.value || "💰";
+      const color = document.getElementById('dbManualKpiColor')?.value || "#38bdf8";
+
+      const filtered = dbGetFilteredDataset();
+      const vals = filtered.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+      let val = 0;
+      if (agg === 'sum') val = vals.reduce((a,b)=>a+b, 0);
+      else if (agg === 'mean') val = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+      else if (agg === 'count') val = filtered.length;
+      else if (agg === 'max') val = vals.length ? Math.max(...vals) : 0;
+      else if (agg === 'min') val = vals.length ? Math.min(...vals) : 0;
+
+      let displayStr = "";
+      if (fmt === 'currency') {
+        displayStr = "$" + Number(val).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      } else if (fmt === 'percentage') {
+        displayStr = Number(val).toFixed(1) + "%";
+      } else if (fmt === 'integer') {
+        displayStr = Math.round(val).toLocaleString();
+      } else if (fmt === 'decimal') {
+        displayStr = Number(val).toFixed(2);
+      } else {
+        // Compact
+        displayStr = (val >= 1e6) ? (val/1e6).toFixed(1) + "M" : (val >= 1e3 ? (val/1e3).toFixed(1) + "K" : Number(val).toFixed(1));
+      }
+
+      const box = document.getElementById('dbCustomKpiPreviewBox');
+      if (box) {
+        box.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:2px; font-weight:700;">${document.getElementById('dbManualKpiTitle')?.value || 'Custom KPI'}</div>
+              <div style="font-size:1.9rem; font-weight:800; color:${color}; line-height:1.2;">${displayStr}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">
+                ${agg.toUpperCase()} of <code>${col}</code> • ${filtered.length} active records
+              </div>
+            </div>
+            <div style="font-size:2.4rem; opacity:0.85;">${icon}</div>
+          </div>
+        `;
+      }
+    }
+
+    function dbSubmitCustomKpi() {
+      const col = document.getElementById('dbManualKpiCol')?.value;
+      const agg = document.getElementById('dbManualKpiAgg')?.value || "sum";
+      const fmt = document.getElementById('dbManualKpiFormat')?.value || "compact";
+      const icon = document.getElementById('dbManualKpiIcon')?.value || "💰";
+      const color = document.getElementById('dbManualKpiColor')?.value || "#38bdf8";
+      const span = parseInt(document.getElementById('dbManualKpiSpan')?.value || "3", 10);
+      const title = document.getElementById('dbManualKpiTitle')?.value || `Total ${col}`;
+
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (!curPage) return;
+
+      const newWidget = {
+        id: `w_kpi_${Date.now()}`,
+        type: "kpi",
+        title: title,
+        metric: col,
+        agg: agg,
+        format: fmt,
+        icon: icon,
+        color: color,
+        span: span
+      };
+
+      curPage.widgets.push(newWidget);
+      dbCloseCustomKpiModal();
+      dbRenderWidgets();
+      showToast(`Added custom KPI card: "${title}"!`, "success");
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. MANUAL CUSTOM SLICER / FILTER BUILDER
+    // -------------------------------------------------------------------------
+    function dbOpenCustomSlicerModal() {
+      if (!currentDataset || !currentDataset.length) {
+        showToast("Please load a dataset before adding slicers.", "warning");
+        return;
+      }
+      const catCols = columns.filter(c => !isColNumeric(c));
+      const dimSelect = document.getElementById('dbManualSlicerDim');
+      if (dimSelect) {
+        dimSelect.innerHTML = columns.map(c => {
+          const isNum = isColNumeric(c);
+          return `<option value="${c}">${c} (${isNum ? '123' : 'Aa'})</option>`;
+        }).join('');
+        dimSelect.value = catCols.length ? catCols[0] : columns[0];
+      }
+      const titleInput = document.getElementById('dbManualSlicerTitle');
+      if (titleInput && dimSelect) titleInput.value = 'Filter by ' + dimSelect.value;
+
+      const modal = document.getElementById('dbCustomSlicerModal');
+      if (modal) modal.style.display = 'flex';
+      const menu = document.getElementById('dbAddWidgetDropdown');
+      if (menu) menu.style.display = 'none';
+    }
+
+    function dbCloseCustomSlicerModal() {
+      const modal = document.getElementById('dbCustomSlicerModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dbSubmitCustomSlicer() {
+      const dim = document.getElementById('dbManualSlicerDim')?.value;
+      const span = parseInt(document.getElementById('dbManualSlicerSpan')?.value || "6", 10);
+      const title = document.getElementById('dbManualSlicerTitle')?.value || `Filter by ${dim}`;
+
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (!curPage) return;
+
+      const newWidget = {
+        id: `w_slicer_${Date.now()}`,
+        type: "slicer",
+        title: title,
+        dim: dim,
+        metric: columns.find(c => isColNumeric(c)) || columns[0],
+        agg: "sum",
+        span: span
+      };
+
+      curPage.widgets.push(newWidget);
+      dbCloseCustomSlicerModal();
+      dbRenderWidgets();
+      showToast(`Added interactive slicer: "${title}"!`, "success");
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. HD HIGH-DPI VISUALIZATION RENDERING ENGINE
+    // -------------------------------------------------------------------------
     function dbDrawChart(canvasId, widget, data) {
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // RETINA / HIGH-DPI SCALING (HD Graphics)
+      const dpr = Math.max(2, window.devicePixelRatio || 2);
+      const rect = canvas.getBoundingClientRect();
+      const width = rect.width || canvas.parentElement?.clientWidth || 480;
+      const height = rect.height || 180;
+
+      if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+      }
+      ctx.resetTransform?.();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
 
       const dim = widget.dim || columns[0];
       const metric = widget.metric || columns[1];
       const agg = widget.agg || "sum";
+      const limit = widget.limit || 8;
 
       // Group data
       const groups = {};
@@ -24792,42 +25184,81 @@ result = df.describe()
         else if (agg === 'min') val = Math.min(...vals);
         else val = vals.length;
         return { label: k, val };
-      }).sort((a, b) => b.val - a.val).slice(0, 7);
+      }).sort((a, b) => b.val - a.val).slice(0, limit);
 
       if (!entries.length) {
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "11px sans-serif";
-        ctx.fillText("No data for current filters", 20, canvas.height / 2);
+        ctx.font = "600 11px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.fillText("No data matching current filters", 20, height / 2);
         return;
       }
 
-      const padLeft = 35;
-      const padBottom = 25;
-      const plotW = canvas.width - padLeft - 15;
-      const plotH = canvas.height - padBottom - 15;
+      const padLeft = 40;
+      const padBottom = 28;
+      const padTop = 15;
+      const plotW = width - padLeft - 15;
+      const plotH = height - padBottom - padTop;
       const maxVal = Math.max(...entries.map(e => e.val), 1);
+
+      // Subtle HD gridlines
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      ctx.lineWidth = 1;
+      for (let g = 0; g <= 4; g++) {
+        const gy = Math.round(padTop + (g / 4) * plotH) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, gy);
+        ctx.lineTo(width - 15, gy);
+        ctx.stroke();
+      }
 
       if (widget.type === 'chart_bar') {
         const barW = plotW / entries.length;
         entries.forEach((e, i) => {
-          const h = (e.val / maxVal) * (plotH - 10);
-          const x = padLeft + i * barW;
-          const y = canvas.height - padBottom - h;
+          const h = Math.max(4, (e.val / maxVal) * (plotH - 12));
+          const x = padLeft + i * barW + 4;
+          const y = height - padBottom - h;
+          const bw = Math.max(4, barW - 8);
           const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === e.label;
 
-          ctx.fillStyle = isSelected ? "#a855f7" : "rgba(99, 102, 241, 0.8)";
-          ctx.fillRect(x + 4, y, barW - 8, h);
+          // HD Linear Gradient Fill
+          const grad = ctx.createLinearGradient(0, y, 0, height - padBottom);
+          if (isSelected) {
+            grad.addColorStop(0, '#c084fc');
+            grad.addColorStop(1, '#9333ea');
+          } else {
+            grad.addColorStop(0, '#818cf8');
+            grad.addColorStop(1, '#4f46e5');
+          }
+          ctx.fillStyle = grad;
+          ctx.shadowColor = isSelected ? "rgba(192, 132, 252, 0.4)" : "rgba(99, 102, 241, 0.25)";
+          ctx.shadowBlur = 6;
 
-          ctx.fillStyle = "#cbd5e1";
-          ctx.font = "9px sans-serif";
-          ctx.fillText(e.val >= 1000 ? (e.val/1000).toFixed(1) + "k" : e.val.toFixed(0), x + 6, y - 4);
-          ctx.fillText(e.label.slice(0, 6), x + 4, canvas.height - 8);
+          // Rounded bar top
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(x, y, bw, h, [4, 4, 0, 0]);
+            ctx.fill();
+          } else {
+            ctx.fillRect(x, y, bw, h);
+          }
+          ctx.shadowBlur = 0;
+
+          // HD Crisp Labels
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "600 10px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.textAlign = "center";
+          const valTxt = e.val >= 1e6 ? (e.val/1e6).toFixed(1) + "M" : (e.val >= 1e3 ? (e.val/1e3).toFixed(1) + "k" : Number(e.val).toFixed(0));
+          ctx.fillText(valTxt, x + bw / 2, y - 5);
+
+          ctx.fillStyle = isSelected ? "#c084fc" : "#94a3b8";
+          ctx.font = isSelected ? "bold 9px sans-serif" : "9px sans-serif";
+          ctx.fillText(e.label.slice(0, 7), x + bw / 2, height - 10);
         });
+        ctx.textAlign = "start";
 
-        // Click on chart for cross-filtering
         canvas.onclick = (evt) => {
-          const rect = canvas.getBoundingClientRect();
-          const clickX = evt.clientX - rect.left;
+          const r = canvas.getBoundingClientRect();
+          const clickX = evt.clientX - r.left;
           const idx = Math.floor((clickX - padLeft) / (plotW / entries.length));
           if (idx >= 0 && idx < entries.length) {
             dbApplyCrossFilter(dim, entries[idx].label);
@@ -24836,99 +25267,165 @@ result = df.describe()
       } else if (widget.type === 'chart_hbar') {
         const barH = plotH / entries.length;
         entries.forEach((e, i) => {
-          const w = (e.val / maxVal) * (plotW - 20);
-          const y = padTop || 15 + i * barH;
-          ctx.fillStyle = "rgba(16, 185, 129, 0.85)";
-          ctx.fillRect(padLeft + 45, y + 2, w, barH - 6);
-          ctx.fillStyle = "#cbd5e1";
-          ctx.font = "9px sans-serif";
-          ctx.fillText(e.label.slice(0, 6), 5, y + barH / 2 + 3);
-          ctx.fillText(e.val >= 1000 ? (e.val/1000).toFixed(1) + "k" : e.val.toFixed(0), padLeft + 50 + w, y + barH / 2 + 3);
+          const w = Math.max(4, (e.val / maxVal) * (plotW - 30));
+          const y = padTop + i * barH + 2;
+          const bh = Math.max(4, barH - 6);
+          const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === e.label;
+
+          const grad = ctx.createLinearGradient(padLeft + 45, 0, padLeft + 45 + w, 0);
+          grad.addColorStop(0, isSelected ? '#34d399' : '#10b981');
+          grad.addColorStop(1, isSelected ? '#059669' : '#047857');
+          ctx.fillStyle = grad;
+
+          if (ctx.roundRect) {
+            ctx.beginPath();
+            ctx.roundRect(padLeft + 45, y, w, bh, [0, 4, 4, 0]);
+            ctx.fill();
+          } else {
+            ctx.fillRect(padLeft + 45, y, w, bh);
+          }
+
+          ctx.fillStyle = isSelected ? "#34d399" : "#cbd5e1";
+          ctx.font = "600 9px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.fillText(e.label.slice(0, 7), 5, y + bh / 2 + 3);
+
+          const valTxt = e.val >= 1e6 ? (e.val/1e6).toFixed(1) + "M" : (e.val >= 1e3 ? (e.val/1e3).toFixed(1) + "k" : Number(e.val).toFixed(0));
+          ctx.fillStyle = "#ffffff";
+          ctx.fillText(valTxt, padLeft + 52 + w, y + bh / 2 + 3);
         });
+
+        canvas.onclick = (evt) => {
+          const r = canvas.getBoundingClientRect();
+          const clickY = evt.clientY - r.top;
+          const idx = Math.floor((clickY - padTop) / (plotH / entries.length));
+          if (idx >= 0 && idx < entries.length) {
+            dbApplyCrossFilter(dim, entries[idx].label);
+          }
+        };
+      } else if (widget.type === 'chart_line' || widget.type === 'chart_area') {
+        const stepW = plotW / Math.max(1, entries.length - 1);
+        const pts = entries.map((e, i) => {
+          const x = padLeft + i * stepW;
+          const y = height - padBottom - (e.val / maxVal) * (plotH - 12);
+          return { x, y, label: e.label, val: e.val };
+        });
+
+        // Area Gradient Fill
+        if (widget.type === 'chart_area') {
+          const areaGrad = ctx.createLinearGradient(0, padTop, 0, height - padBottom);
+          areaGrad.addColorStop(0, "rgba(56, 189, 248, 0.4)");
+          areaGrad.addColorStop(1, "rgba(56, 189, 248, 0.01)");
+          ctx.fillStyle = areaGrad;
+
+          ctx.beginPath();
+          ctx.moveTo(pts[0].x, pts[0].y);
+          for (let i = 0; i < pts.length - 1; i++) {
+            const mx = (pts[i].x + pts[i + 1].x) / 2;
+            const my = (pts[i].y + pts[i + 1].y) / 2;
+            ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+          }
+          ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+          ctx.lineTo(pts[pts.length - 1].x, height - padBottom);
+          ctx.lineTo(pts[0].x, height - padBottom);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        // Smooth Bezier Spline Stroke
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 3;
+        ctx.shadowColor = "rgba(56, 189, 248, 0.4)";
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.moveTo(pts[0].x, pts[0].y);
+        for (let i = 0; i < pts.length - 1; i++) {
+          const mx = (pts[i].x + pts[i + 1].x) / 2;
+          const my = (pts[i].y + pts[i + 1].y) / 2;
+          ctx.quadraticCurveTo(pts[i].x, pts[i].y, mx, my);
+        }
+        ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Data Markers & Values
+        pts.forEach(pt => {
+          ctx.fillStyle = "#ffffff";
+          ctx.strokeStyle = "#0284c7";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 4.5, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "9px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(pt.label.slice(0, 6), pt.x, height - 10);
+        });
+        ctx.textAlign = "start";
+      } else if (widget.type === 'chart_donut') {
+        const total = entries.reduce((a,b)=>a+b.val,0) || 1;
+        const cx = width / 2 - 45;
+        const cy = height / 2;
+        const r = Math.min(cx, cy) - 15;
+        const innerR = r * 0.58;
+        const colors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#8b5cf6", "#14b8a6"];
+
+        let curAngle = -0.5 * Math.PI;
+        entries.forEach((e, i) => {
+          const sliceAngle = (e.val / total) * 2 * Math.PI;
+          const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === e.label;
+          const color = colors[i % colors.length];
+
+          ctx.fillStyle = isSelected ? "#ffffff" : color;
+          ctx.shadowColor = isSelected ? color : "rgba(0,0,0,0.2)";
+          ctx.shadowBlur = isSelected ? 10 : 2;
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, curAngle, curAngle + sliceAngle);
+          ctx.arc(cx, cy, innerR, curAngle + sliceAngle, curAngle, true);
+          ctx.closePath();
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          // Legend
+          const ly = 18 + i * 18;
+          ctx.fillStyle = color;
+          ctx.fillRect(width - 100, ly, 10, 10);
+          ctx.fillStyle = isSelected ? "#ffffff" : "#cbd5e1";
+          ctx.font = isSelected ? "bold 9px sans-serif" : "9px sans-serif";
+          ctx.fillText(`${e.label.slice(0, 7)} (${Math.round(e.val/total*100)}%)`, width - 85, ly + 9);
+
+          curAngle += sliceAngle;
+        });
+
+        // Center HD Display
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.textAlign = "center";
+        const totalTxt = total >= 1e6 ? (total/1e6).toFixed(1)+"M" : (total>=1e3 ? (total/1e3).toFixed(1)+"k" : total.toFixed(0));
+        ctx.fillText(totalTxt, cx, cy + 2);
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "9px sans-serif";
+        ctx.fillText("Total", cx, cy + 14);
+        ctx.textAlign = "start";
       } else if (widget.type === 'chart_scatter') {
-        data.slice(0, 60).forEach(r => {
+        data.slice(0, 80).forEach(r => {
           const vx = parseFloat(r[dim]);
           const vy = parseFloat(r[metric]);
           if (!isNaN(vx) && !isNaN(vy)) {
             const minX = Math.min(...data.map(d=>parseFloat(d[dim])).filter(v=>!isNaN(v)));
             const maxX = Math.max(...data.map(d=>parseFloat(d[dim])).filter(v=>!isNaN(v))) || 1;
             const cx = padLeft + ((vx - minX) / (maxX - minX || 1)) * plotW;
-            const cy = canvas.height - padBottom - ((vy / maxVal) * (plotH - 10));
-            ctx.fillStyle = "#f59e0b";
+            const cy = height - padBottom - ((vy / maxVal) * (plotH - 12));
+            ctx.fillStyle = "rgba(245, 158, 11, 0.85)";
+            ctx.strokeStyle = "#ffffff";
+            ctx.lineWidth = 1;
             ctx.beginPath();
-            ctx.arc(cx, cy, 3.5, 0, 2 * Math.PI);
+            ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
             ctx.fill();
+            ctx.stroke();
           }
         });
-      } else if (widget.type === 'chart_line' || widget.type === 'chart_area') {
-        const stepW = plotW / Math.max(1, entries.length - 1);
-        ctx.strokeStyle = "#10b981";
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-
-        const pts = entries.map((e, i) => {
-          const x = padLeft + i * stepW;
-          const y = canvas.height - padBottom - (e.val / maxVal) * (plotH - 10);
-          return { x, y, label: e.label, val: e.val };
-        });
-
-        pts.forEach((pt, i) => {
-          if (i === 0) ctx.moveTo(pt.x, pt.y);
-          else ctx.lineTo(pt.x, pt.y);
-        });
-        ctx.stroke();
-
-        if (widget.type === 'chart_area') {
-          ctx.lineTo(pts[pts.length - 1].x, canvas.height - padBottom);
-          ctx.lineTo(pts[0].x, canvas.height - padBottom);
-          ctx.closePath();
-          ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
-          ctx.fill();
-        }
-
-        pts.forEach(pt => {
-          ctx.fillStyle = "#38bdf8";
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, 3.5, 0, 2 * Math.PI);
-          ctx.fill();
-          ctx.fillStyle = "#94a3b8";
-          ctx.font = "9px sans-serif";
-          ctx.fillText(pt.label.slice(0, 5), pt.x - 10, canvas.height - 8);
-        });
-      } else if (widget.type === 'chart_donut') {
-        const total = entries.reduce((a,b)=>a+b.val,0) || 1;
-        const cx = canvas.width / 2 - 40;
-        const cy = canvas.height / 2;
-        const r = Math.min(cx, cy) - 20;
-        const innerR = r * 0.55;
-        const colors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#8b5cf6", "#14b8a6"];
-
-        let curAngle = -0.5 * Math.PI;
-        entries.forEach((e, i) => {
-          const sliceAngle = (e.val / total) * 2 * Math.PI;
-          ctx.fillStyle = colors[i % colors.length];
-          ctx.beginPath();
-          ctx.arc(cx, cy, r, curAngle, curAngle + sliceAngle);
-          ctx.arc(cx, cy, innerR, curAngle + sliceAngle, curAngle, true);
-          ctx.closePath();
-          ctx.fill();
-
-          // Legend
-          const ly = 25 + i * 18;
-          ctx.fillRect(canvas.width - 90, ly, 10, 10);
-          ctx.fillStyle = "#cbd5e1";
-          ctx.font = "9px sans-serif";
-          ctx.fillText(e.label.slice(0, 7) + ` (${Math.round(e.val/total*100)}%)`, canvas.width - 76, ly + 9);
-
-          curAngle += sliceAngle;
-        });
-
-        // Center Total
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 11px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(total >= 1e6 ? (total/1e6).toFixed(1)+"M" : (total>=1e3 ? (total/1e3).toFixed(1)+"k" : total.toFixed(0)), cx, cy + 4);
-        ctx.textAlign = "start";
       }
     }
 
@@ -25339,11 +25836,22 @@ result = df.describe()
       const widget = curPage?.widgets.find(w => w.id === widgetId);
       if (!widget) return;
       widget[field] = value;
-      if (field === 'dim' || field === 'metric') {
-        widget.title = `${widget.metric} by ${widget.dim}`;
+      if (widget.type === 'kpi') {
+        const aggName = widget.agg === 'mean' ? 'Average' : (widget.agg === 'sum' ? 'Total' : (widget.agg || '').toUpperCase());
+        widget.title = `${aggName} ${widget.metric || ''}`.trim();
+        dbRenderWidgets();
+        showToast(`Updated KPI to: ${widget.title}`, "info");
+      } else if (widget.type === 'slicer') {
+        if (field === 'dim') widget.title = `Filter by ${widget.dim}`;
+        dbRenderWidgets();
+        showToast(`Updated Slicer dimension to: ${widget.dim}`, "info");
+      } else {
+        if (field === 'dim' || field === 'metric') {
+          widget.title = `${widget.metric} by ${widget.dim}`;
+        }
+        dbRenderWidgets();
+        showToast(`Updated chart to: ${widget.title}`, "info");
       }
-      dbRenderWidgets();
-      showToast(`Updated chart to: ${widget.metric} by ${widget.dim}`, "info");
     }
 
   </script>
