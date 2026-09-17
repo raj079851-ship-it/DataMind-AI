@@ -6813,6 +6813,7 @@ result = df.describe()
         setTimeout(() => { initSecurityModuleUI(); }, 30);
       }
     }
+    window.switchModule = switchModule; // expose for hook
 
     function loadSampleChurn() {
       notifyTaskStart("Load Telecom Churn Dataset");
@@ -17478,7 +17479,7 @@ result = df.describe()
 
       document.getElementById('nlpPosScore').textContent = (s.positive||0).toLocaleString();
       document.getElementById('nlpNegScore').textContent = (s.negative||0).toLocaleString();
-      document.getElementById('nlpNeuScore').textContent = (s.neutral||neutral||0).toLocaleString();
+      document.getElementById('nlpNeuScore').textContent = (s.neutral || 0).toLocaleString();
       document.getElementById('nlpSentLabel').textContent = s.label || 'Mixed';
       document.getElementById('nlpPosPct').textContent = posPct + '%';
       document.getElementById('nlpNegPct').textContent = negPct + '%';
@@ -17715,13 +17716,16 @@ Trained,' + (m.trained_at||'—');
       }
     }
 
-    // Hook into module switch to auto-init NLP column selector and load registry
-    const _origSwitchModule = typeof switchModule !== 'undefined' ? switchModule : null;
-    function switchModule(id) {
-      if (_origSwitchModule) _origSwitchModule(id);
-      if (id === 'moduleNLP') setTimeout(initNLPModule, 100);
-      if (id === 'moduleRegistry') setTimeout(loadModelRegistry, 100);
-    }
+    // Hook into module switch to auto-init NLP and Registry modules
+    // We patch the existing switchModule by wrapping it AFTER DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const _origSM = window.switchModule;
+      window.switchModule = function(id) {
+        if (typeof _origSM === 'function') _origSM(id);
+        if (id === 'moduleNLP') setTimeout(initNLPModule, 150);
+        if (id === 'moduleRegistry') setTimeout(loadModelRegistry, 150);
+      };
+    });
 
     // Helper toast notification
     function showToast(msg, type='info') {
