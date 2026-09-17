@@ -93,6 +93,7 @@ from modules.visualizer import (
     plot_pareto,
     recommend_best_chart
 )
+from modules.ai_chart_recommender import AIChartRecommender, default_chart_recommender
 from modules.sql_studio import SQLStudio, generate_ai_sql, explain_and_optimize_sql
 from modules.statistical_engine import (
     run_descriptive_statistics,
@@ -1091,6 +1092,14 @@ if st.session_state.get("show_omnibar", False):
             st.markdown(res.get("message", ""))
             if "sql_suggestion" in res:
                 st.code(res["sql_suggestion"], language="sql")
+            if "chart_result" in res and res["chart_result"].get("figure") is not None:
+                st.plotly_chart(res["chart_result"]["figure"], use_container_width=True)
+                if res["chart_result"].get("explanation"):
+                    st.info(f"💡 **AI Explanation:** {res['chart_result']['explanation']}")
+                if res["chart_result"].get("patterns"):
+                    st.markdown("**🔍 Identified Empirical Patterns:**")
+                    for pat in res["chart_result"]["patterns"]:
+                        st.markdown(f"- {pat}")
 
 
 def render_python_environment(df: pd.DataFrame, key_prefix: str = "py_"):
@@ -2761,10 +2770,162 @@ elif selected_module == "📈 Visualization":
     
     chart_category = st.selectbox(
         "Chart Category:",
-        ["Basic Charts", "Statistical Charts", "Time-Series", "Advanced & BI Charts", "Geospatial Maps", "✨ AI Chart Generator"]
+        ["🤖 AI Chart Recommendation Engine", "Basic Charts", "Statistical Charts", "Time-Series", "Advanced & BI Charts", "Geospatial Maps", "✨ AI Chart Generator"]
     )
 
-    if chart_category == "Basic Charts":
+    if chart_category in ["🤖 AI Chart Recommendation Engine", "✨ AI Chart Generator"]:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.85) 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 12px; padding: 18px 20px; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 800; color: #f8fafc;">
+                        🤖 AI Chart Recommendation Engine
+                    </h3>
+                    <p style="margin: 4px 0 0 0; font-size: 0.85rem; color: #94a3b8;">
+                        Ask in natural language (e.g. <i>"Show me the relationship between sales and profit"</i>) or automatically generate the best visualization suite for your dataset.
+                    </p>
+                </div>
+                <span style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.35); font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 20px;">
+                    Plotly 3.0 • Automated Insights
+                </span>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        cat_cols = df.select_dtypes(include=["object", "string", "category"]).columns.tolist()
+        c1 = num_cols[0] if len(num_cols) > 0 else "Sales"
+        c2 = num_cols[1] if len(num_cols) > 1 else ("Profit" if len(num_cols) > 0 else "Profit")
+        cat1 = cat_cols[0] if len(cat_cols) > 0 else "Category"
+
+        if "ai_chart_input" not in st.session_state:
+            st.session_state.ai_chart_input = f"Show me the relationship between {c1.lower()} and {c2.lower()}"
+
+        st.markdown("**💡 Quick Prompt Suggestions:**")
+        chip_col1, chip_col2, chip_col3, chip_col4 = st.columns(4)
+        with chip_col1:
+            if st.button(f"🔗 Relationship: {c1} & {c2}", key="chip_rel", use_container_width=True):
+                st.session_state.ai_chart_input = f"Show me the relationship between {c1.lower()} and {c2.lower()}"
+                st.session_state.run_ai_chart = True
+                st.rerun()
+        with chip_col2:
+            if st.button(f"📊 Distribution of {c1}", key="chip_dist", use_container_width=True):
+                st.session_state.ai_chart_input = f"Show distribution of {c1.lower()}"
+                st.session_state.run_ai_chart = True
+                st.rerun()
+        with chip_col3:
+            if st.button(f"📊 Compare {c1} by {cat1}", key="chip_cat", use_container_width=True):
+                st.session_state.ai_chart_input = f"Compare {c1.lower()} across {cat1.lower()}"
+                st.session_state.run_ai_chart = True
+                st.rerun()
+        with chip_col4:
+            if st.button("✨ Create best charts collection", key="chip_coll", use_container_width=True):
+                st.session_state.ai_chart_input = "Create the best charts for this dataset"
+                st.session_state.run_ai_chart = True
+                st.rerun()
+
+        ai_chart_q_col, ai_chart_btn_col1, ai_chart_btn_col2 = st.columns([3, 1, 1.2])
+        with ai_chart_q_col:
+            user_chart_query = st.text_input(
+                "Your Analytical or Chart Question:",
+                value=st.session_state.get("ai_chart_input", f"Show me the relationship between {c1.lower()} and {c2.lower()}"),
+                placeholder="e.g. 'Show me the relationship between sales and profit' or 'Create the best charts for this dataset'",
+                key="ai_chart_user_input",
+                label_visibility="collapsed"
+            )
+        with ai_chart_btn_col1:
+            execute_single = st.button("🚀 Recommend Chart", type="primary", use_container_width=True, key="btn_exec_chart")
+        with ai_chart_btn_col2:
+            execute_collection = st.button("✨ Best Charts Suite", use_container_width=True, key="btn_exec_collection")
+
+        should_run = execute_single or execute_collection or st.session_state.get("run_ai_chart", False)
+        if st.session_state.get("run_ai_chart", False):
+            st.session_state.run_ai_chart = False
+
+        query_to_run = user_chart_query.strip()
+        is_collection_mode = execute_collection or ("best chart" in query_to_run.lower() or "collection" in query_to_run.lower() or "all charts" in query_to_run.lower())
+
+        if should_run and query_to_run:
+            if is_collection_mode:
+                with st.spinner("AI Engine profiling distributions, correlations, and segment cardinalities to generate curated visual suite..."):
+                    coll_results = default_chart_recommender.create_best_charts_collection(df, max_charts=6)
+                
+                st.success(f"✨ Successfully generated **{len(coll_results)}** prioritized visualizations for `{st.session_state.get('dataset_source', 'active dataset')}` ({df.shape[0]:,} rows × {df.shape[1]} cols).")
+                
+                for i in range(0, len(coll_results), 2):
+                    c_left, c_right = st.columns(2)
+                    item_l = coll_results[i]
+                    with c_left:
+                        st.markdown(f"#### {item_l['title']}")
+                        st.caption(f"**Intent:** `{item_l['intent'].capitalize()}` | **Type:** `{item_l['chart_type_label']}`")
+                        if item_l.get("figure"):
+                            st.plotly_chart(item_l["figure"], use_container_width=True, key=f"coll_fig_{i}")
+                        with st.expander(f"💡 Explanation & Insights for {item_l['title']}", expanded=True):
+                            st.markdown(f"**Why this chart was chosen:**\n\n_{item_l['rationale']}_\n\n{item_l['explanation']}")
+                            if item_l.get("patterns"):
+                                st.markdown("**🔍 Identified Empirical Patterns:**")
+                                for pat in item_l["patterns"]:
+                                    st.markdown(f"- {pat}")
+                    
+                    if i + 1 < len(coll_results):
+                        item_r = coll_results[i + 1]
+                        with c_right:
+                            st.markdown(f"#### {item_r['title']}")
+                            st.caption(f"**Intent:** `{item_r['intent'].capitalize()}` | **Type:** `{item_r['chart_type_label']}`")
+                            if item_r.get("figure"):
+                                st.plotly_chart(item_r["figure"], use_container_width=True, key=f"coll_fig_{i+1}")
+                            with st.expander(f"💡 Explanation & Insights for {item_r['title']}", expanded=True):
+                                st.markdown(f"**Why this chart was chosen:**\n\n_{item_r['rationale']}_\n\n{item_r['explanation']}")
+                                if item_r.get("patterns"):
+                                    st.markdown("**🔍 Identified Empirical Patterns:**")
+                                    for pat in item_r["patterns"]:
+                                        st.markdown(f"- {pat}")
+                    st.markdown("---")
+            else:
+                with st.spinner("AI parsing query intent, selecting optimal geometry, and detecting empirical patterns..."):
+                    res = default_chart_recommender.recommend_chart(df, query_to_run)
+                
+                res_col_left, res_col_right = st.columns([2.2, 1.3])
+                with res_col_left:
+                    st.markdown(f"### {res['title']}")
+                    st.caption(f"**Identified Features:** `{', '.join(res.get('relevant_columns', []))}` | **Chart Type:** `{res.get('chart_type_label')}`")
+                    if res.get("figure"):
+                        st.plotly_chart(res["figure"], use_container_width=True, key="single_ai_chart_fig")
+                    else:
+                        st.warning("Could not generate a Plotly figure with the selected parameters.")
+
+                with res_col_right:
+                    st.markdown(f"""
+                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">🎯 AI Recommendation Rationale</div>
+                        <p style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e2e8f0; line-height: 1.45;">
+                            {res.get('rationale', '')}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    st.markdown(f"""
+                    <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.05em;">📖 Plain-Language Explanation</div>
+                        <p style="margin: 6px 0 0 0; font-size: 0.84rem; color: #cbd5e1; line-height: 1.45;">
+                            {res.get('explanation', '')}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+                    patterns = res.get("patterns", [])
+                    st.markdown("""
+                    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px;">
+                        <div style="font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.05em;">🔍 Identified Empirical Patterns</div>
+                    """, unsafe_allow_html=True)
+                    if patterns:
+                        for pat in patterns:
+                            st.markdown(f"- <span style='font-size: 0.83rem; color: #f1f5f9;'>{pat}</span>", unsafe_allow_html=True)
+                    else:
+                        st.caption("No strong anomalous skewness or outlier patterns identified.")
+                    st.markdown("</div>", unsafe_allow_html=True)
+
+    elif chart_category == "Basic Charts":
         b_type = st.selectbox("Chart Type:", ["Bar Chart", "Line Chart", "Scatter Plot", "Donut Chart", "Pie Chart"])
         num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         cat_cols = df.select_dtypes(include=["object", "string", "category"]).columns.tolist()
@@ -2808,6 +2969,18 @@ elif selected_module == "📈 Visualization":
             elif s_type == "ECDF":
                 st.plotly_chart(plot_ecdf(df, sel_col), use_container_width=True)
 
+    elif chart_category == "Time-Series":
+        date_candidates = [c for c in df.columns if any(w in c.lower() for w in ["date", "time", "year", "month", "day"])]
+        all_cols = list(df.columns)
+        num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        if num_cols:
+            ts_date_col = st.selectbox("Time/Date Axis:", date_candidates if date_candidates else all_cols)
+            ts_val_col = st.selectbox("Metric to Track:", num_cols)
+            fig_ts = plot_dashboard_line_chart(df, ts_date_col, ts_val_col)
+            st.plotly_chart(fig_ts, use_container_width=True)
+        else:
+            st.warning("No numeric columns available for time-series trend plotting.")
+
     elif chart_category == "Advanced & BI Charts":
         adv_type = st.selectbox("Advanced BI Chart:", ["Pareto 80/20 Chart", "Treemap", "Funnel Chart", "Performance Gauge"])
         num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
@@ -2832,18 +3005,6 @@ elif selected_module == "📈 Visualization":
         if num_cols:
             map_metric = st.selectbox("Map Metric:", num_cols)
             st.plotly_chart(plot_dashboard_map_chart(df, map_metric), use_container_width=True)
-
-    elif chart_category == "✨ AI Chart Generator":
-        st.markdown("#### Natural Language Chart Generator")
-        ai_chart_prompt = st.text_input("Enter chart request:", placeholder="e.g. 'Show monthly charges across contract types'")
-        if st.button("Generate Chart", type="primary") and ai_chart_prompt:
-            num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
-            cat_cols = df.select_dtypes(include=["object", "string", "category"]).columns.tolist()
-            rec = recommend_best_chart(df, cat_cols[0] if cat_cols else df.columns[0], num_cols[0] if num_cols else None)
-            st.info(f"**AI Recommendation:** {rec['rationale']}")
-            if cat_cols and num_cols:
-                fig = plot_dashboard_column_chart(df, cat_cols[0], num_cols[0])
-                st.plotly_chart(fig, use_container_width=True)
 
 
 # ---------------- 10. SQL & QUERIES ----------------

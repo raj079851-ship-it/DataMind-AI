@@ -87,6 +87,7 @@ from modules.security import (
     default_audit_logger,
     CredentialSanitizer
 )
+from modules.ai_chart_recommender import default_chart_recommender
 
 # Initialize App
 app = FastAPI(
@@ -141,6 +142,10 @@ class CreateAPIKeyRequest(BaseModel):
 
 class ColumnEncryptionRequest(BaseModel):
     columns: List[str]
+
+class ChartRecommendationRequest(BaseModel):
+    query: str = "Show me the relationship between sales and profit."
+
 
 class CreateProjectRequest(BaseModel):
     name: str
@@ -543,6 +548,80 @@ def eda_correlations(method: str = "pearson"):
         "top_negative": corr["top_negative"],
         "collinear_pairs": corr["collinear_pairs"]
     }
+
+
+# ---------------- 7. AI VISUALIZATION & CHART RECOMMENDATIONS ----------------
+@app.post("/charts/recommend", tags=["AI Visualization"])
+def recommend_chart(req: ChartRecommendationRequest):
+    """
+    AI Chart Recommendation Engine:
+    Identifies columns, selects optimal chart, generates Plotly visualization,
+    explains chart rationale, and detects empirical statistical patterns.
+    """
+    df = get_current_df()
+    res = default_chart_recommender.recommend_from_query(req.query, df)
+    if res.get("status") == "error":
+        raise HTTPException(status_code=400, detail=res.get("message"))
+
+    if res.get("mode") == "collection":
+        serialized_collection = []
+        for item in res.get("collection", []):
+            serialized_collection.append({
+                "title": item["title"],
+                "chart_type": item["chart_type"],
+                "columns": item["columns"],
+                "rationale": item["rationale"],
+                "explanation": item["explanation"],
+                "patterns": item["patterns"],
+                "figure": json.loads(item["figure"].to_json()) if item.get("figure") else None
+            })
+        return {
+            "status": "success",
+            "mode": "collection",
+            "query": req.query,
+            "summary": res.get("summary"),
+            "charts": serialized_collection
+        }
+
+    return {
+        "status": "success",
+        "mode": "single",
+        "query": req.query,
+        "matched_columns": res.get("matched_columns"),
+        "intent": res.get("intent"),
+        "chart_type": res.get("chart_type"),
+        "title": res.get("title"),
+        "rationale": res.get("rationale"),
+        "explanation": res.get("explanation"),
+        "patterns": res.get("patterns"),
+        "figure": json.loads(res["figure"].to_json()) if res.get("figure") else None
+    }
+
+
+@app.get("/charts/best-collection", tags=["AI Visualization"])
+def get_best_charts_collection(max_charts: int = 5):
+    """
+    Synthesizes a curated collection of high-impact visualizations for the active dataset.
+    """
+    df = get_current_df()
+    collection = default_chart_recommender.create_best_charts_collection(df, max_charts=max_charts)
+    serialized = []
+    for item in collection:
+        serialized.append({
+            "title": item["title"],
+            "chart_type": item["chart_type"],
+            "columns": item["columns"],
+            "rationale": item["rationale"],
+            "explanation": item["explanation"],
+            "patterns": item["patterns"],
+            "figure": json.loads(item["figure"].to_json()) if item.get("figure") else None
+        })
+    return {
+        "status": "success",
+        "total_charts": len(serialized),
+        "charts": serialized
+    }
+
 
 @app.post("/statistics/hypothesis-test", tags=["Statistics"])
 def hypothesis_test(req: HypothesisTestRequest):

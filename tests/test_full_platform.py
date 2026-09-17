@@ -304,6 +304,29 @@ class TestFullPlatform(unittest.TestCase):
         ans = orch.generate_grounded_answer("What is the average revenue?", self.df_sales)
         self.assertIn("Revenue", ans)
 
+        # Test chart routing in Omnibar
+        chart_route = orch.route_omnibar_command("Show me the relationship between Sales and Profit", self.df_sales)
+        self.assertEqual(chart_route["agent"], "Visualization Agent")
+        self.assertIn("chart_result", chart_route)
+        self.assertEqual(chart_route["chart_result"]["chart_type"], "scatter")
+
+    def test_ai_chart_recommender_integration(self):
+        from modules.ai_chart_recommender import default_chart_recommender
+        res = default_chart_recommender.recommend_chart(self.df_sales, "Show me the relationship between Sales and Profit")
+        self.assertEqual(res["chart_type"], "scatter")
+        self.assertTrue("Revenue" in res["relevant_columns"] or "Sales" in res["relevant_columns"])
+        self.assertIn("Profit", res["relevant_columns"])
+        self.assertIn("scatter plot", res["rationale"].lower())
+        self.assertIsNotNone(res["figure"])
+        self.assertGreater(len(res["patterns"]), 0)
+
+        coll = default_chart_recommender.create_best_charts_collection(self.df_sales, max_charts=4)
+        self.assertGreaterEqual(len(coll), 2)
+        for c in coll:
+            self.assertIn("title", c)
+            self.assertIn("rationale", c)
+            self.assertIn("figure", c)
+
 
 if __name__ == "__main__":
     unittest.main()

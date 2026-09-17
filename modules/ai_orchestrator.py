@@ -75,13 +75,24 @@ class AIOrchestrator:
             }
 
         # 4. Chart / Visualization Intent
-        if any(w in q for w in ["chart", "plot", "visualize", "graph", "histogram", "scatter", "bar"]):
-            return {
-                "agent": "Visualization Agent",
-                "recommended_module": "Visualization",
-                "action": "render_chart",
-                "message": f"Routed to **Visualization Engine**. Generating optimal interactive chart based on analytical intent."
-            }
+        if any(w in q for w in ["chart", "plot", "visualize", "visualization", "graph", "histogram", "scatter", "bar", "relationship", "distribution", "trend", "breakdown", "best chart"]):
+            try:
+                from modules.ai_chart_recommender import default_chart_recommender
+                rec_res = default_chart_recommender.recommend_chart(df, query)
+                return {
+                    "agent": "Visualization Agent",
+                    "recommended_module": "Visualization",
+                    "action": "render_chart",
+                    "chart_result": rec_res,
+                    "message": f"Routed to **Visualization Engine**.\n\n**Recommendation:** {rec_res.get('rationale', '')}\n\n**Selected Chart:** `{rec_res.get('chart_type_label', rec_res.get('chart_type', 'Chart'))}`"
+                }
+            except Exception as e:
+                return {
+                    "agent": "Visualization Agent",
+                    "recommended_module": "Visualization",
+                    "action": "render_chart",
+                    "message": f"Routed to **Visualization Engine**. Generating optimal interactive chart based on analytical intent."
+                }
 
         # 5. Data Cleaning Intent
         if any(w in q for w in ["clean", "impute", "outlier", "missing", "duplicate", "null", "sanitize"]):
