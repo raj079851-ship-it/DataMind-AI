@@ -942,6 +942,38 @@
             <span class="badge badge-primary">AES-256</span>
           </button>
 
+          <button class="nav-item" id="navBtnVisualization" onclick="switchModule('moduleVisualization')">
+            <span class="nav-item-content">
+              <span>🤖</span>
+              <span>20. AI Chart Recommender</span>
+            </span>
+            <span class="badge badge-info">NL Query</span>
+          </button>
+
+          <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
+            <span class="nav-item-content">
+              <span>🔍</span>
+              <span>21. Data Quality Audit</span>
+            </span>
+            <span class="badge badge-warning">Health</span>
+          </button>
+
+          <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
+            <span class="nav-item-content">
+              <span>🧠</span>
+              <span>22. NLP & Text Analytics</span>
+            </span>
+            <span class="badge badge-info">Sentiment</span>
+          </button>
+
+          <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
+            <span class="nav-item-content">
+              <span>🏆</span>
+              <span>23. Model Registry</span>
+            </span>
+            <span class="badge badge-success">Leaderboard</span>
+          </button>
+
         </nav>
       </div>
 
@@ -5363,6 +5395,488 @@ result = df.describe()
             </div>
           </div>
         </div>
+      </div>
+
+    
+
+      <!-- MODULE 20: AI CHART RECOMMENDER -->
+      <div id="moduleVisualization" class="module-view">
+
+        <!-- Hero Banner -->
+        <div class="banner-box" style="border-left-color:#38bdf8; margin-bottom:18px; background:linear-gradient(135deg,rgba(56,189,248,0.1) 0%,rgba(99,102,241,0.06) 100%);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h4 style="color:#38bdf8;margin-bottom:4px;font-size:1.15rem;font-weight:700;">🤖 AI Chart Recommendation Engine</h4>
+              <p style="font-size:0.84rem;color:var(--text-muted);margin:0;">
+                Ask in natural language — <em>"Show the relationship between sales and profit"</em> — and the AI engine auto-selects the optimal chart type, maps columns, generates insights, and detects empirical patterns.
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="badge badge-info">Plotly Engine</span>
+              <span class="badge badge-success">Pattern Detection</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Prompt Chips -->
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header">
+            <span>💡 Quick Prompt Suggestions</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px;">
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Show me the relationship between the top 2 numeric columns')">🔗 Relationship</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Show distribution of the main numeric column')">📊 Distribution</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Compare values across categories')">📊 Category Compare</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Show trend over time')">📈 Time Trend</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Create the best charts for this dataset')">✨ Best Suite</button>
+            <button class="btn btn-outline" style="font-size:0.8rem;" onclick="setChartPrompt('Show correlation heatmap')">🔥 Heatmap</button>
+          </div>
+        </div>
+
+        <!-- Query Input -->
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header">
+            <span>🔍 Natural Language Chart Query</span>
+            <span class="badge badge-info" id="vizStatusBadge">Ready</span>
+          </div>
+          <div style="padding:14px 16px;">
+            <div style="display:flex;gap:10px;align-items:center;">
+              <input type="text" id="aiChartQueryInput"
+                placeholder="e.g. 'Show me the relationship between sales and profit' or 'Create the best charts for this dataset'"
+                style="flex:1;padding:10px 14px;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:8px;font-size:0.9rem;"
+              />
+              <button class="btn btn-primary" onclick="runAIChartRecommender()" style="white-space:nowrap;padding:10px 18px;">
+                🚀 Recommend Chart
+              </button>
+              <button class="btn btn-outline" onclick="createBestChartsCollection()" style="white-space:nowrap;padding:10px 18px;">
+                ✨ Best Suite
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Panel -->
+        <div id="vizResultPanel" style="display:none;">
+          <!-- Single Chart Result -->
+          <div id="vizSingleResult" style="display:none;">
+            <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px;">
+              <div class="panel">
+                <div class="panel-header" style="justify-content:space-between;">
+                  <span id="vizChartTitle">AI Recommended Visualization</span>
+                  <span class="badge badge-success" id="vizChartTypeBadge">Chart</span>
+                </div>
+                <div style="padding:12px 16px;">
+                  <div id="vizChartContainer" style="min-height:360px;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.4);border-radius:8px;">
+                    <span style="color:var(--text-muted);font-size:0.9rem;">Chart will appear here after recommendation</span>
+                  </div>
+                  <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);" id="vizChartCaption"></div>
+                </div>
+              </div>
+              <div>
+                <div class="panel" style="margin-bottom:12px;">
+                  <div class="panel-header"><span>🎯 AI Rationale</span></div>
+                  <div style="padding:12px 16px;font-size:0.86rem;line-height:1.6;color:var(--text-muted);" id="vizRationale">—</div>
+                </div>
+                <div class="panel" style="margin-bottom:12px;">
+                  <div class="panel-header"><span>📊 Chart Details</span></div>
+                  <div style="padding:12px 16px;">
+                    <div style="margin-bottom:8px;"><strong style="color:var(--text-muted);font-size:0.78rem;">CHART TYPE</strong><br/><span id="vizChartTypeDetail" style="font-size:0.9rem;">—</span></div>
+                    <div style="margin-bottom:8px;"><strong style="color:var(--text-muted);font-size:0.78rem;">FEATURES USED</strong><br/><span id="vizFeaturesUsed" style="font-size:0.9rem;">—</span></div>
+                    <div><strong style="color:var(--text-muted);font-size:0.78rem;">INTENT</strong><br/><span id="vizIntent" style="font-size:0.9rem;">—</span></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-header"><span>🔍 Detected Patterns</span></div>
+                  <div style="padding:12px 16px;" id="vizPatternsList">
+                    <span style="color:var(--text-muted);font-size:0.86rem;">Run a recommendation to see patterns.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Explanation -->
+            <div class="panel" style="margin-bottom:16px;">
+              <div class="panel-header"><span>💡 AI Explanation & Insights</span></div>
+              <div style="padding:14px 16px;font-size:0.87rem;line-height:1.7;color:var(--text-muted);" id="vizExplanation">—</div>
+            </div>
+          </div>
+
+          <!-- Collection Result -->
+          <div id="vizCollectionResult" style="display:none;">
+            <div class="banner-box" style="border-left-color:#10b981;margin-bottom:16px;">
+              <span id="vizCollectionSummary" style="font-size:0.9rem;color:#34d399;font-weight:600;">Best Charts Collection</span>
+            </div>
+            <div id="vizCollectionGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="vizEmptyState" class="panel" style="padding:40px;text-align:center;">
+          <div style="font-size:3rem;margin-bottom:16px;">🤖</div>
+          <h3 style="margin-bottom:8px;color:var(--text-muted);">AI Chart Recommender Ready</h3>
+          <p style="color:var(--text-muted);font-size:0.9rem;max-width:500px;margin:0 auto;">
+            Upload a dataset, then ask a natural language question or click <strong>Best Suite</strong> to auto-generate the optimal visualization collection for your data.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- MODULE 21: DATA QUALITY AUDIT -->
+      <div id="moduleDataQuality" class="module-view">
+
+        <!-- Hero Banner -->
+        <div class="banner-box" style="border-left-color:#f59e0b;margin-bottom:18px;background:linear-gradient(135deg,rgba(245,158,11,0.1) 0%,rgba(239,68,68,0.05) 100%);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h4 style="color:#fbbf24;margin-bottom:4px;font-size:1.15rem;font-weight:700;">🔍 Data Quality Audit & Hygiene Engine</h4>
+              <p style="font-size:0.84rem;color:var(--text-muted);margin:0;">
+                Automatically profile every column for nulls, duplicates, outliers, type inconsistencies, and data hygiene issues. Get a quality score and actionable remediation recommendations.
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn btn-primary" onclick="runDataQualityAudit()" style="padding:8px 16px;">🔍 Run Quality Audit</button>
+              <button class="btn btn-outline" onclick="exportQualityReport()" style="padding:8px 14px;">📥 Export Report</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Card Row -->
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px;" id="dqScoreCards">
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#10b981;" id="dqOverallScore">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">OVERALL SCORE</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#ef4444;" id="dqNullPct">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">AVG NULL %</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#f59e0b;" id="dqDuplicates">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">DUPLICATES</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#f59e0b;" id="dqOutliers">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">OUTLIER COLS</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#38bdf8;" id="dqColumns">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">TOTAL COLUMNS</div>
+          </div>
+        </div>
+
+        <!-- Column Profile Table -->
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header" style="justify-content:space-between;">
+            <span>📋 Column-Level Quality Profile</span>
+            <span class="badge badge-warning" id="dqStatusBadge">Not Run</span>
+          </div>
+          <div style="overflow-x:auto;padding:0 0 4px 0;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.84rem;" id="dqProfileTable">
+              <thead>
+                <tr style="border-bottom:1px solid var(--card-border);background:rgba(15,23,42,0.4);">
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Column</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Type</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">Null %</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">Unique</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">Outliers</th>
+                  <th style="padding:10px 12px;text-align:center;color:var(--text-muted);">Health</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Issues</th>
+                </tr>
+              </thead>
+              <tbody id="dqProfileBody">
+                <tr><td colspan="7" style="padding:24px;text-align:center;color:var(--text-muted);">Run a Data Quality Audit to see column profiles.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Issues & Recommendations -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="panel">
+            <div class="panel-header"><span>⚠️ Detected Issues</span></div>
+            <div style="padding:12px 16px;" id="dqIssuesList">
+              <span style="color:var(--text-muted);font-size:0.86rem;">No issues detected yet. Run the audit.</span>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span>💡 Remediation Recommendations</span></div>
+            <div style="padding:12px 16px;" id="dqRecommendationsList">
+              <span style="color:var(--text-muted);font-size:0.86rem;">Recommendations will appear after audit.</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MODULE 22: NLP & TEXT ANALYTICS -->
+      <div id="moduleNLP" class="module-view">
+
+        <!-- Hero Banner -->
+        <div class="banner-box" style="border-left-color:#8b5cf6;margin-bottom:18px;background:linear-gradient(135deg,rgba(139,92,246,0.1) 0%,rgba(59,130,246,0.06) 100%);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h4 style="color:#a78bfa;margin-bottom:4px;font-size:1.15rem;font-weight:700;">🧠 NLP & Text Analytics Studio</h4>
+              <p style="font-size:0.84rem;color:var(--text-muted);margin:0;">
+                Run sentiment analysis, keyword extraction, topic modeling, and word frequency analysis on any text column in your dataset.
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <span class="badge badge-info">Sentiment</span>
+              <span class="badge badge-info">Keywords</span>
+              <span class="badge badge-info">Topics</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuration -->
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header"><span>⚙️ NLP Configuration</span></div>
+          <div style="padding:14px 16px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;">
+              <div>
+                <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:6px;">TEXT COLUMN</label>
+                <select id="nlpColumnSel" style="width:100%;padding:8px 12px;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:6px;font-size:0.86rem;">
+                  <option value="">-- Select text column --</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:6px;">ANALYSIS TYPE</label>
+                <select id="nlpAnalysisType" style="width:100%;padding:8px 12px;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:6px;font-size:0.86rem;">
+                  <option value="all">All Analysis</option>
+                  <option value="sentiment">Sentiment Only</option>
+                  <option value="keywords">Keywords Only</option>
+                  <option value="topics">Topic Modeling</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.8rem;color:var(--text-muted);display:block;margin-bottom:6px;">MAX ROWS TO ANALYZE</label>
+                <input type="number" id="nlpMaxRows" value="500" min="10" max="10000"
+                  style="width:100%;padding:8px 12px;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:6px;font-size:0.86rem;"
+                />
+              </div>
+              <button class="btn btn-primary" onclick="runNLPAnalysis()" style="padding:10px 18px;">🧠 Analyze</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results Tabs -->
+        <div style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--card-border);padding-bottom:10px;">
+          <button class="btn btn-primary nlp-tab-btn" id="nlpTabBtnSentiment" onclick="switchNLPTab('Sentiment')">😊 Sentiment</button>
+          <button class="btn btn-outline nlp-tab-btn" id="nlpTabBtnKeywords" onclick="switchNLPTab('Keywords')">🔑 Keywords</button>
+          <button class="btn btn-outline nlp-tab-btn" id="nlpTabBtnTopics" onclick="switchNLPTab('Topics')">📋 Topics</button>
+          <button class="btn btn-outline nlp-tab-btn" id="nlpTabBtnWordFreq" onclick="switchNLPTab('WordFreq')">📊 Word Frequency</button>
+        </div>
+
+        <!-- Sentiment Panel -->
+        <div id="nlpPanelSentiment">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;">
+            <div class="panel" style="text-align:center;padding:20px 10px;">
+              <div style="font-size:2rem;font-weight:800;color:#10b981;" id="nlpPosScore">—</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">POSITIVE</div>
+            </div>
+            <div class="panel" style="text-align:center;padding:20px 10px;">
+              <div style="font-size:2rem;font-weight:800;color:#ef4444;" id="nlpNegScore">—</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">NEGATIVE</div>
+            </div>
+            <div class="panel" style="text-align:center;padding:20px 10px;">
+              <div style="font-size:2rem;font-weight:800;color:#94a3b8;" id="nlpNeuScore">—</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">NEUTRAL</div>
+            </div>
+            <div class="panel" style="text-align:center;padding:20px 10px;">
+              <div style="font-size:2rem;font-weight:800;color:#fbbf24;" id="nlpSentLabel">—</div>
+              <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">OVERALL</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span>😊 Sentiment Distribution</span></div>
+            <div id="nlpSentimentChart" style="padding:14px 16px;">
+              <div style="background:rgba(16,185,129,0.15);border-radius:6px;height:24px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;">
+                <span style="font-size:0.8rem;color:#34d399;">Positive</span>
+                <div id="nlpPosBar" style="flex:1;height:10px;background:#10b981;border-radius:4px;margin:0 8px;width:0%;transition:width 0.5s;"></div>
+                <span id="nlpPosPct" style="font-size:0.8rem;color:#34d399;">0%</span>
+              </div>
+              <div style="background:rgba(239,68,68,0.15);border-radius:6px;height:24px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;">
+                <span style="font-size:0.8rem;color:#f87171;">Negative</span>
+                <div id="nlpNegBar" style="flex:1;height:10px;background:#ef4444;border-radius:4px;margin:0 8px;width:0%;transition:width 0.5s;"></div>
+                <span id="nlpNegPct" style="font-size:0.8rem;color:#f87171;">0%</span>
+              </div>
+              <div style="background:rgba(148,163,184,0.1);border-radius:6px;height:24px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;">
+                <span style="font-size:0.8rem;color:#94a3b8;">Neutral&nbsp;</span>
+                <div id="nlpNeuBar" style="flex:1;height:10px;background:#64748b;border-radius:4px;margin:0 8px;width:0%;transition:width 0.5s;"></div>
+                <span id="nlpNeuPct" style="font-size:0.8rem;color:#94a3b8;">0%</span>
+              </div>
+            </div>
+            <div id="nlpSentimentSamples" style="padding:0 16px 14px;font-size:0.85rem;line-height:1.7;color:var(--text-muted);">
+              Run analysis to see sentiment breakdown.
+            </div>
+          </div>
+        </div>
+
+        <!-- Keywords Panel -->
+        <div id="nlpPanelKeywords" style="display:none;">
+          <div class="panel">
+            <div class="panel-header"><span>🔑 Top Keywords & Phrases</span></div>
+            <div id="nlpKeywordsContainer" style="padding:14px 16px;display:flex;flex-wrap:wrap;gap:8px;min-height:100px;">
+              <span style="color:var(--text-muted);font-size:0.86rem;">Run NLP analysis to extract keywords.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Topics Panel -->
+        <div id="nlpPanelTopics" style="display:none;">
+          <div class="panel">
+            <div class="panel-header"><span>📋 Topic Clusters</span></div>
+            <div id="nlpTopicsContainer" style="padding:14px 16px;min-height:100px;">
+              <span style="color:var(--text-muted);font-size:0.86rem;">Run NLP analysis to detect topics.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Word Frequency Panel -->
+        <div id="nlpPanelWordFreq" style="display:none;">
+          <div class="panel">
+            <div class="panel-header"><span>📊 Word Frequency Analysis</span></div>
+            <div style="overflow-x:auto;padding:0 0 4px 0;">
+              <table style="width:100%;border-collapse:collapse;font-size:0.84rem;" id="nlpWordFreqTable">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--card-border);background:rgba(15,23,42,0.4);">
+                    <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Rank</th>
+                    <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Word</th>
+                    <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">Frequency</th>
+                    <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">% of Total</th>
+                    <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Bar</th>
+                  </tr>
+                </thead>
+                <tbody id="nlpWordFreqBody">
+                  <tr><td colspan="5" style="padding:24px;text-align:center;color:var(--text-muted);">Run NLP analysis to see word frequencies.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- MODULE 23: MODEL REGISTRY & LEADERBOARD -->
+      <div id="moduleRegistry" class="module-view">
+
+        <!-- Hero Banner -->
+        <div class="banner-box" style="border-left-color:#10b981;margin-bottom:18px;background:linear-gradient(135deg,rgba(16,185,129,0.1) 0%,rgba(6,182,212,0.05) 100%);">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h4 style="color:#34d399;margin-bottom:4px;font-size:1.15rem;font-weight:700;">🏆 Model Registry & AutoML Leaderboard</h4>
+              <p style="font-size:0.84rem;color:var(--text-muted);margin:0;">
+                Browse all trained models, compare performance metrics, manage model lifecycle (deploy, archive, delete), and track AutoML pipeline results.
+              </p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button class="btn btn-primary" onclick="loadModelRegistry()" style="padding:8px 16px;">🔄 Refresh Registry</button>
+              <button class="btn btn-outline" onclick="clearModelRegistry()" style="padding:8px 14px;">🗑️ Clear All</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Registry Stats -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;">
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#10b981;" id="regTotalModels">0</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">TOTAL MODELS</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#38bdf8;" id="regBestAccuracy">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">BEST ACCURACY</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#a78bfa;" id="regActiveModel">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">ACTIVE MODEL</div>
+          </div>
+          <div class="panel" style="text-align:center;padding:20px 10px;">
+            <div style="font-size:2.2rem;font-weight:800;color:#fbbf24;" id="regLastTrained">—</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">LAST TRAINED</div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="panel" style="margin-bottom:16px;">
+          <div class="panel-header" style="justify-content:space-between;">
+            <span>🏆 Model Leaderboard</span>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <input type="text" id="regSearchInput" placeholder="Search models..." onkeyup="filterRegistry()"
+                style="padding:6px 10px;background:rgba(15,23,42,0.6);color:var(--text);border:1px solid var(--card-border);border-radius:6px;font-size:0.82rem;width:180px;"
+              />
+              <select id="regSortBy" onchange="sortRegistry()" style="padding:6px 10px;background:var(--card-bg);color:var(--text);border:1px solid var(--card-border);border-radius:6px;font-size:0.82rem;">
+                <option value="accuracy">Sort: Accuracy</option>
+                <option value="f1">Sort: F1 Score</option>
+                <option value="date">Sort: Date</option>
+                <option value="name">Sort: Name</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
+              <thead>
+                <tr style="border-bottom:1px solid var(--card-border);background:rgba(15,23,42,0.4);">
+                  <th style="padding:10px 12px;text-align:center;color:var(--text-muted);">Rank</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Model</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Task</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">Accuracy</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">F1</th>
+                  <th style="padding:10px 12px;text-align:right;color:var(--text-muted);">AUC</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Target</th>
+                  <th style="padding:10px 12px;text-align:left;color:var(--text-muted);">Trained</th>
+                  <th style="padding:10px 12px;text-align:center;color:var(--text-muted);">Status</th>
+                  <th style="padding:10px 12px;text-align:center;color:var(--text-muted);">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="regLeaderboardBody">
+                <tr><td colspan="10" style="padding:24px;text-align:center;color:var(--text-muted);">No models in registry. Train a model in the ML Studio, then refresh here.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Model Details Drawer -->
+        <div id="regModelDetails" style="display:none;" class="panel">
+          <div class="panel-header" style="justify-content:space-between;">
+            <span id="regDetailModelName">Model Details</span>
+            <button class="btn btn-outline" style="padding:4px 10px;font-size:0.8rem;" onclick="document.getElementById('regModelDetails').style.display='none'">✕ Close</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:14px 16px;">
+            <div>
+              <div style="margin-bottom:12px;"><strong style="color:var(--text-muted);font-size:0.78rem;">HYPERPARAMETERS</strong>
+                <pre id="regDetailParams" style="margin-top:6px;font-size:0.8rem;background:rgba(15,23,42,0.6);padding:10px;border-radius:6px;color:#a5f3fc;overflow:auto;max-height:150px;">—</pre>
+              </div>
+              <div><strong style="color:var(--text-muted);font-size:0.78rem;">FEATURE IMPORTANCE (TOP 10)</strong>
+                <div id="regDetailFeatures" style="margin-top:6px;font-size:0.84rem;color:var(--text-muted);">—</div>
+              </div>
+            </div>
+            <div>
+              <div style="margin-bottom:12px;"><strong style="color:var(--text-muted);font-size:0.78rem;">PERFORMANCE METRICS</strong>
+                <div id="regDetailMetrics" style="margin-top:6px;"></div>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                <button class="btn btn-primary" id="regDeployBtn" onclick="deployModel()" style="padding:8px 14px;">🚀 Set as Active</button>
+                <button class="btn btn-outline" id="regExportBtn" onclick="exportModelMetrics()" style="padding:8px 14px;">📥 Export Metrics</button>
+                <button class="btn btn-outline" style="padding:8px 14px;border-color:#ef4444;color:#ef4444;" onclick="deleteSelectedModel()">🗑️ Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AutoML Leaderboard Section -->
+        <div class="panel">
+          <div class="panel-header" style="justify-content:space-between;">
+            <span>🤖 AutoML Pipeline Results</span>
+            <button class="btn btn-outline" onclick="loadAutoMLLeaderboard()" style="padding:6px 12px;font-size:0.82rem;">🔄 Load AutoML Results</button>
+          </div>
+          <div id="regAutoMLContainer" style="padding:14px 16px;">
+            <div style="color:var(--text-muted);font-size:0.86rem;text-align:center;padding:20px;">
+              Run AutoML in the ML Studio (module 13), then click <strong>Load AutoML Results</strong> to see the full pipeline leaderboard here.
+            </div>
+          </div>
+        </div>
+
       </div>
 
     </main>
@@ -16601,6 +17115,625 @@ result = df.describe()
     }
 
 
-  </script>
+  
+
+    // ================================================================
+    // MODULE 20: AI CHART RECOMMENDER
+    // ================================================================
+    function setChartPrompt(text) {
+      const inp = document.getElementById('aiChartQueryInput');
+      if (inp) inp.value = text;
+    }
+
+    async function runAIChartRecommender() {
+      const query = (document.getElementById('aiChartQueryInput') || {}).value || '';
+      if (!query.trim()) { alert('Please enter a chart query.'); return; }
+      const badge = document.getElementById('vizStatusBadge');
+      if (badge) { badge.textContent = 'Processing...'; badge.className = 'badge badge-warning'; }
+
+      document.getElementById('vizEmptyState').style.display = 'none';
+      document.getElementById('vizResultPanel').style.display = 'none';
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/charts/recommend`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, dataset_id: 'default' })
+        });
+        const res = await resp.json();
+        if (!resp.ok || res.status === 'error') throw new Error(res.message || 'Error from API');
+
+        if (res.mode === 'collection' && res.collection) {
+          renderChartCollection(res.collection, res.summary || '');
+        } else {
+          renderSingleChart(res);
+        }
+        if (badge) { badge.textContent = 'Done'; badge.className = 'badge badge-success'; }
+      } catch (err) {
+        console.warn('AI Chart API failed, using client-side fallback:', err);
+        renderChartFallback(query);
+        if (badge) { badge.textContent = 'Offline Mode'; badge.className = 'badge badge-warning'; }
+      }
+    }
+
+    async function createBestChartsCollection() {
+      const badge = document.getElementById('vizStatusBadge');
+      if (badge) { badge.textContent = 'Generating Suite...'; badge.className = 'badge badge-warning'; }
+      document.getElementById('vizEmptyState').style.display = 'none';
+      document.getElementById('vizResultPanel').style.display = 'none';
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/charts/best-collection`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ dataset_id: 'default', max_charts: 6 })
+        });
+        const res = await resp.json();
+        if (!resp.ok) throw new Error(res.message || 'Error');
+        renderChartCollection(res.collection || [], res.summary || `Generated ${(res.collection||[]).length} charts`);
+        if (badge) { badge.textContent = 'Done'; badge.className = 'badge badge-success'; }
+      } catch (err) {
+        console.warn('Best-collection API failed:', err);
+        renderChartFallback('best charts collection');
+        if (badge) { badge.textContent = 'Offline'; badge.className = 'badge badge-warning'; }
+      }
+    }
+
+    function renderSingleChart(res) {
+      document.getElementById('vizResultPanel').style.display = 'block';
+      document.getElementById('vizSingleResult').style.display = 'block';
+      document.getElementById('vizCollectionResult').style.display = 'none';
+
+      const title = res.title || 'AI Recommended Visualization';
+      document.getElementById('vizChartTitle').textContent = title;
+      document.getElementById('vizChartTypeBadge').textContent = res.chart_type_label || res.chart_type || 'Chart';
+      document.getElementById('vizRationale').textContent = res.rationale || '—';
+      document.getElementById('vizChartTypeDetail').textContent = res.chart_type_label || '—';
+      document.getElementById('vizFeaturesUsed').textContent = (res.relevant_columns || res.matched_columns || []).join(', ') || '—';
+      document.getElementById('vizIntent').textContent = res.intent || '—';
+      document.getElementById('vizExplanation').innerHTML = res.explanation || '—';
+      document.getElementById('vizChartCaption').textContent = `X: ${res.col_x||'—'} | Y: ${res.col_y||'—'}`;
+
+      // Render patterns
+      const patEl = document.getElementById('vizPatternsList');
+      const pats = res.patterns || [];
+      patEl.innerHTML = pats.length > 0
+        ? pats.map(p => `<div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-muted);">• ${p}</div>`).join('')
+        : '<span style="color:var(--text-muted);font-size:0.86rem;">No patterns detected.</span>';
+
+      // Show chart info (Plotly figures can't be embedded directly from API JSON in pure HTML)
+      document.getElementById('vizChartContainer').innerHTML =
+        `<div style="text-align:center;padding:20px;">
+          <div style="font-size:3rem;margin-bottom:12px;">📊</div>
+          <strong style="color:var(--text);">${title}</strong><br/>
+          <span style="color:var(--text-muted);font-size:0.85rem;">Chart type: ${res.chart_type_label||res.chart_type||'—'} | View in Streamlit app for interactive Plotly chart</span>
+        </div>`;
+    }
+
+    function renderChartCollection(collection, summary) {
+      document.getElementById('vizResultPanel').style.display = 'block';
+      document.getElementById('vizSingleResult').style.display = 'none';
+      document.getElementById('vizCollectionResult').style.display = 'block';
+      document.getElementById('vizCollectionSummary').textContent = summary || `${collection.length} charts generated`;
+
+      const grid = document.getElementById('vizCollectionGrid');
+      grid.innerHTML = collection.map((item, i) => `
+        <div class="panel">
+          <div class="panel-header" style="justify-content:space-between;">
+            <span>${item.title || 'Visualization ' + (i+1)}</span>
+            <span class="badge badge-info">${item.chart_type_label || item.chart_type || 'Chart'}</span>
+          </div>
+          <div style="padding:12px 16px;">
+            <div style="background:rgba(15,23,42,0.4);border-radius:8px;padding:20px;text-align:center;margin-bottom:10px;">
+              <div style="font-size:2rem;margin-bottom:8px;">📊</div>
+              <span style="font-size:0.82rem;color:var(--text-muted);">Type: ${item.chart_type_label||'—'}<br/>X: ${item.col_x||'—'} | Y: ${item.col_y||'—'}</span>
+            </div>
+            <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.5;">${item.rationale || ''}</div>
+            ${(item.patterns||[]).length > 0 ? '<div style="margin-top:8px;font-size:0.8rem;color:#38bdf8;">• ' + (item.patterns||[]).join('<br/>• ') + '</div>' : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderChartFallback(query) {
+      // Client-side fallback using current dataset
+      if (!rawDataset || rawDataset.length === 0) {
+        document.getElementById('vizEmptyState').style.display = 'block';
+        return;
+      }
+      const numericCols = Object.keys(rawDataset[0]).filter(k => rawDataset.every(r => !isNaN(parseFloat(r[k])) && r[k] !== null && r[k] !== ''));
+      const textCols = Object.keys(rawDataset[0]).filter(k => !numericCols.includes(k));
+
+      document.getElementById('vizResultPanel').style.display = 'block';
+      document.getElementById('vizSingleResult').style.display = 'block';
+      document.getElementById('vizCollectionResult').style.display = 'none';
+
+      const lq = query.toLowerCase();
+      let chartType = 'bar';
+      if (lq.includes('scatter') || lq.includes('relationship') || lq.includes('correlation')) chartType = 'scatter';
+      else if (lq.includes('line') || lq.includes('trend') || lq.includes('time')) chartType = 'line';
+      else if (lq.includes('hist') || lq.includes('distribution')) chartType = 'histogram';
+      else if (lq.includes('heatmap')) chartType = 'heatmap';
+
+      const fakeTitle = `${chartType.charAt(0).toUpperCase()+chartType.slice(1)} Chart (Client-side, offline)`;
+      document.getElementById('vizChartTitle').textContent = fakeTitle;
+      document.getElementById('vizChartTypeBadge').textContent = chartType;
+      document.getElementById('vizRationale').textContent = `Detected intent: ${chartType} based on your query. Connect to backend for full AI-powered recommendation.`;
+      document.getElementById('vizChartTypeDetail').textContent = chartType;
+      document.getElementById('vizFeaturesUsed').textContent = numericCols.slice(0,3).join(', ') || '—';
+      document.getElementById('vizIntent').textContent = 'Auto-detected (offline)';
+      document.getElementById('vizExplanation').textContent = 'Backend API not available. Showing client-side analysis.';
+      document.getElementById('vizChartContainer').innerHTML =
+        `<div style="text-align:center;padding:20px;"><div style="font-size:3rem;margin-bottom:12px;">📊</div>
+        <strong>${fakeTitle}</strong><br/><span style="color:var(--text-muted);font-size:0.85rem;">
+        ${rawDataset.length.toLocaleString()} rows × ${Object.keys(rawDataset[0]).length} columns</span></div>`;
+      document.getElementById('vizPatternsList').innerHTML = '<div style="color:var(--text-muted);font-size:0.86rem;">• Start the FastAPI backend to enable pattern detection.</div>';
+      document.getElementById('vizChartCaption').textContent = '';
+    }
+
+    // ================================================================
+    // MODULE 21: DATA QUALITY AUDIT
+    // ================================================================
+    async function runDataQualityAudit() {
+      const badge = document.getElementById('dqStatusBadge');
+      if (badge) { badge.textContent = 'Auditing...'; badge.className = 'badge badge-warning'; }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/data/quality-report?dataset_id=default`);
+        const report = await resp.json();
+        if (!resp.ok) throw new Error(report.detail || 'API error');
+        renderDataQualityReport(report);
+        if (badge) { badge.textContent = 'Complete'; badge.className = 'badge badge-success'; }
+      } catch (err) {
+        console.warn('Quality API failed, using client-side:', err);
+        runDataQualityClientSide();
+        if (badge) { badge.textContent = 'Offline Mode'; badge.className = 'badge badge-warning'; }
+      }
+    }
+
+    function runDataQualityClientSide() {
+      if (!rawDataset || rawDataset.length === 0) {
+        alert('Please upload a dataset first.'); return;
+      }
+      const cols = Object.keys(rawDataset[0]);
+      const n = rawDataset.length;
+      const profiles = cols.map(col => {
+        const vals = rawDataset.map(r => r[col]);
+        const nulls = vals.filter(v => v === null || v === '' || v === undefined).length;
+        const nullPct = ((nulls / n) * 100).toFixed(1);
+        const unique = new Set(vals.filter(v => v !== null && v !== '')).size;
+        const numVals = vals.map(v => parseFloat(v)).filter(v => !isNaN(v));
+        let outliers = 0;
+        if (numVals.length > 4) {
+          const sorted = [...numVals].sort((a,b)=>a-b);
+          const q1 = sorted[Math.floor(sorted.length*0.25)];
+          const q3 = sorted[Math.floor(sorted.length*0.75)];
+          const iqr = q3 - q1;
+          outliers = numVals.filter(v => v < q1 - 1.5*iqr || v > q3 + 1.5*iqr).length;
+        }
+        const dtype = numVals.length > n*0.7 ? 'numeric' : 'text';
+        const health = nullPct > 30 ? 'Poor' : nullPct > 10 ? 'Fair' : 'Good';
+        return { col, dtype, nullPct, unique, outliers, health };
+      });
+
+      renderDataQualityReport({
+        overall_score: Math.round(100 - profiles.reduce((s, p) => s + parseFloat(p.nullPct), 0) / cols.length),
+        avg_null_pct: (profiles.reduce((s, p) => s + parseFloat(p.nullPct), 0) / cols.length).toFixed(1) + '%',
+        duplicates: 0,
+        outlier_cols: profiles.filter(p => p.outliers > 0).length,
+        column_count: cols.length,
+        columns: profiles,
+        issues: profiles.filter(p => parseFloat(p.nullPct) > 10).map(p => `Column '${p.col}' has ${p.nullPct}% null values`),
+        recommendations: profiles.filter(p => parseFloat(p.nullPct) > 0).map(p => `Impute or drop nulls in '${p.col}'`)
+      });
+    }
+
+    function renderDataQualityReport(report) {
+      // Score cards
+      document.getElementById('dqOverallScore').textContent = (report.overall_score || '—') + (report.overall_score ? '%' : '');
+      document.getElementById('dqNullPct').textContent = report.avg_null_pct || '—';
+      document.getElementById('dqDuplicates').textContent = report.duplicates ?? '—';
+      document.getElementById('dqOutliers').textContent = report.outlier_cols ?? '—';
+      document.getElementById('dqColumns').textContent = report.column_count || (report.columns||[]).length || '—';
+
+      // Column profile table
+      const tbody = document.getElementById('dqProfileBody');
+      const cols = report.columns || [];
+      if (cols.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="padding:20px;text-align:center;color:var(--text-muted);">No column data available.</td></tr>';
+      } else {
+        tbody.innerHTML = cols.map(c => {
+          const hColor = c.health === 'Good' ? '#10b981' : c.health === 'Fair' ? '#f59e0b' : '#ef4444';
+          return `<tr style="border-bottom:1px solid rgba(51,65,85,0.4);">
+            <td style="padding:9px 12px;font-weight:600;">${c.col}</td>
+            <td style="padding:9px 12px;color:var(--text-muted);">${c.dtype}</td>
+            <td style="padding:9px 12px;text-align:right;color:${parseFloat(c.nullPct)>10?'#ef4444':'var(--text)'};">${c.nullPct}%</td>
+            <td style="padding:9px 12px;text-align:right;">${c.unique}</td>
+            <td style="padding:9px 12px;text-align:right;color:${c.outliers>0?'#f59e0b':'var(--text)'};">${c.outliers}</td>
+            <td style="padding:9px 12px;text-align:center;"><span class="badge" style="background:${hColor}20;color:${hColor};border:1px solid ${hColor}50;">${c.health}</span></td>
+            <td style="padding:9px 12px;font-size:0.8rem;color:#f59e0b;">${c.nullPct>10?'High nulls':c.outliers>0?'Outliers':''}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Issues
+      const issues = report.issues || [];
+      document.getElementById('dqIssuesList').innerHTML = issues.length > 0
+        ? issues.map(i => `<div style="margin-bottom:8px;font-size:0.85rem;padding:8px 10px;background:rgba(239,68,68,0.1);border-left:3px solid #ef4444;border-radius:4px;color:#fca5a5;">⚠️ ${i}</div>`).join('')
+        : '<div style="color:#10b981;font-size:0.86rem;">✅ No critical issues detected.</div>';
+
+      // Recommendations
+      const recs = report.recommendations || [];
+      document.getElementById('dqRecommendationsList').innerHTML = recs.length > 0
+        ? recs.map(r => `<div style="margin-bottom:8px;font-size:0.85rem;padding:8px 10px;background:rgba(56,189,248,0.08);border-left:3px solid #38bdf8;border-radius:4px;color:#7dd3fc;">💡 ${r}</div>`).join('')
+        : '<div style="color:var(--text-muted);font-size:0.86rem;">No specific recommendations at this time.</div>';
+    }
+
+    async function exportQualityReport() {
+      const rows = Array.from(document.querySelectorAll('#dqProfileTable tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim()).join(',')
+      );
+      const csv = 'Column,Type,Null%,Unique,Outliers,Health,Issues
+' + rows.join('
+');
+      const a = document.createElement('a');
+      a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+      a.download = 'data_quality_report.csv';
+      a.click();
+    }
+
+    // ================================================================
+    // MODULE 22: NLP & TEXT ANALYTICS
+    // ================================================================
+    function switchNLPTab(tab) {
+      ['Sentiment','Keywords','Topics','WordFreq'].forEach(t => {
+        const btn = document.getElementById('nlpTabBtn' + t);
+        const panel = document.getElementById('nlpPanel' + t);
+        if (btn) btn.className = t === tab ? 'btn btn-primary nlp-tab-btn' : 'btn btn-outline nlp-tab-btn';
+        if (panel) panel.style.display = t === tab ? 'block' : 'none';
+      });
+    }
+
+    function initNLPModule() {
+      // Populate text column selector
+      const sel = document.getElementById('nlpColumnSel');
+      if (!sel || !rawDataset || rawDataset.length === 0) return;
+      const cols = Object.keys(rawDataset[0]);
+      const textCols = cols.filter(col => {
+        const vals = rawDataset.slice(0,50).map(r => r[col]).filter(v => v && String(v).length > 5);
+        return vals.length > 5 && vals.some(v => isNaN(parseFloat(v)));
+      });
+      sel.innerHTML = '<option value="">-- Select text column --</option>' +
+        textCols.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    async function runNLPAnalysis() {
+      const col = document.getElementById('nlpColumnSel').value;
+      const type = document.getElementById('nlpAnalysisType').value;
+      const maxRows = parseInt(document.getElementById('nlpMaxRows').value) || 500;
+      if (!col) { alert('Please select a text column.'); return; }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/nlp/analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ column: col, analysis_type: type, max_rows: maxRows, dataset_id: 'default' })
+        });
+        const res = await resp.json();
+        if (!resp.ok) throw new Error(res.detail || 'API error');
+        renderNLPResults(res);
+      } catch (err) {
+        console.warn('NLP API failed, using client-side:', err);
+        runNLPClientSide(col, type, maxRows);
+      }
+    }
+
+    function runNLPClientSide(col, type, maxRows) {
+      if (!rawDataset || rawDataset.length === 0) return;
+      const texts = rawDataset.slice(0, maxRows).map(r => String(r[col] || '')).filter(Boolean);
+
+      // Simple client-side sentiment (keyword-based)
+      const posWords = ['good','great','excellent','amazing','love','best','perfect','fantastic','wonderful','awesome','happy','positive','success'];
+      const negWords = ['bad','terrible','awful','hate','worst','horrible','poor','negative','failure','problem','issue','error','wrong'];
+
+      let pos = 0, neg = 0;
+      const wordFreq = {};
+      const stopWords = new Set(['the','a','an','is','are','was','were','be','been','and','or','but','in','on','at','to','for','of','with','this','that','it','he','she','they','we','i','you']);
+
+      texts.forEach(text => {
+        const words = text.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).filter(w => w.length > 2);
+        let rowPos = 0, rowNeg = 0;
+        words.forEach(w => {
+          if (!stopWords.has(w)) wordFreq[w] = (wordFreq[w] || 0) + 1;
+          if (posWords.includes(w)) rowPos++;
+          if (negWords.includes(w)) rowNeg++;
+        });
+        if (rowPos > rowNeg) pos++;
+        else if (rowNeg > rowPos) neg++;
+      });
+
+      const total = texts.length;
+      const neutral = total - pos - neg;
+      const topWords = Object.entries(wordFreq).sort((a,b) => b[1]-a[1]).slice(0, 30);
+
+      renderNLPResults({
+        sentiment: { positive: pos, negative: neg, neutral: neutral, total, label: pos > neg ? 'Positive' : neg > pos ? 'Negative' : 'Neutral' },
+        keywords: topWords.slice(0, 20).map(([word, count]) => ({ word, count, score: count/total })),
+        topics: [
+          { label: 'Topic 1', keywords: topWords.slice(0, 5).map(([w]) => w) },
+          { label: 'Topic 2', keywords: topWords.slice(5, 10).map(([w]) => w) },
+          { label: 'Topic 3', keywords: topWords.slice(10, 15).map(([w]) => w) },
+        ],
+        word_freq: topWords.map(([word, count]) => ({ word, count }))
+      });
+    }
+
+    function renderNLPResults(res) {
+      // Sentiment
+      const s = res.sentiment || {};
+      const total = s.total || 1;
+      const posPct = Math.round((s.positive||0)/total*100);
+      const negPct = Math.round((s.negative||0)/total*100);
+      const neuPct = 100 - posPct - negPct;
+
+      document.getElementById('nlpPosScore').textContent = (s.positive||0).toLocaleString();
+      document.getElementById('nlpNegScore').textContent = (s.negative||0).toLocaleString();
+      document.getElementById('nlpNeuScore').textContent = (s.neutral||neutral||0).toLocaleString();
+      document.getElementById('nlpSentLabel').textContent = s.label || 'Mixed';
+      document.getElementById('nlpPosPct').textContent = posPct + '%';
+      document.getElementById('nlpNegPct').textContent = negPct + '%';
+      document.getElementById('nlpNeuPct').textContent = neuPct + '%';
+      document.getElementById('nlpPosBar').style.width = posPct + '%';
+      document.getElementById('nlpNegBar').style.width = negPct + '%';
+      document.getElementById('nlpNeuBar').style.width = neuPct + '%';
+      document.getElementById('nlpSentimentSamples').innerHTML =
+        `<strong>${total.toLocaleString()}</strong> texts analyzed — <span style="color:#34d399;">${posPct}% positive</span>, <span style="color:#f87171;">${negPct}% negative</span>, <span style="color:#94a3b8;">${neuPct}% neutral</span>`;
+
+      // Keywords
+      const kws = res.keywords || [];
+      document.getElementById('nlpKeywordsContainer').innerHTML = kws.map(k =>
+        `<span style="display:inline-block;padding:4px 10px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.35);border-radius:20px;font-size:0.82rem;color:#a5b4fc;cursor:default;" title="Count: ${k.count}">${k.word}</span>`
+      ).join(' ') || '<span style="color:var(--text-muted);">No keywords extracted.</span>';
+
+      // Topics
+      const topics = res.topics || [];
+      document.getElementById('nlpTopicsContainer').innerHTML = topics.map((t, i) =>
+        `<div style="margin-bottom:12px;padding:10px 14px;background:rgba(15,23,42,0.5);border-left:3px solid ${['#6366f1','#10b981','#f59e0b','#ef4444','#38bdf8'][i%5]};border-radius:0 6px 6px 0;">
+          <strong style="font-size:0.88rem;">${t.label || 'Topic ' + (i+1)}</strong><br/>
+          <span style="font-size:0.82rem;color:var(--text-muted);">${(t.keywords||[]).join(', ')}</span>
+        </div>`
+      ).join('') || '<span style="color:var(--text-muted);">No topics detected.</span>';
+
+      // Word Frequency
+      const wf = res.word_freq || (res.keywords || []).map(k => ({ word: k.word, count: k.count }));
+      const maxCount = Math.max(...wf.map(w => w.count), 1);
+      const totalWords = wf.reduce((s, w) => s + w.count, 0) || 1;
+      document.getElementById('nlpWordFreqBody').innerHTML = wf.slice(0, 30).map((w, i) =>
+        `<tr style="border-bottom:1px solid rgba(51,65,85,0.3);">
+          <td style="padding:8px 12px;color:var(--text-muted);">#${i+1}</td>
+          <td style="padding:8px 12px;font-weight:600;">${w.word}</td>
+          <td style="padding:8px 12px;text-align:right;">${w.count.toLocaleString()}</td>
+          <td style="padding:8px 12px;text-align:right;">${((w.count/totalWords)*100).toFixed(2)}%</td>
+          <td style="padding:8px 12px;"><div style="height:8px;background:rgba(99,102,241,0.3);border-radius:4px;overflow:hidden;"><div style="height:100%;background:#6366f1;width:${(w.count/maxCount*100).toFixed(1)}%;border-radius:4px;"></div></div></td>
+        </tr>`
+      ).join('') || '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text-muted);">No word frequency data.</td></tr>';
+    }
+
+    // ================================================================
+    // MODULE 23: MODEL REGISTRY
+    // ================================================================
+    let registryData = [];
+    let selectedModelIdx = null;
+
+    async function loadModelRegistry() {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/ml/registry`);
+        const data = await resp.json();
+        if (!resp.ok) throw new Error(data.detail || 'Error');
+        registryData = data.models || data || [];
+        renderRegistry(registryData);
+      } catch (err) {
+        console.warn('Registry API failed, loading local:', err);
+        // Try to load from localStorage
+        const local = localStorage.getItem('datamind_model_registry');
+        if (local) {
+          try { registryData = JSON.parse(local); renderRegistry(registryData); return; } catch(e) {}
+        }
+        registryData = [];
+        renderRegistry([]);
+      }
+    }
+
+    function renderRegistry(models) {
+      document.getElementById('regTotalModels').textContent = models.length;
+      if (models.length > 0) {
+        const bestAcc = Math.max(...models.map(m => parseFloat(m.accuracy||m.test_accuracy||0)||0));
+        document.getElementById('regBestAccuracy').textContent = (bestAcc*100).toFixed(1) + '%';
+        const active = models.find(m => m.status === 'active' || m.is_active);
+        document.getElementById('regActiveModel').textContent = active ? (active.name||active.model_type||'—') : '—';
+        const last = models[models.length-1];
+        const dt = last.trained_at || last.timestamp || last.date || '—';
+        document.getElementById('regLastTrained').textContent = dt !== '—' ? dt.substring(0,10) : '—';
+      } else {
+        document.getElementById('regBestAccuracy').textContent = '—';
+        document.getElementById('regActiveModel').textContent = '—';
+        document.getElementById('regLastTrained').textContent = '—';
+      }
+
+      const tbody = document.getElementById('regLeaderboardBody');
+      if (models.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="padding:24px;text-align:center;color:var(--text-muted);">No models in registry. Train a model in the ML Studio (module 13).</td></tr>';
+        return;
+      }
+
+      const sorted = [...models].sort((a,b) => (parseFloat(b.accuracy||b.test_accuracy||0)||0) - (parseFloat(a.accuracy||a.test_accuracy||0)||0));
+      tbody.innerHTML = sorted.map((m, i) => {
+        const acc = parseFloat(m.accuracy||m.test_accuracy||0);
+        const f1 = parseFloat(m.f1||m.f1_score||0);
+        const auc = parseFloat(m.auc||m.roc_auc||0);
+        const isActive = m.status === 'active' || m.is_active;
+        return `<tr style="border-bottom:1px solid rgba(51,65,85,0.4);cursor:pointer;" onclick="showModelDetails(${i})">
+          <td style="padding:10px 12px;text-align:center;">
+            ${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}
+          </td>
+          <td style="padding:10px 12px;font-weight:600;">${m.name||m.model_type||m.algorithm||'Unknown'}</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">${m.task||m.task_type||'—'}</td>
+          <td style="padding:10px 12px;text-align:right;color:${acc>0.9?'#10b981':acc>0.75?'#fbbf24':'#ef4444'};">${acc>0?(acc*100).toFixed(2)+'%':'—'}</td>
+          <td style="padding:10px 12px;text-align:right;">${f1>0?(f1*100).toFixed(2)+'%':'—'}</td>
+          <td style="padding:10px 12px;text-align:right;">${auc>0?auc.toFixed(3):'—'}</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">${m.target||m.target_column||'—'}</td>
+          <td style="padding:10px 12px;font-size:0.8rem;color:var(--text-muted);">${(m.trained_at||m.timestamp||'—').substring(0,16)}</td>
+          <td style="padding:10px 12px;text-align:center;">
+            <span class="badge ${isActive?'badge-success':'badge-info'}">${isActive?'Active':'Saved'}</span>
+          </td>
+          <td style="padding:10px 12px;text-align:center;">
+            <button class="btn btn-outline" style="padding:4px 8px;font-size:0.78rem;" onclick="event.stopPropagation();deployModelByIdx(${i})">Deploy</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function showModelDetails(idx) {
+      selectedModelIdx = idx;
+      const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
+      const m = sorted[idx];
+      document.getElementById('regModelDetails').style.display = 'block';
+      document.getElementById('regDetailModelName').textContent = m.name||m.model_type||'Model Details';
+      document.getElementById('regDetailParams').textContent = JSON.stringify(m.params||m.hyperparameters||{}, null, 2) || '{}';
+
+      const feats = m.feature_importance || m.features || [];
+      document.getElementById('regDetailFeatures').innerHTML = feats.length > 0
+        ? Object.entries(typeof feats === 'object' && !Array.isArray(feats) ? feats : {}).slice(0,10).map(([k,v]) =>
+            `<div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:0.82rem;"><span>${k}</span><span style="color:#38bdf8;">${typeof v==='number'?v.toFixed(4):v}</span></div>`
+          ).join('') || '<span style="color:var(--text-muted);">No feature importance data.</span>'
+        : '<span style="color:var(--text-muted);">No feature importance data.</span>';
+
+      const acc = parseFloat(m.accuracy||m.test_accuracy||0);
+      const f1 = parseFloat(m.f1||m.f1_score||0);
+      const auc = parseFloat(m.auc||m.roc_auc||0);
+      document.getElementById('regDetailMetrics').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="text-align:center;padding:12px;background:rgba(16,185,129,0.1);border-radius:6px;"><div style="font-size:1.4rem;font-weight:700;color:#10b981;">${acc>0?(acc*100).toFixed(2)+'%':'—'}</div><div style="font-size:0.75rem;color:var(--text-muted);">Accuracy</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(56,189,248,0.1);border-radius:6px;"><div style="font-size:1.4rem;font-weight:700;color:#38bdf8;">${f1>0?(f1*100).toFixed(2)+'%':'—'}</div><div style="font-size:0.75rem;color:var(--text-muted);">F1 Score</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(139,92,246,0.1);border-radius:6px;"><div style="font-size:1.4rem;font-weight:700;color:#a78bfa;">${auc>0?auc.toFixed(3):'—'}</div><div style="font-size:0.75rem;color:var(--text-muted);">AUC-ROC</div></div>
+          <div style="text-align:center;padding:12px;background:rgba(245,158,11,0.1);border-radius:6px;"><div style="font-size:1.4rem;font-weight:700;color:#fbbf24;">${m.train_rows||'—'}</div><div style="font-size:0.75rem;color:var(--text-muted);">Train Rows</div></div>
+        </div>`;
+    }
+
+    async function deployModelByIdx(idx) {
+      const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
+      const m = sorted[idx];
+      try {
+        await fetch(`${API_BASE_URL}/ml/deploy`, {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ model_id: m.id || m.model_id || idx })
+        });
+      } catch(e) {}
+      registryData.forEach(mdl => mdl.is_active = false);
+      m.is_active = true;
+      renderRegistry(registryData);
+      showToast('Model deployed as active model!', 'success');
+    }
+
+    function deployModel() { if (selectedModelIdx !== null) deployModelByIdx(selectedModelIdx); }
+    function deleteSelectedModel() {
+      if (selectedModelIdx === null) return;
+      const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
+      const m = sorted[selectedModelIdx];
+      registryData = registryData.filter(x => x !== m);
+      document.getElementById('regModelDetails').style.display = 'none';
+      renderRegistry(registryData);
+    }
+
+    function filterRegistry() {
+      const q = (document.getElementById('regSearchInput').value || '').toLowerCase();
+      const filtered = registryData.filter(m =>
+        (m.name||'').toLowerCase().includes(q) ||
+        (m.model_type||'').toLowerCase().includes(q) ||
+        (m.target||'').toLowerCase().includes(q) ||
+        (m.task||'').toLowerCase().includes(q)
+      );
+      renderRegistry(filtered);
+    }
+
+    function sortRegistry() {
+      const by = document.getElementById('regSortBy').value;
+      const sorted = [...registryData].sort((a,b) => {
+        if (by === 'accuracy') return (parseFloat(b.accuracy||b.test_accuracy||0)||0) - (parseFloat(a.accuracy||a.test_accuracy||0)||0);
+        if (by === 'f1') return (parseFloat(b.f1||b.f1_score||0)||0) - (parseFloat(a.f1||a.f1_score||0)||0);
+        if (by === 'date') return (b.trained_at||'').localeCompare(a.trained_at||'');
+        if (by === 'name') return (a.name||a.model_type||'').localeCompare(b.name||b.model_type||'');
+        return 0;
+      });
+      renderRegistry(sorted);
+    }
+
+    function clearModelRegistry() {
+      if (!confirm('Clear all models from the registry? This cannot be undone.')) return;
+      registryData = [];
+      localStorage.removeItem('datamind_model_registry');
+      renderRegistry([]);
+    }
+
+    function exportModelMetrics() {
+      if (selectedModelIdx === null) return;
+      const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
+      const m = sorted[selectedModelIdx];
+      const csv = 'Metric,Value
+Model,' + (m.name||m.model_type||'Unknown') + '
+Accuracy,' + (m.accuracy||'—') + '
+F1,' + (m.f1||'—') + '
+AUC,' + (m.auc||'—') + '
+Target,' + (m.target||'—') + '
+Trained,' + (m.trained_at||'—');
+      const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'model_metrics.csv'; a.click();
+    }
+
+    function loadAutoMLLeaderboard() {
+      const local = localStorage.getItem('datamind_automl_results');
+      if (!local) { document.getElementById('regAutoMLContainer').innerHTML = '<div style="color:var(--text-muted);font-size:0.86rem;text-align:center;padding:20px;">No AutoML results found. Run AutoML in the ML Studio first.</div>'; return; }
+      try {
+        const data = JSON.parse(local);
+        const rows = (data.results||data||[]);
+        document.getElementById('regAutoMLContainer').innerHTML =
+          `<table style="width:100%;border-collapse:collapse;font-size:0.84rem;">
+            <thead><tr style="border-bottom:1px solid var(--card-border);background:rgba(15,23,42,0.4);">
+              <th style="padding:8px 12px;text-align:left;color:var(--text-muted);">Model</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--text-muted);">Accuracy</th>
+              <th style="padding:8px 12px;text-align:right;color:var(--text-muted);">F1</th>
+              <th style="padding:8px 12px;text-align:left;color:var(--text-muted);">Status</th>
+            </tr></thead>
+            <tbody>${rows.map(r => `<tr style="border-bottom:1px solid rgba(51,65,85,0.3);">
+              <td style="padding:8px 12px;font-weight:600;">${r.model||r.name||'—'}</td>
+              <td style="padding:8px 12px;text-align:right;">${r.accuracy?(r.accuracy*100).toFixed(2)+'%':'—'}</td>
+              <td style="padding:8px 12px;text-align:right;">${r.f1?(r.f1*100).toFixed(2)+'%':'—'}</td>
+              <td style="padding:8px 12px;"><span class="badge badge-success">${r.status||'done'}</span></td>
+            </tr>`).join('')}</tbody>
+          </table>`;
+      } catch(e) {
+        document.getElementById('regAutoMLContainer').innerHTML = '<div style="color:#ef4444;font-size:0.86rem;">Error loading AutoML results.</div>';
+      }
+    }
+
+    // Hook into module switch to auto-init NLP column selector and load registry
+    const _origSwitchModule = typeof switchModule !== 'undefined' ? switchModule : null;
+    function switchModule(id) {
+      if (_origSwitchModule) _origSwitchModule(id);
+      if (id === 'moduleNLP') setTimeout(initNLPModule, 100);
+      if (id === 'moduleRegistry') setTimeout(loadModelRegistry, 100);
+    }
+
+    // Helper toast notification
+    function showToast(msg, type='info') {
+      const t = document.createElement('div');
+      const colors = {success:'#10b981',error:'#ef4444',info:'#38bdf8',warning:'#f59e0b'};
+      t.style.cssText = `position:fixed;bottom:24px;right:24px;z-index:9999;padding:12px 20px;background:var(--card-bg);border-left:4px solid ${colors[type]||colors.info};border-radius:8px;box-shadow:0 4px 20px rgba(0,0,0,0.4);font-size:0.86rem;color:var(--text);max-width:360px;`;
+      t.textContent = msg;
+      document.body.appendChild(t);
+      setTimeout(() => t.remove(), 4000);
+    }
+
+
+</script>
 </body>
 </html>
