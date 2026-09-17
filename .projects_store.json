@@ -5,7 +5,7 @@
       "name": "Customer Churn Intelligence",
       "description": "Predictive churn analytics and retention drivers.",
       "created_at": "2026-09-15 09:34:06",
-      "updated_at": "2026-09-15 09:34:06",
+      "updated_at": "2026-09-17 04:25:29",
       "archived": false,
       "active_dataset": "Customer Churn (Demo Dataset)",
       "datasets": [
@@ -57,6 +57,12 @@
         }
       ],
       "activity_log": [
+        {
+          "action": "Executed Auto-Clean",
+          "details": "Cleaned 0 issues.",
+          "timestamp": "2026-09-17 04:25:29",
+          "user": "Analyst"
+        },
         {
           "action": "Project Initialized",
           "timestamp": "2026-09-15 09:34:06",
