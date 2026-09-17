@@ -1,13 +1,25 @@
 # DataMind AI | Next-Gen AI-Powered Data Analytics Platform
 
-A full-stack, interactive AI Data Analytics platform built with Python, Streamlit, Pandas, Scikit-Learn, Scipy, and Plotly. Upload any CSV file or pick from built-in sample datasets to perform end-to-end data analysis across three core pillars: **Data Cleaning**, **Feature Engineering**, and **Exploratory Data Analysis (EDA)**.
+[![Live Demo](https://img.shields.io/badge/Live%20Host%20Link-Run%20DataMind%20AI-6366f1?style=for-the-badge&logo=google-chrome&logoColor=white)](https://raj079851-ship-it.github.io/DataMind-AI/)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Active-10b981?style=for-the-badge&logo=github&logoColor=white)](https://raj079851-ship-it.github.io/DataMind-AI/)
+
+> ### 🌐 Live Web Application (Instant 1-Click Launch)
+> **Run Online Now**: 👉 **[https://raj079851-ship-it.github.io/DataMind-AI/](https://raj079851-ship-it.github.io/DataMind-AI/)**  
+> *Runs 100% client-side in any browser with zero setup, zero installations, and ultra-fast performance on datasets up to 250,000+ rows.*
+
+---
+
+A full-stack, enterprise-grade AI Data Analytics platform featuring 25 specialized modules across **Exploratory Data Analysis (EDA)**, **Statistical Hypothesis Testing**, **Machine Learning Studio**, **A/B Testing & Experimentation**, **Interactive Power BI Dashboards**, and **Automated Data Cleaning**.
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Launch with One Click (Windows)
-Double-click `run.bat` in this folder.
+### 1. Run Online in Browser (Recommended)
+Simply click: **[https://raj079851-ship-it.github.io/DataMind-AI/](https://raj079851-ship-it.github.io/DataMind-AI/)**
+
+### 2. Launch with One Click (Windows)
+Double-click `run.bat` or open `index.html` in any browser.
 
 ### 2. Manual Terminal Launch
 ```powershell
