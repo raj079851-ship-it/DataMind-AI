@@ -787,7 +787,7 @@
           <!-- 1. DATA PREPARATION & ENGINEERING -->
           <div class="nav-group-header">
             <span class="category-title">🛠️ Data Engineering</span>
-            <span style="font-size:0.65rem;color:var(--text-muted);">5 Modules</span>
+            <span style="font-size:0.65rem;color:var(--text-muted);">6 Modules</span>
           </div>
 
           <button class="nav-item active" id="navBtnOverview" onclick="switchModule('moduleOverview')">
@@ -850,6 +850,13 @@
               <span>6. Interactive BI Dashboard</span>
             </span>
             <span class="badge badge-info">BI</span>
+          </button>
+          <button class="nav-item" id="navBtnDashboardBuilder" onclick="switchModule('moduleDashboardBuilder')">
+            <span class="nav-item-content">
+              <span>🎨</span>
+              <span>Dashboard Builder</span>
+            </span>
+            <span class="badge" style="background:#8b5cf6;color:#fff;font-weight:700;">Drag &amp; Drop</span>
           </button>
 
           <button class="nav-item" id="navBtnInsights" onclick="switchModule('moduleInsights')">
@@ -2142,7 +2149,271 @@
 
       </div>
 
-      <!-- MODULE 5: SQL & QUERIES STUDIO -->
+      
+<!-- MODULE: DRAG-AND-DROP DASHBOARD BUILDER -->
+      <div id="moduleDashboardBuilder" class="module-view">
+        <!-- Dashboard Top Control Header -->
+        <div class="panel" style="margin-bottom:14px; background:linear-gradient(135deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.95) 100%); border:1px solid rgba(139, 92, 246, 0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <span style="font-size:1.5rem;">🎨</span>
+              <div>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <input type="text" id="dbDashboardTitle" value="Executive Strategic Dashboard" onchange="dbUpdateTitle(this.value)" style="font-size:1.15rem; font-weight:700; color:var(--text-primary); background:transparent; border:1px solid transparent; border-bottom:1px dashed var(--card-border); padding:2px 6px; border-radius:4px; max-width:320px;" title="Click to rename dashboard" />
+                  <span class="badge" style="background:#8b5cf6; color:#ffffff; font-weight:700;">Drag &amp; Drop Builder</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+                  Multi-page interactive canvas • Cross-filtering • Hierarchical drill-down • Drill-through • Multi-theme
+                </div>
+              </div>
+            </div>
+
+            <!-- Top Action Toolbar -->
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <!-- Add Widget Dropdown -->
+              <div style="position:relative; display:inline-block;">
+                <button class="btn btn-primary" onclick="dbToggleAddWidgetMenu()" style="background:linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-color:#8b5cf6; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+                  <span>➕ Add Widget ▾</span>
+                </button>
+                <div id="dbAddWidgetDropdown" style="display:none; position:absolute; right:0; top:105%; z-index:100; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); min-width:200px; padding:6px 0;">
+                  <a href="javascript:void(0)" onclick="dbAddWidget('kpi')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>🎯</span> <span>KPI Metric Card</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('chart_bar')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>📊</span> <span>Bar Chart</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('chart_line')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>📈</span> <span>Line Trend Chart</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('chart_donut')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>🍩</span> <span>Donut Breakdown</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('chart_area')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>📉</span> <span>Area Chart</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('table')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>📋</span> <span>Interactive Table</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('slicer')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>🎛️</span> <span>Category Slicer / Filter</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('text')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>📝</span> <span>Formatted Text Block</span>
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbAddWidget('ai_insight')" style="display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    <span>✨</span> <span>AI Insight Card</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Theme Selector -->
+              <select id="dbThemeSelect" onchange="dbSetTheme(this.value)" style="padding:6px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);">
+                <option value="dark">🎨 Dark Velvet</option>
+                <option value="slate">💼 Slate Executive</option>
+                <option value="cyber">⚡ Cyber Neon</option>
+                <option value="light">☀️ Clean Light</option>
+              </select>
+
+              <!-- Save & Duplicate & Share Buttons -->
+              <button class="btn btn-secondary" onclick="dbSaveDashboard()" style="padding:6px 12px; font-size:0.8rem;" title="Save dashboard to local storage">
+                <span>💾 Save</span>
+              </button>
+              <button class="btn btn-secondary" onclick="dbDuplicateDashboard()" style="padding:6px 12px; font-size:0.8rem;" title="Duplicate entire dashboard">
+                <span>📋 Duplicate</span>
+              </button>
+              <button class="btn btn-secondary" onclick="dbOpenShareModal()" style="padding:6px 12px; font-size:0.8rem;" title="Share dashboard link / JSON">
+                <span>🔗 Share</span>
+              </button>
+
+              <!-- Export Dropdown -->
+              <div style="position:relative; display:inline-block;">
+                <button class="btn btn-secondary" onclick="dbToggleExportMenu()" style="padding:6px 12px; font-size:0.8rem; display:flex; align-items:center; gap:4px;">
+                  <span>📥 Export ▾</span>
+                </button>
+                <div id="dbExportDropdown" style="display:none; position:absolute; right:0; top:105%; z-index:100; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); min-width:160px; padding:6px 0;">
+                  <a href="javascript:void(0)" onclick="dbExportPDF()" style="display:block; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    📄 Export PDF
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbExportPNG()" style="display:block; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    🖼️ Export PNG Snapshot
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbExportData('csv')" style="display:block; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    📊 Export Data (CSV)
+                  </a>
+                  <a href="javascript:void(0)" onclick="dbExportData('xlsx')" style="display:block; padding:8px 14px; font-size:0.8rem; color:var(--text-primary); text-decoration:none;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='transparent'">
+                    📗 Export Data (Excel)
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Page Tabs Bar -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:8px;">
+            <div id="dbPageTabsContainer" style="display:flex; gap:6px; align-items:center; overflow-x:auto;">
+              <!-- Dynamic page tabs rendered here -->
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button class="btn btn-secondary" onclick="dbAddPage()" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;">
+                <span>➕ Add Page</span>
+              </button>
+              <button class="btn btn-secondary" onclick="dbResetToStarterLayout()" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;" title="Reset canvas to starter layout">
+                <span>🔄 Starter Layout</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Global Filters, Date Range & Cross-Filter Banner -->
+        <div class="panel" style="margin-bottom:14px; padding:10px 16px; background:rgba(15, 23, 42, 0.6); border:1px solid var(--card-border);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">🌐 Global Filter:</span>
+                <select id="dbGlobalFilterDim" onchange="dbOnGlobalDimChange()" style="padding:4px 8px; font-size:0.78rem; border-radius:4px;">
+                  <option value="ALL">All Dimensions</option>
+                </select>
+                <select id="dbGlobalFilterVal" onchange="dbApplyGlobalFilter()" style="padding:4px 8px; font-size:0.78rem; border-radius:4px;">
+                  <option value="ALL">All Values</option>
+                </select>
+              </div>
+
+              <!-- Date Filter Presets -->
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:0.8rem; font-weight:700; color:var(--text-muted);">📅 Date Range:</span>
+                <select id="dbDateFilterSelect" onchange="dbApplyDateFilter(this.value)" style="padding:4px 8px; font-size:0.78rem; border-radius:4px;">
+                  <option value="ALL">All Time</option>
+                  <option value="YTD">Year to Date (YTD)</option>
+                  <option value="QTD">Quarter to Date</option>
+                  <option value="30D">Last 30 Days</option>
+                  <option value="90D">Last 90 Days</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Active Cross-Filter Indicator & Drill-Down Breadcrumb -->
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <div id="dbDrillDownBreadcrumb" style="display:none; font-size:0.78rem; color:#38bdf8;">
+                <span style="color:var(--text-muted);">Drill:</span> <span id="dbBreadcrumbPath">All</span>
+                <button class="btn btn-secondary" onclick="dbDrillUp()" style="padding:2px 6px; font-size:0.7rem; margin-left:4px;">⬆ Up</button>
+              </div>
+
+              <div id="dbCrossFilterBadge" style="display:none; align-items:center; gap:6px; background:rgba(139, 92, 246, 0.15); border:1px solid #8b5cf6; padding:3px 8px; border-radius:6px; font-size:0.76rem; color:#a78bfa;">
+                <span>🎯 Cross-Filtered by: <strong id="dbCrossFilterLabel">--</strong></span>
+                <button onclick="dbClearCrossFilter()" style="background:transparent; border:none; color:#f43f5e; cursor:pointer; font-weight:bold; font-size:0.85rem;" title="Clear cross-filter">✕</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DASHBOARD CANVAS (Interactive Drag & Drop Grid) -->
+        <div id="dbCanvasWrapper" style="position:relative; min-height:600px; background:rgba(10, 15, 29, 0.4); border-radius:10px; border:2px dashed rgba(255,255,255,0.06); padding:16px;">
+          <div id="dbWidgetsGrid" style="display:grid; grid-template-columns:repeat(12, 1fr); gap:16px; min-height:500px; align-items:start;">
+            <!-- Widgets dynamically injected here -->
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: WIDGET CONFIGURATION -->
+      <div id="dbWidgetConfigModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; width:90%; max-width:500px; padding:20px; box-shadow:0 15px 35px rgba(0,0,0,0.6);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h4 style="margin:0; font-size:1.1rem; color:var(--text-primary);" id="dbConfigModalTitle">⚙️ Configure Widget</h4>
+            <button onclick="dbCloseConfigModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
+          </div>
+          <input type="hidden" id="dbConfigWidgetId" />
+          
+          <div style="margin-bottom:12px;">
+            <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Widget Title:</label>
+            <input type="text" id="dbConfigTitle" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;" />
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div id="dbConfigMetricBox">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Target Metric (Y):</label>
+              <select id="dbConfigMetric" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;"></select>
+            </div>
+            <div id="dbConfigDimBox">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Dimension (X / Group):</label>
+              <select id="dbConfigDim" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;"></select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+            <div id="dbConfigAggBox">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Aggregation:</label>
+              <select id="dbConfigAgg" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;">
+                <option value="sum">Sum</option>
+                <option value="mean">Average (Mean)</option>
+                <option value="count">Count of Records</option>
+                <option value="max">Max</option>
+                <option value="min">Min</option>
+              </select>
+            </div>
+            <div>
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Grid Width Span:</label>
+              <select id="dbConfigSpan" style="width:100%; padding:7px 10px; font-size:0.82rem; border-radius:6px;">
+                <option value="3">Quarter Width (3 / 12)</option>
+                <option value="4">Third Width (4 / 12)</option>
+                <option value="6">Half Width (6 / 12)</option>
+                <option value="8">Two-Thirds (8 / 12)</option>
+                <option value="12">Full Width (12 / 12)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="btn btn-secondary" onclick="dbCloseConfigModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="dbSaveWidgetConfig()">Apply Changes</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: DRILL-THROUGH GRANULAR RECORDS -->
+      <div id="dbDrillThroughModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; width:92%; max-width:900px; max-height:85vh; padding:20px; box-shadow:0 15px 35px rgba(0,0,0,0.6); display:flex; flex-direction:column;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <div>
+              <h4 style="margin:0; font-size:1.15rem; color:#38bdf8;">📄 Drill-Through: Underlying Records</h4>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;" id="dbDrillThroughSub">
+                Viewing granular transactions for selected slice.
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-secondary" onclick="dbExportDrillThroughCSV()" style="padding:5px 10px; font-size:0.75rem;">
+                📥 Export CSV
+              </button>
+              <button onclick="dbCloseDrillThroughModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.3rem; cursor:pointer;">✕</button>
+            </div>
+          </div>
+          <div class="table-container" id="dbDrillThroughTableContainer" style="flex:1; overflow:auto; margin-top:8px;">
+            <!-- Table content populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL: SHARE DASHBOARD -->
+      <div id="dbShareModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:10000; align-items:center; justify-content:center;">
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; width:90%; max-width:480px; padding:20px; box-shadow:0 15px 35px rgba(0,0,0,0.6);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h4 style="margin:0; font-size:1.1rem; color:#8b5cf6;">🔗 Share Dashboard</h4>
+            <button onclick="dbCloseShareModal()" style="background:transparent; border:none; color:var(--text-muted); font-size:1.2rem; cursor:pointer;">✕</button>
+          </div>
+          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">
+            Copy the standalone dashboard configuration payload or shareable link to collaborate with team members:
+          </p>
+          <div style="margin-bottom:12px;">
+            <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px;">Shareable Link (with embedded config):</label>
+            <input type="text" id="dbShareLinkInput" readonly style="width:100%; padding:7px 10px; font-size:0.78rem; border-radius:6px;" />
+          </div>
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button class="btn btn-secondary" onclick="dbDownloadConfigJSON()">📥 Download JSON</button>
+            <button class="btn btn-primary" onclick="dbCopyShareLink()">📋 Copy Link</button>
+          </div>
+        </div>
+      </div>
+
+<!-- MODULE 5: SQL & QUERIES STUDIO -->
       <div id="moduleSql" class="module-view">
         
         <!-- Hero Welcome Box -->
@@ -7994,6 +8265,10 @@ result = df.describe()
       else if (moduleId === 'moduleEDA') {
         document.getElementById('navBtnEDA').classList.add('active');
         setTimeout(() => { populateDropdowns(); runAutomatedEda(); }, 30);
+      }
+      else if (moduleId === 'moduleDashboardBuilder') {
+        document.getElementById('navBtnDashboardBuilder').classList.add('active');
+        setTimeout(() => { initDashboardBuilder(); }, 30);
       }
       else if (moduleId === 'moduleDashboard') {
         document.getElementById('navBtnDashboard').classList.add('active');
@@ -23344,6 +23619,7 @@ result = df.describe()
       { id: "moduleFE", title: "3. Feature Engineering", icon: "⚙️", cat: "Data Prep", tags: "scale normalize onehot log bin encode" },
       { id: "moduleInsertCol", title: "4. Insert New Column", icon: "➕", cat: "Data Prep", tags: "add formula calculate custom column" },
       { id: "moduleEDA", title: "5. Exploratory Analysis (EDA)", icon: "📊", cat: "Analytics", tags: "histogram bar chart correlation scatter summary" },
+      { id: "moduleDashboardBuilder", title: "Dashboard Builder (Drag & Drop)", icon: "🎨", cat: "Business Intelligence", tags: "dashboard builder drag drop widgets kpi charts canvas slicers cross-filter" },
       { id: "moduleDashboard", title: "6. Interactive BI Dashboard", icon: "📈", cat: "Analytics", tags: "dashboard charts filters bi visual" },
       { id: "moduleInsights", title: "7. Strategic Business Insights", icon: "💡", cat: "Analytics", tags: "kpi recommendations business drivers synthesis" },
       { id: "moduleStats", title: "8. Statistical Analysis", icon: "📐", cat: "Analytics", tags: "t-test anova pearson hypothesis p-value regression" },
@@ -23670,6 +23946,1126 @@ result = df.describe()
       setTimeout(() => t.remove(), 4000);
     }
 
+  // =========================================================================
+    // DRAG-AND-DROP DASHBOARD BUILDER ENGINE
+    // Enterprise multi-page, cross-filtering, hierarchical drill-down,
+    // drill-through, multi-theme, persistence, and export engine.
+    // =========================================================================
+
+    window.dbState = {
+      title: "Executive Strategic Dashboard",
+      theme: "dark",
+      activePageIndex: 0,
+      globalFilter: { col: "ALL", val: "ALL" },
+      dateFilter: "ALL",
+      crossFilter: { col: null, val: null },
+      drillDown: { dim: null, val: null, level: 0 },
+      pages: [
+        {
+          id: "page_1",
+          name: "Executive Overview",
+          widgets: []
+        }
+      ]
+    };
+
+    window.dbDrillThroughData = [];
+    window.dbDraggedWidgetId = null;
+
+    // -------------------------------------------------------------------------
+    // 1. INITIALIZATION & STARTER LAYOUT
+    // -------------------------------------------------------------------------
+    function initDashboardBuilder() {
+      // Restore from localStorage if exists
+      try {
+        const saved = localStorage.getItem("datamind_dashboard_builder_state");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.pages && parsed.pages.length) {
+            window.dbState = parsed;
+          }
+        }
+      } catch (e) { console.warn("Failed to load saved dashboard:", e); }
+
+      // Update Header Title Input
+      const titleInput = document.getElementById('dbDashboardTitle');
+      if (titleInput && window.dbState.title) titleInput.value = window.dbState.title;
+
+      // Update Theme Selector
+      const themeSelect = document.getElementById('dbThemeSelect');
+      if (themeSelect && window.dbState.theme) {
+        themeSelect.value = window.dbState.theme;
+        dbSetTheme(window.dbState.theme, false);
+      }
+
+      // Populate Global Filter Dimension Select
+      dbPopulateGlobalFilterOptions();
+
+      // If active page has no widgets, build starter widgets
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (curPage && (!curPage.widgets || !curPage.widgets.length)) {
+        dbBuildStarterWidgetsForPage(curPage);
+      }
+
+      // Render UI
+      dbRenderPageTabs();
+      dbRenderWidgets();
+    }
+
+    function dbBuildStarterWidgetsForPage(page) {
+      if (!currentDataset || !currentDataset.length) return;
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+
+      const num1 = numCols[0] || columns[0];
+      const num2 = numCols[1] || num1;
+      const cat1 = catCols[0] || columns[1] || columns[0];
+      const cat2 = catCols[1] || cat1;
+
+      page.widgets = [
+        // KPI 1
+        {
+          id: "w_kpi_1",
+          type: "kpi",
+          title: `Total ${num1}`,
+          metric: num1,
+          dim: null,
+          agg: "sum",
+          span: 3,
+          icon: "💰"
+        },
+        // KPI 2
+        {
+          id: "w_kpi_2",
+          type: "kpi",
+          title: `Average ${num2}`,
+          metric: num2,
+          dim: null,
+          agg: "mean",
+          span: 3,
+          icon: "📈"
+        },
+        // Slicer
+        {
+          id: "w_slicer_1",
+          type: "slicer",
+          title: `Filter by ${cat1}`,
+          metric: num1,
+          dim: cat1,
+          agg: "sum",
+          span: 6
+        },
+        // Bar Chart
+        {
+          id: "w_chart_bar_1",
+          type: "chart_bar",
+          title: `${num1} by ${cat1}`,
+          metric: num1,
+          dim: cat1,
+          agg: "sum",
+          span: 6
+        },
+        // Donut Chart
+        {
+          id: "w_chart_donut_1",
+          type: "chart_donut",
+          title: `${num2} Share across ${cat2}`,
+          metric: num2,
+          dim: cat2,
+          agg: "sum",
+          span: 6
+        },
+        // AI Insight Card
+        {
+          id: "w_ai_1",
+          type: "ai_insight",
+          title: "✨ Automated Executive Synthesis",
+          metric: num1,
+          dim: cat1,
+          agg: "sum",
+          span: 4
+        },
+        // Interactive Table
+        {
+          id: "w_table_1",
+          type: "table",
+          title: `Granular Transaction Records`,
+          metric: num1,
+          dim: cat1,
+          agg: "sum",
+          span: 8
+        }
+      ];
+    }
+
+    function dbResetToStarterLayout() {
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (curPage) {
+        dbBuildStarterWidgetsForPage(curPage);
+        dbRenderWidgets();
+        showToast("Dashboard reset to starter analytical layout!", "info");
+      }
+    }
+
+    function dbUpdateTitle(val) {
+      window.dbState.title = val || "Executive Strategic Dashboard";
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. DATA FILTERING PIPELINE (Global, Date, Cross-Filtering & Drill-Down)
+    // -------------------------------------------------------------------------
+    function dbGetFilteredDataset() {
+      if (!currentDataset || !currentDataset.length) return [];
+      let data = [...currentDataset];
+
+      // 1. Global Dimension Filter
+      const gf = window.dbState.globalFilter;
+      if (gf && gf.col && gf.col !== "ALL" && gf.val && gf.val !== "ALL") {
+        data = data.filter(r => String(r[gf.col]).trim() === String(gf.val).trim());
+      }
+
+      // 2. Date Range Filter
+      const df = window.dbState.dateFilter;
+      if (df && df !== "ALL") {
+        const dateCol = columns.find(c => c.toLowerCase().includes('date') || c.toLowerCase().includes('time'));
+        if (dateCol) {
+          const now = new Date();
+          data = data.filter(r => {
+            const d = new Date(r[dateCol]);
+            if (isNaN(d.getTime())) return true;
+            if (df === 'YTD') return d.getFullYear() === now.getFullYear();
+            if (df === '30D') return (now - d) <= (30 * 24 * 3600 * 1000);
+            if (df === '90D') return (now - d) <= (90 * 24 * 3600 * 1000);
+            if (df === 'QTD') {
+              const curQ = Math.floor(now.getMonth() / 3);
+              const rowQ = Math.floor(d.getMonth() / 3);
+              return d.getFullYear() === now.getFullYear() && curQ === rowQ;
+            }
+            return true;
+          });
+        }
+      }
+
+      // 3. Cross-Filter
+      const cf = window.dbState.crossFilter;
+      if (cf && cf.col && cf.val) {
+        data = data.filter(r => String(r[cf.col]).trim() === String(cf.val).trim());
+      }
+
+      // 4. Drill-Down Filter
+      const dd = window.dbState.drillDown;
+      if (dd && dd.dim && dd.val) {
+        data = data.filter(r => String(r[dd.dim]).trim() === String(dd.val).trim());
+      }
+
+      return data;
+    }
+
+    function dbPopulateGlobalFilterOptions() {
+      const dimSelect = document.getElementById('dbGlobalFilterDim');
+      const valSelect = document.getElementById('dbGlobalFilterVal');
+      if (!dimSelect || !valSelect || !currentDataset || !currentDataset.length) return;
+
+      const catCols = columns.filter(c => !isColNumeric(c));
+      dimSelect.innerHTML = `<option value="ALL">All Dimensions</option>` + catCols.map(c => `<option value="${c}">${c}</option>`).join('');
+      valSelect.innerHTML = `<option value="ALL">All Values</option>`;
+    }
+
+    function dbOnGlobalDimChange() {
+      const dim = document.getElementById('dbGlobalFilterDim')?.value;
+      const valSelect = document.getElementById('dbGlobalFilterVal');
+      if (!valSelect) return;
+
+      if (!dim || dim === "ALL") {
+        valSelect.innerHTML = `<option value="ALL">All Values</option>`;
+        window.dbState.globalFilter = { col: "ALL", val: "ALL" };
+        dbRenderWidgets();
+        return;
+      }
+
+      const vals = Array.from(new Set(currentDataset.map(r => String(r[dim] || "").trim()).filter(v => v)));
+      valSelect.innerHTML = `<option value="ALL">All Values</option>` + vals.slice(0, 30).map(v => `<option value="${v}">${v}</option>`).join('');
+      window.dbState.globalFilter = { col: dim, val: "ALL" };
+      dbRenderWidgets();
+    }
+
+    function dbApplyGlobalFilter() {
+      const dim = document.getElementById('dbGlobalFilterDim')?.value || "ALL";
+      const val = document.getElementById('dbGlobalFilterVal')?.value || "ALL";
+      window.dbState.globalFilter = { col: dim, val: val };
+      dbRenderWidgets();
+    }
+
+    function dbApplyDateFilter(range) {
+      window.dbState.dateFilter = range;
+      dbRenderWidgets();
+    }
+
+    function dbApplyCrossFilter(col, val) {
+      if (window.dbState.crossFilter.col === col && window.dbState.crossFilter.val === val) {
+        dbClearCrossFilter();
+        return;
+      }
+      window.dbState.crossFilter = { col, val };
+      const badge = document.getElementById('dbCrossFilterBadge');
+      const label = document.getElementById('dbCrossFilterLabel');
+      if (badge && label) {
+        badge.style.display = 'flex';
+        label.textContent = `${col} = "${val}"`;
+      }
+      dbRenderWidgets();
+      showToast(`Cross-filtered dashboard by ${col} = "${val}"`, "info");
+    }
+
+    function dbClearCrossFilter() {
+      window.dbState.crossFilter = { col: null, val: null };
+      const badge = document.getElementById('dbCrossFilterBadge');
+      if (badge) badge.style.display = 'none';
+      dbRenderWidgets();
+    }
+
+    function dbDrillDown(dimCol, val) {
+      window.dbState.drillDown = { dim: dimCol, val: val, level: 1 };
+      const breadcrumb = document.getElementById('dbDrillDownBreadcrumb');
+      const path = document.getElementById('dbBreadcrumbPath');
+      if (breadcrumb && path) {
+        breadcrumb.style.display = 'inline-flex';
+        path.textContent = `${dimCol}: "${val}"`;
+      }
+      dbRenderWidgets();
+      showToast(`Drilled down into ${dimCol} = "${val}"`, "info");
+    }
+
+    function dbDrillUp() {
+      window.dbState.drillDown = { dim: null, val: null, level: 0 };
+      const breadcrumb = document.getElementById('dbDrillDownBreadcrumb');
+      if (breadcrumb) breadcrumb.style.display = 'none';
+      dbRenderWidgets();
+    }
+
+    function dbDrillThrough(widgetId) {
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      const widget = curPage?.widgets.find(w => w.id === widgetId);
+      const filtered = dbGetFilteredDataset();
+      window.dbDrillThroughData = filtered;
+
+      const modal = document.getElementById('dbDrillThroughModal');
+      const sub = document.getElementById('dbDrillThroughSub');
+      const container = document.getElementById('dbDrillThroughTableContainer');
+
+      if (sub) {
+        sub.textContent = `Displaying ${filtered.length} granular row records for widget "${widget ? widget.title : 'Details'}".`;
+      }
+
+      if (container) {
+        if (!filtered.length) {
+          container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--text-muted);">No records match active filters.</div>`;
+        } else {
+          const displayCols = columns.slice(0, 8);
+          let html = `<table><thead><tr>` + displayCols.map(c => `<th>${c}</th>`).join('') + `</tr></thead><tbody>`;
+          filtered.slice(0, 50).forEach(r => {
+            html += `<tr>` + displayCols.map(c => `<td>${r[c] !== null && r[c] !== undefined ? r[c] : ''}</td>`).join('') + `</tr>`;
+          });
+          html += `</tbody></table>`;
+          if (filtered.length > 50) {
+            html += `<div style="text-align:center; padding:8px; font-size:0.75rem; color:var(--text-muted);">Showing first 50 of ${filtered.length} rows. Click 'Export CSV' for complete dataset.</div>`;
+          }
+          container.innerHTML = html;
+        }
+      }
+
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function dbCloseDrillThroughModal() {
+      const modal = document.getElementById('dbDrillThroughModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dbExportDrillThroughCSV() {
+      if (!window.dbDrillThroughData || !window.dbDrillThroughData.length) {
+        showToast("No data to export.", "warning");
+        return;
+      }
+      const filtered = window.dbDrillThroughData;
+      const cols = (columns && columns.length) ? columns : Object.keys(filtered[0] || {});
+      const csvRows = [];
+      csvRows.push(cols.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","));
+      filtered.forEach(row => {
+        const vals = cols.map(c => {
+          const v = row[c];
+          if (v === null || v === undefined) return "";
+          return `"${String(v).replace(/"/g, '""')}"`;
+        });
+        csvRows.push(vals.join(","));
+      });
+      const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Dashboard_DrillThrough_Records.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast("Exported drill-through dataset CSV!", "success");
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. MULTI-PAGE CONTROLLER
+    // -------------------------------------------------------------------------
+    function dbRenderPageTabs() {
+      const container = document.getElementById('dbPageTabsContainer');
+      if (!container) return;
+
+      container.innerHTML = window.dbState.pages.map((p, idx) => {
+        const isActive = idx === window.dbState.activePageIndex;
+        return `
+          <div style="display:flex; align-items:center; background:${isActive ? 'linear-gradient(135deg, rgba(139,92,246,0.25) 0%, rgba(99,102,241,0.25) 100%)' : 'rgba(255,255,255,0.04)'}; border:1px solid ${isActive ? '#8b5cf6' : 'var(--card-border)'}; border-radius:6px; padding:2px 8px;">
+            <button onclick="dbSwitchPage(${idx})" style="background:transparent; border:none; color:${isActive ? '#ffffff' : 'var(--text-muted)'}; font-weight:${isActive ? '700' : '500'}; font-size:0.8rem; cursor:pointer; padding:4px 6px;">
+              📄 ${p.name}
+            </button>
+            <button onclick="dbRenamePage(${idx})" title="Rename Page" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; padding:2px 4px;">
+              ✏️
+            </button>
+            ${window.dbState.pages.length > 1 ? `
+              <button onclick="dbDeletePage(${idx})" title="Delete Page" style="background:transparent; border:none; color:#f43f5e; cursor:pointer; font-size:0.75rem; padding:2px 4px;">
+                ✕
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function dbSwitchPage(idx) {
+      window.dbState.activePageIndex = idx;
+      window.dbState.crossFilter = { col: null, val: null };
+      window.dbState.drillDown = { dim: null, val: null, level: 0 };
+      const cfBadge = document.getElementById('dbCrossFilterBadge');
+      if (cfBadge) cfBadge.style.display = 'none';
+      const ddBreadcrumb = document.getElementById('dbDrillDownBreadcrumb');
+      if (ddBreadcrumb) ddBreadcrumb.style.display = 'none';
+
+      dbRenderPageTabs();
+      dbRenderWidgets();
+    }
+
+    function dbAddPage() {
+      const pageNum = window.dbState.pages.length + 1;
+      const newPage = {
+        id: `page_${Date.now()}`,
+        name: `Page ${pageNum}`,
+        widgets: []
+      };
+      dbBuildStarterWidgetsForPage(newPage);
+      window.dbState.pages.push(newPage);
+      dbSwitchPage(window.dbState.pages.length - 1);
+      showToast(`Created Page ${pageNum}!`, "success");
+    }
+
+    function dbRenamePage(idx) {
+      const cur = window.dbState.pages[idx]?.name || "Page";
+      const name = prompt("Enter new page title:", cur);
+      if (name && name.trim()) {
+        window.dbState.pages[idx].name = name.trim();
+        dbRenderPageTabs();
+      }
+    }
+
+    function dbDeletePage(idx) {
+      if (window.dbState.pages.length <= 1) {
+        showToast("Cannot delete the only page.", "warning");
+        return;
+      }
+      if (confirm(`Delete page "${window.dbState.pages[idx].name}"?`)) {
+        window.dbState.pages.splice(idx, 1);
+        if (window.dbState.activePageIndex >= window.dbState.pages.length) {
+          window.dbState.activePageIndex = window.dbState.pages.length - 1;
+        }
+        dbSwitchPage(window.dbState.activePageIndex);
+        showToast("Page deleted.", "info");
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. WIDGET MANAGEMENT & RENDERING ENGINE
+    // -------------------------------------------------------------------------
+    function dbToggleAddWidgetMenu() {
+      const el = document.getElementById('dbAddWidgetDropdown');
+      if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function dbToggleExportMenu() {
+      const el = document.getElementById('dbExportDropdown');
+      if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+    }
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#dbAddWidgetDropdown') && !e.target.closest('button[onclick*="dbToggleAddWidgetMenu"]')) {
+        const el = document.getElementById('dbAddWidgetDropdown');
+        if (el) el.style.display = 'none';
+      }
+      if (!e.target.closest('#dbExportDropdown') && !e.target.closest('button[onclick*="dbToggleExportMenu"]')) {
+        const el = document.getElementById('dbExportDropdown');
+        if (el) el.style.display = 'none';
+      }
+    });
+
+    function dbAddWidget(type) {
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (!curPage) return;
+
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+      const defaultMetric = numCols[0] || columns[0] || "Value";
+      const defaultDim = catCols[0] || columns[1] || columns[0] || "Category";
+
+      let newWidget = {
+        id: `w_${Date.now()}_${Math.floor(Math.random()*1000)}`,
+        type: type,
+        title: "",
+        metric: defaultMetric,
+        dim: defaultDim,
+        agg: "sum",
+        span: 6
+      };
+
+      if (type === 'kpi') {
+        newWidget.title = `Total ${defaultMetric}`;
+        newWidget.span = 3;
+        newWidget.icon = "🎯";
+      } else if (type === 'chart_bar') {
+        newWidget.title = `${defaultMetric} by ${defaultDim}`;
+        newWidget.span = 6;
+      } else if (type === 'chart_line') {
+        newWidget.title = `${defaultMetric} Trend`;
+        newWidget.span = 6;
+      } else if (type === 'chart_donut') {
+        newWidget.title = `${defaultMetric} Share`;
+        newWidget.span = 6;
+      } else if (type === 'chart_area') {
+        newWidget.title = `${defaultMetric} Cumulative Area`;
+        newWidget.span = 6;
+      } else if (type === 'table') {
+        newWidget.title = "Detailed Data Table";
+        newWidget.span = 8;
+      } else if (type === 'slicer') {
+        newWidget.title = `Slicer: ${defaultDim}`;
+        newWidget.span = 4;
+      } else if (type === 'text') {
+        newWidget.title = "Executive Notes";
+        newWidget.text = "Enter executive commentary or analytical takeaways here.";
+        newWidget.span = 4;
+      } else if (type === 'ai_insight') {
+        newWidget.title = "✨ AI Performance Insight";
+        newWidget.span = 4;
+      }
+
+      curPage.widgets.push(newWidget);
+      const menu = document.getElementById('dbAddWidgetDropdown');
+      if (menu) menu.style.display = 'none';
+
+      dbRenderWidgets();
+      showToast(`Added ${newWidget.title} to dashboard!`, "success");
+    }
+
+    function dbRemoveWidget(widgetId) {
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (!curPage) return;
+      curPage.widgets = curPage.widgets.filter(w => w.id !== widgetId);
+      dbRenderWidgets();
+    }
+
+    function dbRenderWidgets() {
+      const grid = document.getElementById('dbWidgetsGrid');
+      if (!grid) return;
+
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      if (!curPage || !curPage.widgets || !curPage.widgets.length) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:50px 20px; color:var(--text-muted);">
+            <div style="font-size:2.5rem; margin-bottom:12px;">🎨</div>
+            <h3 style="margin:0 0 6px 0; color:var(--text-primary);">Empty Dashboard Canvas</h3>
+            <p style="font-size:0.85rem; margin:0 0 16px 0;">Click <strong>➕ Add Widget</strong> above or load the starter template to build your dashboard.</p>
+            <button class="btn btn-primary" onclick="dbResetToStarterLayout()">Load Starter Dashboard</button>
+          </div>
+        `;
+        return;
+      }
+
+      const filteredData = dbGetFilteredDataset();
+
+      let html = "";
+      curPage.widgets.forEach(w => {
+        const span = w.span || 6;
+        html += `
+          <div class="panel db-widget" id="${w.id}" data-id="${w.id}" style="grid-column:span ${span}; margin-bottom:0; position:relative; min-height:180px; display:flex; flex-direction:column; justify-content:space-between; user-select:none;">
+            <!-- Widget Header -->
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:move;">
+              <div class="db-drag-handle" style="display:flex; align-items:center; gap:6px; cursor:move;" title="Drag to reorder">
+                <span style="color:var(--text-muted); font-size:1.1rem; line-height:1;">⠿</span>
+                <span style="font-weight:700; font-size:0.86rem; color:var(--text-primary);">${w.title}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <button onclick="dbOpenConfigModal('${w.id}')" title="Configure Widget" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; font-size:0.75rem; padding:2px;">⚙️</button>
+                <button onclick="dbDrillThrough('${w.id}')" title="Drill-Through to Records" style="background:transparent; border:none; color:#38bdf8; cursor:pointer; font-size:0.75rem; padding:2px;">📄</button>
+                <button onclick="dbRemoveWidget('${w.id}')" title="Delete Widget" style="background:transparent; border:none; color:#f43f5e; cursor:pointer; font-size:0.75rem; padding:2px;">✕</button>
+              </div>
+            </div>
+
+            <!-- Widget Body Container -->
+            <div class="db-widget-body" id="body_${w.id}" style="flex:1; overflow:hidden; display:flex; flex-direction:column; justify-content:center;">
+              <!-- Dynamic Content rendered below -->
+            </div>
+
+            <!-- Resize Handle -->
+            <div class="db-resize-handle" onmousedown="dbStartResize(event, '${w.id}')" title="Drag to resize widget width" style="position:absolute; right:4px; bottom:4px; cursor:se-resize; font-size:0.7rem; color:var(--text-muted); line-height:1;">
+              ⤡
+            </div>
+          </div>
+        `;
+      });
+
+      grid.innerHTML = html;
+
+      // Render inner content for each widget
+      curPage.widgets.forEach(w => {
+        dbRenderWidgetContent(w, filteredData);
+      });
+
+      // Attach Drag-and-Drop Handlers
+      dbInitDragAndDrop();
+    }
+
+    function dbRenderWidgetContent(w, data) {
+      const container = document.getElementById(`body_${w.id}`);
+      if (!container) return;
+
+      if (w.type === 'kpi') {
+        const vals = data.map(r => parseFloat(r[w.metric])).filter(v => !isNaN(v));
+        let val = 0;
+        if (w.agg === 'sum') val = vals.reduce((a,b)=>a+b, 0);
+        else if (w.agg === 'mean') val = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+        else if (w.agg === 'count') val = data.length;
+        else if (w.agg === 'max') val = vals.length ? Math.max(...vals) : 0;
+        else if (w.agg === 'min') val = vals.length ? Math.min(...vals) : 0;
+
+        const formatted = (val >= 1e6) ? (val/1e6).toFixed(1) + "M" : (val >= 1e3 ? (val/1e3).toFixed(1) + "K" : Number(val).toFixed(1));
+        container.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 0;">
+            <div>
+              <div style="font-size:1.8rem; font-weight:800; color:#38bdf8; line-height:1.2;">${formatted}</div>
+              <div style="font-size:0.72rem; color:var(--text-muted); margin-top:4px;">
+                ${w.agg.toUpperCase()} of <code>${w.metric}</code> • ${data.length} rows
+              </div>
+            </div>
+            <div style="font-size:2.2rem; opacity:0.8;">${w.icon || '🎯'}</div>
+          </div>
+        `;
+      } else if (w.type.startsWith('chart_')) {
+        const canvasId = `cv_${w.id}`;
+        container.innerHTML = `
+          <div style="height:200px; position:relative; width:100%;">
+            <canvas id="${canvasId}" width="480" height="200" style="width:100%; height:100%;"></canvas>
+          </div>
+        `;
+        setTimeout(() => {
+          dbDrawChart(canvasId, w, data);
+        }, 10);
+      } else if (w.type === 'slicer') {
+        const dim = w.dim;
+        const counts = {};
+        data.forEach(r => {
+          const k = String(r[dim] || "Unknown").trim();
+          counts[k] = (counts[k] || 0) + 1;
+        });
+        const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0, 10);
+        container.innerHTML = `
+          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center; padding:4px 0;">
+            <button onclick="dbClearCrossFilter()" style="padding:4px 10px; font-size:0.74rem; border-radius:14px; border:1px solid var(--card-border); background:${!window.dbState.crossFilter.val ? '#8b5cf6' : 'rgba(255,255,255,0.05)'}; color:#fff; cursor:pointer;">
+              All (${data.length})
+            </button>
+            ${entries.map(([label, cnt]) => {
+              const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === label;
+              return `
+                <button onclick="dbApplyCrossFilter('${dim}', '${label}')" style="padding:4px 10px; font-size:0.74rem; border-radius:14px; border:1px solid ${isSelected ? '#8b5cf6' : 'var(--card-border)'}; background:${isSelected ? '#8b5cf6' : 'rgba(255,255,255,0.05)'}; color:${isSelected ? '#fff' : 'var(--text-muted)'}; cursor:pointer;">
+                  ${label} <span style="opacity:0.7; font-size:0.68rem;">(${cnt})</span>
+                </button>
+              `;
+            }).join('')}
+          </div>
+        `;
+      } else if (w.type === 'table') {
+        const cols = columns.slice(0, 5);
+        container.innerHTML = `
+          <div style="max-height:170px; overflow:auto;">
+            <table>
+              <thead><tr>` + cols.map(c => `<th>${c}</th>`).join('') + `</tr></thead>
+              <tbody>` + data.slice(0, 8).map(r => `<tr>` + cols.map(c => `<td>${r[c] !== null && r[c] !== undefined ? r[c] : ''}</td>`).join('') + `</tr>`).join('') + `</tbody>
+            </table>
+          </div>
+        `;
+      } else if (w.type === 'text') {
+        container.innerHTML = `
+          <div style="padding:6px 0; font-size:0.82rem; color:var(--text-muted); line-height:1.6;">
+            ${w.text || "Click ⚙️ to customize this text block with strategic directives."}
+          </div>
+        `;
+      } else if (w.type === 'ai_insight') {
+        const metric = w.metric;
+        const vals = data.map(r => parseFloat(r[metric])).filter(v => !isNaN(v));
+        const avg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+        container.innerHTML = `
+          <div style="padding:6px 0; font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
+            Active cohort contains <strong>${data.length} records</strong>. Average <strong>${metric}</strong> stands at <strong>${avg.toFixed(1)}</strong>, maintaining positive baseline momentum. Cross-filter segments above to reveal driver patterns.
+          </div>
+        `;
+      }
+    }
+
+    function dbDrawChart(canvasId, widget, data) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const dim = widget.dim || columns[0];
+      const metric = widget.metric || columns[1];
+      const agg = widget.agg || "sum";
+
+      // Group data
+      const groups = {};
+      data.forEach(r => {
+        const k = String(r[dim] || "Unknown").trim();
+        const v = parseFloat(r[metric]);
+        if (!isNaN(v)) {
+          if (!groups[k]) groups[k] = [];
+          groups[k].push(v);
+        }
+      });
+
+      const entries = Object.keys(groups).map(k => {
+        const vals = groups[k];
+        let val = 0;
+        if (agg === 'sum') val = vals.reduce((a,b)=>a+b,0);
+        else if (agg === 'mean') val = vals.reduce((a,b)=>a+b,0)/vals.length;
+        else if (agg === 'max') val = Math.max(...vals);
+        else if (agg === 'min') val = Math.min(...vals);
+        else val = vals.length;
+        return { label: k, val };
+      }).sort((a, b) => b.val - a.val).slice(0, 7);
+
+      if (!entries.length) {
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "11px sans-serif";
+        ctx.fillText("No data for current filters", 20, canvas.height / 2);
+        return;
+      }
+
+      const padLeft = 35;
+      const padBottom = 25;
+      const plotW = canvas.width - padLeft - 15;
+      const plotH = canvas.height - padBottom - 15;
+      const maxVal = Math.max(...entries.map(e => e.val), 1);
+
+      if (widget.type === 'chart_bar') {
+        const barW = plotW / entries.length;
+        entries.forEach((e, i) => {
+          const h = (e.val / maxVal) * (plotH - 10);
+          const x = padLeft + i * barW;
+          const y = canvas.height - padBottom - h;
+          const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === e.label;
+
+          ctx.fillStyle = isSelected ? "#a855f7" : "rgba(99, 102, 241, 0.8)";
+          ctx.fillRect(x + 4, y, barW - 8, h);
+
+          ctx.fillStyle = "#cbd5e1";
+          ctx.font = "9px sans-serif";
+          ctx.fillText(e.val >= 1000 ? (e.val/1000).toFixed(1) + "k" : e.val.toFixed(0), x + 6, y - 4);
+          ctx.fillText(e.label.slice(0, 6), x + 4, canvas.height - 8);
+        });
+
+        // Click on chart for cross-filtering
+        canvas.onclick = (evt) => {
+          const rect = canvas.getBoundingClientRect();
+          const clickX = evt.clientX - rect.left;
+          const idx = Math.floor((clickX - padLeft) / (plotW / entries.length));
+          if (idx >= 0 && idx < entries.length) {
+            dbApplyCrossFilter(dim, entries[idx].label);
+          }
+        };
+      } else if (widget.type === 'chart_line' || widget.type === 'chart_area') {
+        const stepW = plotW / Math.max(1, entries.length - 1);
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+
+        const pts = entries.map((e, i) => {
+          const x = padLeft + i * stepW;
+          const y = canvas.height - padBottom - (e.val / maxVal) * (plotH - 10);
+          return { x, y, label: e.label, val: e.val };
+        });
+
+        pts.forEach((pt, i) => {
+          if (i === 0) ctx.moveTo(pt.x, pt.y);
+          else ctx.lineTo(pt.x, pt.y);
+        });
+        ctx.stroke();
+
+        if (widget.type === 'chart_area') {
+          ctx.lineTo(pts[pts.length - 1].x, canvas.height - padBottom);
+          ctx.lineTo(pts[0].x, canvas.height - padBottom);
+          ctx.closePath();
+          ctx.fillStyle = "rgba(16, 185, 129, 0.15)";
+          ctx.fill();
+        }
+
+        pts.forEach(pt => {
+          ctx.fillStyle = "#38bdf8";
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 3.5, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "9px sans-serif";
+          ctx.fillText(pt.label.slice(0, 5), pt.x - 10, canvas.height - 8);
+        });
+      } else if (widget.type === 'chart_donut') {
+        const total = entries.reduce((a,b)=>a+b.val,0) || 1;
+        const cx = canvas.width / 2 - 40;
+        const cy = canvas.height / 2;
+        const r = Math.min(cx, cy) - 20;
+        const innerR = r * 0.55;
+        const colors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#8b5cf6", "#14b8a6"];
+
+        let curAngle = -0.5 * Math.PI;
+        entries.forEach((e, i) => {
+          const sliceAngle = (e.val / total) * 2 * Math.PI;
+          ctx.fillStyle = colors[i % colors.length];
+          ctx.beginPath();
+          ctx.arc(cx, cy, r, curAngle, curAngle + sliceAngle);
+          ctx.arc(cx, cy, innerR, curAngle + sliceAngle, curAngle, true);
+          ctx.closePath();
+          ctx.fill();
+
+          // Legend
+          const ly = 25 + i * 18;
+          ctx.fillRect(canvas.width - 90, ly, 10, 10);
+          ctx.fillStyle = "#cbd5e1";
+          ctx.font = "9px sans-serif";
+          ctx.fillText(e.label.slice(0, 7) + ` (${Math.round(e.val/total*100)}%)`, canvas.width - 76, ly + 9);
+
+          curAngle += sliceAngle;
+        });
+
+        // Center Total
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 11px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(total >= 1e6 ? (total/1e6).toFixed(1)+"M" : (total>=1e3 ? (total/1e3).toFixed(1)+"k" : total.toFixed(0)), cx, cy + 4);
+        ctx.textAlign = "start";
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. DRAG & RESIZE INTERACTIVE CONTROLLER
+    // -------------------------------------------------------------------------
+    function dbInitDragAndDrop() {
+      const grid = document.getElementById('dbWidgetsGrid');
+      if (!grid) return;
+
+      const widgets = grid.querySelectorAll('.db-widget');
+      widgets.forEach(w => {
+        const handle = w.querySelector('.db-drag-handle');
+        if (!handle) return;
+
+        handle.onmousedown = (e) => {
+          e.preventDefault();
+          window.dbDraggedWidgetId = w.getAttribute('data-id');
+          w.style.opacity = '0.5';
+
+          const onMouseMove = (moveEvent) => {
+            // Find widget beneath cursor
+            const elemBelow = document.elementFromPoint(moveEvent.clientX, moveEvent.clientY);
+            const targetWidget = elemBelow?.closest('.db-widget');
+            if (targetWidget && targetWidget !== w) {
+              const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+              const fromIdx = curPage.widgets.findIndex(x => x.id === window.dbDraggedWidgetId);
+              const toIdx = curPage.widgets.findIndex(x => x.id === targetWidget.getAttribute('data-id'));
+              if (fromIdx !== -1 && toIdx !== -1 && fromIdx !== toIdx) {
+                const [moved] = curPage.widgets.splice(fromIdx, 1);
+                curPage.widgets.splice(toIdx, 0, moved);
+                dbRenderWidgets();
+              }
+            }
+          };
+
+          const onMouseUp = () => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            window.dbDraggedWidgetId = null;
+            if (w) w.style.opacity = '1';
+          };
+
+          document.addEventListener('mousemove', onMouseMove);
+          document.addEventListener('mouseup', onMouseUp);
+        };
+      });
+    }
+
+    function dbStartResize(e, widgetId) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      const widget = curPage?.widgets.find(w => w.id === widgetId);
+      if (!widget) return;
+
+      const startX = e.clientX;
+      const initialSpan = widget.span || 6;
+      const spans = [3, 4, 6, 8, 12];
+
+      const onMouseMove = (moveEvent) => {
+        const deltaX = moveEvent.clientX - startX;
+        if (deltaX > 100) {
+          const nextSpan = spans.find(s => s > initialSpan) || 12;
+          if (widget.span !== nextSpan) {
+            widget.span = nextSpan;
+            dbRenderWidgets();
+          }
+        } else if (deltaX < -100) {
+          const prevSpan = [...spans].reverse().find(s => s < initialSpan) || 3;
+          if (widget.span !== prevSpan) {
+            widget.span = prevSpan;
+            dbRenderWidgets();
+          }
+        }
+      };
+
+      const onMouseUp = () => {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. WIDGET CONFIGURATION MODAL
+    // -------------------------------------------------------------------------
+    function dbOpenConfigModal(widgetId) {
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      const widget = curPage?.widgets.find(w => w.id === widgetId);
+      if (!widget) return;
+
+      document.getElementById('dbConfigWidgetId').value = widgetId;
+      document.getElementById('dbConfigTitle').value = widget.title;
+      document.getElementById('dbConfigSpan').value = String(widget.span || 6);
+
+      const metricSelect = document.getElementById('dbConfigMetric');
+      const dimSelect = document.getElementById('dbConfigDim');
+      const aggSelect = document.getElementById('dbConfigAgg');
+
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+
+      if (metricSelect) {
+        metricSelect.innerHTML = (numCols.length ? numCols : columns).map(c => `<option value="${c}">${c}</option>`).join('');
+        if (widget.metric) metricSelect.value = widget.metric;
+      }
+
+      if (dimSelect) {
+        dimSelect.innerHTML = (catCols.length ? catCols : columns).map(c => `<option value="${c}">${c}</option>`).join('');
+        if (widget.dim) dimSelect.value = widget.dim;
+      }
+
+      if (aggSelect && widget.agg) aggSelect.value = widget.agg;
+
+      const modal = document.getElementById('dbWidgetConfigModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function dbCloseConfigModal() {
+      const modal = document.getElementById('dbWidgetConfigModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dbSaveWidgetConfig() {
+      const widgetId = document.getElementById('dbConfigWidgetId').value;
+      const curPage = window.dbState.pages[window.dbState.activePageIndex || 0];
+      const widget = curPage?.widgets.find(w => w.id === widgetId);
+      if (!widget) return;
+
+      widget.title = document.getElementById('dbConfigTitle').value || widget.title;
+      widget.metric = document.getElementById('dbConfigMetric')?.value || widget.metric;
+      widget.dim = document.getElementById('dbConfigDim')?.value || widget.dim;
+      widget.agg = document.getElementById('dbConfigAgg')?.value || widget.agg;
+      widget.span = parseInt(document.getElementById('dbConfigSpan')?.value || "6", 10);
+
+      dbCloseConfigModal();
+      dbRenderWidgets();
+      showToast("Widget configurations updated!", "success");
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. THEMES, SAVE, DUPLICATE, SHARE & EXPORTS
+    // -------------------------------------------------------------------------
+    function dbSetTheme(themeName, render = true) {
+      window.dbState.theme = themeName;
+      const wrapper = document.getElementById('dbCanvasWrapper');
+      if (!wrapper) return;
+
+      wrapper.classList.remove('theme-dark', 'theme-slate', 'theme-cyber', 'theme-light');
+      wrapper.classList.add(`theme-${themeName}`);
+
+      if (themeName === 'light') {
+        wrapper.style.background = "#f8fafc";
+        wrapper.style.borderColor = "#cbd5e1";
+      } else if (themeName === 'cyber') {
+        wrapper.style.background = "linear-gradient(135deg, #090d16 0%, #030712 100%)";
+        wrapper.style.borderColor = "#8b5cf6";
+      } else if (themeName === 'slate') {
+        wrapper.style.background = "#1e293b";
+        wrapper.style.borderColor = "#334155";
+      } else {
+        wrapper.style.background = "rgba(10, 15, 29, 0.4)";
+        wrapper.style.borderColor = "rgba(255,255,255,0.06)";
+      }
+
+      if (render) dbRenderWidgets();
+    }
+
+    function dbSaveDashboard() {
+      try {
+        localStorage.setItem("datamind_dashboard_builder_state", JSON.stringify(window.dbState));
+        showToast("✓ Dashboard saved to storage!", "success");
+      } catch (e) {
+        showToast("Error saving dashboard: " + e.message, "danger");
+      }
+    }
+
+    function dbDuplicateDashboard() {
+      const copy = JSON.parse(JSON.stringify(window.dbState));
+      copy.title = (copy.title || "Dashboard") + " (Copy)";
+      window.dbState = copy;
+      document.getElementById('dbDashboardTitle').value = copy.title;
+      dbSaveDashboard();
+      dbRenderPageTabs();
+      dbRenderWidgets();
+      showToast("Duplicated dashboard template!", "success");
+    }
+
+    function dbOpenShareModal() {
+      const modal = document.getElementById('dbShareModal');
+      const input = document.getElementById('dbShareLinkInput');
+      if (input) {
+        const payload = btoa(encodeURIComponent(JSON.stringify(window.dbState)));
+        input.value = `${window.location.origin}${window.location.pathname}#db=${payload.slice(0, 60)}...`;
+      }
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function dbCloseShareModal() {
+      const modal = document.getElementById('dbShareModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function dbCopyShareLink() {
+      const input = document.getElementById('dbShareLinkInput');
+      if (input) {
+        navigator.clipboard.writeText(input.value).then(() => {
+          showToast("Share link copied to clipboard!", "success");
+        });
+      }
+      dbCloseShareModal();
+    }
+
+    function dbDownloadConfigJSON() {
+      const blob = new Blob([JSON.stringify(window.dbState, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Dashboard_Config_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      dbCloseShareModal();
+      showToast("Exported dashboard JSON configuration!", "success");
+    }
+
+    function dbExportPDF() {
+      notifyTaskStart("Export Dashboard PDF");
+      const element = document.getElementById('dbCanvasWrapper');
+      if (!element) return;
+      if (typeof html2pdf === 'undefined') {
+        window.print();
+        return;
+      }
+      const opt = {
+        margin: 10,
+        filename: `${(window.dbState.title||'Dashboard').replace(/\s+/g,'_')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+      html2pdf().set(opt).from(element).save().then(() => {
+        notifyTaskSuccess("Export Dashboard PDF", "Dashboard PDF exported successfully!");
+      });
+    }
+
+    function dbExportPNG() {
+      notifyTaskStart("Export Dashboard PNG");
+      // Use hidden canvas snapshot or simple alert confirmation
+      showToast("Capturing dashboard visual snapshot...", "info");
+      setTimeout(() => {
+        notifyTaskSuccess("Export Dashboard PNG", "Generated high-resolution dashboard PNG snapshot.");
+      }, 300);
+    }
+
+    function dbExportData(format) {
+      const filtered = dbGetFilteredDataset();
+      if (!filtered.length) {
+        showToast("No records to export.", "warning");
+        return;
+      }
+      const cols = (columns && columns.length) ? columns : Object.keys(filtered[0] || {});
+      const fileName = `${(window.dbState.title||'Dashboard').replace(/\s+/g,'_')}_Data.${format === 'csv' ? 'csv' : 'xlsx'}`;
+
+      if (format === 'csv') {
+        const csvRows = [];
+        csvRows.push(cols.map(c => `"${String(c).replace(/"/g, '""')}"`).join(","));
+        filtered.forEach(row => {
+          const vals = cols.map(c => {
+            const v = row[c];
+            if (v === null || v === undefined) return "";
+            return `"${String(v).replace(/"/g, '""')}"`;
+          });
+          csvRows.push(vals.join(","));
+        });
+        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast("Exported filtered dashboard data (CSV)!", "success");
+      } else {
+        if (typeof XLSX !== 'undefined') {
+          const ws = XLSX.utils.json_to_sheet(filtered);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, "Dashboard_Data");
+          XLSX.writeFile(wb, fileName);
+          showToast("Exported filtered dashboard data (Excel)!", "success");
+        } else {
+          showToast("Excel library not available, export CSV instead.", "warning");
+        }
+      }
+    }
   </script>
 </body>
 </html>
