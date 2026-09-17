@@ -17374,9 +17374,7 @@ result = df.describe()
       const rows = Array.from(document.querySelectorAll('#dqProfileTable tbody tr')).map(tr =>
         Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim()).join(',')
       );
-      const csv = 'Column,Type,Null%,Unique,Outliers,Health,Issues
-' + rows.join('
-');
+      const csv = `Column,Type,Null%,Unique,Outliers,Health,Issues\n` + rows.join('\n');
       const a = document.createElement('a');
       a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
       a.download = 'data_quality_report.csv';
@@ -17546,7 +17544,8 @@ result = df.describe()
     }
 
     function renderRegistry(models) {
-      document.getElementById('regTotalModels').textContent = models.length;
+      registryData = models || [];
+      document.getElementById('regTotalModels').textContent = registryData.length;
       if (models.length > 0) {
         const bestAcc = Math.max(...models.map(m => parseFloat(m.accuracy||m.test_accuracy||0)||0));
         document.getElementById('regBestAccuracy').textContent = (bestAcc*100).toFixed(1) + '%';
@@ -17598,6 +17597,7 @@ result = df.describe()
       selectedModelIdx = idx;
       const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
       const m = sorted[idx];
+      if (!m) return;
       document.getElementById('regModelDetails').style.display = 'block';
       document.getElementById('regDetailModelName').textContent = m.name||m.model_type||'Model Details';
       document.getElementById('regDetailParams').textContent = JSON.stringify(m.params||m.hyperparameters||{}, null, 2) || '{}';
@@ -17624,6 +17624,7 @@ result = df.describe()
     async function deployModelByIdx(idx) {
       const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
       const m = sorted[idx];
+      if (!m) return;
       try {
         await fetch(`${API_BASE_URL}/ml/deploy`, {
           method: 'POST', headers: {'Content-Type':'application/json'},
@@ -17680,13 +17681,8 @@ result = df.describe()
       if (selectedModelIdx === null) return;
       const sorted = [...registryData].sort((a,b)=>(parseFloat(b.accuracy||b.test_accuracy||0)||0)-(parseFloat(a.accuracy||a.test_accuracy||0)||0));
       const m = sorted[selectedModelIdx];
-      const csv = 'Metric,Value
-Model,' + (m.name||m.model_type||'Unknown') + '
-Accuracy,' + (m.accuracy||'—') + '
-F1,' + (m.f1||'—') + '
-AUC,' + (m.auc||'—') + '
-Target,' + (m.target||'—') + '
-Trained,' + (m.trained_at||'—');
+      if (!m) return;
+      const csv = `Metric,Value\nModel,${m.name||m.model_type||'Unknown'}\nAccuracy,${m.accuracy||'—'}\nF1,${m.f1||'—'}\nAUC,${m.auc||'—'}\nTarget,${m.target||'—'}\nTrained,${m.trained_at||'—'}`;
       const a = document.createElement('a'); a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv); a.download = 'model_metrics.csv'; a.click();
     }
 
