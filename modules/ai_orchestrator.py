@@ -94,7 +94,19 @@ class AIOrchestrator:
                     "message": f"Routed to **Visualization Engine**. Generating optimal interactive chart based on analytical intent."
                 }
 
-        # 5. Data Cleaning Intent
+        # 5. Insert New Column Intent
+        if any(w in q for w in ["add column", "new column", "insert column", "create column", "add a column", "add a new column"]):
+            col_match = re.search(r'["\'](.*?)["\']', query)
+            col_name = col_match.group(1).strip() if col_match else "column asaihn"
+            return {
+                "agent": "Data Engineering Agent",
+                "recommended_module": "➕ Insert New Column",
+                "action": "insert_column",
+                "col_name": col_name,
+                "message": f"Routed to **Insert New Column Module**. Ready to append new empty column `{col_name}` into the active dataset."
+            }
+
+        # 6. Data Cleaning Intent
         if any(w in q for w in ["clean", "impute", "outlier", "missing", "duplicate", "null", "sanitize"]):
             return {
                 "agent": "Cleaning Agent",

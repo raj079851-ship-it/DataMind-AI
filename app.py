@@ -1100,6 +1100,17 @@ if st.session_state.get("show_omnibar", False):
                     st.markdown("**🔍 Identified Empirical Patterns:**")
                     for pat in res["chart_result"]["patterns"]:
                         st.markdown(f"- {pat}")
+            if res.get("action") == "insert_column" and "col_name" in res:
+                col_to_add = res["col_name"]
+                if col_to_add not in df.columns:
+                    new_df = df.copy()
+                    new_df[col_to_add] = np.nan
+                    st.session_state.current_df = new_df
+                    st.session_state.cleaning_manager = CleaningPipelineManager(new_df)
+                    set_task_status("Insert New Column", "success", f"Added empty column '{col_to_add}' successfully.")
+                    st.success(f"Column '{col_to_add}' has been added as an empty column (`NaN`/nulls) to the active dataset!")
+                else:
+                    st.info(f"Column '{col_to_add}' is already present in the active dataset.")
 
 
 def render_python_environment(df: pd.DataFrame, key_prefix: str = "py_"):
@@ -4158,7 +4169,7 @@ elif selected_module == "➕ Insert New Column":
             
             c_n1, c_n2 = st.columns(2)
             with c_n1:
-                new_col_name = st.text_input("New Column Name:", placeholder="e.g. bonus_pay, margin_ratio, tier", key="inc_new_col_name")
+                new_col_name = st.text_input("New Column Name:", value=st.session_state.get("inc_col_name_val", "column asaihn"), placeholder="e.g. column asaihn, bonus_pay, margin_ratio", key="inc_new_col_name")
             with c_n2:
                 gen_method = st.selectbox(
                     "Generation Method:",
@@ -4169,13 +4180,16 @@ elif selected_module == "➕ Insert New Column":
                         "4. Conditional Threshold (If-Else / Binning)",
                         "5. Text Concatenation (Merge Columns)",
                         "6. Constant / Static Value",
-                        "7. Copy / Duplicate Column"
+                        "7. Copy / Duplicate Column",
+                        "8. Empty Column (None / NaN / Null)"
                     ],
                     key="inc_gen_method"
                 )
 
             # Dynamic Form Inputs
-            if gen_method.startswith("1."):
+            if gen_method.startswith("8."):
+                st.info("Creating an empty column populated with `NaN` / `None` values (unassigned empty cells ready for downstream operations).")
+            elif gen_method.startswith("1."):
                 m_c1, m_c2, m_c3 = st.columns(3)
                 with m_c1:
                     m_col_a = st.selectbox("Column A (Numeric):", num_cols if num_cols else all_cols, key="inc_math_a")
@@ -4297,6 +4311,9 @@ elif selected_module == "➕ Insert New Column":
 
                         elif gen_method.startswith("7."):
                             new_df[clean_col_name] = new_df[dup_col]
+
+                        elif gen_method.startswith("8."):
+                            new_df[clean_col_name] = np.nan
 
                         st.session_state.current_df = new_df
                         st.session_state.cleaning_manager = CleaningPipelineManager(new_df)

@@ -136,6 +136,19 @@ def create_calculated_column(
         return df, f"Error calculating column: {str(e)}"
 
 
+def add_new_column(
+    df: pd.DataFrame,
+    col_name: str = "column asaihn",
+    value: Any = np.nan
+) -> Tuple[pd.DataFrame, str]:
+    """
+    Appends a new column to the DataFrame. Defaults to empty (np.nan / None).
+    """
+    out = df.copy()
+    out[col_name] = value
+    return out, f"Added new column '{col_name}' successfully ({len(out):,} rows)."
+
+
 def group_by_aggregate(
     df: pd.DataFrame,
     group_cols: List[str],
