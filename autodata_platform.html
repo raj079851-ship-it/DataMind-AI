@@ -1571,32 +1571,375 @@
       </div>
 
       <!-- MODULE 4: EDA -->
+      <!-- MODULE 5: AUTOMATED EXPLORATORY DATA ANALYSIS (EDA) ENGINE -->
       <div id="moduleEDA" class="module-view">
-        <div class="panel">
-          <div class="panel-header">📈 Summary Statistics (Numerical Features)</div>
-          <div class="table-container" id="edaStatsContainer">Computing stats...</div>
-        </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
-          <div class="panel">
-            <div class="panel-header">Univariate Distribution Histogram</div>
-            <select id="edaDistCol" style="margin-bottom:12px;" onchange="renderHistogramChart()"></select>
-            <div class="chart-box">
-              <canvas id="histCanvas"></canvas>
+        <!-- EDA Header & Quick Action Toolbar -->
+        <div class="panel" style="margin-bottom:16px; background:linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%); border:1px solid rgba(99, 102, 241, 0.25);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:1.4rem;">📊</span>
+                <h3 style="margin:0; font-size:1.2rem; font-weight:700; color:var(--text-primary); letter-spacing:-0.02em;">
+                  Automated Exploratory Data Analysis (EDA) Engine
+                </h3>
+                <span class="badge badge-primary" style="background:rgba(99,102,241,0.2); color:#818cf8; border:1px solid rgba(99,102,241,0.4);">Enterprise AI</span>
+              </div>
+              <p style="margin:4px 0 0 0; font-size:0.82rem; color:var(--text-muted);">
+                Autonomous statistical profiler, univariate &amp; bivariate analysis, multivariate correlation, clustering, PCA decomposition, and AI interesting relationship miner.
+              </p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="runAutomatedEda()" style="padding:7px 16px; font-size:0.82rem; font-weight:700; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); display:flex; align-items:center; gap:6px;">
+                <span>⚡ Run Full Automated EDA</span>
+              </button>
+              <button class="btn btn-secondary" onclick="exportEdaDossierHTML()" style="padding:7px 14px; font-size:0.82rem; display:flex; align-items:center; gap:6px;">
+                <span>📑 Export EDA Dossier</span>
+              </button>
+              <button class="btn btn-secondary" onclick="exportEdaStatsJSON()" style="padding:7px 14px; font-size:0.82rem; display:flex; align-items:center; gap:6px;">
+                <span>📥 Export JSON</span>
+              </button>
             </div>
           </div>
-          <div class="panel">
-            <div class="panel-header">Categorical Frequency Breakdown</div>
-            <select id="edaBarCol" style="margin-bottom:12px;" onchange="renderBarChart()"></select>
-            <div class="chart-box">
-              <canvas id="barCanvas"></canvas>
+
+          <!-- Top Executive Metrics Strip -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.08);">
+            <div class="metric-card" style="padding:10px 14px;">
+              <div class="metric-title" style="font-size:0.75rem;">Total Profiled Features</div>
+              <div class="metric-val" id="edaKpiTotalFeatures" style="font-size:1.35rem; color:#38bdf8;">0</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaKpiNumVsCat">0 Num • 0 Cat</div>
+            </div>
+            <div class="metric-card" style="padding:10px 14px;">
+              <div class="metric-title" style="font-size:0.75rem;">AI Discovered Insights</div>
+              <div class="metric-val" id="edaKpiInsightsCount" style="font-size:1.35rem; color:#a855f7;">0</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">Interesting Relationships</div>
+            </div>
+            <div class="metric-card" style="padding:10px 14px;">
+              <div class="metric-title" style="font-size:0.75rem;">Strong Correlations (|r| &gt; 0.6)</div>
+              <div class="metric-val" id="edaKpiCorrPairs" style="font-size:1.35rem; color:#10b981;">0</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">Feature Associations</div>
+            </div>
+            <div class="metric-card" style="padding:10px 14px;">
+              <div class="metric-title" style="font-size:0.75rem;">Dataset Skewness Profile</div>
+              <div class="metric-val" id="edaKpiSkewProfile" style="font-size:1.15rem; color:#f59e0b;">Balanced</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaKpiAvgSkew">Avg Skew: 0.00</div>
+            </div>
+            <div class="metric-card" style="padding:10px 14px;">
+              <div class="metric-title" style="font-size:0.75rem;">Data Hygiene &amp; Completeness</div>
+              <div class="metric-val" id="edaKpiCompleteness" style="font-size:1.35rem; color:#34d399;">100%</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaKpiMissingCells">0 Missing Cells</div>
             </div>
           </div>
         </div>
 
-        <div class="panel">
-          <div class="panel-header">🔥 Feature Correlation Matrix (Pearson)</div>
-          <div class="table-container" id="edaCorrContainer">Computing correlation...</div>
+        <!-- EDA Sub-Navigation Tabs Bar -->
+        <div style="display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--card-border); padding-bottom:8px; overflow-x:auto;">
+          <button class="btn btn-secondary eda-tab-btn active" id="edaTabBtn_ai" onclick="switchEdaSubTab('ai')" style="font-size:0.84rem; padding:8px 16px; border-radius:8px;">
+            <span>🤖 AI Interesting Relationships</span>
+          </button>
+          <button class="btn btn-secondary eda-tab-btn" id="edaTabBtn_univariate" onclick="switchEdaSubTab('univariate')" style="font-size:0.84rem; padding:8px 16px; border-radius:8px;">
+            <span>📊 Univariate Analysis</span>
+          </button>
+          <button class="btn btn-secondary eda-tab-btn" id="edaTabBtn_bivariate" onclick="switchEdaSubTab('bivariate')" style="font-size:0.84rem; padding:8px 16px; border-radius:8px;">
+            <span>🔗 Bivariate Analysis</span>
+          </button>
+          <button class="btn btn-secondary eda-tab-btn" id="edaTabBtn_multivariate" onclick="switchEdaSubTab('multivariate')" style="font-size:0.84rem; padding:8px 16px; border-radius:8px;">
+            <span>🌐 Multivariate &amp; Clusters</span>
+          </button>
+          <button class="btn btn-secondary eda-tab-btn" id="edaTabBtn_summary" onclick="switchEdaSubTab('summary')" style="font-size:0.84rem; padding:8px 16px; border-radius:8px;">
+            <span>📈 Statistical Matrix</span>
+          </button>
+        </div>
+
+        <!-- SUB-TAB 1: AI INTERESTING RELATIONSHIPS -->
+        <div id="edaSubView_ai" class="eda-sub-view">
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+              <span>💡 Automatically Discovered Business Relationships &amp; Disparities</span>
+              <div style="display:flex; gap:6px;" id="edaAiFilterPills">
+                <button class="btn btn-secondary active" style="padding:4px 10px; font-size:0.75rem;" onclick="filterEdaInsights('all', this)">All Insights</button>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="filterEdaInsights('group', this)">Group Disparities</button>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="filterEdaInsights('corr', this)">Correlations</button>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="filterEdaInsights('dist', this)">Distribution Shifts</button>
+                <button class="btn btn-secondary" style="padding:4px 10px; font-size:0.75rem;" onclick="filterEdaInsights('pareto', this)">Concentration / 80-20</button>
+              </div>
+            </div>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
+              The AI hypothesis scanner cross-evaluates all categorical segments, numerical target metrics, correlation matrices, and variance distributions to uncover actionable business drivers.
+            </p>
+
+            <!-- Discovered Relationships Container -->
+            <div id="edaAiInsightsGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:14px;">
+              <div style="grid-column:1/-1; text-align:center; padding:32px; color:var(--text-muted); font-size:0.88rem;">
+                Click "⚡ Run Full Automated EDA" or upload a dataset to generate automated relationships.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 2: UNIVARIATE ANALYSIS -->
+        <div id="edaSubView_univariate" class="eda-sub-view" style="display:none;">
+          <!-- Feature Selector Ribbon -->
+          <div class="panel" style="margin-bottom:16px; padding:14px 18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                <label style="font-size:0.82rem; font-weight:700; color:var(--text-muted);">Select Feature to Profile:</label>
+                <select id="edaUniFeatureSelect" onchange="renderEdaUnivariate()" style="padding:6px 12px; font-size:0.84rem; border-radius:6px; min-width:220px;"></select>
+                <span id="edaUniFeatureBadge" class="badge badge-info">Numeric</span>
+                <span id="edaUniMissingBadge" class="badge badge-secondary">0% Missing</span>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <label style="font-size:0.75rem; color:var(--text-muted);">Histogram Bins:</label>
+                <input type="range" id="edaUniBinSlider" min="5" max="30" value="10" oninput="document.getElementById('edaUniBinCountLabel').textContent = this.value; renderEdaUnivariate();" style="width:100px;">
+                <span id="edaUniBinCountLabel" style="font-size:0.75rem; color:#818cf8; font-weight:700;">10</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Univariate Statistical Metrics Cards Grid -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-bottom:16px;">
+            <!-- Central Tendency -->
+            <div class="metric-card">
+              <div class="metric-title">Mean</div>
+              <div class="metric-val" id="edaUniMean" style="color:#38bdf8;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniTrimmedMean">5% Trim: --</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Median (Q2)</div>
+              <div class="metric-val" id="edaUniMedian" style="color:#818cf8;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniMode">Mode: --</div>
+            </div>
+            <!-- Dispersion -->
+            <div class="metric-card">
+              <div class="metric-title">Std Deviation (σ)</div>
+              <div class="metric-val" id="edaUniStd" style="color:#f59e0b;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniVariance">Var: --</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">IQR (Q3 - Q1)</div>
+              <div class="metric-val" id="edaUniIqr" style="color:#ec4899;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniRange">Range: --</div>
+            </div>
+            <!-- Skewness & Kurtosis -->
+            <div class="metric-card">
+              <div class="metric-title">Skewness</div>
+              <div class="metric-val" id="edaUniSkew" style="color:#10b981;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniSkewInterpretation">--</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Excess Kurtosis</div>
+              <div class="metric-val" id="edaUniKurt" style="color:#06b6d4;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaUniKurtInterpretation">--</div>
+            </div>
+          </div>
+
+          <!-- Univariate Visualizations Grid -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>📈 Distribution Histogram &amp; KDE Density</span>
+                <span class="badge badge-secondary" id="edaDistSubtitle">Normal Curve Overlay</span>
+              </div>
+              <div class="chart-box" style="height:280px; position:relative;">
+                <canvas id="histCanvas" width="600" height="280"></canvas>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>📊 Frequency Breakdown &amp; Pareto</span>
+                <span class="badge badge-secondary" id="edaFreqSubtitle">Top Values</span>
+              </div>
+              <div class="chart-box" style="height:280px; position:relative;">
+                <canvas id="barCanvas" width="600" height="280"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 3: BIVARIATE ANALYSIS -->
+        <div id="edaSubView_bivariate" class="eda-sub-view" style="display:none;">
+          <!-- Variable Selectors Ribbon -->
+          <div class="panel" style="margin-bottom:16px; padding:14px 18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+              <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                <div>
+                  <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Feature X (Dimension / Group / Time):</label>
+                  <select id="edaBiColX" onchange="renderEdaBivariate()" style="padding:6px 12px; font-size:0.84rem; border-radius:6px; min-width:200px;"></select>
+                </div>
+                <div>
+                  <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Feature Y (Target / Numerical Metric):</label>
+                  <select id="edaBiColY" onchange="renderEdaBivariate()" style="padding:6px 12px; font-size:0.84rem; border-radius:6px; min-width:200px;"></select>
+                </div>
+                <div>
+                  <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Bivariate Analysis Mode:</label>
+                  <select id="edaBiMode" onchange="renderEdaBivariate()" style="padding:6px 12px; font-size:0.84rem; border-radius:6px;">
+                    <option value="auto">Auto-Detect Relationship</option>
+                    <option value="num_vs_num">Numerical vs Numerical (Scatter &amp; OLS)</option>
+                    <option value="cat_vs_num">Category vs Numerical (Group Comparisons)</option>
+                    <option value="time_vs_metric">Time vs Metric (Chronological Trend)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="edaBiBadgeContainer">
+                <span class="badge badge-primary" id="edaBiTypeBadge">Linear Relationship</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bivariate Statistical Metrics Strip -->
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:12px; margin-bottom:16px;">
+            <div class="metric-card">
+              <div class="metric-title">Pearson Correlation (r)</div>
+              <div class="metric-val" id="edaBiPearson" style="color:#818cf8;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaBiPearsonStrength">Linear Association</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Sample Covariance (Cov)</div>
+              <div class="metric-val" id="edaBiCovariance" style="color:#38bdf8;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">Co-dispersion</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Spearman Rank (ρ)</div>
+              <div class="metric-val" id="edaBiSpearman" style="color:#10b981;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);">Monotonic Rank</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Variance Explained (R²)</div>
+              <div class="metric-val" id="edaBiR2" style="color:#f59e0b;">--</div>
+              <div style="font-size:0.72rem; color:var(--text-muted);" id="edaBiOlsEq">OLS: y = mx + b</div>
+            </div>
+          </div>
+
+          <!-- Dynamic Bivariate Visualization & Group Table -->
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px;">
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="edaBiChartTitle">Interactive Bivariate Scatter &amp; Trendline</span>
+                <span class="badge badge-secondary" id="edaBiChartSub">OLS Regression</span>
+              </div>
+              <div class="chart-box" style="height:320px; position:relative;">
+                <canvas id="edaBiCanvas" width="650" height="320"></canvas>
+              </div>
+            </div>
+
+            <!-- Group Comparisons / Breakdown Table -->
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span id="edaBiBreakdownTitle">Segment Group Comparisons</span>
+                <span class="badge badge-info" id="edaBiGroupCountBadge">0 Groups</span>
+              </div>
+              <div class="table-container" id="edaBiGroupTableContainer" style="max-height:300px; overflow-y:auto;">
+                <div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.84rem;">
+                  Select a categorical feature X and numerical feature Y to view segment comparisons.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bivariate Narrative Banner -->
+          <div class="banner-box" id="edaBiNarrativeBanner" style="margin-top:16px; border-left-color:#8b5cf6;">
+            <div style="display:flex; align-items:flex-start; gap:10px;">
+              <span style="font-size:1.2rem;">💡</span>
+              <div>
+                <strong style="color:var(--text-primary); font-size:0.85rem;" id="edaBiNarrativeTitle">AI Bivariate Finding:</strong>
+                <p style="margin:4px 0 0 0; font-size:0.82rem; color:var(--text-muted); line-height:1.5;" id="edaBiNarrativeText">
+                  Configure feature pairs to generate automated bivariate intelligence.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 4: MULTIVARIATE ANALYSIS & CLUSTERING -->
+        <div id="edaSubView_multivariate" class="eda-sub-view" style="display:none;">
+          <!-- Heatmap & Pair Plots Row -->
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-bottom:16px;">
+            <!-- Pearson Correlation Matrix Heatmap -->
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>🔥 Correlation Matrix Heatmap (Pearson r)</span>
+                <span class="badge badge-primary">Interactive Drill-down</span>
+              </div>
+              <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:10px;">
+                Click any cell in the heatmap matrix to immediately launch bivariate regression for that pair.
+              </p>
+              <div class="table-container" id="edaCorrContainer" style="max-height:340px; overflow:auto;">
+                Computing correlation matrix...
+              </div>
+            </div>
+
+            <!-- Feature Relationship Ranking List -->
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>🏆 Top Correlated Feature Pairs</span>
+                <span class="badge badge-success">Ranked</span>
+              </div>
+              <div class="table-container" id="edaTopPairsContainer" style="max-height:340px; overflow-y:auto;">
+                Ranking feature relationships...
+              </div>
+            </div>
+          </div>
+
+          <!-- Pair Plots Matrix Preview -->
+          <div class="panel" style="margin-bottom:16px;">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>🔲 Pair Plots Matrix (Scatter &amp; Univariate Distributions)</span>
+              <span class="badge badge-secondary" id="edaPairPlotBadge">Top 4 Numerical Features</span>
+            </div>
+            <div class="chart-box" style="height:360px; position:relative; overflow:hidden; background:rgba(15,23,42,0.4); border-radius:8px;">
+              <canvas id="edaPairCanvas" width="900" height="360"></canvas>
+            </div>
+          </div>
+
+          <!-- Cluster Visualization & PCA Dimensionality Reduction Grid -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <!-- k-Means Clustering 2D Scatter -->
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <span>🎯 k-Means Cluster Visualization</span>
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <label style="font-size:0.72rem; color:var(--text-muted);">Clusters (k):</label>
+                  <select id="edaKMeansK" onchange="renderEdaMultivariate()" style="padding:4px 8px; font-size:0.75rem; border-radius:4px;">
+                    <option value="2">k = 2</option>
+                    <option value="3" selected>k = 3</option>
+                    <option value="4">k = 4</option>
+                    <option value="5">k = 5</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-box" style="height:280px; position:relative;">
+                <canvas id="edaClusterCanvas" width="550" height="280"></canvas>
+              </div>
+              <div id="edaClusterProfileTable" style="margin-top:10px; font-size:0.78rem;"></div>
+            </div>
+
+            <!-- PCA Dimensionality Reduction (2D Projection) -->
+            <div class="panel">
+              <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+                <span>🧬 PCA 2D Dimensionality Reduction</span>
+                <span class="badge badge-info" id="edaPcaVarianceBadge">PC1: --% | PC2: --%</span>
+              </div>
+              <div class="chart-box" style="height:280px; position:relative;">
+                <canvas id="edaPcaCanvas" width="550" height="280"></canvas>
+              </div>
+              <div id="edaPcaLoadingsText" style="margin-top:10px; font-size:0.76rem; color:var(--text-muted);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SUB-TAB 5: FULL STATISTICAL SUMMARY MATRIX -->
+        <div id="edaSubView_summary" class="eda-sub-view" style="display:none;">
+          <div class="panel">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>📈 Comprehensive Descriptive Statistics Matrix</span>
+              <span class="badge badge-success" id="edaStatsColCountBadge">All Features</span>
+            </div>
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">
+              Complete univariate statistics across all dataset columns: missingness, central tendency, dispersion, and shape parameters.
+            </p>
+            <div class="table-container" id="edaStatsContainer">
+              Computing descriptive statistics...
+            </div>
+          </div>
         </div>
       </div>
 
@@ -7650,7 +7993,7 @@ result = df.describe()
       }
       else if (moduleId === 'moduleEDA') {
         document.getElementById('navBtnEDA').classList.add('active');
-        setTimeout(() => { populateDropdowns(); renderHistogramChart(); renderBarChart(); renderEDAStats(); renderCorrelation(); }, 30);
+        setTimeout(() => { populateDropdowns(); runAutomatedEda(); }, 30);
       }
       else if (moduleId === 'moduleDashboard') {
         document.getElementById('navBtnDashboard').classList.add('active');
@@ -10083,115 +10426,1907 @@ result = df.describe()
       el.innerHTML = html;
     }
 
-    function renderHistogramChart() {
-      const col = document.getElementById("edaDistCol")?.value;
-      const canvas = document.getElementById("histCanvas");
-      if (!canvas || !col) return;
-      const ctx = canvas.getContext("2d");
+    // =========================================================================
+    // AUTOMATED EXPLORATORY DATA ANALYSIS (EDA) ENGINE
+    // Enterprise statistical profiler, Univariate, Bivariate, Multivariate,
+    // Clustering, PCA decomposition, and AI Interesting Relationship Miner
+    // =========================================================================
+
+    window.edaMinedInsights = [];
+    window.edaLastSelectedTab = 'ai';
+
+    // -------------------------------------------------------------------------
+    // MATHEMATICAL & STATISTICAL UTILITY FUNCTIONS
+    // -------------------------------------------------------------------------
+    function edaCalcMean(arr) {
+      if (!arr || !arr.length) return 0;
+      return arr.reduce((a, b) => a + b, 0) / arr.length;
+    }
+
+    function edaCalcMedian(arr) {
+      if (!arr || !arr.length) return 0;
+      const sorted = [...arr].sort((a, b) => a - b);
+      const mid = Math.floor(sorted.length / 2);
+      return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+    }
+
+    function edaCalcMode(arr) {
+      if (!arr || !arr.length) return "N/A";
+      const freq = {};
+      let maxCnt = 0;
+      let mode = arr[0];
+      arr.forEach(v => {
+        const k = String(v);
+        freq[k] = (freq[k] || 0) + 1;
+        if (freq[k] > maxCnt) {
+          maxCnt = freq[k];
+          mode = v;
+        }
+      });
+      return mode;
+    }
+
+    function edaCalcTrimmedMean(arr, p = 0.05) {
+      if (!arr || arr.length < 5) return edaCalcMean(arr);
+      const sorted = [...arr].sort((a, b) => a - b);
+      const trimCount = Math.floor(sorted.length * p);
+      const trimmed = sorted.slice(trimCount, sorted.length - trimCount);
+      return edaCalcMean(trimmed);
+    }
+
+    function edaCalcVariance(arr, mean) {
+      if (!arr || arr.length < 2) return 0;
+      const m = (mean !== undefined) ? mean : edaCalcMean(arr);
+      return arr.reduce((acc, v) => acc + Math.pow(v - m, 2), 0) / (arr.length - 1);
+    }
+
+    function edaCalcStd(arr, mean) {
+      return Math.sqrt(edaCalcVariance(arr, mean));
+    }
+
+    function edaCalcIQR(arr) {
+      if (!arr || !arr.length) return { q1: 0, q3: 0, iqr: 0, min: 0, max: 0 };
+      const sorted = [...arr].sort((a, b) => a - b);
+      const q1 = sorted[Math.floor(sorted.length * 0.25)];
+      const q3 = sorted[Math.floor(sorted.length * 0.75)];
+      return {
+        q1,
+        q3,
+        iqr: q3 - q1,
+        min: sorted[0],
+        max: sorted[sorted.length - 1]
+      };
+    }
+
+    function edaCalcMAD(arr, median) {
+      if (!arr || !arr.length) return 0;
+      const med = (median !== undefined) ? median : edaCalcMedian(arr);
+      const devs = arr.map(v => Math.abs(v - med));
+      return edaCalcMedian(devs);
+    }
+
+    function edaCalcCV(mean, std) {
+      if (!mean || mean === 0) return 0;
+      return (std / Math.abs(mean)) * 100;
+    }
+
+    function edaCalcSkewness(arr, mean, std) {
+      const n = arr.length;
+      if (n < 3 || !std || std === 0) return 0;
+      const m = (mean !== undefined) ? mean : edaCalcMean(arr);
+      const s = (std !== undefined) ? std : edaCalcStd(arr, m);
+      const sumCubed = arr.reduce((acc, v) => acc + Math.pow((v - m) / s, 3), 0);
+      return (n / ((n - 1) * (n - 2))) * sumCubed;
+    }
+
+    function edaCalcKurtosis(arr, mean, std) {
+      const n = arr.length;
+      if (n < 4 || !std || std === 0) return 0;
+      const m = (mean !== undefined) ? mean : edaCalcMean(arr);
+      const s = (std !== undefined) ? std : edaCalcStd(arr, m);
+      const sumFourth = arr.reduce((acc, v) => acc + Math.pow((v - m) / s, 4), 0);
+      const term1 = (n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3));
+      const term2 = (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+      return term1 * sumFourth - term2;
+    }
+
+    function edaCalcCovariance(arrX, arrY) {
+      const n = Math.min(arrX.length, arrY.length);
+      if (n < 2) return 0;
+      const mx = edaCalcMean(arrX);
+      const my = edaCalcMean(arrY);
+      let sum = 0;
+      for (let i = 0; i < n; i++) {
+        sum += (arrX[i] - mx) * (arrY[i] - my);
+      }
+      return sum / (n - 1);
+    }
+
+    function edaCalcPearson(arrX, arrY) {
+      const n = Math.min(arrX.length, arrY.length);
+      if (n < 2) return 0;
+      const cov = edaCalcCovariance(arrX, arrY);
+      const sx = edaCalcStd(arrX);
+      const sy = edaCalcStd(arrY);
+      if (sx === 0 || sy === 0) return 0;
+      const r = cov / (sx * sy);
+      return Math.max(-1, Math.min(1, r));
+    }
+
+    function edaCalcSpearman(arrX, arrY) {
+      const n = Math.min(arrX.length, arrY.length);
+      if (n < 2) return 0;
+      // Convert to rank arrays
+      const rank = (a) => {
+        const sorted = a.map((val, idx) => ({ val, idx })).sort((x, y) => x.val - y.val);
+        const ranks = new Array(a.length);
+        sorted.forEach((item, r) => { ranks[item.idx] = r + 1; });
+        return ranks;
+      };
+      const rx = rank(arrX);
+      const ry = rank(arrY);
+      return edaCalcPearson(rx, ry);
+    }
+
+    function edaCalcOLS(arrX, arrY) {
+      const n = Math.min(arrX.length, arrY.length);
+      if (n < 2) return { slope: 0, intercept: 0, r2: 0 };
+      const mx = edaCalcMean(arrX);
+      const my = edaCalcMean(arrY);
+      let num = 0;
+      let den = 0;
+      for (let i = 0; i < n; i++) {
+        num += (arrX[i] - mx) * (arrY[i] - my);
+        den += Math.pow(arrX[i] - mx, 2);
+      }
+      const slope = (den !== 0) ? num / den : 0;
+      const intercept = my - slope * mx;
+      const r = edaCalcPearson(arrX, arrY);
+      const r2 = Math.pow(r, 2);
+      return { slope, intercept, r2, r };
+    }
+
+    function edaCalcKMeans(data2D, k = 3, maxIter = 15) {
+      if (!data2D || data2D.length < k) return { assignments: [], centroids: [] };
+      const n = data2D.length;
+      // Initialize centroids using k-means++-style spread
+      let centroids = [];
+      centroids.push([...data2D[0]]);
+      for (let i = 1; i < k; i++) {
+        const step = Math.floor(n / k) * i;
+        centroids.push([...data2D[Math.min(n - 1, step)]]);
+      }
+
+      let assignments = new Array(n).fill(0);
+      for (let iter = 0; iter < maxIter; iter++) {
+        let changed = false;
+        // Step 1: Assign points to nearest centroid
+        for (let i = 0; i < n; i++) {
+          const p = data2D[i];
+          let minDist = Infinity;
+          let bestK = 0;
+          for (let j = 0; j < k; j++) {
+            const dist = Math.pow(p[0] - centroids[j][0], 2) + Math.pow(p[1] - centroids[j][1], 2);
+            if (dist < minDist) {
+              minDist = dist;
+              bestK = j;
+            }
+          }
+          if (assignments[i] !== bestK) {
+            assignments[i] = bestK;
+            changed = true;
+          }
+        }
+        // Step 2: Update centroids
+        const counts = new Array(k).fill(0);
+        const sums = Array.from({ length: k }, () => [0, 0]);
+        for (let i = 0; i < n; i++) {
+          const c = assignments[i];
+          counts[c]++;
+          sums[c][0] += data2D[i][0];
+          sums[c][1] += data2D[i][1];
+        }
+        for (let j = 0; j < k; j++) {
+          if (counts[j] > 0) {
+            centroids[j][0] = sums[j][0] / counts[j];
+            centroids[j][1] = sums[j][1] / counts[j];
+          }
+        }
+        if (!changed) break;
+      }
+      return { assignments, centroids };
+    }
+
+    function edaCalcPCA2D(data2D) {
+      // 2D PCA on multi-dimensional numeric matrix
+      if (!data2D || !data2D.length) return { coords: [], expVar1: 50, expVar2: 30 };
+      const n = data2D.length;
+      const d = data2D[0].length;
+      if (d < 2) {
+        return {
+          coords: data2D.map((r, i) => [r[0] || 0, i]),
+          expVar1: 85,
+          expVar2: 15
+        };
+      }
+
+      // 1. Center & scale features
+      const means = new Array(d).fill(0);
+      const stds = new Array(d).fill(0);
+      for (let j = 0; j < d; j++) {
+        const colVals = data2D.map(r => r[j]);
+        means[j] = edaCalcMean(colVals);
+        stds[j] = edaCalcStd(colVals, means[j]) || 1;
+      }
+      const X = data2D.map(r => r.map((v, j) => (v - means[j]) / stds[j]));
+
+      // 2. Compute Covariance Matrix (d x d)
+      const cov = Array.from({ length: d }, () => new Array(d).fill(0));
+      for (let i = 0; i < d; i++) {
+        for (let j = i; j < d; j++) {
+          let sum = 0;
+          for (let k = 0; k < n; k++) {
+            sum += X[k][i] * X[k][j];
+          }
+          const c = sum / (n - 1);
+          cov[i][j] = c;
+          cov[j][i] = c;
+        }
+      }
+
+      // 3. Power Iteration for top 2 Eigenvectors
+      const powerIter = (A, numIter = 25) => {
+        let v = new Array(d).fill(0).map((_, i) => (i === 0 ? 1 : 0.5));
+        for (let it = 0; it < numIter; it++) {
+          let nextV = new Array(d).fill(0);
+          for (let r = 0; r < d; r++) {
+            for (let c = 0; c < d; c++) {
+              nextV[r] += A[r][c] * v[c];
+            }
+          }
+          const norm = Math.sqrt(nextV.reduce((acc, val) => acc + val * val, 0)) || 1;
+          v = nextV.map(val => val / norm);
+        }
+        // Eigenvalue
+        let lambda = 0;
+        for (let r = 0; r < d; r++) {
+          let rowDot = 0;
+          for (let c = 0; c < d; c++) rowDot += A[r][c] * v[c];
+          lambda += v[r] * rowDot;
+        }
+        return { v, lambda: Math.max(0.01, lambda) };
+      };
+
+      const eig1 = powerIter(cov);
+      // Deflate
+      const covDeflated = cov.map((row, r) => row.map((val, c) => val - eig1.lambda * eig1.v[r] * eig1.v[c]));
+      const eig2 = powerIter(covDeflated);
+
+      const totalVar = cov.reduce((acc, row, r) => acc + row[r], 0) || 1;
+      const expVar1 = Math.min(95, Math.round((eig1.lambda / totalVar) * 100));
+      const expVar2 = Math.min(100 - expVar1, Math.round((eig2.lambda / totalVar) * 100));
+
+      // Project points
+      const coords = X.map(row => {
+        let pc1 = 0, pc2 = 0;
+        for (let j = 0; j < d; j++) {
+          pc1 += row[j] * eig1.v[j];
+          pc2 += row[j] * eig2.v[j];
+        }
+        return [pc1, pc2];
+      });
+
+      return { coords, expVar1, expVar2 };
+    }
+
+    // -------------------------------------------------------------------------
+    // SUB-TAB CONTROLLER & WORKSPACE NAVIGATION
+    // -------------------------------------------------------------------------
+    function switchEdaSubTab(tabName) {
+      window.edaLastSelectedTab = tabName;
+      const tabs = ['ai', 'univariate', 'bivariate', 'multivariate', 'summary'];
+      tabs.forEach(t => {
+        const view = document.getElementById('edaSubView_' + t);
+        const btn = document.getElementById('edaTabBtn_' + t);
+        if (view) view.style.display = (t === tabName) ? 'block' : 'none';
+        if (btn) {
+          if (t === tabName) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      });
+
+      // Lazy render current view
+      if (tabName === 'univariate') renderEdaUnivariate();
+      else if (tabName === 'bivariate') renderEdaBivariate();
+      else if (tabName === 'multivariate') renderEdaMultivariate();
+      else if (tabName === 'summary') renderEdaSummaryTable();
+      else if (tabName === 'ai') renderEdaAiRelationships();
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. FULL AUTOMATED EDA DISCOVERY RUNNER
+    // -------------------------------------------------------------------------
+    function runAutomatedEda() {
+      notifyTaskStart("Automated EDA Profiler");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Automated EDA Profiler", "No active dataset loaded. Please upload a CSV or load demo data.");
+        return;
+      }
+
+      // Populate column selectors
+      populateEdaSelectors();
+
+      // Mine AI Relationships & Disparities
+      edaMineInterestingRelationships();
+
+      // Update Top Executive KPI Strip
+      updateEdaExecutiveMetrics();
+
+      // Render Active Tab
+      switchEdaSubTab(window.edaLastSelectedTab || 'ai');
+
+      notifyTaskSuccess("Automated EDA Profiler", `Synthesized EDA across ${columns.length} features, discovering ${window.edaMinedInsights.length} actionable business relationships.`);
+    }
+
+    function populateEdaSelectors() {
+      if (!currentDataset || !currentDataset.length) return;
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+
+      // 1. Univariate Feature Select
+      const uniSel = document.getElementById('edaUniFeatureSelect');
+      if (uniSel) {
+        const prev = uniSel.value;
+        uniSel.innerHTML = columns.map(c => {
+          const isNum = numCols.includes(c);
+          return `<option value="${c}">${c} (${isNum ? '123 Numeric' : 'Aa Category'})</option>`;
+        }).join('');
+        if (prev && columns.includes(prev)) uniSel.value = prev;
+        else if (numCols.length) uniSel.value = numCols[0];
+      }
+
+      // 2. Bivariate Feature X & Y
+      const biX = document.getElementById('edaBiColX');
+      const biY = document.getElementById('edaBiColY');
+      if (biX && biY) {
+        const prevX = biX.value;
+        const prevY = biY.value;
+        biX.innerHTML = columns.map(c => `<option value="${c}">${c}</option>`).join('');
+        biY.innerHTML = columns.map(c => `<option value="${c}">${c}</option>`).join('');
+        
+        if (prevX && columns.includes(prevX)) biX.value = prevX;
+        else if (catCols.length) biX.value = catCols[0];
+        else biX.value = columns[0];
+
+        if (prevY && columns.includes(prevY)) biY.value = prevY;
+        else if (numCols.length > 1) biY.value = numCols[1] || numCols[0];
+        else biY.value = columns[columns.length - 1];
+      }
+
+      // Backward compatibility dropdowns
+      const oldDist = document.getElementById('edaDistCol');
+      const oldBar = document.getElementById('edaBarCol');
+      if (oldDist) {
+        oldDist.innerHTML = numCols.map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+      if (oldBar) {
+        oldBar.innerHTML = (catCols.length ? catCols : columns).map(c => `<option value="${c}">${c}</option>`).join('');
+      }
+    }
+
+    function updateEdaExecutiveMetrics() {
+      const rows = currentDataset.length;
+      const cols = columns.length;
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+
+      // Total Profiled Features
+      const featEl = document.getElementById('edaKpiTotalFeatures');
+      const numCatEl = document.getElementById('edaKpiNumVsCat');
+      if (featEl) featEl.textContent = cols;
+      if (numCatEl) numCatEl.textContent = `${numCols.length} Numerical • ${catCols.length} Categorical`;
+
+      // Insights Count
+      const insEl = document.getElementById('edaKpiInsightsCount');
+      if (insEl) insEl.textContent = window.edaMinedInsights.length;
+
+      // Strong Correlations
+      let strongCorrCount = 0;
+      if (numCols.length >= 2) {
+        for (let i = 0; i < numCols.length; i++) {
+          for (let j = i + 1; j < numCols.length; j++) {
+            const arrX = currentDataset.map(r => parseFloat(r[numCols[i]])).filter(v => !isNaN(v));
+            const arrY = currentDataset.map(r => parseFloat(r[numCols[j]])).filter(v => !isNaN(v));
+            const r = Math.abs(edaCalcPearson(arrX, arrY));
+            if (r >= 0.6) strongCorrCount++;
+          }
+        }
+      }
+      const corrEl = document.getElementById('edaKpiCorrPairs');
+      if (corrEl) corrEl.textContent = strongCorrCount;
+
+      // Skewness Profile
+      let totalSkew = 0;
+      let skewCount = 0;
+      numCols.forEach(c => {
+        const vals = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v));
+        if (vals.length >= 4) {
+          totalSkew += Math.abs(edaCalcSkewness(vals));
+          skewCount++;
+        }
+      });
+      const avgSkew = skewCount > 0 ? (totalSkew / skewCount) : 0;
+      const skewProfEl = document.getElementById('edaKpiSkewProfile');
+      const skewAvgEl = document.getElementById('edaKpiAvgSkew');
+      if (skewProfEl) {
+        skewProfEl.textContent = avgSkew < 0.5 ? 'Balanced' : (avgSkew < 1.0 ? 'Moderate Skew' : 'High Asymmetry');
+        skewProfEl.style.color = avgSkew < 0.5 ? '#10b981' : (avgSkew < 1.0 ? '#f59e0b' : '#ec4899');
+      }
+      if (skewAvgEl) skewAvgEl.textContent = `Avg |Skew|: ${avgSkew.toFixed(2)}`;
+
+      // Completeness
+      let missingCells = 0;
+      const totalCells = rows * cols;
+      currentDataset.forEach(r => {
+        columns.forEach(c => {
+          if (r[c] === null || r[c] === undefined || String(r[c]).trim() === '') missingCells++;
+        });
+      });
+      const pct = Math.round((1 - missingCells / (totalCells || 1)) * 100);
+      const compEl = document.getElementById('edaKpiCompleteness');
+      const missEl = document.getElementById('edaKpiMissingCells');
+      if (compEl) compEl.textContent = `${pct}%`;
+      if (missEl) missEl.textContent = `${missingCells} Missing Cells (${(100 - pct).toFixed(1)}%)`;
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. AI INTERESTING RELATIONSHIPS MINER
+    // -------------------------------------------------------------------------
+    function edaMineInterestingRelationships() {
+      window.edaMinedInsights = [];
+      if (!currentDataset || !currentDataset.length) return;
+
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
+
+      // 1. Group Comparisons (Category vs Numerical)
+      catCols.forEach(cat => {
+        numCols.forEach(num => {
+          const groups = {};
+          currentDataset.forEach(r => {
+            const k = String(r[cat] || "Other").trim();
+            const val = parseFloat(r[num]);
+            if (!isNaN(val)) {
+              if (!groups[k]) groups[k] = [];
+              groups[k].push(val);
+            }
+          });
+
+          const groupKeys = Object.keys(groups).filter(k => groups[k].length >= 2);
+          if (groupKeys.length >= 2) {
+            const groupStats = groupKeys.map(k => ({
+              key: k,
+              mean: edaCalcMean(groups[k]),
+              median: edaCalcMedian(groups[k]),
+              count: groups[k].length
+            })).sort((a, b) => b.mean - a.mean);
+
+            const top = groupStats[0];
+            const second = groupStats[1];
+            const bottom = groupStats[groupStats.length - 1];
+
+            if (top.mean > 0 && second.mean > 0) {
+              const diffPct = Math.round(((top.mean - second.mean) / second.mean) * 1000) / 10;
+              if (Math.abs(diffPct) >= 8) {
+                window.edaMinedInsights.push({
+                  type: 'group',
+                  badge: 'Group Disparity',
+                  badgeColor: '#a855f7',
+                  title: `${cat} drives significant variance in ${num}`,
+                  text: `Customers acquired through <strong>${top.key}</strong> have <strong>${diffPct}% higher average ${num}</strong> than <strong>${second.key}</strong> (${top.mean.toFixed(1)} vs ${second.mean.toFixed(1)}).`,
+                  metric: `+${diffPct}%`,
+                  feature1: cat,
+                  feature2: num
+                });
+              }
+            } else if (top.mean !== bottom.mean) {
+              const diff = Math.round((top.mean - bottom.mean) * 10) / 10;
+              window.edaMinedInsights.push({
+                type: 'group',
+                badge: 'Segment Gap',
+                badgeColor: '#a855f7',
+                title: `${top.key} leads ${num} across ${cat}`,
+                text: `Segment <strong>${top.key}</strong> outperforms <strong>${bottom.key}</strong> by a delta of <strong>${diff}</strong> in ${num} (Top avg: ${top.mean.toFixed(1)}, Baseline: ${bottom.mean.toFixed(1)}).`,
+                metric: `Δ ${diff}`,
+                feature1: cat,
+                feature2: num
+              });
+            }
+          }
+        });
+      });
+
+      // 2. Strong Correlations (Numerical vs Numerical)
+      for (let i = 0; i < numCols.length; i++) {
+        for (let j = i + 1; j < numCols.length; j++) {
+          const colX = numCols[i];
+          const colY = numCols[j];
+          const arrX = currentDataset.map(r => parseFloat(r[colX])).filter(v => !isNaN(v));
+          const arrY = currentDataset.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
+          const r = edaCalcPearson(arrX, arrY);
+          const absR = Math.abs(r);
+          const r2 = Math.round(Math.pow(r, 2) * 100);
+
+          if (absR >= 0.55) {
+            const isPos = r > 0;
+            window.edaMinedInsights.push({
+              type: 'corr',
+              badge: isPos ? 'Positive Linear Link' : 'Inverse Trade-off',
+              badgeColor: isPos ? '#10b981' : '#ec4899',
+              title: `${colX} and ${colY} exhibit strong co-movement`,
+              text: `Strong ${isPos ? 'positive' : 'negative'} correlation detected (<strong>r = ${r.toFixed(2)}</strong>, <strong>R² = ${r2}%</strong>). Changes in <strong>${colX}</strong> account for ${r2}% of the variance in <strong>${colY}</strong>.`,
+              metric: `r = ${r.toFixed(2)}`,
+              feature1: colX,
+              feature2: colY
+            });
+          }
+        }
+      }
+
+      // 3. Distribution Anomalies & Skewness
+      numCols.forEach(col => {
+        const vals = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+        if (vals.length >= 5) {
+          const mean = edaCalcMean(vals);
+          const std = edaCalcStd(vals, mean);
+          const skew = edaCalcSkewness(vals, mean, std);
+          const kurt = edaCalcKurtosis(vals, mean, std);
+
+          if (skew > 1.2) {
+            window.edaMinedInsights.push({
+              type: 'dist',
+              badge: 'Right-Tail Heavy',
+              badgeColor: '#f59e0b',
+              title: `High positive skewness in '${col}'`,
+              text: `<strong>${col}</strong> exhibits heavy right-tail asymmetry (skewness = <strong>+${skew.toFixed(2)}</strong>). A minority of high-value outliers significantly elevates the arithmetic mean above the median.`,
+              metric: `Skew: +${skew.toFixed(2)}`,
+              feature1: col
+            });
+          } else if (skew < -1.2) {
+            window.edaMinedInsights.push({
+              type: 'dist',
+              badge: 'Left-Tail Heavy',
+              badgeColor: '#f59e0b',
+              title: `Negative skewness in '${col}'`,
+              text: `<strong>${col}</strong> is left-skewed (skewness = <strong>${skew.toFixed(2)}</strong>) with values clustered toward upper bounds and extreme underperformers.`,
+              metric: `Skew: ${skew.toFixed(2)}`,
+              feature1: col
+            });
+          }
+
+          if (kurt > 3.0) {
+            window.edaMinedInsights.push({
+              type: 'dist',
+              badge: 'Leptokurtic Outliers',
+              badgeColor: '#ef4444',
+              title: `Excess kurtosis in '${col}'`,
+              text: `Excess kurtosis of <strong>+${kurt.toFixed(2)}</strong> indicates a fat-tailed distribution with significant extreme event risk compared to a standard normal curve.`,
+              metric: `Kurt: +${kurt.toFixed(2)}`,
+              feature1: col
+            });
+          }
+        }
+      });
+
+      // 4. Pareto Concentration (80/20 Rule)
+      catCols.forEach(cat => {
+        numCols.slice(0, 2).forEach(num => {
+          const sums = {};
+          let total = 0;
+          currentDataset.forEach(r => {
+            const k = String(r[cat] || "Other");
+            const v = parseFloat(r[num]);
+            if (!isNaN(v) && v > 0) {
+              sums[k] = (sums[k] || 0) + v;
+              total += v;
+            }
+          });
+          const sorted = Object.entries(sums).sort((a, b) => b[1] - a[1]);
+          if (sorted.length >= 3 && total > 0) {
+            const topTwo = sorted.slice(0, 2).reduce((acc, e) => acc + e[1], 0);
+            const topTwoPct = Math.round((topTwo / total) * 100);
+            if (topTwoPct >= 60) {
+              window.edaMinedInsights.push({
+                type: 'pareto',
+                badge: 'Pareto 80/20 Concentration',
+                badgeColor: '#38bdf8',
+                title: `Top ${cat} segments dominate ${num}`,
+                text: `High concentration detected: Top 2 categories (<strong>${sorted[0][0]}</strong> and <strong>${sorted[1][0]}</strong>) account for <strong>${topTwoPct}%</strong> of all cumulative ${num} volume.`,
+                metric: `${topTwoPct}% Vol`,
+                feature1: cat,
+                feature2: num
+              });
+            }
+          }
+        });
+      });
+
+      // Sort insights: group disparities and high correlations first
+      window.edaMinedInsights.sort((a, b) => {
+        const order = { group: 1, corr: 2, pareto: 3, dist: 4 };
+        return (order[a.type] || 5) - (order[b.type] || 5);
+      });
+    }
+
+    function renderEdaAiRelationships() {
+      const container = document.getElementById('edaAiInsightsGrid');
+      if (!container) return;
+
+      if (!window.edaMinedInsights || !window.edaMinedInsights.length) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:32px; color:var(--text-muted); font-size:0.88rem;">
+            No significant disparities or relationships found yet. Click <strong>⚡ Run Full Automated EDA</strong> to scan the active dataset.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = window.edaMinedInsights.map((ins, idx) => `
+        <div class="panel eda-insight-card" data-type="${ins.type}" style="margin-bottom:0; border-left:4px solid ${ins.badgeColor}; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
+              <span class="badge" style="background:rgba(255,255,255,0.06); color:${ins.badgeColor}; border:1px solid ${ins.badgeColor}40;">
+                ${ins.badge}
+              </span>
+              <span style="font-weight:700; font-size:0.86rem; color:${ins.badgeColor};">
+                ${ins.metric}
+              </span>
+            </div>
+            <h4 style="margin:0 0 6px 0; font-size:0.92rem; color:var(--text-primary); font-weight:700;">
+              ${ins.title}
+            </h4>
+            <p style="margin:0 0 12px 0; font-size:0.8rem; color:var(--text-muted); line-height:1.5;">
+              ${ins.text}
+            </p>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; pt-2; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+            <div style="font-size:0.72rem; color:var(--text-muted);">
+              ${ins.feature2 ? `Features: <code>${ins.feature1}</code> × <code>${ins.feature2}</code>` : `Feature: <code>${ins.feature1}</code>`}
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary" style="padding:3px 8px; font-size:0.72rem;" onclick="copyEdaInsightText('${escape(ins.text)}')">
+                <span>📋 Copy</span>
+              </button>
+              ${ins.feature2 ? `
+                <button class="btn btn-primary" style="padding:3px 8px; font-size:0.72rem;" onclick="drillDownEdaPair('${ins.feature1}', '${ins.feature2}')">
+                  <span>Explore ↗</span>
+                </button>
+              ` : `
+                <button class="btn btn-primary" style="padding:3px 8px; font-size:0.72rem;" onclick="drillDownEdaSingle('${ins.feature1}')">
+                  <span>Explore ↗</span>
+                </button>
+              `}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterEdaInsights(type, btn) {
+      document.querySelectorAll('#edaAiFilterPills button').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.eda-insight-card');
+      cards.forEach(c => {
+        if (type === 'all' || c.getAttribute('data-type') === type) {
+          c.style.display = 'flex';
+        } else {
+          c.style.display = 'none';
+        }
+      });
+    }
+
+    function copyEdaInsightText(escapedText) {
+      const plain = unescape(escapedText).replace(/<[^>]+>/g, '');
+      navigator.clipboard.writeText(plain).then(() => {
+        showToast("Insight copied to clipboard!", "success");
+      }).catch(() => {
+        showToast("Copied: " + plain.slice(0, 40) + "...", "info");
+      });
+    }
+
+    function drillDownEdaPair(f1, f2) {
+      switchEdaSubTab('bivariate');
+      const biX = document.getElementById('edaBiColX');
+      const biY = document.getElementById('edaBiColY');
+      if (biX && biY) {
+        biX.value = f1;
+        biY.value = f2;
+        renderEdaBivariate();
+      }
+    }
+
+    function drillDownEdaSingle(f) {
+      switchEdaSubTab('univariate');
+      const sel = document.getElementById('edaUniFeatureSelect');
+      if (sel) {
+        sel.value = f;
+        renderEdaUnivariate();
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. UNIVARIATE ANALYSIS WORKSPACE
+    // -------------------------------------------------------------------------
+    function renderEdaUnivariate() {
+      if (!currentDataset || !currentDataset.length) return;
+      const col = document.getElementById('edaUniFeatureSelect')?.value || columns[0];
+      const isNum = isColNumeric(col);
+
+      // Badge
+      const badge = document.getElementById('edaUniFeatureBadge');
+      if (badge) {
+        badge.textContent = isNum ? '123 Numeric' : 'Aa Categorical';
+        badge.className = isNum ? 'badge badge-info' : 'badge badge-success';
+      }
+
+      // Missing %
+      let missingCnt = 0;
+      currentDataset.forEach(r => {
+        if (r[col] === null || r[col] === undefined || String(r[col]).trim() === '') missingCnt++;
+      });
+      const missPct = Math.round((missingCnt / currentDataset.length) * 100);
+      const missBadge = document.getElementById('edaUniMissingBadge');
+      if (missBadge) {
+        missBadge.textContent = `${missPct}% Missing (${missingCnt})`;
+        missBadge.className = missPct === 0 ? 'badge badge-secondary' : (missPct > 15 ? 'badge badge-danger' : 'badge badge-warning');
+      }
+
+      if (isNum) {
+        const vals = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a, b) => a - b);
+        if (vals.length) {
+          const mean = edaCalcMean(vals);
+          const median = edaCalcMedian(vals);
+          const mode = edaCalcMode(vals);
+          const trimMean = edaCalcTrimmedMean(vals, 0.05);
+          const variance = edaCalcVariance(vals, mean);
+          const std = Math.sqrt(variance);
+          const iqrObj = edaCalcIQR(vals);
+          const skew = edaCalcSkewness(vals, mean, std);
+          const kurt = edaCalcKurtosis(vals, mean, std);
+
+          document.getElementById('edaUniMean').textContent = mean.toFixed(2);
+          document.getElementById('edaUniTrimmedMean').textContent = `5% Trim: ${trimMean.toFixed(2)}`;
+          document.getElementById('edaUniMedian').textContent = median.toFixed(2);
+          document.getElementById('edaUniMode').textContent = `Mode: ${typeof mode === 'number' ? mode.toFixed(2) : mode}`;
+          document.getElementById('edaUniStd').textContent = std.toFixed(2);
+          document.getElementById('edaUniVariance').textContent = `Var: ${variance.toFixed(2)}`;
+          document.getElementById('edaUniIqr').textContent = iqrObj.iqr.toFixed(2);
+          document.getElementById('edaUniRange').textContent = `Range: ${(iqrObj.max - iqrObj.min).toFixed(1)} [${iqrObj.min}..${iqrObj.max}]`;
+
+          // Skew
+          const skewEl = document.getElementById('edaUniSkew');
+          const skewInterp = document.getElementById('edaUniSkewInterpretation');
+          if (skewEl) skewEl.textContent = (skew >= 0 ? '+' : '') + skew.toFixed(2);
+          if (skewInterp) {
+            skewInterp.textContent = Math.abs(skew) < 0.5 ? 'Symmetric' : (skew > 0 ? 'Right-Skewed' : 'Left-Skewed');
+          }
+
+          // Kurtosis
+          const kurtEl = document.getElementById('edaUniKurt');
+          const kurtInterp = document.getElementById('edaUniKurtInterpretation');
+          if (kurtEl) kurtEl.textContent = (kurt >= 0 ? '+' : '') + kurt.toFixed(2);
+          if (kurtInterp) {
+            kurtInterp.textContent = kurt > 1 ? 'Leptokurtic (Heavy Tails)' : (kurt < -1 ? 'Platykurtic (Flat)' : 'Mesokurtic (Normal)');
+          }
+
+          // Draw Histogram & KDE
+          const binCount = parseInt(document.getElementById('edaUniBinSlider')?.value || '10', 10);
+          drawEdaHistogramKde('histCanvas', vals, binCount, mean, std);
+
+          // Draw Box / Quartile breakdown in second canvas
+          drawEdaQuartiles('barCanvas', vals, iqrObj);
+          const freqSub = document.getElementById('edaFreqSubtitle');
+          if (freqSub) freqSub.textContent = "Percentile & Quartile Spectrum";
+        }
+      } else {
+        // Categorical feature
+        const counts = {};
+        currentDataset.forEach(r => {
+          const k = String(r[col] || "Null / Empty");
+          counts[k] = (counts[k] || 0) + 1;
+        });
+        const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+        const uniqueCount = entries.length;
+        const topCategory = entries[0] || ["N/A", 0];
+
+        document.getElementById('edaUniMean').textContent = `N/A (Cat)`;
+        document.getElementById('edaUniTrimmedMean').textContent = `Distinct: ${uniqueCount}`;
+        document.getElementById('edaUniMedian').textContent = `Top: ${topCategory[0].slice(0, 10)}`;
+        document.getElementById('edaUniMode').textContent = `Count: ${topCategory[1]}`;
+        document.getElementById('edaUniStd').textContent = `--`;
+        document.getElementById('edaUniVariance').textContent = `Unique: ${uniqueCount}`;
+        document.getElementById('edaUniIqr').textContent = `--`;
+        document.getElementById('edaUniRange').textContent = `Entropy: ${(uniqueCount / currentDataset.length).toFixed(2)}`;
+        document.getElementById('edaUniSkew').textContent = `--`;
+        document.getElementById('edaUniSkewInterpretation').textContent = `Categorical Field`;
+        document.getElementById('edaUniKurt').textContent = `--`;
+        document.getElementById('edaUniKurtInterpretation').textContent = `Categorical Field`;
+
+        drawEdaBarChart('histCanvas', entries.slice(0, 10), currentDataset.length);
+        drawEdaParetoChart('barCanvas', entries, currentDataset.length);
+        const freqSub = document.getElementById('edaFreqSubtitle');
+        if (freqSub) freqSub.textContent = "Pareto Cumulative (80/20)";
+      }
+    }
+
+    function drawEdaHistogramKde(canvasId, vals, binCount = 10, mean, std) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const vals = currentDataset.map(r => r[col]).filter(v => typeof v === "number");
-      if (!vals.length) return;
-
-      const min = Math.min(...vals);
-      const max = Math.max(...vals);
-      const binCount = 6;
-      const binWidth = (max - min) / binCount || 1;
+      const min = vals[0];
+      const max = vals[vals.length - 1];
+      const span = max - min || 1;
+      const binWidth = span / binCount;
       const bins = new Array(binCount).fill(0);
 
       vals.forEach(v => {
-        let idx = Math.min(binCount - 1, Math.floor((v - min) / binWidth));
+        const idx = Math.min(binCount - 1, Math.floor((v - min) / binWidth));
         bins[idx]++;
       });
 
       const maxBin = Math.max(...bins, 1);
-      const w = canvas.width / binCount;
+      const padLeft = 40;
+      const padBottom = 30;
+      const padTop = 20;
+      const plotW = canvas.width - padLeft - 20;
+      const plotH = canvas.height - padBottom - padTop;
+      const barW = plotW / binCount;
 
+      // Draw Axes
+      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, padTop);
+      ctx.lineTo(padLeft, canvas.height - padBottom);
+      ctx.lineTo(canvas.width - 20, canvas.height - padBottom);
+      ctx.stroke();
+
+      // Draw Bars
       bins.forEach((cnt, i) => {
-        const h = (cnt / maxBin) * (canvas.height - 40);
-        ctx.fillStyle = "#6366f1";
-        ctx.fillRect(i * w + 6, canvas.height - h - 20, w - 12, h);
+        const h = (cnt / maxBin) * (plotH - 10);
+        const x = padLeft + i * barW;
+        const y = canvas.height - padBottom - h;
+
+        ctx.fillStyle = "rgba(99, 102, 241, 0.75)";
+        ctx.fillRect(x + 2, y, barW - 4, h);
+        ctx.strokeStyle = "#818cf8";
+        ctx.strokeRect(x + 2, y, barW - 4, h);
+
+        // Value text
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "10px sans-serif";
+        ctx.fillText(cnt, x + barW / 2 - 4, y - 4);
+
+        // Bin X-tick
+        if (i % 2 === 0 || binCount <= 8) {
+          const tickVal = (min + i * binWidth).toFixed(1);
+          ctx.fillStyle = "#94a3b8";
+          ctx.font = "9px sans-serif";
+          ctx.fillText(tickVal, x + 2, canvas.height - 10);
+        }
+      });
+
+      // Draw KDE Density Curve
+      if (std > 0) {
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2.5;
+        ctx.beginPath();
+        const steps = 60;
+        for (let s = 0; s <= steps; s++) {
+          const curXVal = min + (s / steps) * span;
+          // Gaussian density
+          const z = (curXVal - mean) / std;
+          const density = (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
+          // Scale density to canvas plot height
+          const peakDensity = 1 / (std * Math.sqrt(2 * Math.PI));
+          const y = canvas.height - padBottom - (density / (peakDensity || 1)) * (plotH - 15);
+          const x = padLeft + (s / steps) * plotW;
+          if (s === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    }
+
+    function drawEdaQuartiles(canvasId, vals, iqrObj) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const padLeft = 40;
+      const padBottom = 30;
+      const plotW = canvas.width - padLeft - 20;
+      const plotH = canvas.height - padBottom - 40;
+
+      // Draw 5 percentiles (Min, Q1, Median, Q3, Max)
+      const pcts = [
+        { label: "Min", val: iqrObj.min, color: "#64748b" },
+        { label: "Q1 (25%)", val: iqrObj.q1, color: "#38bdf8" },
+        { label: "Median", val: edaCalcMedian(vals), color: "#818cf8" },
+        { label: "Q3 (75%)", val: iqrObj.q3, color: "#a855f7" },
+        { label: "Max", val: iqrObj.max, color: "#ec4899" }
+      ];
+
+      const barW = plotW / pcts.length;
+      const maxVal = Math.max(...vals);
+      const minVal = Math.min(...vals);
+      const span = maxVal - minVal || 1;
+
+      pcts.forEach((p, i) => {
+        const norm = (p.val - minVal) / span;
+        const h = Math.max(8, norm * (plotH - 20));
+        const x = padLeft + i * barW;
+        const y = canvas.height - padBottom - h;
+
+        ctx.fillStyle = p.color;
+        ctx.fillRect(x + 10, y, barW - 20, h);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 10px sans-serif";
+        ctx.fillText(Number(p.val).toFixed(1), x + 12, y - 8);
+
         ctx.fillStyle = "#94a3b8";
         ctx.font = "10px sans-serif";
-        ctx.fillText(cnt, i * w + w / 2 - 4, canvas.height - h - 25);
+        ctx.fillText(p.label, x + 10, canvas.height - 10);
       });
+    }
+
+    function drawEdaBarChart(canvasId, entries, totalCount) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const maxVal = Math.max(...entries.map(e => e[1]), 1);
+      const barH = (canvas.height - 40) / entries.length;
+
+      entries.forEach(([label, cnt], i) => {
+        const w = (cnt / maxVal) * (canvas.width - 150);
+        const y = 20 + i * barH;
+
+        ctx.fillStyle = "#10b981";
+        ctx.fillRect(100, y + 2, w, barH - 6);
+
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "10px sans-serif";
+        ctx.fillText(label.slice(0, 12), 10, y + barH / 2 + 2);
+
+        const pct = Math.round((cnt / (totalCount || 1)) * 100);
+        ctx.fillStyle = "#94a3b8";
+        ctx.fillText(`${cnt} (${pct}%)`, 105 + w, y + barH / 2 + 2);
+      });
+    }
+
+    function drawEdaParetoChart(canvasId, entries, totalCount) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const topEntries = entries.slice(0, 8);
+      const maxCnt = topEntries[0] ? topEntries[0][1] : 1;
+      const w = (canvas.width - 80) / topEntries.length;
+      let cumSum = 0;
+      const cumPcts = [];
+
+      topEntries.forEach(([label, cnt]) => {
+        cumSum += cnt;
+        cumPcts.push((cumSum / (totalCount || 1)) * 100);
+      });
+
+      topEntries.forEach(([label, cnt], i) => {
+        const h = (cnt / maxCnt) * (canvas.height - 80);
+        const x = 40 + i * w;
+        const y = canvas.height - 40 - h;
+
+        ctx.fillStyle = "#06b6d4";
+        ctx.fillRect(x + 4, y, w - 8, h);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "9px sans-serif";
+        ctx.fillText(label.slice(0, 7), x + 4, canvas.height - 20);
+      });
+
+      // Cumulative line
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      cumPcts.forEach((pct, i) => {
+        const x = 40 + i * w + w / 2;
+        const y = canvas.height - 40 - (pct / 100) * (canvas.height - 80);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // 80% threshold guideline
+      const y80 = canvas.height - 40 - 0.8 * (canvas.height - 80);
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.6)";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(40, y80);
+      ctx.lineTo(canvas.width - 20, y80);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#ef4444";
+      ctx.font = "9px sans-serif";
+      ctx.fillText("80% Pareto Line", canvas.width - 90, y80 - 4);
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. BIVARIATE ANALYSIS WORKSPACE
+    // -------------------------------------------------------------------------
+    function renderEdaBivariate() {
+      if (!currentDataset || !currentDataset.length) return;
+      const colX = document.getElementById('edaBiColX')?.value || columns[0];
+      const colY = document.getElementById('edaBiColY')?.value || columns[1];
+      const mode = document.getElementById('edaBiMode')?.value || 'auto';
+
+      const isXNum = isColNumeric(colX);
+      const isYNum = isColNumeric(colY);
+
+      // Determine effective mode
+      let effectiveMode = mode;
+      if (mode === 'auto') {
+        if (isXNum && isYNum) effectiveMode = 'num_vs_num';
+        else if (!isXNum && isYNum) effectiveMode = 'cat_vs_num';
+        else if (colX.toLowerCase().includes('date') || colX.toLowerCase().includes('time')) effectiveMode = 'time_vs_metric';
+        else effectiveMode = 'cat_vs_num';
+      }
+
+      // Update badge
+      const badge = document.getElementById('edaBiTypeBadge');
+      if (badge) {
+        badge.textContent = effectiveMode === 'num_vs_num' ? 'Numerical vs Numerical (OLS)' :
+                            effectiveMode === 'cat_vs_num' ? 'Category vs Numerical (Group Breakdown)' : 'Time vs Metric';
+      }
+
+      if (effectiveMode === 'num_vs_num') {
+        const pairs = currentDataset.map(r => [parseFloat(r[colX]), parseFloat(r[colY])])
+                                    .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+        const arrX = pairs.map(p => p[0]);
+        const arrY = pairs.map(p => p[1]);
+
+        const r = edaCalcPearson(arrX, arrY);
+        const rho = edaCalcSpearman(arrX, arrY);
+        const cov = edaCalcCovariance(arrX, arrY);
+        const ols = edaCalcOLS(arrX, arrY);
+
+        document.getElementById('edaBiPearson').textContent = r.toFixed(3);
+        document.getElementById('edaBiPearsonStrength').textContent = Math.abs(r) > 0.7 ? "Strong Association" : (Math.abs(r) > 0.3 ? "Moderate Association" : "Weak Association");
+        document.getElementById('edaBiCovariance').textContent = cov.toFixed(2);
+        document.getElementById('edaBiSpearman').textContent = rho.toFixed(3);
+        document.getElementById('edaBiR2').textContent = (ols.r2 * 100).toFixed(1) + "%";
+        document.getElementById('edaBiOlsEq').textContent = `y = ${ols.slope.toFixed(2)}x ${ols.intercept >= 0 ? '+' : ''}${ols.intercept.toFixed(2)}`;
+
+        // Draw Scatter & Trendline
+        drawEdaScatterPlot('edaBiCanvas', pairs, ols, colX, colY);
+
+        // Hide or repurpose group table for quantile correlation bins
+        renderEdaBinnedBreakdown(arrX, arrY, colX, colY);
+
+        // Update Narrative
+        const isPos = r > 0;
+        document.getElementById('edaBiNarrativeTitle').textContent = `Linear Regression Fit: ${colX} vs ${colY}`;
+        document.getElementById('edaBiNarrativeText').innerHTML = `
+          <strong>${colX}</strong> and <strong>${colY}</strong> exhibit a <strong>${Math.abs(r) > 0.6 ? 'strong' : 'moderate'} ${isPos ? 'positive' : 'inverse'} relationship</strong> 
+          (r = <strong>${r.toFixed(3)}</strong>, R² = <strong>${(ols.r2 * 100).toFixed(1)}%</strong>). For every 1-unit increase in ${colX}, ${colY} shifts by approximately <strong>${ols.slope.toFixed(3)}</strong> units.
+        `;
+      } else {
+        // Category vs Numerical Group comparisons
+        const groups = {};
+        currentDataset.forEach(r => {
+          const k = String(r[colX] || "Unassigned").trim();
+          const v = parseFloat(r[colY]);
+          if (!isNaN(v)) {
+            if (!groups[k]) groups[k] = [];
+            groups[k].push(v);
+          }
+        });
+
+        const groupStats = Object.keys(groups).map(k => {
+          const vals = groups[k];
+          const mean = edaCalcMean(vals);
+          const median = edaCalcMedian(vals);
+          const std = edaCalcStd(vals, mean);
+          return {
+            group: k,
+            count: vals.length,
+            mean,
+            median,
+            std,
+            min: Math.min(...vals),
+            max: Math.max(...vals)
+          };
+        }).sort((a, b) => b.mean - a.mean);
+
+        // Overall benchmark
+        const allVals = currentDataset.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
+        const overallMean = edaCalcMean(allVals);
+
+        // Metrics strip
+        const topG = groupStats[0] || { group: "N/A", mean: 0 };
+        const botG = groupStats[groupStats.length - 1] || { group: "N/A", mean: 0 };
+        const spreadPct = botG.mean > 0 ? Math.round(((topG.mean - botG.mean) / botG.mean) * 100) : 0;
+
+        document.getElementById('edaBiPearson').textContent = `${groupStats.length} Grps`;
+        document.getElementById('edaBiPearsonStrength').textContent = "Categorical Partitions";
+        document.getElementById('edaBiCovariance').textContent = `Δ ${spreadPct}%`;
+        document.getElementById('edaBiSpearman').textContent = topG.group.slice(0, 10);
+        document.getElementById('edaBiR2').textContent = overallMean.toFixed(1);
+        document.getElementById('edaBiOlsEq').textContent = `Overall Benchmark Mean`;
+
+        // Render Group Comparison Bar Chart
+        drawEdaGroupComparisonChart('edaBiCanvas', groupStats.slice(0, 8), overallMean, colX, colY);
+
+        // Render Group Table
+        renderEdaGroupTable(groupStats, overallMean);
+
+        // Narrative
+        const secG = groupStats[1] || botG;
+        const diffVsSec = secG.mean > 0 ? Math.round(((topG.mean - secG.mean) / secG.mean) * 1000) / 10 : 0;
+        document.getElementById('edaBiNarrativeTitle').textContent = `Group Disparity Finding (${colX} on ${colY}):`;
+        document.getElementById('edaBiNarrativeText').innerHTML = `
+          Customers acquired through <strong>${topG.group}</strong> have <strong>${diffVsSec}% higher average ${colY}</strong> than <strong>${secG.group}</strong> 
+          (${topG.mean.toFixed(1)} vs ${secG.mean.toFixed(1)}). Across all ${groupStats.length} cohorts, the total performance gap between the top and bottom segment spans <strong>${spreadPct}%</strong>.
+        `;
+      }
+    }
+
+    function drawEdaScatterPlot(canvasId, pairs, ols, colX, colY) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const padLeft = 45;
+      const padBottom = 35;
+      const padTop = 20;
+      const plotW = canvas.width - padLeft - 20;
+      const plotH = canvas.height - padBottom - padTop;
+
+      const xs = pairs.map(p => p[0]);
+      const ys = pairs.map(p => p[1]);
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+      const spanX = maxX - minX || 1;
+      const spanY = maxY - minY || 1;
+
+      // Axes
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(padLeft, padTop);
+      ctx.lineTo(padLeft, canvas.height - padBottom);
+      ctx.lineTo(canvas.width - 20, canvas.height - padBottom);
+      ctx.stroke();
+
+      // Points
+      pairs.forEach(([xVal, yVal]) => {
+        const cx = padLeft + ((xVal - minX) / spanX) * plotW;
+        const cy = canvas.height - padBottom - ((yVal - minY) / spanY) * plotH;
+        ctx.fillStyle = "rgba(129, 140, 248, 0.75)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.5, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+
+      // OLS Regression Trendline
+      const yFitMin = ols.slope * minX + ols.intercept;
+      const yFitMax = ols.slope * maxX + ols.intercept;
+      const lineX1 = padLeft;
+      const lineY1 = canvas.height - padBottom - ((yFitMin - minY) / spanY) * plotH;
+      const lineX2 = padLeft + plotW;
+      const lineY2 = canvas.height - padBottom - ((yFitMax - minY) / spanY) * plotH;
+
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(lineX1, lineY1);
+      ctx.lineTo(lineX2, lineY2);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "10px sans-serif";
+      ctx.fillText(minX.toFixed(1), padLeft, canvas.height - 12);
+      ctx.fillText(maxX.toFixed(1), canvas.width - 45, canvas.height - 12);
+      ctx.fillText(minY.toFixed(1), 10, canvas.height - padBottom);
+      ctx.fillText(maxY.toFixed(1), 10, padTop + 10);
+    }
+
+    function drawEdaGroupComparisonChart(canvasId, groupStats, overallMean, colX, colY) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const padLeft = 45;
+      const padBottom = 35;
+      const plotW = canvas.width - padLeft - 20;
+      const plotH = canvas.height - padBottom - 20;
+
+      const maxMean = Math.max(...groupStats.map(g => g.mean), overallMean, 1);
+      const barW = plotW / groupStats.length;
+
+      // Group Bars
+      groupStats.forEach((g, i) => {
+        const h = (g.mean / maxMean) * (plotH - 20);
+        const x = padLeft + i * barW;
+        const y = canvas.height - padBottom - h;
+
+        ctx.fillStyle = g.mean >= overallMean ? "rgba(16, 185, 129, 0.8)" : "rgba(244, 63, 94, 0.75)";
+        ctx.fillRect(x + 6, y, barW - 12, h);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 10px sans-serif";
+        ctx.fillText(g.mean.toFixed(1), x + 8, y - 5);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "9px sans-serif";
+        ctx.fillText(g.group.slice(0, 8), x + 6, canvas.height - 12);
+      });
+
+      // Overall Mean Benchmark Dashed Line
+      const yBench = canvas.height - padBottom - (overallMean / maxMean) * (plotH - 20);
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padLeft, yBench);
+      ctx.lineTo(canvas.width - 20, yBench);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "9px sans-serif";
+      ctx.fillText(`Mean Benchmark (${overallMean.toFixed(1)})`, padLeft + 6, yBench - 4);
+    }
+
+    function renderEdaGroupTable(groupStats, overallMean) {
+      const container = document.getElementById('edaBiGroupTableContainer');
+      if (!container) return;
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Cohort / Segment</th>
+              <th>Records</th>
+              <th>Mean</th>
+              <th>Median</th>
+              <th>Std Dev</th>
+              <th>Delta vs Avg</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      groupStats.forEach(g => {
+        const deltaPct = overallMean > 0 ? Math.round(((g.mean - overallMean) / overallMean) * 100) : 0;
+        const deltaColor = deltaPct >= 0 ? '#10b981' : '#f43f5e';
+        html += `
+          <tr>
+            <td><strong>${g.group}</strong></td>
+            <td>${g.count}</td>
+            <td>${g.mean.toFixed(2)}</td>
+            <td>${g.median.toFixed(2)}</td>
+            <td>${g.std.toFixed(2)}</td>
+            <td style="color:${deltaColor}; font-weight:700;">${deltaPct >= 0 ? '+' : ''}${deltaPct}%</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+      const countBadge = document.getElementById('edaBiGroupCountBadge');
+      if (countBadge) countBadge.textContent = `${groupStats.length} Cohorts`;
+    }
+
+    function renderEdaBinnedBreakdown(arrX, arrY, colX, colY) {
+      const container = document.getElementById('edaBiGroupTableContainer');
+      if (!container) return;
+      // 4 Quantile Bins for colX
+      const pairs = arrX.map((x, i) => ({ x, y: arrY[i] })).sort((a, b) => a.x - b.x);
+      const binSize = Math.ceil(pairs.length / 4);
+      const bins = [
+        { name: "Quartile 1 (Low)", items: pairs.slice(0, binSize) },
+        { name: "Quartile 2 (Mid-Low)", items: pairs.slice(binSize, binSize * 2) },
+        { name: "Quartile 3 (Mid-High)", items: pairs.slice(binSize * 2, binSize * 3) },
+        { name: "Quartile 4 (High)", items: pairs.slice(binSize * 3) }
+      ];
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>${colX} Bracket</th>
+              <th>Records</th>
+              <th>Avg ${colX}</th>
+              <th>Avg ${colY}</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      bins.forEach(b => {
+        if (!b.items.length) return;
+        const avgX = edaCalcMean(b.items.map(i => i.x));
+        const avgY = edaCalcMean(b.items.map(i => i.y));
+        html += `
+          <tr>
+            <td><strong>${b.name}</strong></td>
+            <td>${b.items.length}</td>
+            <td>${avgX.toFixed(2)}</td>
+            <td style="color:#818cf8; font-weight:700;">${avgY.toFixed(2)}</td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. MULTIVARIATE ANALYSIS & CLUSTERING WORKSPACE
+    // -------------------------------------------------------------------------
+    function renderEdaMultivariate() {
+      if (!currentDataset || !currentDataset.length) return;
+      const numCols = columns.filter(c => isColNumeric(c));
+
+      // 1. Correlation Matrix Heatmap
+      renderEdaCorrelationHeatmap(numCols);
+
+      // 2. Top Correlated Pairs Ranking
+      renderEdaTopPairsRanking(numCols);
+
+      // 3. Pair Plots Matrix Preview
+      drawEdaPairPlotsMatrix('edaPairCanvas', numCols.slice(0, 4));
+
+      // 4. k-Means Clustering
+      renderEdaKMeansClustering(numCols);
+
+      // 5. PCA Dimensionality Reduction
+      renderEdaPcaDecomposition(numCols);
+    }
+
+    function renderEdaCorrelationHeatmap(numCols) {
+      const container = document.getElementById('edaCorrContainer');
+      if (!container) return;
+
+      if (numCols.length < 2) {
+        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.84rem;">At least 2 numerical features required for correlation matrix.</div>`;
+        return;
+      }
+
+      const activeCols = numCols.slice(0, 8); // Top 8 features
+      let html = `<table><thead><tr><th>Feature</th>` + activeCols.map(c => `<th>${c}</th>`).join('') + `</tr></thead><tbody>`;
+
+      activeCols.forEach(rCol => {
+        html += `<tr><td><strong>${rCol}</strong></td>`;
+        const arrR = currentDataset.map(r => parseFloat(r[rCol])).filter(v => !isNaN(v));
+
+        activeCols.forEach(cCol => {
+          if (rCol === cCol) {
+            html += `<td style="background:rgba(99, 102, 241, 0.35); font-weight:700; color:#ffffff; text-align:center;">1.00</td>`;
+          } else {
+            const arrC = currentDataset.map(r => parseFloat(r[cCol])).filter(v => !isNaN(v));
+            const rVal = edaCalcPearson(arrR, arrC);
+            const rFixed = rVal.toFixed(2);
+            
+            // Heatmap color interpolation
+            let bg = "transparent";
+            let color = "inherit";
+            if (rVal > 0) {
+              const alpha = Math.min(0.7, Math.abs(rVal) * 0.7);
+              bg = `rgba(16, 185, 129, ${alpha})`;
+              color = rVal > 0.4 ? '#ffffff' : 'inherit';
+            } else {
+              const alpha = Math.min(0.7, Math.abs(rVal) * 0.7);
+              bg = `rgba(244, 63, 94, ${alpha})`;
+              color = Math.abs(rVal) > 0.4 ? '#ffffff' : 'inherit';
+            }
+
+            html += `
+              <td style="background:${bg}; color:${color}; text-align:center; cursor:pointer;" 
+                  title="Click to explore ${rCol} vs ${cCol}" 
+                  onclick="drillDownEdaPair('${rCol}', '${cCol}')">
+                ${rFixed}
+              </td>
+            `;
+          }
+        });
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    function renderEdaTopPairsRanking(numCols) {
+      const container = document.getElementById('edaTopPairsContainer');
+      if (!container) return;
+
+      const pairs = [];
+      for (let i = 0; i < numCols.length; i++) {
+        for (let j = i + 1; j < numCols.length; j++) {
+          const colX = numCols[i];
+          const colY = numCols[j];
+          const arrX = currentDataset.map(r => parseFloat(r[colX])).filter(v => !isNaN(v));
+          const arrY = currentDataset.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
+          const r = edaCalcPearson(arrX, arrY);
+          pairs.push({ colX, colY, r, absR: Math.abs(r) });
+        }
+      }
+
+      pairs.sort((a, b) => b.absR - a.absR);
+
+      if (!pairs.length) {
+        container.innerHTML = `<div style="padding:16px; color:var(--text-muted); font-size:0.82rem;">Insufficient numerical features.</div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Feature Pair</th>
+              <th>Pearson r</th>
+              <th>Strength</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      pairs.slice(0, 8).forEach(p => {
+        const isPos = p.r > 0;
+        const color = isPos ? '#10b981' : '#f43f5e';
+        const strength = p.absR > 0.7 ? 'Strong' : (p.absR > 0.4 ? 'Moderate' : 'Weak');
+        html += `
+          <tr>
+            <td><strong>${p.colX}</strong> ↔ <strong>${p.colY}</strong></td>
+            <td style="color:${color}; font-weight:700;">${p.r.toFixed(3)}</td>
+            <td><span class="badge" style="background:rgba(255,255,255,0.05); color:${color};">${strength}</span></td>
+            <td>
+              <button class="btn btn-secondary" style="padding:2px 8px; font-size:0.72rem;" onclick="drillDownEdaPair('${p.colX}', '${p.colY}')">
+                Analyze ↗
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    function drawEdaPairPlotsMatrix(canvasId, targetCols) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (targetCols.length < 2) return;
+      const k = targetCols.length;
+      const pad = 8;
+      const cellW = (canvas.width - (k + 1) * pad) / k;
+      const cellH = (canvas.height - (k + 1) * pad) / k;
+
+      for (let r = 0; r < k; r++) {
+        for (let c = 0; c < k; c++) {
+          const x0 = pad + c * (cellW + pad);
+          const y0 = pad + r * (cellH + pad);
+
+          // Cell Border
+          ctx.strokeStyle = "rgba(255,255,255,0.08)";
+          ctx.strokeRect(x0, y0, cellW, cellH);
+
+          if (r === c) {
+            // Diagonal: Univariate Histogram
+            const col = targetCols[r];
+            const vals = currentDataset.map(row => parseFloat(row[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
+            if (vals.length) {
+              const bins = new Array(6).fill(0);
+              const min = vals[0], max = vals[vals.length - 1];
+              const span = max - min || 1;
+              vals.forEach(v => {
+                const idx = Math.min(5, Math.floor(((v - min) / span) * 6));
+                bins[idx]++;
+              });
+              const maxB = Math.max(...bins, 1);
+              const bW = cellW / 6;
+              bins.forEach((cnt, bi) => {
+                const bH = (cnt / maxB) * (cellH - 18);
+                ctx.fillStyle = "rgba(99, 102, 241, 0.6)";
+                ctx.fillRect(x0 + bi * bW + 1, y0 + cellH - bH - 2, bW - 2, bH);
+              });
+              ctx.fillStyle = "#cbd5e1";
+              ctx.font = "bold 9px sans-serif";
+              ctx.fillText(col.slice(0, 10), x0 + 4, y0 + 12);
+            }
+          } else {
+            // Off-Diagonal: Bivariate Scatter
+            const colX = targetCols[c];
+            const colY = targetCols[r];
+            const pairs = currentDataset.map(row => [parseFloat(row[colX]), parseFloat(row[colY])])
+                                        .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+            if (pairs.length) {
+              const xs = pairs.map(p => p[0]);
+              const ys = pairs.map(p => p[1]);
+              const minX = Math.min(...xs), maxX = Math.max(...xs);
+              const minY = Math.min(...ys), maxY = Math.max(...ys);
+              const spanX = maxX - minX || 1;
+              const spanY = maxY - minY || 1;
+
+              pairs.slice(0, 50).forEach(([px, py]) => {
+                const dotX = x0 + 4 + ((px - minX) / spanX) * (cellW - 8);
+                const dotY = y0 + cellH - 4 - ((py - minY) / spanY) * (cellH - 8);
+                ctx.fillStyle = "rgba(56, 189, 248, 0.7)";
+                ctx.fillRect(dotX - 1, dotY - 1, 2.5, 2.5);
+              });
+            }
+          }
+        }
+      }
+    }
+
+    function renderEdaKMeansClustering(numCols) {
+      const canvas = document.getElementById('edaClusterCanvas');
+      if (!canvas || numCols.length < 2) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const k = parseInt(document.getElementById('edaKMeansK')?.value || '3', 10);
+      const colX = numCols[0];
+      const colY = numCols[1];
+      const data2D = currentDataset.map(r => [parseFloat(r[colX]), parseFloat(r[colY])])
+                                  .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+
+      if (data2D.length < k) return;
+
+      const { assignments, centroids } = edaCalcKMeans(data2D, k);
+
+      // Plot points with cluster colors
+      const clusterColors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#06b6d4"];
+      const xs = data2D.map(p => p[0]);
+      const ys = data2D.map(p => p[1]);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const spanX = maxX - minX || 1;
+      const spanY = maxY - minY || 1;
+
+      const pad = 30;
+      const plotW = canvas.width - 2 * pad;
+      const plotH = canvas.height - 2 * pad;
+
+      data2D.forEach((p, i) => {
+        const c = assignments[i] % clusterColors.length;
+        const cx = pad + ((p[0] - minX) / spanX) * plotW;
+        const cy = canvas.height - pad - ((p[1] - minY) / spanY) * plotH;
+        ctx.fillStyle = clusterColors[c];
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+
+      // Plot Centroids
+      centroids.forEach((cent, cIdx) => {
+        const cx = pad + ((cent[0] - minX) / spanX) * plotW;
+        const cy = canvas.height - pad - ((cent[1] - minY) / spanY) * plotH;
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.fillStyle = clusterColors[cIdx % clusterColors.length];
+        ctx.beginPath();
+        ctx.arc(cx, cy, 7, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke();
+      });
+
+      // Cluster Profile Table
+      const counts = new Array(k).fill(0);
+      assignments.forEach(c => counts[c]++);
+      let profHtml = `<div style="display:flex; gap:8px; flex-wrap:wrap;">`;
+      for (let i = 0; i < k; i++) {
+        const color = clusterColors[i % clusterColors.length];
+        const pct = Math.round((counts[i] / data2D.length) * 100);
+        profHtml += `
+          <div style="background:rgba(255,255,255,0.04); border-left:3px solid ${color}; padding:4px 8px; border-radius:4px;">
+            <strong>Cluster ${i + 1}</strong>: ${counts[i]} rows (${pct}%) • Center: [${centroids[i][0].toFixed(1)}, ${centroids[i][1].toFixed(1)}]
+          </div>
+        `;
+      }
+      profHtml += `</div>`;
+      const profContainer = document.getElementById('edaClusterProfileTable');
+      if (profContainer) profContainer.innerHTML = profHtml;
+    }
+
+    function renderEdaPcaDecomposition(numCols) {
+      const canvas = document.getElementById('edaPcaCanvas');
+      if (!canvas || numCols.length < 2) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const targetCols = numCols.slice(0, 6);
+      const multiData = currentDataset.map(r => targetCols.map(c => parseFloat(r[c])))
+                                      .filter(row => row.every(v => !isNaN(v)));
+
+      if (!multiData.length) return;
+
+      const { coords, expVar1, expVar2 } = edaCalcPCA2D(multiData);
+
+      // Badge
+      const badge = document.getElementById('edaPcaVarianceBadge');
+      if (badge) badge.textContent = `PC1: ${expVar1}% | PC2: ${expVar2}% (Total: ${expVar1 + expVar2}%)`;
+
+      // Draw PCA projection scatter
+      const xs = coords.map(p => p[0]);
+      const ys = coords.map(p => p[1]);
+      const minX = Math.min(...xs), maxX = Math.max(...xs);
+      const minY = Math.min(...ys), maxY = Math.max(...ys);
+      const spanX = maxX - minX || 1;
+      const spanY = maxY - minY || 1;
+
+      const pad = 30;
+      const plotW = canvas.width - 2 * pad;
+      const plotH = canvas.height - 2 * pad;
+
+      // Zero-axes lines
+      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      ctx.beginPath();
+      ctx.moveTo(pad, canvas.height / 2);
+      ctx.lineTo(canvas.width - pad, canvas.height / 2);
+      ctx.moveTo(canvas.width / 2, pad);
+      ctx.lineTo(canvas.width / 2, canvas.height - pad);
+      ctx.stroke();
+
+      coords.forEach(p => {
+        const cx = pad + ((p[0] - minX) / spanX) * plotW;
+        const cy = canvas.height - pad - ((p[1] - minY) / spanY) * plotH;
+        ctx.fillStyle = "rgba(168, 85, 247, 0.8)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
+        ctx.fill();
+      });
+
+      const textEl = document.getElementById('edaPcaLoadingsText');
+      if (textEl) {
+        textEl.textContent = `Projected ${multiData.length} records from ${targetCols.length}D space into 2 principal components capturing ${expVar1 + expVar2}% of variance.`;
+      }
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. COMPREHENSIVE DESCRIPTIVE STATISTICS TABLE
+    // -------------------------------------------------------------------------
+    function renderEdaSummaryTable() {
+      const container = document.getElementById('edaStatsContainer');
+      if (!container) return;
+
+      if (!currentDataset || !currentDataset.length) {
+        container.innerHTML = `<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:0.85rem;">No dataset loaded.</div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Type</th>
+              <th>Missing</th>
+              <th>Mean</th>
+              <th>Median</th>
+              <th>Std Dev</th>
+              <th>Min</th>
+              <th>Max</th>
+              <th>Skewness</th>
+              <th>Kurtosis</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      columns.forEach(col => {
+        const isNum = isColNumeric(col);
+        let miss = 0;
+        currentDataset.forEach(r => {
+          if (r[col] === null || r[col] === undefined || String(r[col]).trim() === '') miss++;
+        });
+        const missPct = ((miss / currentDataset.length) * 100).toFixed(1) + "%";
+
+        if (isNum) {
+          const vals = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
+          if (vals.length) {
+            const mean = edaCalcMean(vals);
+            const median = edaCalcMedian(vals);
+            const std = edaCalcStd(vals, mean);
+            const skew = edaCalcSkewness(vals, mean, std);
+            const kurt = edaCalcKurtosis(vals, mean, std);
+            html += `
+              <tr>
+                <td><strong>${col}</strong></td>
+                <td><span class="badge badge-info">Numeric</span></td>
+                <td>${missPct}</td>
+                <td>${mean.toFixed(2)}</td>
+                <td>${median.toFixed(2)}</td>
+                <td>${std.toFixed(2)}</td>
+                <td>${vals[0]}</td>
+                <td>${vals[vals.length - 1]}</td>
+                <td style="color:${Math.abs(skew)>1?'#f59e0b':'inherit'}; font-weight:700;">${(skew>=0?'+':'')+skew.toFixed(2)}</td>
+                <td style="color:${kurt>2?'#ec4899':'inherit'};">${(kurt>=0?'+':'')+kurt.toFixed(2)}</td>
+              </tr>
+            `;
+          }
+        } else {
+          // Categorical
+          const counts = {};
+          currentDataset.forEach(r => {
+            const k = String(r[col] || "Null");
+            counts[k] = (counts[k] || 0) + 1;
+          });
+          const distinct = Object.keys(counts).length;
+          const topKey = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+          html += `
+            <tr>
+              <td><strong>${col}</strong></td>
+              <td><span class="badge badge-success">Categorical</span></td>
+              <td>${missPct}</td>
+              <td colspan="5" style="color:var(--text-muted); font-size:0.78rem;">
+                Distinct: <strong>${distinct}</strong> | Mode: <strong>${topKey ? topKey[0] : 'N/A'}</strong> (${topKey ? topKey[1] : 0} rows)
+              </td>
+              <td style="color:var(--text-muted);">--</td>
+              <td style="color:var(--text-muted);">--</td>
+            </tr>
+          `;
+        }
+      });
+
+      html += `</tbody></table>`;
+      container.innerHTML = html;
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. EXPORT DOSSIER & REPORT GENERATORS
+    // -------------------------------------------------------------------------
+    function exportEdaDossierHTML() {
+      notifyTaskStart("Export EDA Dossier");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Export EDA Dossier", "No active dataset loaded.");
+        return;
+      }
+
+      const rows = currentDataset.length;
+      const cols = columns.length;
+      const dateStr = new Date().toLocaleDateString();
+
+      let reportHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>DataMind AI - Automated EDA Dossier</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background:#0f172a; color:#f8fafc; padding:30px; margin:0; }
+            h1, h2, h3 { color:#38bdf8; }
+            .card { background:#1e293b; border:1px solid #334155; border-radius:8px; padding:18px; margin-bottom:20px; }
+            table { width:100%; border-collapse:collapse; margin-top:10px; font-size:12px; }
+            th, td { border:1px solid #334155; padding:8px 10px; text-align:left; }
+            th { background:#0f172a; color:#38bdf8; }
+            .badge { padding:2px 6px; border-radius:4px; font-size:10px; font-weight:bold; }
+          </style>
+        </head>
+        <body>
+          <h1>📊 Automated Exploratory Data Analysis (EDA) Dossier</h1>
+          <p>Generated on ${dateStr} • Analyzed ${rows} records across ${cols} columns.</p>
+          
+          <div class="card">
+            <h2>🤖 AI Discovered Interesting Business Relationships</h2>
+            <ul>
+              ${window.edaMinedInsights.map(ins => `<li><strong>[${ins.badge}]</strong> ${ins.text}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div class="card">
+            <h2>📈 Full Statistical Feature Profiles</h2>
+            ${document.getElementById('edaStatsContainer')?.innerHTML || ''}
+          </div>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([reportHtml], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `DataMind_EDA_Dossier_${Date.now()}.html`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      notifyTaskSuccess("Export EDA Dossier", "Exported comprehensive standalone HTML report.");
+    }
+
+    function exportEdaStatsJSON() {
+      notifyTaskStart("Export EDA JSON");
+      if (!currentDataset || !currentDataset.length) {
+        notifyTaskFailed("Export EDA JSON", "No active dataset loaded.");
+        return;
+      }
+
+      const numCols = columns.filter(c => isColNumeric(c));
+      const statsObj = {
+        metadata: {
+          generatedAt: new Date().toISOString(),
+          totalRows: currentDataset.length,
+          totalColumns: columns.length,
+          features: columns
+        },
+        aiMinedRelationships: window.edaMinedInsights,
+        numericalFeatures: {},
+        correlationMatrix: {}
+      };
+
+      numCols.forEach(col => {
+        const vals = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+        if (vals.length) {
+          const mean = edaCalcMean(vals);
+          const median = edaCalcMedian(vals);
+          const std = edaCalcStd(vals, mean);
+          statsObj.numericalFeatures[col] = {
+            count: vals.length,
+            mean,
+            median,
+            std,
+            iqr: edaCalcIQR(vals),
+            skewness: edaCalcSkewness(vals, mean, std),
+            kurtosis: edaCalcKurtosis(vals, mean, std)
+          };
+        }
+      });
+
+      const blob = new Blob([JSON.stringify(statsObj, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `DataMind_EDA_Stats_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      notifyTaskSuccess("Export EDA JSON", "Exported JSON statistics dictionary.");
+    }
+
+    // -------------------------------------------------------------------------
+    // BACKWARD COMPATIBILITY WRAPPERS
+    // -------------------------------------------------------------------------
+    function renderHistogramChart() {
+      renderEdaUnivariate();
     }
 
     function renderBarChart() {
-      const col = document.getElementById("edaBarCol")?.value;
-      const canvas = document.getElementById("barCanvas");
-      if (!canvas || !col) return;
-      const ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const counts = {};
-      currentDataset.forEach(r => {
-        const k = String(r[col] || "null");
-        counts[k] = (counts[k] || 0) + 1;
-      });
-
-      const entries = Object.entries(counts).slice(0, 6);
-      const maxVal = Math.max(...entries.map(e => e[1]), 1);
-      const w = canvas.width / entries.length;
-
-      entries.forEach(([label, cnt], i) => {
-        const h = (cnt / maxVal) * (canvas.height - 45);
-        ctx.fillStyle = "#10b981";
-        ctx.fillRect(i * w + 6, canvas.height - h - 25, w - 12, h);
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "10px sans-serif";
-        ctx.fillText(label.slice(0, 8), i * w + 6, canvas.height - 8);
-        ctx.fillText(cnt, i * w + w / 2 - 4, canvas.height - h - 30);
-      });
+      renderEdaUnivariate();
     }
 
     function renderEDAStats() {
-      const container = document.getElementById("edaStatsContainer");
-      if (!currentDataset.length) {
-        if (container) container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">No dataset loaded. Upload a CSV to view descriptive statistics.</div>';
-        return;
-      }
-      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number");
-      if (!numCols.length) {
-        if (container) container.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">No numeric columns available in the active dataset.</div>';
-        return;
-      }
-      let html = '<table><thead><tr><th>Feature</th><th>Count</th><th>Mean</th><th>Min</th><th>Median</th><th>Max</th></tr></thead><tbody>';
-      numCols.forEach(c => {
-        const vals = currentDataset.map(r => r[c]).filter(v => typeof v === "number").sort((a,b)=>a-b);
-        if (!vals.length) return;
-        const mean = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1);
-        const med = vals[Math.floor(vals.length/2)].toFixed(1);
-        html += `<tr><td><b>${c}</b></td><td>${vals.length}</td><td>${mean}</td><td>${vals[0]}</td><td>${med}</td><td>${vals[vals.length-1]}</td></tr>`;
-      });
-      html += '</tbody></table>';
-      if (container) container.innerHTML = html;
+      renderEdaSummaryTable();
     }
 
     function renderCorrelation() {
-      const container = document.getElementById("edaCorrContainer");
-      if (!currentDataset.length) {
-        if (container) container.innerHTML = "<p style='padding:16px;color:var(--text-muted);text-align:center;'>Upload a dataset to calculate correlation matrix.</p>";
-        return;
-      }
-      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number").slice(0, 6);
-      if (numCols.length < 2) {
-        if (container) container.innerHTML = "<p style='padding:16px;color:var(--text-muted);text-align:center;'>Upload a dataset with at least 2 numerical columns to calculate correlation matrix.</p>";
-        return;
-      }
-      let html = '<table><thead><tr><th>Feature</th>' + numCols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-      numCols.forEach(rCol => {
-        html += `<tr><td><b>${rCol}</b></td>`;
-        numCols.forEach(cCol => {
-          let corr = (rCol === cCol) ? 1.0 : (Math.sin(rCol.length + cCol.length) * 0.7).toFixed(2);
-          html += `<td style="color:${Math.abs(corr)>0.5?'#818cf8':'inherit'}">${corr}</td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      if (container) container.innerHTML = html;
+      renderEdaMultivariate();
     }
 
+    
     function renderAIInsights() {
       if (document.getElementById("aiExecSummary")) {
         const rows = currentDataset.length;
