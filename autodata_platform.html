@@ -24,12 +24,19 @@
       --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      max-height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: var(--font);
       line-height: 1.5;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       flex-direction: column;
     }
@@ -37,13 +44,19 @@
     /* Top Header */
     .header {
       background: linear-gradient(90deg, #1e1b4b 0%, #111827 100%);
-      padding: 16px 28px;
+      padding: 10px 24px;
       border-bottom: 1px solid var(--card-border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
       gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      flex-shrink: 0;
+      width: 100%;
+      box-sizing: border-box;
     }
     .brand {
       display: flex;
@@ -79,7 +92,12 @@
     .app-wrapper {
       display: grid;
       grid-template-columns: 340px 1fr;
-      min-height: calc(100vh - 73px);
+      flex: 1;
+      height: calc(100vh - 84px);
+      min-height: 0;
+      overflow: hidden;
+      width: 100%;
+      box-sizing: border-box;
     }
     @media (max-width: 1024px) {
       .app-wrapper { grid-template-columns: 1fr; }
@@ -89,11 +107,16 @@
     .sidebar {
       background: var(--sidebar-bg);
       border-right: 1px solid var(--card-border);
-      padding: 22px 18px;
+      padding: 20px 18px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 20px;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
       overflow-y: auto;
+      overflow-x: hidden;
+      box-sizing: border-box;
     }
     .sidebar-section {
       display: flex;
@@ -254,10 +277,15 @@
     /* Main Area */
     .content-area {
       padding: 24px;
+      height: 100%;
+      max-height: 100%;
+      min-height: 0;
       overflow-y: auto;
-      max-width: 1250px;
+      overflow-x: hidden;
+      max-width: 1350px;
       width: 100%;
       margin: 0 auto;
+      box-sizing: border-box;
     }
 
     /* Metrics Grid */
@@ -590,14 +618,6 @@
         <span>📥</span>
         <span>Download Active CSV</span>
       </button>
-      <button id="topAiCopilotBtn" class="btn btn-primary" style="width:auto;margin:0;padding:8px 18px;display:flex;align-items:center;gap:7px;background:linear-gradient(135deg, #6366f1 0%, #4338ca 100%);box-shadow:0 4px 18px rgba(99,102,241,0.5);font-weight:700;border:1px solid rgba(255,255,255,0.25);cursor:pointer;" onclick="toggleFloatingAiDrawer()">
-        <span style="font-size:1.05rem;">🤖</span>
-        <span>AI Copilot</span>
-      </button>
-      <button id="themeToggleBtn" class="btn btn-outline" style="width:auto;margin:0;padding:8px 16px;display:flex;align-items:center;gap:7px;font-weight:600;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:var(--text);border-radius:8px;cursor:pointer;" onclick="toggleBrightnessTheme()" title="Toggle Brightness / Light Theme">
-        <span id="themeToggleIcon">☀️</span>
-        <span id="themeToggleText">Light Mode</span>
-      </button>
 
       <!-- Enterprise User Authentication Pill -->
       <div id="topUserContainer" style="display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); padding:5px 12px; border-radius:20px; border:1px solid var(--card-border); cursor:pointer; transition:all 0.2s ease;" onclick="openAuthModal()" title="Manage Authentication, Switch User, and View Security Permissions">
@@ -608,6 +628,11 @@
         </div>
         <span style="font-size:0.7rem; color:var(--text-muted); margin-left:2px;">▾</span>
       </div>
+
+      <!-- Icon-Only Day / Night Theme Toggle Button at the Last of Header -->
+      <button id="themeToggleBtn" class="btn btn-outline" style="width:38px;height:38px;min-width:38px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;font-size:1.15rem;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:var(--text);border-radius:50%;cursor:pointer;flex-shrink:0;transition:all 0.2s ease;" onclick="toggleBrightnessTheme()" title="Toggle Day / Night Mode">
+        <span id="themeToggleIcon">☀️</span>
+      </button>
     </div>
   </header>
 
