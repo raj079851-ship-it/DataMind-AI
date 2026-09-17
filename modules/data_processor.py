@@ -138,7 +138,7 @@ def create_calculated_column(
 
 def add_new_column(
     df: pd.DataFrame,
-    col_name: str = "column asaihn",
+    col_name: str = "new_column",
     value: Any = np.nan
 ) -> Tuple[pd.DataFrame, str]:
     """
@@ -147,6 +147,20 @@ def add_new_column(
     out = df.copy()
     out[col_name] = value
     return out, f"Added new column '{col_name}' successfully ({len(out):,} rows)."
+
+
+def drop_column(
+    df: pd.DataFrame,
+    col_name: str
+) -> Tuple[pd.DataFrame, str]:
+    """
+    Removes a specified column from the DataFrame.
+    """
+    out = df.copy()
+    if col_name in out.columns:
+        out = out.drop(columns=[col_name])
+        return out, f"Removed column '{col_name}' successfully."
+    return out, f"Column '{col_name}' not found in dataset."
 
 
 def group_by_aggregate(

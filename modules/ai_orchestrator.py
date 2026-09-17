@@ -97,13 +97,25 @@ class AIOrchestrator:
         # 5. Insert New Column Intent
         if any(w in q for w in ["add column", "new column", "insert column", "create column", "add a column", "add a new column"]):
             col_match = re.search(r'["\'](.*?)["\']', query)
-            col_name = col_match.group(1).strip() if col_match else "column asaihn"
+            col_name = col_match.group(1).strip() if col_match else "new_column"
             return {
                 "agent": "Data Engineering Agent",
                 "recommended_module": "➕ Insert New Column",
                 "action": "insert_column",
                 "col_name": col_name,
                 "message": f"Routed to **Insert New Column Module**. Ready to append new empty column `{col_name}` into the active dataset."
+            }
+
+        # 6. Remove / Drop Column Intent
+        if any(w in q for w in ["remove column", "drop column", "delete column", "renove", "remove the column", "drop the column"]):
+            col_match = re.search(r'["\'](.*?)["\']', query)
+            col_name = col_match.group(1).strip() if col_match else "column asaihn"
+            return {
+                "agent": "Data Engineering Agent",
+                "recommended_module": "🔄 Data Processing & Transform",
+                "action": "drop_column",
+                "col_name": col_name,
+                "message": f"Routed to **Data Engineering Agent**. Removing column `{col_name}` from the dataset."
             }
 
         # 6. Data Cleaning Intent

@@ -1109,8 +1109,20 @@ if st.session_state.get("show_omnibar", False):
                     st.session_state.cleaning_manager = CleaningPipelineManager(new_df)
                     set_task_status("Insert New Column", "success", f"Added empty column '{col_to_add}' successfully.")
                     st.success(f"Column '{col_to_add}' has been added as an empty column (`NaN`/nulls) to the active dataset!")
+                    st.rerun()
                 else:
                     st.info(f"Column '{col_to_add}' is already present in the active dataset.")
+            if res.get("action") == "drop_column" and "col_name" in res:
+                col_to_drop = res["col_name"]
+                if col_to_drop in df.columns:
+                    new_df = df.drop(columns=[col_to_drop])
+                    st.session_state.current_df = new_df
+                    st.session_state.cleaning_manager = CleaningPipelineManager(new_df)
+                    set_task_status("Drop Column", "success", f"Removed column '{col_to_drop}' successfully.")
+                    st.success(f"Column '{col_to_drop}' has been removed from the active dataset!")
+                    st.rerun()
+                else:
+                    st.info(f"Column '{col_to_drop}' was not found in the active dataset.")
 
 
 def render_python_environment(df: pd.DataFrame, key_prefix: str = "py_"):
@@ -4169,7 +4181,7 @@ elif selected_module == "➕ Insert New Column":
             
             c_n1, c_n2 = st.columns(2)
             with c_n1:
-                new_col_name = st.text_input("New Column Name:", value=st.session_state.get("inc_col_name_val", "column asaihn"), placeholder="e.g. column asaihn, bonus_pay, margin_ratio", key="inc_new_col_name")
+                new_col_name = st.text_input("New Column Name:", value=st.session_state.get("inc_col_name_val", ""), placeholder="e.g. bonus_pay, margin_ratio, tier", key="inc_new_col_name")
             with c_n2:
                 gen_method = st.selectbox(
                     "Generation Method:",
