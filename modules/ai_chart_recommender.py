@@ -213,6 +213,15 @@ class AIChartRecommender:
             else:
                 matched_cols = list(df.columns[:2]) if len(df.columns) >= 2 else list(df.columns[:1])
 
+        if not matched_cols:
+            return {
+                "chart_type": "none",
+                "col_x": None,
+                "col_y": None,
+                "title": "No Features Available",
+                "rationale": "No suitable columns available in the dataset for visualization."
+            }
+
         # Single Column
         if len(matched_cols) == 1:
             col = matched_cols[0]
@@ -323,9 +332,11 @@ class AIChartRecommender:
             "rationale": f"A segmented cross-tabulation chart is recommended because both '{c1}' and '{c2}' are categorical factors, illuminating interaction rates."
         }
 
-    def generate_visualization(self, df: pd.DataFrame, rec: Dict[str, Any]) -> go.Figure:
+    def generate_visualization(self, df: pd.DataFrame, rec: Dict[str, Any]) -> Optional[go.Figure]:
         """Constructs and returns an interactive, theme-styled Plotly Figure."""
-        chart_type = rec["chart_type"]
+        if rec is None or rec.get("chart_type") == "none" or df is None or df.empty:
+            return None
+        chart_type = rec.get("chart_type", "distribution")
         x = rec.get("col_x")
         y = rec.get("col_y")
         title = rec.get("title", "AI Recommended Visualization")
@@ -335,14 +346,23 @@ class AIChartRecommender:
         colors = px.colors.qualitative.Plotly
 
         if chart_type == "scatter":
-            fig = px.scatter(
-                df, x=x, y=y,
-                trendline="ols",
-                title=f"<b>{title}</b>",
-                template=theme_template,
-                opacity=0.75,
-                labels={x: x.replace("_", " ").title(), y: y.replace("_", " ").title()}
-            )
+            try:
+                fig = px.scatter(
+                    df, x=x, y=y,
+                    trendline="ols",
+                    title=f"<b>{title}</b>",
+                    template=theme_template,
+                    opacity=0.75,
+                    labels={x: str(x).replace("_", " ").title(), y: str(y).replace("_", " ").title()}
+                )
+            except Exception:
+                fig = px.scatter(
+                    df, x=x, y=y,
+                    title=f"<b>{title}</b>",
+                    template=theme_template,
+                    opacity=0.75,
+                    labels={x: str(x).replace("_", " ").title(), y: str(y).replace("_", " ").title()}
+                )
             fig.update_traces(marker=dict(size=8, color="#6366f1", line=dict(width=1, color="#e0e7ff")))
 
         elif chart_type == "distribution":
@@ -481,7 +501,9 @@ class AIChartRecommender:
 
     def generate_explanation(self, df: pd.DataFrame, rec: Dict[str, Any]) -> str:
         """Produces a human-readable AI explanation of the chart structure and interpretation."""
-        chart_type = rec["chart_type"]
+        if not rec or rec.get("chart_type") == "none" or df is None or df.empty:
+            return rec.get("rationale", "No visualization explanation available.") if rec else "No data available."
+        chart_type = rec.get("chart_type", "distribution")
         x = rec.get("col_x")
         y = rec.get("col_y")
         rationale = rec.get("rationale", "")
@@ -534,9 +556,20 @@ class AIChartRecommender:
     def detect_important_patterns(self, df: pd.DataFrame, rec: Dict[str, Any]) -> List[str]:
         """Detects key empirical patterns, statistical relationships, outliers, and segment leaders."""
         patterns: List[str] = []
-        chart_type = rec["chart_type"]
+        if not rec or rec.get("chart_type") == "none" or df is None or df.empty:
+            return ["No significant patterns detected."]
+        chart_type = rec.get("chart_type", "distribution")
         x = rec.get("col_x")
         y = rec.get("col_y")
+
+        if chart_type == "correlation_heatmap":
+            num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+            if len(num_cols) >= 2:
+                corr = df[num_cols].corr().abs()
+                np.fill_diagonal(corr.values, 0)
+                max_corr = corr.max().max()
+                patterns.append(f"**Max Collinearity**: Peak feature correlation in matrix is |r| = {max_corr:.2f}.")
+            return patterns or ["Feature collinearity heatmap computed across continuous variables."]
 
         if not x or x not in df.columns:
             return ["No significant patterns detected due to missing columns."]
@@ -608,6 +641,29 @@ class AIChartRecommender:
 
         return patterns
 
+    @staticmethod
+    def _create_empty_or_error_result(query: str, message: str, title: str = "Visualization Unavailable", status: str = "error") -> Dict[str, Any]:
+        return {
+            "status": status,
+            "mode": "error",
+            "query": query or "",
+            "title": title,
+            "chart_type": "none",
+            "chart_type_label": "None",
+            "matched_columns": [],
+            "relevant_columns": [],
+            "intent": "general",
+            "col_x": None,
+            "col_y": None,
+            "rationale": message,
+            "figure": None,
+            "explanation": message,
+            "patterns": [],
+            "collection": [],
+            "summary": message,
+            "message": message
+        }
+
     def recommend_from_query(self, query: str, df: pd.DataFrame) -> Dict[str, Any]:
         """
         End-to-end recommendation workflow:
@@ -618,50 +674,75 @@ class AIChartRecommender:
         5. Formulate AI explanation
         6. Compute empirical patterns
         """
-        if df is None or df.empty:
-            return {
-                "status": "error",
-                "message": "Active dataset is empty. Please upload or load a dataset first.",
-                "figure": None
-            }
+        if df is None or df.empty or len(df.columns) == 0:
+            return self._create_empty_or_error_result(
+                query=query,
+                message="Active dataset is empty. Please upload or load a dataset first.",
+                title="Active Dataset is Empty"
+            )
 
         matched_cols, intent, meta = self.identify_columns(query, df)
 
         # Multi-chart collection intent
         if intent == "best_collection":
             collection = self.create_best_charts_collection(df)
+            first_item = collection[0] if collection else {}
+            first_title = first_item.get("title", f"Curated Visual Suite ({len(collection)} Charts)")
+            all_cols = list(dict.fromkeys([col for item in collection for col in item.get("columns", [])]))
             return {
                 "status": "success",
                 "mode": "collection",
                 "query": query,
+                "title": f"Curated Visual Suite: {first_title}" if len(collection) == 1 else f"Curated Visualizations Suite ({len(collection)} Charts)",
+                "chart_type": first_item.get("chart_type", "collection"),
+                "chart_type_label": first_item.get("chart_type_label", "Multi-Chart Suite"),
+                "matched_columns": all_cols,
+                "relevant_columns": all_cols,
+                "intent": "best_collection",
+                "col_x": first_item.get("col_x"),
+                "col_y": first_item.get("col_y"),
+                "rationale": first_item.get("rationale", "Curated visual suite profiling dataset distributions, correlations, and segments."),
+                "figure": first_item.get("figure"),
+                "explanation": first_item.get("explanation", f"Generated {len(collection)} prioritized charts based on comprehensive dataset profiling."),
+                "patterns": first_item.get("patterns", [f"Curated suite contains {len(collection)} charts."]),
                 "collection": collection,
                 "summary": f"Synthesized {len(collection)} high-impact visualizations profiling the dataset."
             }
 
         # Single recommended visualization
-        rec = self.recommend_chart_type(df, matched_cols, intent)
-        fig = self.generate_visualization(df, rec)
-        explanation = self.generate_explanation(df, rec)
-        patterns = self.detect_important_patterns(df, rec)
-        chart_label = CHART_LABELS.get(rec["chart_type"], rec["chart_type"].capitalize())
+        try:
+            rec = self.recommend_chart_type(df, matched_cols, intent)
+            fig = self.generate_visualization(df, rec)
+            explanation = self.generate_explanation(df, rec)
+            patterns = self.detect_important_patterns(df, rec)
+            chart_label = CHART_LABELS.get(rec.get("chart_type", "custom"), str(rec.get("chart_type", "Custom")).capitalize())
+            chart_title = rec.get("title") or (f"{chart_label} of {', '.join(matched_cols)}" if matched_cols else "Recommended Visualization")
 
-        return {
-            "status": "success",
-            "mode": "single",
-            "query": query,
-            "matched_columns": matched_cols,
-            "relevant_columns": matched_cols,
-            "intent": intent,
-            "chart_type": rec["chart_type"],
-            "chart_type_label": chart_label,
-            "col_x": rec.get("col_x"),
-            "col_y": rec.get("col_y"),
-            "title": rec["title"],
-            "rationale": rec["rationale"],
-            "figure": fig,
-            "explanation": explanation,
-            "patterns": patterns
-        }
+            return {
+                "status": "success",
+                "mode": "single",
+                "query": query,
+                "matched_columns": matched_cols,
+                "relevant_columns": matched_cols,
+                "intent": intent,
+                "chart_type": rec.get("chart_type", "custom"),
+                "chart_type_label": chart_label,
+                "col_x": rec.get("col_x"),
+                "col_y": rec.get("col_y"),
+                "title": chart_title,
+                "rationale": rec.get("rationale", f"A {chart_label.lower()} is recommended based on feature datatypes."),
+                "figure": fig,
+                "explanation": explanation,
+                "patterns": patterns,
+                "collection": [],
+                "summary": f"Recommended {chart_label}: {chart_title}"
+            }
+        except Exception as e:
+            return self._create_empty_or_error_result(
+                query=query,
+                message=f"Could not formulate visualization recommendation: {str(e)}",
+                title="Recommendation Error"
+            )
 
     def recommend_chart(self, *args, **kwargs) -> Dict[str, Any]:
         """
@@ -712,12 +793,14 @@ class AIChartRecommender:
             }
             fig_dist = self.generate_visualization(df, rec_dist)
             collection.append({
-                "title": rec_dist["title"],
+                "title": rec_dist.get("title", "Distribution Profile"),
                 "chart_type": "distribution",
                 "chart_type_label": CHART_LABELS.get("distribution", "Distribution"),
                 "intent": "distribution",
                 "columns": [top_num],
-                "rationale": rec_dist["rationale"],
+                "col_x": top_num,
+                "col_y": None,
+                "rationale": rec_dist.get("rationale", ""),
                 "figure": fig_dist,
                 "explanation": self.generate_explanation(df, rec_dist),
                 "patterns": self.detect_important_patterns(df, rec_dist)
@@ -735,12 +818,14 @@ class AIChartRecommender:
             }
             fig_corr = self.generate_visualization(df, rec_corr)
             collection.append({
-                "title": rec_corr["title"],
+                "title": rec_corr.get("title", f"Correlation: {c1} vs {c2}"),
                 "chart_type": "scatter",
                 "chart_type_label": CHART_LABELS.get("scatter", "Scatter Plot"),
                 "intent": "correlation",
                 "columns": [c1, c2],
-                "rationale": rec_corr["rationale"],
+                "col_x": c1,
+                "col_y": c2,
+                "rationale": rec_corr.get("rationale", ""),
                 "figure": fig_corr,
                 "explanation": self.generate_explanation(df, rec_corr),
                 "patterns": self.detect_important_patterns(df, rec_corr)
@@ -761,12 +846,14 @@ class AIChartRecommender:
             }
             fig_cat = self.generate_visualization(df, rec_cat)
             collection.append({
-                "title": rec_cat["title"],
+                "title": rec_cat.get("title", f"Segment Breakdown: {best_cat}"),
                 "chart_type": chart_t,
                 "chart_type_label": CHART_LABELS.get(chart_t, chart_t.capitalize()),
                 "intent": "composition",
                 "columns": [best_cat],
-                "rationale": rec_cat["rationale"],
+                "col_x": best_cat,
+                "col_y": None,
+                "rationale": rec_cat.get("rationale", ""),
                 "figure": fig_cat,
                 "explanation": self.generate_explanation(df, rec_cat),
                 "patterns": self.detect_important_patterns(df, rec_cat)
@@ -785,12 +872,14 @@ class AIChartRecommender:
             }
             fig_biv = self.generate_visualization(df, rec_biv)
             collection.append({
-                "title": rec_biv["title"],
+                "title": rec_biv.get("title", f"{num_c} by {cat_c}"),
                 "chart_type": rec_biv["chart_type"],
                 "chart_type_label": CHART_LABELS.get(rec_biv["chart_type"], rec_biv["chart_type"].capitalize()),
                 "intent": "comparison",
                 "columns": [cat_c, num_c],
-                "rationale": rec_biv["rationale"],
+                "col_x": cat_c,
+                "col_y": num_c,
+                "rationale": rec_biv.get("rationale", ""),
                 "figure": fig_biv,
                 "explanation": self.generate_explanation(df, rec_biv),
                 "patterns": self.detect_important_patterns(df, rec_biv)
@@ -809,12 +898,14 @@ class AIChartRecommender:
             }
             fig_time = self.generate_visualization(df, rec_time)
             collection.append({
-                "title": rec_time["title"],
+                "title": rec_time.get("title", f"Trend: {val_col}"),
                 "chart_type": "line",
                 "chart_type_label": CHART_LABELS.get("line", "Line Chart"),
                 "intent": "trend",
                 "columns": [d_col, val_col],
-                "rationale": rec_time["rationale"],
+                "col_x": d_col,
+                "col_y": val_col,
+                "rationale": rec_time.get("rationale", ""),
                 "figure": fig_time,
                 "explanation": self.generate_explanation(df, rec_time),
                 "patterns": self.detect_important_patterns(df, rec_time)
@@ -829,12 +920,14 @@ class AIChartRecommender:
             }
             fig_heat = self.generate_visualization(df, rec_heat)
             collection.append({
-                "title": rec_heat["title"],
+                "title": rec_heat.get("title", "Feature Collinearity Heatmap"),
                 "chart_type": "correlation_heatmap",
                 "chart_type_label": CHART_LABELS.get("correlation_heatmap", "Heatmap"),
                 "intent": "correlation",
                 "columns": num_cols,
-                "rationale": rec_heat["rationale"],
+                "col_x": None,
+                "col_y": None,
+                "rationale": rec_heat.get("rationale", ""),
                 "figure": fig_heat,
                 "explanation": self.generate_explanation(df, rec_heat),
                 "patterns": self.detect_important_patterns(df, rec_heat)

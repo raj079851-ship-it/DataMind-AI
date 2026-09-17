@@ -145,6 +145,59 @@ class TestAIChartRecommender(unittest.TestCase):
         empty_df = pd.DataFrame()
         res = self.recommender.recommend_from_query("relationship between sales and profit", empty_df)
         self.assertEqual(res["status"], "error")
+        # Ensure title key is always present even in error mode
+        self.assertIn("title", res)
+        self.assertIsInstance(res["title"], str)
+        self.assertTrue(len(res["title"]) > 0)
+
+    def test_consistent_schema_single_mode(self):
+        res = self.recommender.recommend_from_query("relationship between sales and profit", self.df)
+        expected_keys = [
+            "status", "mode", "query", "title", "chart_type", "chart_type_label",
+            "matched_columns", "relevant_columns", "intent", "col_x", "col_y",
+            "rationale", "figure", "explanation", "patterns", "collection", "summary"
+        ]
+        for key in expected_keys:
+            self.assertIn(key, res, f"Expected key '{key}' missing from single-mode recommendation response")
+        self.assertIsInstance(res["title"], str)
+        self.assertTrue(len(res["title"]) > 0)
+
+    def test_consistent_schema_collection_mode(self):
+        res = self.recommender.recommend_from_query("Create the best charts for this dataset", self.df)
+        expected_keys = [
+            "status", "mode", "query", "title", "chart_type", "chart_type_label",
+            "matched_columns", "relevant_columns", "intent", "col_x", "col_y",
+            "rationale", "figure", "explanation", "patterns", "collection", "summary"
+        ]
+        for key in expected_keys:
+            self.assertIn(key, res, f"Expected key '{key}' missing from collection-mode recommendation response")
+        # Direct indexing res['title'] must never fail
+        self.assertIsInstance(res["title"], str)
+        self.assertTrue("Curated" in res["title"] or len(res["title"]) > 0)
+
+    def test_universal_entrypoint_recommend_chart_consistency(self):
+        # Test (df, query) order
+        res1 = self.recommender.recommend_chart(self.df, "distribution of sales")
+        self.assertIn("title", res1)
+        self.assertEqual(res1["status"], "success")
+
+        # Test (query, df) order
+        res2 = self.recommender.recommend_chart("distribution of sales", self.df)
+        self.assertIn("title", res2)
+        self.assertEqual(res2["status"], "success")
+
+        # Test empty df
+        res3 = self.recommender.recommend_chart(pd.DataFrame(), "distribution of sales")
+        self.assertIn("title", res3)
+        self.assertEqual(res3["status"], "error")
+
+    def test_collection_items_contain_all_fields(self):
+        collection = self.recommender.create_best_charts_collection(self.df)
+        for item in collection:
+            for required in ["title", "chart_type", "chart_type_label", "intent", "columns", "col_x", "col_y", "rationale", "figure", "explanation", "patterns"]:
+                self.assertIn(required, item, f"Collection item missing '{required}'")
+            self.assertIsInstance(item["title"], str)
+            self.assertTrue(len(item["title"]) > 0)
 
 
 if __name__ == "__main__":

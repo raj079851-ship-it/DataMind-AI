@@ -2879,12 +2879,17 @@ elif selected_module == "📈 Visualization":
                     c_left, c_right = st.columns(2)
                     item_l = coll_results[i]
                     with c_left:
-                        st.markdown(f"#### {item_l['title']}")
-                        st.caption(f"**Intent:** `{item_l['intent'].capitalize()}` | **Type:** `{item_l['chart_type_label']}`")
+                        title_l = item_l.get("title", f"Visualization {i+1}")
+                        intent_l = item_l.get("intent", "General").capitalize()
+                        type_l = item_l.get("chart_type_label", "Chart")
+                        st.markdown(f"#### {title_l}")
+                        st.caption(f"**Intent:** `{intent_l}` | **Type:** `{type_l}`")
                         if item_l.get("figure"):
                             st.plotly_chart(item_l["figure"], use_container_width=True, key=f"coll_fig_{i}")
-                        with st.expander(f"💡 Explanation & Insights for {item_l['title']}", expanded=True):
-                            st.markdown(f"**Why this chart was chosen:**\n\n_{item_l['rationale']}_\n\n{item_l['explanation']}")
+                        with st.expander(f"💡 Explanation & Insights for {title_l}", expanded=True):
+                            rationale_l = item_l.get("rationale", "")
+                            explanation_l = item_l.get("explanation", "")
+                            st.markdown(f"**Why this chart was chosen:**\n\n_{rationale_l}_\n\n{explanation_l}")
                             if item_l.get("patterns"):
                                 st.markdown("**🔍 Identified Empirical Patterns:**")
                                 for pat in item_l["patterns"]:
@@ -2893,12 +2898,17 @@ elif selected_module == "📈 Visualization":
                     if i + 1 < len(coll_results):
                         item_r = coll_results[i + 1]
                         with c_right:
-                            st.markdown(f"#### {item_r['title']}")
-                            st.caption(f"**Intent:** `{item_r['intent'].capitalize()}` | **Type:** `{item_r['chart_type_label']}`")
+                            title_r = item_r.get("title", f"Visualization {i+2}")
+                            intent_r = item_r.get("intent", "General").capitalize()
+                            type_r = item_r.get("chart_type_label", "Chart")
+                            st.markdown(f"#### {title_r}")
+                            st.caption(f"**Intent:** `{intent_r}` | **Type:** `{type_r}`")
                             if item_r.get("figure"):
                                 st.plotly_chart(item_r["figure"], use_container_width=True, key=f"coll_fig_{i+1}")
-                            with st.expander(f"💡 Explanation & Insights for {item_r['title']}", expanded=True):
-                                st.markdown(f"**Why this chart was chosen:**\n\n_{item_r['rationale']}_\n\n{item_r['explanation']}")
+                            with st.expander(f"💡 Explanation & Insights for {title_r}", expanded=True):
+                                rationale_r = item_r.get("rationale", "")
+                                explanation_r = item_r.get("explanation", "")
+                                st.markdown(f"**Why this chart was chosen:**\n\n_{rationale_r}_\n\n{explanation_r}")
                                 if item_r.get("patterns"):
                                     st.markdown("**🔍 Identified Empirical Patterns:**")
                                     for pat in item_r["patterns"]:
@@ -2908,45 +2918,94 @@ elif selected_module == "📈 Visualization":
                 with st.spinner("AI parsing query intent, selecting optimal geometry, and detecting empirical patterns..."):
                     res = default_chart_recommender.recommend_chart(df, query_to_run)
                 
-                res_col_left, res_col_right = st.columns([2.2, 1.3])
-                with res_col_left:
-                    st.markdown(f"### {res['title']}")
-                    st.caption(f"**Identified Features:** `{', '.join(res.get('relevant_columns', []))}` | **Chart Type:** `{res.get('chart_type_label')}`")
-                    if res.get("figure"):
-                        st.plotly_chart(res["figure"], use_container_width=True, key="single_ai_chart_fig")
-                    else:
-                        st.warning("Could not generate a Plotly figure with the selected parameters.")
+                if res.get("status") == "error":
+                    st.warning(res.get("message") or res.get("title", "Active dataset is empty. Please upload or load a dataset first."))
+                elif res.get("mode") == "collection" and res.get("collection"):
+                    coll_results = res.get("collection", [])
+                    st.success(f"✨ Successfully generated **{len(coll_results)}** prioritized visualizations for `{st.session_state.get('dataset_source', 'active dataset')}` ({df.shape[0]:,} rows × {df.shape[1]} cols).")
+                    for i in range(0, len(coll_results), 2):
+                        c_left, c_right = st.columns(2)
+                        item_l = coll_results[i]
+                        with c_left:
+                            title_l = item_l.get("title", f"Visualization {i+1}")
+                            intent_l = item_l.get("intent", "General").capitalize()
+                            type_l = item_l.get("chart_type_label", "Chart")
+                            st.markdown(f"#### {title_l}")
+                            st.caption(f"**Intent:** `{intent_l}` | **Type:** `{type_l}`")
+                            if item_l.get("figure"):
+                                st.plotly_chart(item_l["figure"], use_container_width=True, key=f"coll_fig_sub_{i}")
+                            with st.expander(f"💡 Explanation & Insights for {title_l}", expanded=True):
+                                rationale_l = item_l.get("rationale", "")
+                                explanation_l = item_l.get("explanation", "")
+                                st.markdown(f"**Why this chart was chosen:**\n\n_{rationale_l}_\n\n{explanation_l}")
+                                if item_l.get("patterns"):
+                                    st.markdown("**🔍 Identified Empirical Patterns:**")
+                                    for pat in item_l["patterns"]:
+                                        st.markdown(f"- {pat}")
+                        
+                        if i + 1 < len(coll_results):
+                            item_r = coll_results[i + 1]
+                            with c_right:
+                                title_r = item_r.get("title", f"Visualization {i+2}")
+                                intent_r = item_r.get("intent", "General").capitalize()
+                                type_r = item_r.get("chart_type_label", "Chart")
+                                st.markdown(f"#### {title_r}")
+                                st.caption(f"**Intent:** `{intent_r}` | **Type:** `{type_r}`")
+                                if item_r.get("figure"):
+                                    st.plotly_chart(item_r["figure"], use_container_width=True, key=f"coll_fig_sub_{i+1}")
+                                with st.expander(f"💡 Explanation & Insights for {title_r}", expanded=True):
+                                    rationale_r = item_r.get("rationale", "")
+                                    explanation_r = item_r.get("explanation", "")
+                                    st.markdown(f"**Why this chart was chosen:**\n\n_{rationale_r}_\n\n{explanation_r}")
+                                    if item_r.get("patterns"):
+                                        st.markdown("**🔍 Identified Empirical Patterns:**")
+                                        for pat in item_r["patterns"]:
+                                            st.markdown(f"- {pat}")
+                        st.markdown("---")
+                else:
+                    chart_title = res.get("title") or "AI Recommended Visualization"
+                    rel_cols = res.get("relevant_columns") or res.get("matched_columns") or []
+                    chart_label = res.get("chart_type_label") or res.get("chart_type", "Chart").capitalize()
 
-                with res_col_right:
-                    st.markdown(f"""
-                    <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">🎯 AI Recommendation Rationale</div>
-                        <p style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e2e8f0; line-height: 1.45;">
-                            {res.get('rationale', '')}
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    res_col_left, res_col_right = st.columns([2.2, 1.3])
+                    with res_col_left:
+                        st.markdown(f"### {chart_title}")
+                        st.caption(f"**Identified Features:** `{', '.join(rel_cols)}` | **Chart Type:** `{chart_label}`")
+                        if res.get("figure"):
+                            st.plotly_chart(res["figure"], use_container_width=True, key="single_ai_chart_fig")
+                        else:
+                            st.warning("Could not generate a Plotly figure with the selected parameters.")
 
-                    st.markdown(f"""
-                    <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.05em;">📖 Plain-Language Explanation</div>
-                        <p style="margin: 6px 0 0 0; font-size: 0.84rem; color: #cbd5e1; line-height: 1.45;">
-                            {res.get('explanation', '')}
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    with res_col_right:
+                        st.markdown(f"""
+                        <div style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">🎯 AI Recommendation Rationale</div>
+                            <p style="margin: 6px 0 0 0; font-size: 0.88rem; color: #e2e8f0; line-height: 1.45;">
+                                {res.get('rationale', '')}
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
 
-                    patterns = res.get("patterns", [])
-                    st.markdown("""
-                    <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px;">
-                        <div style="font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.05em;">🔍 Identified Empirical Patterns</div>
-                    """, unsafe_allow_html=True)
-                    if patterns:
-                        for pat in patterns:
-                            st.markdown(f"- <span style='font-size: 0.83rem; color: #f1f5f9;'>{pat}</span>", unsafe_allow_html=True)
-                    else:
-                        st.caption("No strong anomalous skewness or outlier patterns identified.")
-                    st.markdown("</div>", unsafe_allow_html=True)
+                        st.markdown(f"""
+                        <div style="background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px; margin-bottom: 12px;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #10b981; text-transform: uppercase; letter-spacing: 0.05em;">📖 Plain-Language Explanation</div>
+                            <p style="margin: 6px 0 0 0; font-size: 0.84rem; color: #cbd5e1; line-height: 1.45;">
+                                {res.get('explanation', '')}
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                        patterns = res.get("patterns", [])
+                        st.markdown("""
+                        <div style="background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px 16px;">
+                            <div style="font-size: 0.75rem; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.05em;">🔍 Identified Empirical Patterns</div>
+                        """, unsafe_allow_html=True)
+                        if patterns:
+                            for pat in patterns:
+                                st.markdown(f"- <span style='font-size: 0.83rem; color: #f1f5f9;'>{pat}</span>", unsafe_allow_html=True)
+                        else:
+                            st.caption("No strong anomalous skewness or outlier patterns identified.")
+                        st.markdown("</div>", unsafe_allow_html=True)
 
     elif chart_category == "Basic Charts":
         b_type = st.selectbox("Chart Type:", ["Bar Chart", "Line Chart", "Scatter Plot", "Donut Chart", "Pie Chart"])
@@ -4848,7 +4907,7 @@ elif selected_module == "🎨 Dashboard Builder":
         st.success("Generated layout!")
 
     dash_spec = st.session_state.get("active_dash_spec", generate_ai_dashboard_spec(df))
-    st.markdown(f"### {dash_spec['title']}")
+    st.markdown(f"### {dash_spec.get('title', 'Executive Overview Dashboard')}")
 
     # Render Dashboard KPI Cards
     num_cols = df.select_dtypes(include=[np.number]).columns.tolist()

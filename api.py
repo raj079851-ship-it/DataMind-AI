@@ -60,7 +60,12 @@ from modules.statistical_engine import (
     run_regression_analysis
 )
 from modules.ai_orchestrator import AIOrchestrator
-from modules.ml_engine import run_automl_tournament, run_unsupervised_clustering
+from modules.ml_engine import (
+    run_automl_tournament,
+    run_unsupervised_clustering,
+    train_single_model,
+    preprocess_for_ml
+)
 from modules.automl_pipeline import run_automl_pipeline
 from modules.predictive_engine import predict_scenario
 from modules.forecasting_engine import generate_forecast, detect_time_series_columns
@@ -189,8 +194,40 @@ class ForecastRequest(BaseModel):
 class OmnibarRequest(BaseModel):
     command: str
 
-class WhatIfPredictionRequest(BaseModel):
-    input_values: Dict[str, Any]
+# Active ML Model & Session State
+active_ml_model: Dict[str, Any] = {}
+
+class DatasetSyncRequest(BaseModel):
+    records: List[Dict[str, Any]]
+    dataset_name: Optional[str] = "synced_dataset"
+
+class MLTrainRequest(BaseModel):
+    target_col: str
+    feature_cols: Optional[List[str]] = None
+    algorithm: str = "random_forest"
+    task_type: Optional[str] = None
+    hyperparameters: Optional[Dict[str, Any]] = None
+
+class MLPredictRequest(BaseModel):
+    input_features: Dict[str, Any]
+
+class MLClusteringRequest(BaseModel):
+    columns: List[str]
+    algorithm: str = "kmeans"
+    n_clusters: int = 3
+    eps: float = 0.8
+    min_samples: int = 5
+
+class CreateUserRequest(BaseModel):
+    username: str
+    password: str
+    email: str
+    role: str = "Analyst"
+    full_name: Optional[str] = ""
+    tenant_id: Optional[str] = "tenant_default"
+
+class DashboardGenerateRequest(BaseModel):
+    theme: Optional[str] = "Dark Velvet"
 
 
 # ---------------- 1. AUTH & SECURITY ENDPOINTS ----------------
@@ -430,6 +467,44 @@ def decrypt_columns_api(req: ColumnEncryptionRequest):
 
 
 
+@app.get("/security/users", tags=["Security & Governance"])
+def list_users_api():
+    """Returns the list of active user accounts and roles with hashes stripped."""
+    users = default_user_manager.list_users()
+    return {"total": len(users), "users": users}
+
+
+@app.post("/security/users", tags=["Security & Governance"])
+def create_user_api(req: CreateUserRequest):
+    """Provisions a new enterprise user account with PBKDF2 password hashing."""
+    user, err = default_user_manager.create_user(
+        username=req.username,
+        password=req.password,
+        email=req.email,
+        role=req.role,
+        full_name=req.full_name or "",
+        tenant_id=req.tenant_id or "tenant_default"
+    )
+    if err or not user:
+        raise HTTPException(status_code=400, detail=err or "Failed to create user.")
+    default_audit_logger.log(
+        event_type="USER_CREATED",
+        status="SUCCESS",
+        resource=f"USER:{user.username}",
+        details={"role": user.role, "email": user.email}
+    )
+    return {
+        "status": "success",
+        "user": {
+            "username": user.username,
+            "role": user.role,
+            "email": user.email,
+            "full_name": user.full_name,
+            "created_at": user.get("created_at", "")
+        }
+    }
+
+
 # ---------------- 2. PROJECTS ENDPOINTS ----------------
 @app.get("/projects", tags=["Project Management"])
 def list_projects():
@@ -465,6 +540,49 @@ async def upload_dataset_file(file: UploadFile = File(...)):
     df, meta = load_dataset(contents, filename=file.filename)
     active_datasets["default"] = df
     return {"status": "uploaded", "filename": file.filename, "metadata": meta}
+
+@app.post("/datasets/sync", tags=["Datasets"])
+def sync_dataset_records(req: DatasetSyncRequest):
+    """Synchronizes client-side dataset records directly into backend server memory."""
+    if not req.records or not len(req.records):
+        raise HTTPException(status_code=400, detail="Cannot sync empty dataset records.")
+    df = pd.DataFrame(req.records)
+    active_datasets["default"] = df
+    profile = get_dataset_quick_profile(df)
+    return {
+        "status": "synchronized",
+        "dataset_name": req.dataset_name,
+        "rows": len(df),
+        "columns": list(df.columns),
+        "profile": profile
+    }
+
+@app.post("/datasets/load-demo/{demo_name}", tags=["Datasets"])
+def load_demo_dataset(demo_name: str):
+    """Loads built-in enterprise demo datasets (churn, housing, sales)."""
+    name = demo_name.lower().strip()
+    if "churn" in name:
+        df = generate_sample_customer_churn()
+        title = "Customer Churn"
+    elif "hous" in name:
+        df = generate_sample_housing()
+        title = "Real Estate Housing"
+    elif "sale" in name or "ecom" in name:
+        df = generate_sample_ecommerce_sales()
+        title = "E-Commerce Sales"
+    else:
+        df = generate_sample_customer_churn()
+        title = "Customer Churn"
+    active_datasets["default"] = df
+    profile = get_dataset_quick_profile(df)
+    return {
+        "status": "loaded",
+        "title": title,
+        "rows": len(df),
+        "columns": list(df.columns),
+        "profile": profile,
+        "sample": df.head(10).to_dict(orient="records")
+    }
 
 @app.get("/data-preview", tags=["Data Preview"])
 def preview_data(page: int = 1, page_size: int = 50, sort_by: Optional[str] = None, ascending: bool = True):
@@ -567,19 +685,19 @@ def recommend_chart(req: ChartRecommendationRequest):
         serialized_collection = []
         for item in res.get("collection", []):
             serialized_collection.append({
-                "title": item["title"],
-                "chart_type": item["chart_type"],
-                "columns": item["columns"],
-                "rationale": item["rationale"],
-                "explanation": item["explanation"],
-                "patterns": item["patterns"],
+                "title": item.get("title", "Untitled Visualization"),
+                "chart_type": item.get("chart_type", "custom"),
+                "columns": item.get("columns", []),
+                "rationale": item.get("rationale", ""),
+                "explanation": item.get("explanation", ""),
+                "patterns": item.get("patterns", []),
                 "figure": json.loads(item["figure"].to_json()) if item.get("figure") else None
             })
         return {
             "status": "success",
             "mode": "collection",
             "query": req.query,
-            "summary": res.get("summary"),
+            "summary": res.get("summary", ""),
             "charts": serialized_collection
         }
 
@@ -587,13 +705,13 @@ def recommend_chart(req: ChartRecommendationRequest):
         "status": "success",
         "mode": "single",
         "query": req.query,
-        "matched_columns": res.get("matched_columns"),
-        "intent": res.get("intent"),
-        "chart_type": res.get("chart_type"),
-        "title": res.get("title"),
-        "rationale": res.get("rationale"),
-        "explanation": res.get("explanation"),
-        "patterns": res.get("patterns"),
+        "matched_columns": res.get("matched_columns", []),
+        "intent": res.get("intent", "general"),
+        "chart_type": res.get("chart_type", "custom"),
+        "title": res.get("title", "AI Recommended Visualization"),
+        "rationale": res.get("rationale", ""),
+        "explanation": res.get("explanation", ""),
+        "patterns": res.get("patterns", []),
         "figure": json.loads(res["figure"].to_json()) if res.get("figure") else None
     }
 
@@ -608,12 +726,12 @@ def get_best_charts_collection(max_charts: int = 5):
     serialized = []
     for item in collection:
         serialized.append({
-            "title": item["title"],
-            "chart_type": item["chart_type"],
-            "columns": item["columns"],
-            "rationale": item["rationale"],
-            "explanation": item["explanation"],
-            "patterns": item["patterns"],
+            "title": item.get("title", "Untitled Visualization"),
+            "chart_type": item.get("chart_type", "custom"),
+            "columns": item.get("columns", []),
+            "rationale": item.get("rationale", ""),
+            "explanation": item.get("explanation", ""),
+            "patterns": item.get("patterns", []),
             "figure": json.loads(item["figure"].to_json()) if item.get("figure") else None
         })
     return {
@@ -675,6 +793,127 @@ def automl(target_col: str, prediction_type: str = "auto"):
         "leakage_detected": res["leakage_detected"],
         "registered_model_id": res["registered_model_card"].get("id")
     }
+
+@app.post("/ml/train", tags=["Machine Learning"])
+def train_model_api(req: MLTrainRequest):
+    """Trains a single model with chosen algorithm, computing real metrics, confusion matrix, residuals, and feature importances."""
+    df = get_current_df()
+    if req.target_col not in df.columns:
+        raise HTTPException(status_code=400, detail=f"Target column '{req.target_col}' not found in dataset.")
+    
+    try:
+        prep = preprocess_for_ml(
+            df=df,
+            target_col=req.target_col,
+            feature_cols=req.feature_cols,
+            classification_type=req.task_type
+        )
+        res = train_single_model(
+            prep_data=prep,
+            algorithm=req.algorithm,
+            hyperparams=req.hyperparameters
+        )
+        active_ml_model["current"] = res
+        
+        return {
+            "status": "success",
+            "algorithm": res["algorithm"],
+            "task_type": res["task_type"],
+            "classification_type": res.get("classification_type"),
+            "metrics": res["metrics"],
+            "training_time": res["training_time"],
+            "feature_importances": res.get("feature_importances", []),
+            "eval_data": res.get("eval_data", {})
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Model training error: {str(e)}")
+
+
+@app.post("/ml/predict", tags=["Machine Learning"])
+def predict_scenario_api(req: MLPredictRequest):
+    """Evaluates what-if scenario feature values using the currently trained ML model."""
+    if "current" not in active_ml_model:
+        raise HTTPException(status_code=400, detail="No model has been trained yet. Train a model first via /ml/train or /ml/automl.")
+    try:
+        res = predict_scenario(
+            trained_model_result=active_ml_model["current"],
+            input_values=req.input_features
+        )
+        return {
+            "status": "success",
+            "task_type": res.get("task_type"),
+            "prediction": res.get("prediction"),
+            "prediction_formatted": res.get("prediction_formatted"),
+            "probability": res.get("probability"),
+            "confidence_interval_95": res.get("confidence_interval_95"),
+            "top_driver": res.get("top_driver"),
+            "explanation": res.get("explanation")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Prediction error: {str(e)}")
+
+
+@app.post("/ml/clustering", tags=["Machine Learning"])
+def clustering_api(req: MLClusteringRequest):
+    """Executes unsupervised clustering and returns silhouette score, cluster distribution, and 2D PCA projection coordinates."""
+    df = get_current_df()
+    res = run_unsupervised_clustering(
+        df=df,
+        columns=req.columns,
+        n_clusters=req.n_clusters,
+        algorithm=req.algorithm,
+        eps=req.eps,
+        min_samples=req.min_samples
+    )
+    if "error" in res:
+        raise HTTPException(status_code=400, detail=res["error"])
+    
+    cluster_sample = res["cluster_df"].head(100).to_dict(orient="records")
+    return {
+        "status": "success",
+        "algorithm": res["algorithm"],
+        "n_clusters": res.get("n_clusters_found", req.n_clusters),
+        "silhouette_score": res["silhouette_score"],
+        "pca_explained_variance_pct": res.get("pca_explained_variance_pct", 0.0),
+        "cluster_distribution": res.get("cluster_distribution", {}),
+        "sample_points": cluster_sample
+    }
+
+
+@app.post("/dashboards/generate-ai", tags=["Dashboards"])
+def generate_ai_dashboard_api(req: DashboardGenerateRequest):
+    """Synthesizes AI dashboard layout, KPI goal tracking, period growth, and automated strategic insights."""
+    df = get_current_df()
+    spec = generate_ai_dashboard_spec(df)
+    insights = run_automated_insights_engine(df)
+    
+    num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+    kpi_tracking = []
+    if num_cols:
+        for col in num_cols[:4]:
+            mean_val = float(df[col].mean())
+            target_val = round(mean_val * 1.1, 2)
+            actual_val = round(mean_val, 2)
+            pct = round((actual_val / target_val) * 100, 1) if target_val != 0 else 100.0
+            kpi_tracking.append({
+                "metric": col,
+                "actual": actual_val,
+                "target": target_val,
+                "progress_pct": pct,
+                "status": "On Track" if pct >= 90 else "Attention"
+            })
+            
+    return {
+        "status": "success",
+        "theme": req.theme,
+        "title": spec.get("title", "Executive Performance Dashboard"),
+        "description": spec.get("description", ""),
+        "kpis": kpi_tracking,
+        "cards": spec.get("cards", []),
+        "insights": insights.get("insights", [])[:6] if isinstance(insights, dict) else [],
+        "summary": insights.get("summary", "") if isinstance(insights, dict) else ""
+    }
+
 
 @app.get("/models/registry", tags=["Model Registry"])
 def list_registered_models():
