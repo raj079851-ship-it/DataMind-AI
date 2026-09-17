@@ -8567,7 +8567,134 @@ result = df.describe()
       return v === null || v === undefined || v === "" || v === "NaN" || v === "null" || (typeof v === "number" && isNaN(v));
     }
 
+    // High-Performance Data Helpers & Metadata Cache
+    window.currentDatasetStatsCache = null;
+
+    function getRepresentativeSample(dataset, maxRows = 5000) {
+      if (!dataset || dataset.length <= maxRows) return dataset;
+      const sample = [];
+      const step = dataset.length / maxRows;
+      for (let i = 0; i < maxRows; i++) {
+        sample.push(dataset[Math.floor(i * step)]);
+      }
+      return sample;
+    }
+
+    function computeDatasetDuplicates(dataset, cols) {
+      const rows = dataset ? dataset.length : 0;
+      if (rows <= 1) return 0;
+      const keyCols = cols && cols.length ? cols.slice(0, 8) : Object.keys(dataset[0] || {}).slice(0, 8);
+      if (rows <= 5000) {
+        const set = new Set();
+        let dups = 0;
+        for (let i = 0; i < rows; i++) {
+          const r = dataset[i];
+          let k = '';
+          for (let j = 0; j < keyCols.length; j++) k += r[keyCols[j]] + '│';
+          if (set.has(k)) dups++;
+          else set.add(k);
+        }
+        return dups;
+      } else {
+        const sampleSize = 3000;
+        const step = Math.max(1, Math.floor(rows / sampleSize));
+        const set = new Set();
+        let sampleDups = 0;
+        let count = 0;
+        for (let i = 0; i < rows && count < sampleSize; i += step) {
+          const r = dataset[i];
+          let k = '';
+          for (let j = 0; j < keyCols.length; j++) k += r[keyCols[j]] + '│';
+          if (set.has(k)) sampleDups++;
+          else set.add(k);
+          count++;
+        }
+        const dupRate = count > 0 ? sampleDups / count : 0;
+        return Math.round(dupRate * rows);
+      }
+    }
+
+    function getDatasetColumnStats() {
+      if (window.currentDatasetStatsCache && 
+          window.currentDatasetStatsCache._datasetRef === currentDataset && 
+          window.currentDatasetStatsCache._colsRef === columns) {
+        return window.currentDatasetStatsCache;
+      }
+
+      const rows = (currentDataset || []).length;
+      const cols = (columns || []).length;
+      const colStats = {};
+
+      if (!rows || !cols) {
+        window.currentDatasetStatsCache = {
+          _datasetRef: currentDataset,
+          _colsRef: columns,
+          rows: 0,
+          cols: 0,
+          totalCells: 0,
+          totalNullCount: 0,
+          dupCount: 0,
+          healthScore: 100,
+          colStats: {}
+        };
+        return window.currentDatasetStatsCache;
+      }
+
+      for (let j = 0; j < cols; j++) {
+        colStats[columns[j]] = {
+          name: columns[j],
+          nullCount: 0,
+          numericCount: 0,
+          rawType: typeof currentDataset[0]?.[columns[j]] || 'unknown'
+        };
+      }
+
+      let totalNullCount = 0;
+      for (let i = 0; i < rows; i++) {
+        const r = currentDataset[i];
+        for (let j = 0; j < cols; j++) {
+          const colName = columns[j];
+          const val = r[colName];
+          if (isMissing(val)) {
+            colStats[colName].nullCount++;
+            totalNullCount++;
+          } else if (typeof val === "number" || (!isNaN(parseFloat(val)) && isFinite(val))) {
+            colStats[colName].numericCount++;
+          }
+        }
+      }
+
+      for (let j = 0; j < cols; j++) {
+        const stat = colStats[columns[j]];
+        stat.nonNullCount = rows - stat.nullCount;
+        stat.nullPct = ((stat.nullCount / rows) * 100).toFixed(1);
+        stat.isNumeric = stat.numericCount > 0 && stat.numericCount >= (stat.nonNullCount * 0.6);
+      }
+
+      const dupCount = computeDatasetDuplicates(currentDataset, columns);
+      const totalCells = rows * cols;
+      let score = rows > 0 ? (100 - Math.min(40, (totalNullCount / (totalCells || 1)) * 150) - Math.min(25, (dupCount / (rows || 1)) * 100)) : 100;
+      score = Math.max(10, Math.round(score));
+
+      window.currentDatasetStatsCache = {
+        _datasetRef: currentDataset,
+        _colsRef: columns,
+        rows: rows,
+        cols: cols,
+        totalCells: totalCells,
+        totalNullCount: totalNullCount,
+        dupCount: dupCount,
+        healthScore: score,
+        colStats: colStats
+      };
+
+      return window.currentDatasetStatsCache;
+    }
+
     function isColNumeric(col) {
+      if (window.currentDatasetStatsCache && window.currentDatasetStatsCache.colStats && window.currentDatasetStatsCache.colStats[col]) {
+        return window.currentDatasetStatsCache.colStats[col].isNumeric;
+      }
       if (!currentDataset || !currentDataset.length) return false;
       let numCount = 0;
       let validCount = 0;
@@ -8779,13 +8906,16 @@ result = df.describe()
         currentDataset = [];
         columns = [];
         cleaningLogList = [];
+        window.currentDatasetStatsCache = null;
         updateUI();
         return;
       }
-      rawDataset = JSON.parse(JSON.stringify(data));
-      currentDataset = JSON.parse(JSON.stringify(data));
+      // Zero-copy array slicing prevents multi-megabyte JSON stringification freezes
+      rawDataset = data.slice();
+      currentDataset = data.slice();
       rawColumns = Object.keys(data[0] || {});
       columns = [...rawColumns];
+      window.currentDatasetStatsCache = null;
       cleaningLogList = [];
       try {
         updateUI();
@@ -8807,8 +8937,9 @@ result = df.describe()
       if (rawCSVText && rawCSVText.trim()) {
         parseCSVString(rawCSVText);
       } else {
-        currentDataset = JSON.parse(JSON.stringify(rawDataset));
+        currentDataset = rawDataset.slice();
         columns = rawColumns && rawColumns.length > 0 ? [...rawColumns] : Object.keys(rawDataset[0] || {});
+        window.currentDatasetStatsCache = null;
         cleaningLogList = [];
         updateUI();
         if (activeModuleId === 'moduleDashboard') {
@@ -8927,9 +9058,9 @@ result = df.describe()
 
       // 3. CSV, TSV, TXT (Delimited text files)
       const reader = new FileReader();
-      reader.onload = function(evt) {
+      reader.onload = async function(evt) {
         rawCSVText = evt.target.result;
-        parseCSVString(evt.target.result);
+        await parseCSVString(evt.target.result);
       };
       reader.onerror = function() {
         notifyTaskFailed("Dataset Ingestion", `Failed to read ${ext.toUpperCase()} file.`);
@@ -8938,7 +9069,7 @@ result = df.describe()
       e.target.value = "";
     }
 
-    function parseCSVString(text) {
+    async function parseCSVString(text) {
       if (!text || !text.trim()) {
         notifyTaskFailed("Dataset Ingestion", "Uploaded file is empty.");
         return;
@@ -8948,7 +9079,8 @@ result = df.describe()
         // Strip BOM if present
         text = text.replace(/^\ufeff/, "");
         const lines = text.trim().split(/\r\n|\n|\r/).filter(l => l.trim().length > 0);
-        if (lines.length < 1) {
+        const totalLines = lines.length;
+        if (totalLines < 1) {
           notifyTaskFailed("Dataset Ingestion", "CSV file contains no readable records.");
           return;
         }
@@ -8966,12 +9098,13 @@ result = df.describe()
         else if (pipeCount > commaCount && pipeCount > semiCount) delimiter = "|";
         else delimiter = ",";
 
-        // CSV line parser that respects quotes
+        // Fast CSV line parser that respects quotes without regex overhead
         function parseLine(line, sep) {
           const res = [];
           let cur = "";
           let inQuotes = false;
-          for (let i = 0; i < line.length; i++) {
+          const len = line.length;
+          for (let i = 0; i < len; i++) {
             const c = line[i];
             if (c === '"') {
               if (inQuotes && line[i + 1] === '"') {
@@ -8981,18 +9114,21 @@ result = df.describe()
                 inQuotes = !inQuotes;
               }
             } else if (c === sep && !inQuotes) {
-              res.push(cur.trim());
+              res.push(cur);
               cur = "";
             } else {
               cur += c;
             }
           }
-          res.push(cur.trim());
+          res.push(cur);
           return res;
         }
 
         let headers = parseLine(lines[0], delimiter).map((h, idx) => {
-          let clean = h.replace(/^["']|["']$/g, "").trim();
+          let clean = h.trim();
+          if (clean.length >= 2 && ((clean[0] === '"' && clean[clean.length - 1] === '"') || (clean[0] === "'" && clean[clean.length - 1] === "'"))) {
+            clean = clean.slice(1, -1).trim();
+          }
           return clean || `Column_${idx + 1}`;
         });
 
@@ -9007,29 +9143,43 @@ result = df.describe()
           return h;
         });
 
+        const numHeaders = headers.length;
         const parsed = [];
-        for (let i = 1; i < lines.length; i++) {
+        const chunkSize = 5000;
+        const isVeryLarge = totalLines > 10000;
+
+        for (let i = 1; i < totalLines; i++) {
           const rowVals = parseLine(lines[i], delimiter);
           const item = {};
-          headers.forEach((h, idx) => {
-            let val = rowVals[idx] !== undefined ? rowVals[idx].replace(/^["']|["']$/g, "").trim() : "";
-            if (val === "" || val.toLowerCase() === "nan" || val.toLowerCase() === "null" || val === "None") {
-              item[h] = null;
-            } else {
-              const n = Number(val);
-              if (!isNaN(n) && val !== "" && isFinite(n)) {
-                item[h] = n;
-              } else {
-                item[h] = val;
-              }
+          for (let j = 0; j < numHeaders; j++) {
+            let val = rowVals[j];
+            if (val === undefined || val === null) {
+              item[headers[j]] = null;
+              continue;
             }
-          });
+            val = val.trim();
+            if (val === "" || val === "nan" || val === "null" || val === "None" || val === "NaN" || val === "NULL") {
+              item[headers[j]] = null;
+            } else {
+              if (val.length >= 2 && ((val[0] === '"' && val[val.length - 1] === '"') || (val[0] === "'" && val[val.length - 1] === "'"))) {
+                val = val.slice(1, -1).trim();
+              }
+              const n = Number(val);
+              item[headers[j]] = (!isNaN(n) && isFinite(n) && val !== "") ? n : val;
+            }
+          }
           parsed.push(item);
+
+          // Asynchronous non-blocking chunking for large datasets
+          if (isVeryLarge && i % chunkSize === 0) {
+            notifyTaskStart(`Ingesting: ${i.toLocaleString()} / ${(totalLines - 1).toLocaleString()} rows...`);
+            await new Promise(resolve => setTimeout(resolve, 0));
+          }
         }
 
         if (!parsed.length) {
           const single = {};
-          headers.forEach(h => { single[h] = null; });
+          for (let j = 0; j < numHeaders; j++) single[headers[j]] = null;
           parsed.push(single);
         }
 
@@ -9329,28 +9479,45 @@ result = df.describe()
     function updateUI() {
       try {
         columns = Object.keys(currentDataset[0] || {});
+        window.currentDatasetStatsCache = null; // Recompute fresh metadata for new data
         try { refreshKPIs(); } catch (e) { console.warn("KPI error:", e); }
         try { populateDropdowns(); } catch (e) { console.warn("Dropdown error:", e); }
-        try { renderPreviewTable(); } catch (e) { console.warn("Preview error:", e); }
-        try { renderCleaningPreviewTable(); } catch (e) { console.warn("Clean preview error:", e); }
-        try { renderSchemaTable(); } catch (e) { console.warn("Schema error:", e); }
-        try { renderCategorizedColumns(); } catch (e) { console.warn("Categorized cols error:", e); }
-        try { renderFeSuggestions(); } catch (e) { console.warn("FE suggestions error:", e); }
-        try { renderEDAStats(); } catch (e) { console.warn("EDA error:", e); }
-        try { renderHistogramChart(); } catch (e) { console.warn("Histogram error:", e); }
-        try { renderBarChart(); } catch (e) { console.warn("Bar chart error:", e); }
-        try { renderCorrelation(); } catch (e) { console.warn("Correlation error:", e); }
-        try { renderAIInsights(); } catch (e) { console.warn("Insights error:", e); }
-        try { renderInsightsModule(); } catch (e) { console.warn("Insights module error:", e); }
-        try { renderReportLivePreview(); } catch (e) { console.warn("Report preview error:", e); }
-        try { renderAIRecommendations(); } catch (e) { console.warn("Recs error:", e); }
-        try { renderCleaningLog(); } catch (e) { console.warn("Log error:", e); }
-        try { refreshSqlSchemaUI(); } catch (e) { console.warn("SQL schema error:", e); }
-        try { refreshPyColChips(); } catch (e) { console.warn("Py chips error:", e); }
-        try { renderInsertColChips(); } catch (e) { console.warn("Insert col chips error:", e); }
-        try { renderInsertColDirectory(); } catch (e) { console.warn("Insert col dir error:", e); }
-        try { renderInsertColPreview(); } catch (e) { console.warn("Insert col preview error:", e); }
-        try { renderABTestingModule(); } catch (e) {}
+
+        // Render the currently active module immediately (avoids freezing UI by running 22 modules at once)
+        if (activeModuleId === 'moduleOverview') {
+          try { renderPreviewTable(); } catch (e) { console.warn("Preview error:", e); }
+        } else if (activeModuleId === 'moduleCleaning') {
+          try { renderCleaningPreviewTable(); renderCleaningLog(); } catch (e) { console.warn("Clean preview error:", e); }
+        } else if (activeModuleId === 'moduleEDA') {
+          try { renderEDAStats(); renderHistogramChart(); renderBarChart(); } catch (e) {}
+        } else if (activeModuleId === 'moduleDashboard') {
+          try { updateDashFilterOptions(); renderDashboard(); } catch (e) {}
+        } else if (activeModuleId === 'moduleDashboardBuilder') {
+          try { initDashboardBuilder(); } catch (e) {}
+        } else if (activeModuleId === 'modulePowerBI') {
+          try { recomputePowerBIFromDataset(); } catch (e) {}
+        } else if (activeModuleId === 'moduleInsights') {
+          try { renderInsightsModule(); } catch (e) {}
+        } else if (activeModuleId === 'moduleStats') {
+          try { renderStatsModule(); } catch (e) {}
+        } else if (activeModuleId === 'moduleSql') {
+          try { refreshSqlSchemaUI(); } catch (e) {}
+        } else if (activeModuleId === 'modulePython') {
+          try { refreshPyColChips(); } catch (e) {}
+        } else if (activeModuleId === 'moduleInsertCol') {
+          try { renderInsertColChips(); renderInsertColDirectory(); renderInsertColPreview(); } catch (e) {}
+        } else {
+          try { renderPreviewTable(); } catch (e) {}
+        }
+
+        // Lightweight background updates deferred
+        setTimeout(() => {
+          try { refreshSqlSchemaUI(); } catch (e) {}
+          try { refreshPyColChips(); } catch (e) {}
+          try { renderInsertColChips(); } catch (e) {}
+          try { renderCleaningLog(); } catch (e) {}
+        }, 60);
+
       } catch (err) {
         console.warn("General updateUI error:", err);
       }
@@ -9383,38 +9550,36 @@ result = df.describe()
     }
 
     function refreshKPIs() {
-      const rows = currentDataset.length;
-      const cols = columns.length;
-      let nullCount = 0;
-      let totalCells = rows * cols;
+      const stats = getDatasetColumnStats();
+      const rows = stats.rows;
+      const cols = stats.cols;
+      const nullCount = stats.totalNullCount;
+      const totalCells = stats.totalCells;
+      const dupCount = stats.dupCount;
+      const score = stats.healthScore;
 
-      if (rows > 0) {
-        currentDataset.forEach(r => {
-          columns.forEach(c => {
-            if (r[c] === null || r[c] === undefined || r[c] === "") nullCount++;
-          });
-        });
+      const metricShape = document.getElementById("metricShape");
+      if (metricShape) metricShape.textContent = `${rows.toLocaleString()} × ${cols}`;
+      const metricHealth = document.getElementById("metricHealth");
+      if (metricHealth) {
+        metricHealth.textContent = rows > 0 ? `${score} / 100` : `- / 100`;
+        metricHealth.style.color = rows > 0 ? (score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)';
       }
+      const metricMissing = document.getElementById("metricMissing");
+      if (metricMissing) metricMissing.textContent = `${nullCount.toLocaleString()} (${rows > 0 ? ((nullCount / (totalCells || 1)) * 100).toFixed(1) : 0}%)`;
+      const metricDuplicates = document.getElementById("metricDuplicates");
+      if (metricDuplicates) metricDuplicates.textContent = dupCount.toLocaleString();
+      const metricCols = document.getElementById("metricCols");
+      if (metricCols) metricCols.textContent = cols;
 
-      const rowStrings = currentDataset.map(r => JSON.stringify(r));
-      const uniqueCount = new Set(rowStrings).size;
-      const dupCount = rows > 0 ? rows - uniqueCount : 0;
-
-      let score = rows > 0 ? (100 - Math.min(40, (nullCount / (totalCells || 1)) * 150) - Math.min(25, (dupCount / (rows || 1)) * 100)) : 100;
-      score = Math.max(10, Math.round(score));
-
-      document.getElementById("metricShape").textContent = `${rows.toLocaleString()} × ${cols}`;
-      document.getElementById("metricHealth").textContent = rows > 0 ? `${score} / 100` : `- / 100`;
-      document.getElementById("metricHealth").style.color = rows > 0 ? (score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)';
-      document.getElementById("metricMissing").textContent = `${nullCount} (${rows > 0 ? ((nullCount/(totalCells||1))*100).toFixed(1) : 0}%)`;
-      document.getElementById("metricDuplicates").textContent = dupCount;
-      document.getElementById("metricCols").textContent = cols;
-
-      document.getElementById("navBadgeRows").textContent = `${rows} Rows`;
-      document.getElementById("sidebarColCount").textContent = `${cols} Cols`;
+      const navBadgeRows = document.getElementById("navBadgeRows");
+      if (navBadgeRows) navBadgeRows.textContent = `${rows.toLocaleString()} Rows`;
+      const sidebarColCount = document.getElementById("sidebarColCount");
+      if (sidebarColCount) sidebarColCount.textContent = `${cols} Cols`;
     }
 
     function populateDropdowns() {
+      const stats = getDatasetColumnStats();
       const numCols = columns.filter(c => isColNumeric(c));
       const catCols = columns.filter(c => !numCols.includes(c));
 
@@ -9428,7 +9593,7 @@ result = df.describe()
         el.innerHTML = list.map(c => `<option value="${c}">${c}</option>`).join("");
       }
 
-      // Populate Missing Values dropdown with missing counts
+      // Populate Missing Values dropdown with missing counts from cached stats
       const missSelect = document.getElementById("cleanMissCol");
       if (missSelect) {
         if (!columns.length) {
@@ -9436,17 +9601,16 @@ result = df.describe()
         } else {
           const missList = columns.map(c => ({
             col: c,
-            nullCount: currentDataset.filter(r => isMissing(r[c])).length
+            nullCount: stats.colStats[c] ? stats.colStats[c].nullCount : 0
           })).sort((a, b) => b.nullCount - a.nullCount);
 
           missSelect.innerHTML = missList.map(item => 
-            `<option value="${item.col}">${item.col} (${item.nullCount} missing)</option>`
+            `<option value="${item.col}">${item.col} (${item.nullCount.toLocaleString()} missing)</option>`
           ).join("");
 
           const badgeInfo = document.getElementById("imputeBadgeInfo");
           if (badgeInfo) {
-            const totalNulls = missList.reduce((acc, x) => acc + x.nullCount, 0);
-            badgeInfo.textContent = `${totalNulls} missing cells in dataset`;
+            badgeInfo.textContent = `${stats.totalNullCount.toLocaleString()} missing cells in dataset`;
           }
         }
       }
@@ -9744,13 +9908,14 @@ result = df.describe()
       const activeCategories = Object.values(categoriesMap).filter(cat => cat.columns.length > 0);
       if (badge) badge.textContent = `${activeCategories.length} Active Technology Domains (${columns.length} Total Columns)`;
 
+      const stats = getDatasetColumnStats();
       let html = '';
       activeCategories.forEach(cat => {
         let totalNulls = 0;
         cat.columns.forEach(c => {
-          totalNulls += currentDataset.filter(r => r[c.name] === null || r[c.name] === undefined || r[c.name] === '').length;
+          totalNulls += (stats.colStats[c.name] ? stats.colStats[c.name].nullCount : 0);
         });
-        const nullPct = ((totalNulls / (currentDataset.length * cat.columns.length || 1)) * 100).toFixed(1);
+        const nullPct = ((totalNulls / ((stats.rows * cat.columns.length) || 1)) * 100).toFixed(1);
 
         html += `
           <div style="background:${cat.bg};border:1px solid ${cat.border};border-radius:12px;padding:16px;display:flex;flex-direction:column;justify-content:space-between;transition:transform 0.15s ease;">
@@ -9819,6 +9984,8 @@ result = df.describe()
         filteredCols = columns.filter(c => classifyColumnTechnology(c).key === currentTechFilter);
       }
 
+      const stats = getDatasetColumnStats();
+
       let html = `
         <table>
           <thead>
@@ -9840,10 +10007,11 @@ result = df.describe()
       } else {
         filteredCols.forEach(c => {
           const tech = classifyColumnTechnology(c);
-          let nulls = currentDataset.filter(r => r[c] === null || r[c] === undefined || r[c] === '').length;
-          let pct = ((nulls / currentDataset.length) * 100).toFixed(1);
-          let nonNull = currentDataset.length - nulls;
-          let rawType = typeof currentDataset[0]?.[c];
+          const colMeta = stats.colStats[c] || { nullCount: 0, nonNullCount: stats.rows, nullPct: "0.0", rawType: typeof currentDataset[0]?.[c] };
+          let nulls = colMeta.nullCount;
+          let pct = colMeta.nullPct;
+          let nonNull = colMeta.nonNullCount;
+          let rawType = colMeta.rawType;
 
           html += `
             <tr>
@@ -9876,14 +10044,20 @@ result = df.describe()
     window.cleaningPipelineSteps = [];
     window.cleaningInitialSnapshot = null;
 
+    function snapshotDataset(ds) {
+      if (!ds) return [];
+      if (ds.length > 10000) return ds.slice();
+      return ds.map(r => Object.assign({}, r));
+    }
+
     function pushCleaningState(desc, stepInfo) {
       if (!currentDataset) return;
       if (!window.cleaningInitialSnapshot) {
-        window.cleaningInitialSnapshot = JSON.parse(JSON.stringify(currentDataset));
+        window.cleaningInitialSnapshot = snapshotDataset(currentDataset);
       }
-      // Push deep clone of state before applying modification
+      // Push fast snapshot of state before applying modification
       window.cleaningHistoryStack.push({
-        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        dataset: snapshotDataset(currentDataset),
         columns: [...(columns || [])],
         desc: desc,
         timestamp: new Date().toLocaleTimeString()
@@ -9911,13 +10085,14 @@ result = df.describe()
       }
       // Save current state into redo stack
       window.cleaningRedoStack.push({
-        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        dataset: snapshotDataset(currentDataset),
         columns: [...(columns || [])],
         timestamp: new Date().toLocaleTimeString()
       });
       const prev = window.cleaningHistoryStack.pop();
       currentDataset = prev.dataset;
       columns = prev.columns;
+      window.currentDatasetStatsCache = null;
       if (window.cleaningPipelineSteps.length) window.cleaningPipelineSteps.pop();
       cleaningLogList.unshift(`↩️ [Undo] Reverted to state before: ${prev.desc}`);
       updateUndoRedoButtons();
@@ -9933,7 +10108,7 @@ result = df.describe()
       }
       // Save current into undo stack
       window.cleaningHistoryStack.push({
-        dataset: JSON.parse(JSON.stringify(currentDataset)),
+        dataset: snapshotDataset(currentDataset),
         columns: [...(columns || [])],
         desc: "State before Redo",
         timestamp: new Date().toLocaleTimeString()
@@ -9941,6 +10116,7 @@ result = df.describe()
       const next = window.cleaningRedoStack.pop();
       currentDataset = next.dataset;
       columns = next.columns;
+      window.currentDatasetStatsCache = null;
       cleaningLogList.unshift(`↪️ [Redo] Re-applied transformation state.`);
       updateUndoRedoButtons();
       updateUI();
@@ -12420,24 +12596,25 @@ result = df.describe()
     function renderEdaMultivariate() {
       if (!currentDataset || !currentDataset.length) return;
       const numCols = columns.filter(c => isColNumeric(c));
+      const activeSample = (currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset;
 
       // 1. Correlation Matrix Heatmap
-      renderEdaCorrelationHeatmap(numCols);
+      renderEdaCorrelationHeatmap(numCols, activeSample);
 
       // 2. Top Correlated Pairs Ranking
-      renderEdaTopPairsRanking(numCols);
+      renderEdaTopPairsRanking(numCols, activeSample);
 
       // 3. Pair Plots Matrix Preview
-      drawEdaPairPlotsMatrix('edaPairCanvas', numCols.slice(0, 4));
+      drawEdaPairPlotsMatrix('edaPairCanvas', numCols.slice(0, 4), activeSample);
 
       // 4. k-Means Clustering
-      renderEdaKMeansClustering(numCols);
+      renderEdaKMeansClustering(numCols, activeSample);
 
       // 5. PCA Dimensionality Reduction
-      renderEdaPcaDecomposition(numCols);
+      renderEdaPcaDecomposition(numCols, activeSample);
     }
 
-    function renderEdaCorrelationHeatmap(numCols) {
+    function renderEdaCorrelationHeatmap(numCols, datasetToUse) {
       const container = document.getElementById('edaCorrContainer');
       if (!container) return;
 
@@ -12446,18 +12623,19 @@ result = df.describe()
         return;
       }
 
+      const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const activeCols = numCols.slice(0, 8); // Top 8 features
       let html = `<table><thead><tr><th>Feature</th>` + activeCols.map(c => `<th>${c}</th>`).join('') + `</tr></thead><tbody>`;
 
       activeCols.forEach(rCol => {
         html += `<tr><td><strong>${rCol}</strong></td>`;
-        const arrR = currentDataset.map(r => parseFloat(r[rCol])).filter(v => !isNaN(v));
+        const arrR = dataToUse.map(r => parseFloat(r[rCol])).filter(v => !isNaN(v));
 
         activeCols.forEach(cCol => {
           if (rCol === cCol) {
             html += `<td style="background:rgba(99, 102, 241, 0.35); font-weight:700; color:#ffffff; text-align:center;">1.00</td>`;
           } else {
-            const arrC = currentDataset.map(r => parseFloat(r[cCol])).filter(v => !isNaN(v));
+            const arrC = dataToUse.map(r => parseFloat(r[cCol])).filter(v => !isNaN(v));
             const rVal = edaCalcPearson(arrR, arrC);
             const rFixed = rVal.toFixed(2);
             
@@ -12490,17 +12668,18 @@ result = df.describe()
       container.innerHTML = html;
     }
 
-    function renderEdaTopPairsRanking(numCols) {
+    function renderEdaTopPairsRanking(numCols, datasetToUse) {
       const container = document.getElementById('edaTopPairsContainer');
       if (!container) return;
 
+      const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const pairs = [];
       for (let i = 0; i < numCols.length; i++) {
         for (let j = i + 1; j < numCols.length; j++) {
           const colX = numCols[i];
           const colY = numCols[j];
-          const arrX = currentDataset.map(r => parseFloat(r[colX])).filter(v => !isNaN(v));
-          const arrY = currentDataset.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
+          const arrX = dataToUse.map(r => parseFloat(r[colX])).filter(v => !isNaN(v));
+          const arrY = dataToUse.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
           const r = edaCalcPearson(arrX, arrY);
           pairs.push({ colX, colY, r, absR: Math.abs(r) });
         }
@@ -12546,13 +12725,14 @@ result = df.describe()
       container.innerHTML = html;
     }
 
-    function drawEdaPairPlotsMatrix(canvasId, targetCols) {
+    function drawEdaPairPlotsMatrix(canvasId, targetCols, datasetToUse) {
       const canvas = document.getElementById(canvasId);
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       if (targetCols.length < 2) return;
+      const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const k = targetCols.length;
       const pad = 8;
       const cellW = (canvas.width - (k + 1) * pad) / k;
@@ -12570,7 +12750,7 @@ result = df.describe()
           if (r === c) {
             // Diagonal: Univariate Histogram
             const col = targetCols[r];
-            const vals = currentDataset.map(row => parseFloat(row[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
+            const vals = dataToUse.map(row => parseFloat(row[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
             if (vals.length) {
               const bins = new Array(6).fill(0);
               const min = vals[0], max = vals[vals.length - 1];
@@ -12594,8 +12774,8 @@ result = df.describe()
             // Off-Diagonal: Bivariate Scatter
             const colX = targetCols[c];
             const colY = targetCols[r];
-            const pairs = currentDataset.map(row => [parseFloat(row[colX]), parseFloat(row[colY])])
-                                        .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+            const pairs = dataToUse.map(row => [parseFloat(row[colX]), parseFloat(row[colY])])
+                                    .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
             if (pairs.length) {
               const xs = pairs.map(p => p[0]);
               const ys = pairs.map(p => p[1]);
@@ -12616,17 +12796,18 @@ result = df.describe()
       }
     }
 
-    function renderEdaKMeansClustering(numCols) {
+    function renderEdaKMeansClustering(numCols, datasetToUse) {
       const canvas = document.getElementById('edaClusterCanvas');
       if (!canvas || numCols.length < 2) return;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const k = parseInt(document.getElementById('edaKMeansK')?.value || '3', 10);
       const colX = numCols[0];
       const colY = numCols[1];
-      const data2D = currentDataset.map(r => [parseFloat(r[colX]), parseFloat(r[colY])])
-                                  .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
+      const data2D = dataToUse.map(r => [parseFloat(r[colX]), parseFloat(r[colY])])
+                              .filter(p => !isNaN(p[0]) && !isNaN(p[1]));
 
       if (data2D.length < k) return;
 
@@ -12686,15 +12867,16 @@ result = df.describe()
       if (profContainer) profContainer.innerHTML = profHtml;
     }
 
-    function renderEdaPcaDecomposition(numCols) {
+    function renderEdaPcaDecomposition(numCols, datasetToUse) {
       const canvas = document.getElementById('edaPcaCanvas');
       if (!canvas || numCols.length < 2) return;
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const targetCols = numCols.slice(0, 6);
-      const multiData = currentDataset.map(r => targetCols.map(c => parseFloat(r[c])))
-                                      .filter(row => row.every(v => !isNaN(v)));
+      const multiData = dataToUse.map(r => targetCols.map(c => parseFloat(r[c])))
+                                 .filter(row => row.every(v => !isNaN(v)));
 
       if (!multiData.length) return;
 
@@ -12752,6 +12934,9 @@ result = df.describe()
         return;
       }
 
+      const stats = getDatasetColumnStats();
+      const sample = (currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset;
+
       let html = `
         <table>
           <thead>
@@ -12773,14 +12958,11 @@ result = df.describe()
 
       columns.forEach(col => {
         const isNum = isColNumeric(col);
-        let miss = 0;
-        currentDataset.forEach(r => {
-          if (r[col] === null || r[col] === undefined || String(r[col]).trim() === '') miss++;
-        });
-        const missPct = ((miss / currentDataset.length) * 100).toFixed(1) + "%";
+        const colMeta = stats.colStats[col];
+        const missPct = colMeta ? colMeta.nullPct + "%" : "0.0%";
 
         if (isNum) {
-          const vals = currentDataset.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
+          const vals = sample.map(r => parseFloat(r[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
           if (vals.length) {
             const mean = edaCalcMean(vals);
             const median = edaCalcMedian(vals);
@@ -12805,7 +12987,7 @@ result = df.describe()
         } else {
           // Categorical
           const counts = {};
-          currentDataset.forEach(r => {
+          sample.forEach(r => {
             const k = String(r[col] || "Null");
             counts[k] = (counts[k] || 0) + 1;
           });
@@ -12817,7 +12999,7 @@ result = df.describe()
               <td><span class="badge badge-success">Categorical</span></td>
               <td>${missPct}</td>
               <td colspan="5" style="color:var(--text-muted); font-size:0.78rem;">
-                Distinct: <strong>${distinct}</strong> | Mode: <strong>${topKey ? topKey[0] : 'N/A'}</strong> (${topKey ? topKey[1] : 0} rows)
+                Distinct: <strong>${distinct}</strong> | Mode: <strong>${topKey ? topKey[0] : 'N/A'}</strong> (${topKey ? topKey[1] : 0} sampled)
               </td>
               <td style="color:var(--text-muted);">--</td>
               <td style="color:var(--text-muted);">--</td>
@@ -12993,19 +13175,12 @@ result = df.describe()
       const numCols = columns.filter(c => isColNumeric(c));
       const catCols = columns.filter(c => !isColNumeric(c));
 
-      // 1. Missingness & Health Score
+      // 1. Missingness & Health Score from precomputed cache
+      const stats = getDatasetColumnStats();
       let totalCells = rows * cols;
-      let missingCells = 0;
-      const colMissing = {};
-      currentDataset.forEach(r => {
-        columns.forEach(c => {
-          if (isMissing(r[c])) {
-            missingCells++;
-            colMissing[c] = (colMissing[c] || 0) + 1;
-          }
-        });
-      });
-      const health = Math.max(10, Math.min(100, Math.round(100 - (missingCells / (totalCells || 1)) * 120)));
+      let missingCells = stats.totalNullCount;
+      const health = stats.healthScore;
+
       const healthEl = document.getElementById("insMetricHealth");
       if (healthEl) healthEl.textContent = `${health} / 100`;
       const healthSubEl = document.getElementById("insMetricHealthSub");
@@ -13020,11 +13195,15 @@ result = df.describe()
         badgeHealth.className = health >= 80 ? "badge badge-success" : (health >= 60 ? "badge badge-warning" : "badge badge-danger");
       }
 
-      // 2. Continuous Outlier Detection (IQR method)
+      // Representative sample for IQR outliers, correlations, and metrics (< 20ms)
+      const sample = (currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset;
+      const sampleScale = currentDataset.length / sample.length;
+
+      // 2. Continuous Outlier Detection (IQR method on sample)
       let totalOutliers = 0;
       const colOutliers = {};
       numCols.forEach(c => {
-        const vals = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a, b) => a - b);
+        const vals = sample.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a, b) => a - b);
         if (vals.length >= 4) {
           const q1 = vals[Math.floor(vals.length * 0.25)];
           const q3 = vals[Math.floor(vals.length * 0.75)];
@@ -13033,8 +13212,9 @@ result = df.describe()
           const upper = q3 + 1.5 * iqr;
           const outliers = vals.filter(v => v < lower || v > upper);
           if (outliers.length > 0) {
-            totalOutliers += outliers.length;
-            colOutliers[c] = { count: outliers.length, pct: ((outliers.length / vals.length) * 100).toFixed(1), lower: lower.toFixed(2), upper: upper.toFixed(2) };
+            const estCount = Math.round(outliers.length * sampleScale);
+            totalOutliers += estCount;
+            colOutliers[c] = { count: estCount, pct: ((outliers.length / vals.length) * 100).toFixed(1), lower: lower.toFixed(2), upper: upper.toFixed(2) };
           }
         }
       });
@@ -13044,7 +13224,7 @@ result = df.describe()
       const riskSubEl = document.getElementById("insMetricRiskSub");
       if (riskSubEl) riskSubEl.textContent = `${missingCells} missing • ${totalOutliers} outliers`;
 
-      // 3. Primary Business Driver (Pearson Correlations)
+      // 3. Primary Business Driver (Pearson Correlations on sample)
       let topDriverText = "No correlation pair";
       let topDriverSub = "Need 2+ numeric columns";
       let maxCorr = 0;
@@ -13057,7 +13237,7 @@ result = df.describe()
             const c1 = numCols[i];
             const c2 = numCols[j];
             let n = 0, sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0, sumY2 = 0;
-            currentDataset.forEach(r => {
+            sample.forEach(r => {
               const x = parseFloat(r[c1]);
               const y = parseFloat(r[c2]);
               if (!isNaN(x) && !isNaN(y)) {
@@ -13099,7 +13279,7 @@ result = df.describe()
           DataMind AI intelligence completed an end-to-end statistical audit on <b>${rows.toLocaleString()}</b> records across <b>${cols}</b> features.
           The dataset holds <b>${numCols.length}</b> quantitative dimensions and <b>${catCols.length}</b> categorical entities with an aggregate health index of <b>${health}/100</b>.
           ${corrPairs.length ? `Primary cross-attribute dependency identified between <code>${corrPairs[0].col1}</code> and <code>${corrPairs[0].col2}</code> (<i>r = ${corrPairs[0].r.toFixed(2)}</i>).` : ''}
-          ${missingCells > 0 ? `Detected <b>${missingCells}</b> missing cells requiring imputation.` : 'Zero missing values detected across the active schema.'}
+          ${missingCells > 0 ? `Detected <b>${missingCells.toLocaleString()}</b> missing cells requiring imputation.` : 'Zero missing values detected across the active schema.'}
         `;
       }
       const archList = document.getElementById("insArchitectureList");
@@ -13107,8 +13287,8 @@ result = df.describe()
         archList.innerHTML = `
           <li><b>Volume Density:</b> ${rows.toLocaleString()} rows × ${cols} columns (${totalCells.toLocaleString()} total cells)</li>
           <li><b>Feature Space:</b> ${numCols.length} Numeric, ${catCols.length} Categorical</li>
-          <li><b>Data Cleanliness:</b> ${(((totalCells - missingCells) / (totalCells || 1)) * 100).toFixed(1)}% complete (${missingCells} nulls)</li>
-          <li><b>Outlier Dispersion:</b> ${totalOutliers} extreme signals identified across numeric features</li>
+          <li><b>Data Cleanliness:</b> ${(((totalCells - missingCells) / (totalCells || 1)) * 100).toFixed(1)}% complete (${missingCells.toLocaleString()} nulls)</li>
+          <li><b>Outlier Dispersion:</b> ${totalOutliers.toLocaleString()} extreme signals identified across numeric features</li>
           <li><b>Primary Target Candidate:</b> <code>${catCols.find(c => c.toLowerCase().includes('churn') || c.toLowerCase().includes('target')) || numCols[numCols.length - 1] || 'None'}</code></li>
         `;
       }
@@ -13121,7 +13301,7 @@ result = df.describe()
         } else {
           let tHtml = '<table class="data-table"><thead><tr><th>Feature</th><th>Mean</th><th>Median</th><th>Min</th><th>Max</th></tr></thead><tbody>';
           numCols.slice(0, 8).forEach(c => {
-            const vals = currentDataset.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a, b) => a - b);
+            const vals = sample.map(r => parseFloat(r[c])).filter(v => !isNaN(v)).sort((a, b) => a - b);
             if (!vals.length) return;
             const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
             const med = vals[Math.floor(vals.length / 2)];
