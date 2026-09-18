@@ -8,6 +8,14 @@
   <!-- Multi-Format Parsing & PDF Generation Engines -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Full SQL Engine & Code Editor Libraries -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.3.2/alasql.min.js"></script>
   <style>
     :root {
       /* Luxury Rolls-Royce Inspired Core Palette */
@@ -587,6 +595,124 @@
       z-index: 2;
       border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 16px rgba(212, 175, 55, 0.08) !important;
+    }
+
+    /* =========================================================================
+       LUXURY SQL STUDIO & CODEMIRROR IDE STYLES
+       ========================================================================= */
+    .CodeMirror {
+      font-family: "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace !important;
+      font-size: 0.88rem !important;
+      line-height: 1.55 !important;
+      height: 240px !important;
+      background: #090c14 !important;
+      color: #f1f5f9 !important;
+      border: 1px solid rgba(212, 175, 55, 0.22) !important;
+      border-radius: 0 0 8px 8px !important;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6) !important;
+    }
+    .CodeMirror-focused {
+      border-color: rgba(212, 175, 55, 0.55) !important;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 55, 0.2) !important;
+    }
+    .CodeMirror-gutters {
+      background: #070910 !important;
+      border-right: 1px solid rgba(212, 175, 55, 0.15) !important;
+    }
+    .CodeMirror-linenumber {
+      color: #64748b !important;
+      padding: 0 8px !important;
+    }
+    .CodeMirror-cursor {
+      border-left: 2px solid #d4af37 !important;
+    }
+    .CodeMirror-selected {
+      background: rgba(212, 175, 55, 0.22) !important;
+    }
+    .cm-keyword { color: #d4af37 !important; font-weight: 700 !important; }
+    .cm-builtin { color: #38bdf8 !important; font-weight: 600 !important; }
+    .cm-string { color: #10b981 !important; }
+    .cm-number { color: #f59e0b !important; }
+    .cm-comment { color: #64748b !important; font-style: italic !important; }
+    .cm-operator { color: #ec4899 !important; }
+    .cm-variable-2 { color: #a78bfa !important; }
+    
+    .CodeMirror-hints {
+      position: absolute;
+      z-index: 100000;
+      overflow: hidden;
+      list-style: none;
+      margin: 0;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(212, 175, 55, 0.4);
+      background: #0b0f19;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8), 0 0 16px rgba(212, 175, 55, 0.15);
+      font-family: monospace;
+      font-size: 0.82rem;
+      max-height: 20em;
+      overflow-y: auto;
+    }
+    .CodeMirror-hint {
+      margin: 0;
+      padding: 5px 10px;
+      border-radius: 4px;
+      white-space: pre;
+      color: #e2e8f0;
+      cursor: pointer;
+    }
+    li.CodeMirror-hint-active {
+      background: linear-gradient(90deg, rgba(212, 175, 55, 0.3) 0%, rgba(212, 175, 55, 0.1) 100%);
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .sql-tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px 6px;
+      background: rgba(10, 14, 23, 0.85);
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 8px 8px 0 0;
+      border-bottom: none;
+    }
+    .sql-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 6px 6px 0 0;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .sql-tab:hover {
+      background: rgba(212, 175, 55, 0.08);
+      color: #f8fafc;
+    }
+    .sql-tab.active {
+      background: #090c14;
+      color: var(--champagne-gold);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-bottom-color: #090c14;
+    }
+    .sql-tab .tab-close {
+      opacity: 0.5;
+      font-size: 0.85rem;
+      border-radius: 50%;
+      padding: 0 3px;
+    }
+    .sql-tab .tab-close:hover {
+      opacity: 1;
+      background: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
     }
 
     /* Module Views */
@@ -2829,114 +2955,208 @@
         </div>
       </div>
 
-<!-- MODULE 5: SQL & QUERIES STUDIO -->
+<!-- MODULE 15: SQL & DATABASE STUDIO -->
       <div id="moduleSql" class="module-view">
         
         <!-- Hero Welcome Box -->
-        <div class="banner-box" style="border-left-color:#818cf8;margin-bottom:16px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div class="banner-box" style="border-left-color:var(--champagne-gold); margin-bottom:16px; padding:14px 18px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
-              <h4 style="color:#818cf8;margin-bottom:4px;">🗄️ SQL Analytics Studio & In-Browser Query Engine</h4>
-              <p style="font-size:0.85rem;color:var(--text-muted);margin:0;">
-                Query your active dataset using ANSI SQL: SELECT, WHERE filters, GROUP BY aggregations, ORDER BY, LIMIT, and arithmetic operations.
+              <h4 style="color:var(--champagne-gold); margin-bottom:4px; font-size:1.1rem; font-weight:700; display:flex; align-items:center; gap:8px;">
+                <span>🗄️</span>
+                <span>Enterprise SQL Studio &amp; Database IDE</span>
+              </h4>
+              <p style="font-size:0.84rem; color:var(--text-muted); margin:0;">
+                Full ANSI SQL query environment with syntax highlighting, schema auto-completion, multi-tab workspace, query history, saved queries, and AI query intelligence.
               </p>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-outline" style="width:auto;padding:6px 14px;font-size:0.8rem;" onclick="loadSqlTemplate('basic')">📋 Sample Query</button>
-              <button class="btn btn-primary" style="width:auto;padding:6px 16px;font-size:0.8rem;" onclick="runBrowserSQL()">🚀 Run Query</button>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <span class="badge badge-info" id="sqlActiveTableBadge">Table: dataset</span>
+              <span class="badge badge-success" id="sqlEngineBadge">⚡ AlaSQL ANSI Core</span>
+              <button class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.78rem;" onclick="showSqlSavedQueriesModal()">⭐ Saved Queries</button>
+              <button class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.78rem;" onclick="showSqlHistoryModal()">📜 History</button>
             </div>
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:3fr 1fr;gap:18px;margin-bottom:16px;">
-          <!-- Left: Query Editor & Controls -->
-          <div class="panel">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
-              <div class="panel-header" style="margin-bottom:0;">💻 SQL Query Editor</div>
-              <div style="display:flex;gap:8px;align-items:center;">
-                <label style="font-size:0.78rem;color:var(--text-muted);">Template:</label>
-                <select id="sqlTemplateSelect" style="width:auto;padding:4px 10px;font-size:0.78rem;" onchange="applySqlTemplate(this.value)">
-                  <option value="basic">1. Top 10 Records (SELECT * ... LIMIT 10)</option>
-                  <option value="groupby">2. Group By Aggregation (AVG, COUNT)</option>
-                  <option value="filter">3. Filter Where Numeric > Threshold</option>
-                  <option value="ranking">4. Order By Descending Metric</option>
-                  <option value="complex">5. Multi-column Group & Sums</option>
+        <!-- AI SQL Assistance Bar & Drawers -->
+        <div class="panel" style="margin-bottom:16px; padding:14px; background:rgba(15,20,32,0.85); border:1px solid rgba(212,175,55,0.25);">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.1rem;">🤖</span>
+              <span style="font-weight:700; font-size:0.88rem; color:var(--champagne-gold);">AI SQL Assistant &amp; Query Intelligence</span>
+              <span class="badge badge-info" style="font-size:0.68rem;">NL to SQL &bull; Explain &bull; Optimize</span>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.75rem;" onclick="explainBrowserSQL()" title="Explain current SQL query in simple plain language">🔍 Explain Query</button>
+              <button class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.75rem;" onclick="optimizeBrowserSQL()" title="Analyze query bottlenecks and suggest optimized SQL">⚡ Optimize Query</button>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
+            <input type="text" id="aiSqlPrompt" placeholder="Ask AI: e.g. 'Write SQL to calculate monthly revenue' or 'Find top 10 customers by lifetime revenue'..." style="font-size:0.84rem; margin:0; flex:1;" onkeydown="if(event.key==='Enter') generateBrowserAISQL();" />
+            <button class="btn btn-primary" style="width:auto; padding:7px 18px; white-space:nowrap; font-size:0.82rem; font-weight:700;" onclick="generateBrowserAISQL()">✨ Generate SQL</button>
+          </div>
+
+          <!-- Quick AI Prompt Chips -->
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-size:0.72rem; color:var(--text-muted); font-weight:600;">Prompt Presets:</span>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('revenue')">📈 Monthly Revenue</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('top10')">🏆 Top 10 by Lifetime Revenue</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('churn_group')">📊 Group By &amp; Churn Rate</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('case_tiers')">🎯 Spend Tiers (CASE)</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('join_plans')">🔗 Relational JOIN (Plans)</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('window_rank')">🪟 Window ROW_NUMBER()</button>
+            <button type="button" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.72rem;" onclick="applyAiPromptPreset('cte_pipeline')">🔄 CTE Pipeline</button>
+          </div>
+
+          <!-- AI Explanation Drawer -->
+          <div id="sqlExplanationBox" style="display:none; margin-top:12px; padding:12px 16px; background:rgba(14,20,32,0.95); border:1px solid rgba(212,175,55,0.3); border-left:4px solid var(--champagne-gold); border-radius:6px; font-size:0.84rem; color:#e2e8f0; line-height:1.6;"></div>
+
+          <!-- AI Optimization Drawer -->
+          <div id="sqlOptimizationBox" style="display:none; margin-top:12px; padding:12px 16px; background:rgba(16,24,36,0.95); border:1px solid rgba(16,185,129,0.35); border-left:4px solid #10b981; border-radius:6px; font-size:0.84rem; color:#e2e8f0; line-height:1.6;"></div>
+        </div>
+
+        <!-- Main IDE Workspace (Editor + Sidebar) -->
+        <div style="display:grid; grid-template-columns:2.6fr 1fr; gap:16px; margin-bottom:16px; align-items:start;">
+          
+          <!-- Left: Multi-Tab SQL Editor Panel -->
+          <div class="panel" style="margin-bottom:0; padding:16px; display:flex; flex-direction:column;">
+            
+            <!-- Tab Bar & Toolbar Header -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0; flex-wrap:wrap; gap:8px;">
+              
+              <!-- Multi-Query Tabs -->
+              <div class="sql-tabs-bar" id="sqlTabsBar" style="flex:1; min-width:240px;">
+                <!-- Dynamically populated tabs -->
+                <div class="sql-tab active" onclick="switchSqlTab(1)">
+                  <span>Tab 1: Revenue</span>
+                  <span class="tab-close" onclick="closeSqlTab(event, 1)">&times;</span>
+                </div>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:4px 8px; font-size:0.72rem; border-radius:4px; margin-left:4px;" onclick="addNewSqlTab()" title="Open new query tab">➕</button>
+              </div>
+
+              <!-- Curated Templates Dropdown -->
+              <div style="display:flex; gap:6px; align-items:center;">
+                <label style="font-size:0.75rem; color:var(--text-muted); font-weight:600;">Template:</label>
+                <select id="sqlTemplateSelect" style="width:auto; padding:4px 8px; font-size:0.76rem; margin:0;" onchange="applySqlTemplate(this.value)">
+                  <option value="basic">1. Simple Projections (SELECT * LIMIT 10)</option>
+                  <option value="revenue">2. Monthly Revenue (DATE + SUM)</option>
+                  <option value="top10">3. Top 10 by Lifetime Revenue (ORDER BY)</option>
+                  <option value="case_tiers">4. Spend Tier Segmentation (CASE WHEN)</option>
+                  <option value="having_filter">5. Having Group Filter (HAVING COUNT)</option>
+                  <option value="join_plans">6. Relational Table Join (INNER JOIN)</option>
+                  <option value="union_cohorts">7. Dataset Cohorts Merge (UNION ALL)</option>
+                  <option value="cte_pipeline">8. Multi-Step Analysis (CTE WITH)</option>
+                  <option value="window_rank">9. Partition Ranking (ROW_NUMBER)</option>
+                  <option value="string_dates">10. String &amp; Date Operations (CONCAT)</option>
                 </select>
               </div>
             </div>
 
-            <!-- AI Natural Language to SQL Assistant Drawer -->
-            <div style="background:rgba(15,23,42,0.7);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:12px;margin-bottom:12px;">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-                <span style="font-size:1rem;">🤖</span>
-                <span style="font-weight:600;font-size:0.82rem;color:#818cf8;">AI Natural Language to SQL Assistant:</span>
+            <!-- SQL Editor Container (CodeMirror mounts here) -->
+            <div id="sqlEditorWrapper" style="position:relative; margin-top:0;">
+              <textarea id="sqlInput" style="font-family:'JetBrains Mono',Consolas,monospace; font-size:0.88rem; background:#090d16; color:#38bdf8; border:1px solid rgba(212,175,55,0.25); border-radius:0 0 8px 8px; padding:12px; width:100%; height:240px; resize:vertical; box-sizing:border-box;" placeholder="SELECT * FROM dataset LIMIT 10;">SELECT * FROM dataset LIMIT 10;</textarea>
+            </div>
+
+            <!-- Editor Action Bar & Keyboard Shortcut Tips -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px;">
+              <div style="display:flex; gap:8px; align-items:center;">
+                <button class="btn btn-primary" style="width:auto; padding:8px 22px; font-weight:700;" onclick="runBrowserSQL()" title="Execute SQL (Ctrl+Enter)">
+                  <span>🚀 Run Query</span>
+                  <span style="font-size:0.7rem; opacity:0.8; margin-left:4px;">(Ctrl+Enter)</span>
+                </button>
+                <button class="btn btn-outline" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="formatSqlQuery()" title="Format and beautify SQL keywords">✨ Format</button>
+                <button class="btn btn-outline" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="saveCurrentQuery()" title="Save query to browser storage">⭐ Save</button>
+                <button class="btn btn-outline" style="width:auto; padding:8px 12px; font-size:0.8rem;" onclick="clearSqlEditor()" title="Clear editor">🧹 Clear</button>
               </div>
-              <div style="display:flex;gap:8px;">
-                <input type="text" id="aiSqlPrompt" placeholder="e.g. 'Show top 5 records by MonthlyCharges' or 'Average tenure by Contract'" style="font-size:0.82rem;margin:0;" />
-                <button class="btn btn-outline" style="width:auto;padding:6px 14px;white-space:nowrap;font-size:0.8rem;" onclick="generateBrowserAISQL()">✨ Generate SQL</button>
+
+              <!-- Status & Cursor Info -->
+              <div id="sqlExecutionStatus" style="font-size:0.80rem; color:var(--text-muted); display:flex; align-items:center; gap:10px;">
+                <span id="sqlCursorPos">Line 1, Col 1</span>
+                <span>&bull;</span>
+                <span>Ready</span>
               </div>
             </div>
 
-            <!-- Monospace SQL Textarea -->
-            <textarea id="sqlInput" style="font-family:'Courier New',Courier,monospace;font-size:0.88rem;background:#090d16;color:#38bdf8;border:1px solid #334155;border-radius:8px;padding:12px;width:100%;height:130px;resize:vertical;" placeholder="SELECT * FROM dataset LIMIT 10;">SELECT * FROM dataset LIMIT 10;</textarea>
-
-            <!-- Buttons bar -->
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
-              <div style="display:flex;gap:8px;">
-                <button class="btn btn-primary" style="width:auto;padding:8px 20px;" onclick="runBrowserSQL()">🚀 Run SQL Query</button>
-                <button class="btn btn-outline" style="width:auto;padding:8px 14px;" onclick="explainBrowserSQL()">🔍 Explain Query</button>
-                <button class="btn btn-outline" style="width:auto;padding:8px 14px;" onclick="clearSqlEditor()">🧹 Clear</button>
-              </div>
-              <div id="sqlExecutionStatus" style="font-size:0.82rem;color:var(--text-muted);">
-                Ready to execute. Active table: <code style="color:#818cf8;">dataset</code>
-              </div>
-            </div>
-
-            <div id="sqlExplanationBox" style="display:none;margin-top:12px;padding:10px 14px;background:rgba(99,102,241,0.1);border-left:3px solid #6366f1;border-radius:6px;font-size:0.84rem;color:#cbd5e1;"></div>
           </div>
 
-          <!-- Right: Active Schema Reference -->
-          <div class="panel">
-            <div class="panel-header">📑 Table Schema (<code style="color:#818cf8;">dataset</code>)</div>
-            <p style="font-size:0.76rem;color:var(--text-muted);margin-bottom:8px;">
-              Click any column name to insert into query editor:
-            </p>
-            <div id="sqlSchemaList" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:5px;"></div>
-
-            <div style="margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08);font-size:0.75rem;color:var(--text-muted);">
-              <b>Keywords:</b> SELECT, FROM, WHERE, GROUP BY, ORDER BY, LIMIT, COUNT, AVG, SUM, MIN, MAX
+          <!-- Right: Interactive Database Schema & Snippets Browser -->
+          <div class="panel" style="margin-bottom:0; padding:16px; display:flex; flex-direction:column; max-height:480px;">
+            <div class="panel-header" style="margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid rgba(212,175,55,0.18);">
+              <span style="font-size:0.92rem; font-weight:700; color:var(--champagne-gold);">📑 Database Tables &amp; Schema</span>
             </div>
+
+            <!-- Table Switcher Selector -->
+            <div style="margin-bottom:8px;">
+              <label style="font-size:0.72rem; color:var(--text-muted); font-weight:600; display:block; margin-bottom:3px;">Select Active Table:</label>
+              <select id="sqlTableSelector" style="width:100%; padding:4px 8px; font-size:0.78rem; margin:0;" onchange="switchSqlSchemaTable(this.value)">
+                <option value="dataset">dataset (Active CSV Data)</option>
+                <option value="plans">plans (Subscription Tier Catalog)</option>
+                <option value="regions">regions (Geographic Regions Lookup)</option>
+              </select>
+            </div>
+
+            <!-- Column Search Filter -->
+            <input type="text" id="sqlSchemaSearch" placeholder="Search columns..." style="font-size:0.75rem; padding:4px 8px; margin-bottom:8px;" oninput="filterSqlSchemaList(this.value)" />
+
+            <!-- Clickable Column List -->
+            <div id="sqlSchemaList" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:4px; padding-right:4px; max-height:180px;">
+              <!-- Populated dynamically -->
+            </div>
+
+            <!-- Quick SQL Keywords & Snippets Insert Chips -->
+            <div style="margin-top:10px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:0.72rem; color:var(--text-muted); font-weight:600; margin-bottom:4px;">1-Click Snippet Inserts:</div>
+              <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('SELECT')">SELECT</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('WHERE')">WHERE</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('GROUP_BY')">GROUP BY</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('HAVING')">HAVING</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('ORDER_BY')">ORDER BY</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('JOIN')">JOIN</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('CASE')">CASE WHEN</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('CTE')">WITH (CTE)</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('WINDOW')">ROW_NUMBER()</button>
+                <button type="button" class="btn btn-outline" style="width:auto; padding:2px 6px; font-size:0.68rem;" onclick="insertSqlSnippet('UNION')">UNION</button>
+              </div>
+            </div>
+
           </div>
+
         </div>
 
         <!-- Query Results Section -->
         <div class="panel">
-          <div class="panel-header" style="flex-wrap:wrap;gap:10px;">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <span>📋 Query Results</span>
+          <div class="panel-header" style="flex-wrap:wrap; gap:10px; padding-bottom:8px; border-bottom:1px solid rgba(212,175,55,0.18);">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-weight:700;">📋 SQL Query Results</span>
               <span class="badge badge-success" id="sqlResultCountBadge">0 Rows</span>
-              <span id="sqlQueryTimingBadge" style="font-size:0.78rem;color:var(--text-muted);">0 ms</span>
+              <span class="badge badge-info" id="sqlResultColCountBadge">0 Columns</span>
+              <span id="sqlQueryTimingBadge" style="font-size:0.78rem; color:var(--text-muted); font-family:monospace;">⚡ 0.0 ms</span>
             </div>
-            <div style="display:flex;gap:8px;">
-              <button class="btn btn-outline" style="width:auto;padding:5px 12px;font-size:0.8rem;" onclick="exportSqlResultCSV()">📥 Export Results (CSV)</button>
-              <button class="btn btn-primary" style="width:auto;padding:5px 14px;font-size:0.8rem;" onclick="setQueryResultAsActive()" title="Set this query result as the active dataset for downstream cleaning, EDA, and dashboarding">🔄 Set as Active Dataset</button>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <input type="text" id="sqlResultSearch" placeholder="Filter results..." style="width:140px; padding:3px 8px; font-size:0.76rem; margin:0;" oninput="filterSqlResultsTable(this.value)" />
+              <button class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.8rem;" onclick="exportSqlResultCSV()">📥 Export CSV</button>
+              <button class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.8rem;" onclick="exportSqlResultJSON()">📋 Export JSON</button>
+              <button class="btn btn-primary" style="width:auto; padding:5px 14px; font-size:0.8rem;" onclick="setQueryResultAsActive()" title="Set this query result as the active platform dataset for cleaning, EDA, and dashboarding">🔄 Set as Active Dataset</button>
             </div>
           </div>
 
           <div class="table-container" id="sqlResultsContainer" style="max-height:380px;">
-            <div style="padding:24px;text-align:center;color:var(--text-muted);">
-              Run a query to view results here.
+            <div style="padding:24px; text-align:center; color:var(--text-muted);">
+              Run a query to view results here. Press <kbd style="background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">Ctrl+Enter</kbd> to execute.
             </div>
           </div>
         </div>
 
         <!-- Instant Visualizer for Query Results -->
-        <div class="panel" id="sqlChartPanel" style="display:none;margin-top:16px;">
+        <div class="panel" id="sqlChartPanel" style="display:none; margin-top:16px;">
           <div class="panel-header">
             <span>📈 Query Result Instant Visualization</span>
-            <div style="display:flex;gap:8px;align-items:center;">
-              <label style="font-size:0.78rem;color:var(--text-muted);">Chart Type:</label>
-              <select id="sqlChartTypeSel" style="width:auto;padding:3px 10px;font-size:0.78rem;" onchange="renderSqlQueryChart()">
+            <div style="display:flex; gap:8px; align-items:center;">
+              <label style="font-size:0.78rem; color:var(--text-muted);">Chart Type:</label>
+              <select id="sqlChartTypeSel" style="width:auto; padding:3px 10px; font-size:0.78rem;" onchange="renderSqlQueryChart()">
                 <option value="bar">Bar Chart</option>
                 <option value="line">Line Chart</option>
                 <option value="pie">Pie Chart</option>
@@ -2947,6 +3167,43 @@
             <canvas id="sqlResultCanvas"></canvas>
           </div>
         </div>
+
+      </div>
+
+      <!-- SQL Saved Queries Modal -->
+      <div id="sqlSavedQueriesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div style="background:#0b0f19; border:1px solid rgba(212,175,55,0.35); border-radius:12px; width:90%; max-width:680px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 16px 48px rgba(0,0,0,0.8); overflow:hidden;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid rgba(212,175,55,0.2); background:rgba(212,175,55,0.06);">
+            <span style="font-weight:700; color:var(--champagne-gold); font-size:1.05rem;">⭐ Saved SQL Queries</span>
+            <button class="btn btn-outline" style="width:auto; padding:3px 8px; font-size:0.8rem;" onclick="closeSqlSavedQueriesModal()">&times;</button>
+          </div>
+          <div id="sqlSavedQueriesList" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;">
+            <!-- Dynamically rendered -->
+          </div>
+          <div style="display:flex; justify-content:flex-end; padding:12px 20px; border-top:1px solid rgba(255,255,255,0.08);">
+            <button class="btn btn-outline" style="width:auto; padding:6px 16px;" onclick="closeSqlSavedQueriesModal()">Close</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SQL Query History Modal -->
+      <div id="sqlHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(5px);">
+        <div style="background:#0b0f19; border:1px solid rgba(212,175,55,0.35); border-radius:12px; width:90%; max-width:720px; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 16px 48px rgba(0,0,0,0.8); overflow:hidden;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; border-bottom:1px solid rgba(212,175,55,0.2); background:rgba(212,175,55,0.06);">
+            <span style="font-weight:700; color:var(--champagne-gold); font-size:1.05rem;">📜 SQL Execution History</span>
+            <div style="display:flex; gap:8px;">
+              <button class="btn btn-outline" style="width:auto; padding:3px 10px; font-size:0.75rem;" onclick="clearSqlHistory()">Clear History</button>
+              <button class="btn btn-outline" style="width:auto; padding:3px 8px; font-size:0.8rem;" onclick="closeSqlHistoryModal()">&times;</button>
+            </div>
+          </div>
+          <div id="sqlHistoryList" style="flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px;">
+            <!-- Dynamically rendered -->
+          </div>
+          <div style="display:flex; justify-content:flex-end; padding:12px 20px; border-top:1px solid rgba(255,255,255,0.08);">
+            <button class="btn btn-outline" style="width:auto; padding:6px 16px;" onclick="closeSqlHistoryModal()">Close</button>
+          </div>
+        </div>
+      </div>
 
       </div>
 
@@ -8816,6 +9073,7 @@ result = df.describe()
       try { initConnectorsModuleUI(); } catch (e) { console.warn("Connectors init:", e); }
       try { initMLModuleUI(); } catch (e) { console.warn("ML init:", e); }
       try { initSecurityModuleUI(); } catch (e) { console.warn("Security init:", e); }
+      try { initSqlModule(); } catch (e) { console.warn("SQL studio init:", e); }
     }
 
     // Switch active module from left sidebar
@@ -8868,7 +9126,13 @@ result = df.describe()
       }
       else if (moduleId === 'moduleSql') {
         document.getElementById('navBtnSql').classList.add('active');
-        setTimeout(() => { refreshSqlSchemaUI(); refreshPyColChips(); }, 50);
+        setTimeout(() => {
+          if (typeof initSqlModule === 'function') initSqlModule();
+          else if (typeof refreshSqlSchemaUI === 'function') refreshSqlSchemaUI();
+          if (typeof refreshPyColChips === 'function') refreshPyColChips();
+          const ca = document.querySelector(".content-area");
+          if (ca) ca.scrollTop = 0;
+        }, 30);
       }
       else if (moduleId === 'modulePython') {
         document.getElementById('navBtnPython').classList.add('active');
@@ -9657,7 +9921,10 @@ result = df.describe()
         } else if (activeModuleId === 'moduleStats') {
           try { renderStatsModule(); } catch (e) {}
         } else if (activeModuleId === 'moduleSql') {
-          try { refreshSqlSchemaUI(); } catch (e) {}
+          try {
+            refreshSqlSchemaUI();
+            if (typeof prepareAlaSqlDatabase === 'function') prepareAlaSqlDatabase();
+          } catch (e) {}
         } else if (activeModuleId === 'modulePython') {
           try { refreshPyColChips(); } catch (e) {}
         } else if (activeModuleId === 'moduleInsertCol') {
@@ -9668,7 +9935,10 @@ result = df.describe()
 
         // Lightweight background updates deferred
         setTimeout(() => {
-          try { refreshSqlSchemaUI(); } catch (e) {}
+          try {
+            refreshSqlSchemaUI();
+            if (typeof prepareAlaSqlDatabase === 'function') prepareAlaSqlDatabase();
+          } catch (e) {}
           try { refreshPyColChips(); } catch (e) {}
           try { renderInsertColChips(); } catch (e) {}
           try { renderCleaningLog(); } catch (e) {}
@@ -9679,30 +9949,15 @@ result = df.describe()
       }
     }
 
-    function refreshSqlSchemaUI() {
-      const list = document.getElementById("sqlSchemaList");
-      if (!list) return;
-      if (!columns || !columns.length) {
-        list.innerHTML = '<div style="padding:10px;font-size:0.75rem;color:var(--text-muted);">No columns loaded</div>';
-        return;
-      }
-      list.innerHTML = columns.map(c => {
-        const isNum = isColNumeric(c);
-        const typeBadge = isNum ? '<span class="badge badge-info" style="font-size:0.65rem;">NUM</span>' : '<span class="badge badge-warning" style="font-size:0.65rem;">TEXT</span>';
-        return `
-          <div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.03);padding:4px 8px;border-radius:4px;cursor:pointer;" onclick="insertColumnIntoSql('${c}')" title="Click to insert into SQL query">
-            <span style="font-family:monospace;font-size:0.8rem;color:#f8fafc;">${c}</span>
-            ${typeBadge}
-          </div>
-        `;
-      }).join("");
-    }
-
     function insertColumnIntoSql(col) {
-      const textarea = document.getElementById("sqlInput");
-      if (!textarea) return;
-      textarea.value = textarea.value.trim() + ` ${col}`;
-      textarea.focus();
+      if (typeof insertSqlToken === 'function') {
+        insertSqlToken(col);
+      } else {
+        const textarea = document.getElementById("sqlInput");
+        if (!textarea) return;
+        textarea.value = textarea.value.trim() + ` ${col}`;
+        textarea.focus();
+      }
     }
 
     function refreshKPIs() {
@@ -15604,290 +15859,930 @@ result = df.describe()
     }
 
     // -----------------------------------------------------------------
-    // SQL & QUERIES IN-BROWSER ENGINE
+    // MODULE 15: ENTERPRISE SQL STUDIO & DATABASE IDE
     // -----------------------------------------------------------------
+    let codeMirrorSqlInstance = null;
+    let sqlTabsState = [
+      { id: 1, title: "Query 1", sql: "SELECT * FROM dataset LIMIT 10;", lastResult: [], lastColumns: [], executionTime: 0 }
+    ];
+    let activeSqlTabId = 1;
+    let nextSqlTabId = 2;
     let lastQueryResult = [];
     let lastQueryColumns = [];
+    let sqlExecutionElapsed = 0;
+    let activeSqlSchemaTable = "dataset";
+    let sqlHistory = [];
+    let sqlSavedQueries = [];
+
+    try {
+      sqlHistory = JSON.parse(localStorage.getItem("datamind_sql_history") || "[]");
+    } catch (e) { sqlHistory = []; }
+
+    try {
+      sqlSavedQueries = JSON.parse(localStorage.getItem("datamind_sql_saved") || "[]");
+    } catch (e) { sqlSavedQueries = []; }
+
+    // Auxiliary Relational Tables for multi-table JOINs
+    const sqlAuxiliaryTables = {
+      plans: [
+        { PlanID: "P-101", PlanName: "Month-to-month", BaseFee: 65.0, Tier: "Standard", MaxSpeed: "100Mbps", SupportLevel: "Bronze" },
+        { PlanID: "P-102", PlanName: "One year", BaseFee: 55.0, Tier: "Silver", MaxSpeed: "300Mbps", SupportLevel: "Silver" },
+        { PlanID: "P-103", PlanName: "Two year", BaseFee: 45.0, Tier: "Gold", MaxSpeed: "1Gbps", SupportLevel: "Gold VIP" },
+        { PlanID: "P-104", PlanName: "Enterprise", BaseFee: 120.0, Tier: "Platinum", MaxSpeed: "10Gbps", SupportLevel: "24/7 Dedicated" }
+      ],
+      regions: [
+        { RegionID: "R-NA1", RegionName: "North America - East", Market: "Enterprise", TaxRate: 0.08, Currency: "USD" },
+        { RegionID: "R-NA2", RegionName: "North America - West", Market: "Tech/Startup", TaxRate: 0.09, Currency: "USD" },
+        { RegionID: "R-EU1", RegionName: "Europe - West", Market: "Financial", TaxRate: 0.20, Currency: "EUR" },
+        { RegionID: "R-AP1", RegionName: "Asia-Pacific", Market: "Growth", TaxRate: 0.07, Currency: "SGD" }
+      ]
+    };
+
+    function initSqlModule() {
+      initCodeMirrorSql();
+      renderSqlTabsBar();
+      refreshSqlSchemaUI();
+      prepareAlaSqlDatabase();
+    }
+
+    function initCodeMirrorSql() {
+      const textarea = document.getElementById("sqlInput");
+      if (!textarea) return;
+      if (codeMirrorSqlInstance) {
+        codeMirrorSqlInstance.refresh();
+        return;
+      }
+      if (window.CodeMirror) {
+        const tableHints = {
+          dataset: columns && columns.length ? columns : ["CustomerID", "Contract", "MonthlyCharges", "TotalCharges", "tenure", "Churn"],
+          plans: ["PlanID", "PlanName", "BaseFee", "Tier", "MaxSpeed", "SupportLevel"],
+          regions: ["RegionID", "RegionName", "Market", "TaxRate", "Currency"]
+        };
+
+        codeMirrorSqlInstance = CodeMirror.fromTextArea(textarea, {
+          mode: "text/x-sql",
+          lineNumbers: true,
+          lineWrapping: true,
+          indentWithTabs: false,
+          smartIndent: true,
+          matchBrackets: true,
+          autofocus: false,
+          extraKeys: {
+            "Ctrl-Enter": () => runBrowserSQL(),
+            "Cmd-Enter": () => runBrowserSQL(),
+            "Ctrl-Space": "autocomplete"
+          },
+          hintOptions: {
+            tables: tableHints,
+            completeSingle: false
+          }
+        });
+        window.codeMirrorSqlInstance = codeMirrorSqlInstance;
+
+        // Live autocomplete on alphanumeric input
+        codeMirrorSqlInstance.on("inputRead", (cm, change) => {
+          if (change.text[0] && /[a-zA-Z_]/.test(change.text[0])) {
+            if (CodeMirror.showHint && !cm.state.completionActive) {
+              CodeMirror.showHint(cm, CodeMirror.hint.sql, {
+                tables: {
+                  dataset: columns && columns.length ? columns : ["CustomerID", "Contract", "MonthlyCharges"],
+                  plans: ["PlanID", "PlanName", "BaseFee", "Tier"],
+                  regions: ["RegionID", "RegionName", "TaxRate"]
+                },
+                completeSingle: false
+              });
+            }
+          }
+        });
+
+        // Update cursor position badge
+        codeMirrorSqlInstance.on("cursorActivity", cm => {
+          const pos = cm.getCursor();
+          const posEl = document.getElementById("sqlCursorPos");
+          if (posEl) posEl.textContent = `Line ${pos.line + 1}, Col ${pos.ch + 1}`;
+        });
+
+        // Keep underlying textarea value and active tab in sync
+        codeMirrorSqlInstance.on("change", cm => {
+          const val = cm.getValue();
+          textarea.value = val;
+          const curTab = sqlTabsState.find(t => t.id === activeSqlTabId);
+          if (curTab) curTab.sql = val;
+        });
+
+        setTimeout(() => codeMirrorSqlInstance.refresh(), 30);
+      } else {
+        textarea.addEventListener("keydown", e => {
+          if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+            e.preventDefault();
+            runBrowserSQL();
+          }
+        });
+      }
+    }
+
+    function getSqlEditorContent() {
+      if (codeMirrorSqlInstance) return codeMirrorSqlInstance.getValue();
+      const textarea = document.getElementById("sqlInput");
+      return textarea ? textarea.value : "";
+    }
+
+    function setSqlEditorContent(val) {
+      if (codeMirrorSqlInstance) {
+        codeMirrorSqlInstance.setValue(val);
+        codeMirrorSqlInstance.refresh();
+      } else {
+        const textarea = document.getElementById("sqlInput");
+        if (textarea) textarea.value = val;
+      }
+      const curTab = sqlTabsState.find(t => t.id === activeSqlTabId);
+      if (curTab) curTab.sql = val;
+    }
+
+    function renderSqlTabsBar() {
+      const container = document.getElementById("sqlTabsBar");
+      if (!container) return;
+      container.innerHTML = sqlTabsState.map(tab => `
+        <div class="sql-tab ${tab.id === activeSqlTabId ? 'active' : ''}" onclick="switchSqlTab(${tab.id})" ondblclick="renameSqlTab(${tab.id})" title="Double-click to rename">
+          <span>${escapeHtml(tab.title)}</span>
+          ${sqlTabsState.length > 1 ? `<span class="tab-close" onclick="closeSqlTab(event, ${tab.id})" title="Close tab">&times;</span>` : ''}
+        </div>
+      `).join("") + `
+        <button type="button" class="btn btn-outline" style="width:auto; padding:3px 8px; font-size:0.72rem; border-radius:4px; margin-left:4px;" onclick="addNewSqlTab()" title="Open new query tab">➕</button>
+      `;
+    }
+
+    function switchSqlTab(tabId) {
+      if (activeSqlTabId === tabId) return;
+      const curTab = sqlTabsState.find(t => t.id === activeSqlTabId);
+      if (curTab) curTab.sql = getSqlEditorContent();
+
+      activeSqlTabId = tabId;
+      const newTab = sqlTabsState.find(t => t.id === tabId);
+      if (newTab) {
+        setSqlEditorContent(newTab.sql);
+        if (newTab.lastResult && newTab.lastResult.length) {
+          lastQueryResult = newTab.lastResult;
+          lastQueryColumns = newTab.lastColumns;
+          renderSqlResultsTable(lastQueryResult, newTab.executionTime || 0);
+        }
+      }
+      renderSqlTabsBar();
+    }
+
+    function addNewSqlTab(title, sql) {
+      const curTab = sqlTabsState.find(t => t.id === activeSqlTabId);
+      if (curTab) curTab.sql = getSqlEditorContent();
+
+      const newId = nextSqlTabId++;
+      const newTab = {
+        id: newId,
+        title: title || `Query ${newId}`,
+        sql: sql || "SELECT * FROM dataset LIMIT 10;",
+        lastResult: [],
+        lastColumns: [],
+        executionTime: 0
+      };
+      sqlTabsState.push(newTab);
+      activeSqlTabId = newId;
+      setSqlEditorContent(newTab.sql);
+      renderSqlTabsBar();
+    }
+
+    function closeSqlTab(event, tabId) {
+      if (event) event.stopPropagation();
+      if (sqlTabsState.length <= 1) return;
+      const idx = sqlTabsState.findIndex(t => t.id === tabId);
+      if (idx === -1) return;
+      sqlTabsState.splice(idx, 1);
+      if (activeSqlTabId === tabId) {
+        const nextTab = sqlTabsState[Math.max(0, idx - 1)] || sqlTabsState[0];
+        activeSqlTabId = nextTab.id;
+        setSqlEditorContent(nextTab.sql);
+        if (nextTab.lastResult && nextTab.lastResult.length) {
+          renderSqlResultsTable(nextTab.lastResult, nextTab.executionTime || 0);
+        }
+      }
+      renderSqlTabsBar();
+    }
+
+    function renameSqlTab(tabId, customTitle) {
+      const tab = sqlTabsState.find(t => t.id === tabId);
+      if (!tab) return;
+      const newName = (typeof customTitle === 'string' && customTitle) ? customTitle : prompt("Enter new tab name:", tab.title);
+      if (newName && newName.trim()) {
+        tab.title = newName.trim();
+        renderSqlTabsBar();
+      }
+    }
 
     function refreshSqlSchemaUI() {
       const listEl = document.getElementById("sqlSchemaList");
       if (!listEl) return;
-      if (!columns || !columns.length) {
-        listEl.innerHTML = "<span style='color:var(--text-muted);font-size:0.75rem;'>No columns available.</span>";
+
+      let colsToShow = [];
+      let sampleSource = [];
+      if (activeSqlSchemaTable === "dataset") {
+        colsToShow = columns && columns.length ? columns : [];
+        sampleSource = currentDataset && currentDataset.length ? currentDataset : [];
+      } else if (sqlAuxiliaryTables[activeSqlSchemaTable]) {
+        sampleSource = sqlAuxiliaryTables[activeSqlSchemaTable];
+        colsToShow = Object.keys(sampleSource[0] || {});
+      }
+
+      if (!colsToShow.length) {
+        listEl.innerHTML = "<span style='color:var(--text-muted);font-size:0.75rem;padding:8px;'>No columns found in selected table.</span>";
         return;
       }
-      listEl.innerHTML = columns.map(c => {
-        const sampleVal = currentDataset.find(r => r[c] !== null && r[c] !== undefined)?.[c];
-        const isNum = typeof sampleVal === "number";
-        const typeBadge = isNum ? "num" : "txt";
+
+      listEl.innerHTML = colsToShow.map(c => {
+        const sampleVal = sampleSource.find(r => r[c] !== null && r[c] !== undefined)?.[c];
+        const isNum = typeof sampleVal === "number" || isColNumeric(c);
+        const typeBadge = isNum ? "NUM" : "TXT";
         return `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.06);border-radius:4px;cursor:pointer;font-size:0.78rem;" onclick="insertSqlToken('${c}')" title="Click to insert column into query">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 8px;background:rgba(15,23,42,0.6);border:1px solid rgba(255,255,255,0.06);border-radius:4px;cursor:pointer;font-size:0.78rem;transition:all 0.15s;" onclick="insertSqlToken('${c}')" title="Click to insert '${c}' into query editor">
             <span style="font-family:monospace;color:#f8fafc;">${c}</span>
-            <span class="badge ${isNum ? 'badge-info' : 'badge-warning'}" style="font-size:0.68rem;padding:1px 6px;">${typeBadge}</span>
+            <span class="badge ${isNum ? 'badge-info' : 'badge-warning'}" style="font-size:0.65rem;padding:1px 6px;">${typeBadge}</span>
           </div>
         `;
       }).join("");
     }
 
+    function switchSqlSchemaTable(tbl) {
+      activeSqlSchemaTable = tbl;
+      const badge = document.getElementById("sqlActiveTableBadge");
+      if (badge) badge.textContent = `Table: ${tbl}`;
+      refreshSqlSchemaUI();
+    }
+
+    function filterSqlSchemaList(query) {
+      const q = (query || "").toLowerCase();
+      const listEl = document.getElementById("sqlSchemaList");
+      if (!listEl) return;
+      const items = listEl.querySelectorAll("div");
+      items.forEach(item => {
+        const txt = item.textContent.toLowerCase();
+        item.style.display = txt.includes(q) ? "flex" : "none";
+      });
+    }
+
     function insertSqlToken(token) {
-      const textarea = document.getElementById("sqlInput");
-      if (!textarea) return;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
-      const val = textarea.value;
-      textarea.value = val.substring(0, start) + token + val.substring(end);
-      textarea.focus();
-      textarea.selectionStart = textarea.selectionEnd = start + token.length;
+      if (codeMirrorSqlInstance) {
+        const doc = codeMirrorSqlInstance.getDoc();
+        const cursor = doc.getCursor();
+        doc.replaceRange(token, cursor);
+        codeMirrorSqlInstance.focus();
+      } else {
+        const textarea = document.getElementById("sqlInput");
+        if (!textarea) return;
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const val = textarea.value;
+        textarea.value = val.substring(0, start) + token + val.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + token.length;
+      }
+    }
+
+    function insertSqlSnippet(type) {
+      const snippets = {
+        SELECT: "SELECT * FROM dataset LIMIT 10;",
+        WHERE: "WHERE MonthlyCharges > 50 AND Churn = 'No'",
+        GROUP_BY: "GROUP BY Contract\nHAVING COUNT(*) >= 2",
+        HAVING: "HAVING COUNT(*) > 10 AND AVG(MonthlyCharges) > 60",
+        ORDER_BY: "ORDER BY MonthlyCharges DESC",
+        JOIN: "LEFT JOIN plans ON dataset.Contract = plans.PlanName",
+        CASE: "CASE \n  WHEN MonthlyCharges >= 80 THEN 'High'\n  WHEN MonthlyCharges >= 40 THEN 'Medium'\n  ELSE 'Low'\nEND AS spend_tier",
+        CTE: "WITH active_customers AS (\n  SELECT * FROM dataset WHERE Churn = 'No'\n)\nSELECT Contract, COUNT(*) AS count, ROUND(AVG(MonthlyCharges), 2) AS avg_charges \nFROM active_customers \nGROUP BY Contract;",
+        WINDOW: "ROW_NUMBER() OVER (PARTITION BY Contract ORDER BY MonthlyCharges DESC) AS rank_in_tier",
+        UNION: "SELECT CustomerID, 'Active' AS status FROM dataset WHERE Churn = 'No'\nUNION ALL\nSELECT CustomerID, 'Churned' AS status FROM dataset WHERE Churn = 'Yes'"
+      };
+      if (snippets[type]) {
+        insertSqlToken(`\n${snippets[type]}\n`);
+      }
     }
 
     function applySqlTemplate(type) {
-      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number");
-      const catCols = columns.filter(c => typeof currentDataset[0]?.[c] !== "number");
-      const numCol = numCols[0] || columns[1] || columns[0];
-      const catCol = catCols[0] || columns[0];
+      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number" || isColNumeric(c));
+      const catCols = columns.filter(c => !numCols.includes(c));
+      const numCol = numCols[0] || "MonthlyCharges";
+      const numCol2 = numCols[1] || numCol;
+      const catCol = catCols[0] || "Contract";
 
       let sql = "";
       if (type === "basic") {
         sql = "SELECT * FROM dataset LIMIT 10;";
-      } else if (type === "groupby") {
-        sql = `SELECT \n  ${catCol},\n  COUNT(*) AS records_count,\n  ROUND(AVG(${numCol}), 2) AS avg_${numCol}\nFROM dataset\nGROUP BY ${catCol}\nORDER BY avg_${numCol} DESC;`;
-      } else if (type === "filter") {
-        const threshold = currentDataset.length ? Math.round(currentDataset.reduce((acc, r) => acc + (parseFloat(r[numCol]) || 0), 0) / currentDataset.length) : 50;
-        sql = `SELECT * \nFROM dataset \nWHERE ${numCol} > ${threshold} \nORDER BY ${numCol} DESC \nLIMIT 15;`;
-      } else if (type === "ranking") {
-        sql = `SELECT * \nFROM dataset \nORDER BY ${numCol} DESC \nLIMIT 10;`;
-      } else if (type === "complex") {
-        const numCol2 = numCols[1] || numCol;
-        sql = `SELECT \n  ${catCol},\n  COUNT(*) AS count,\n  ROUND(SUM(${numCol}), 2) AS total_${numCol},\n  ROUND(AVG(${numCol2}), 2) AS avg_${numCol2}\nFROM dataset\nGROUP BY ${catCol}\nORDER BY total_${numCol} DESC;`;
+      } else if (type === "revenue") {
+        sql = `SELECT \n  ${catCol},\n  COUNT(*) AS total_customers,\n  ROUND(SUM(${numCol}), 2) AS total_revenue,\n  ROUND(AVG(${numCol}), 2) AS avg_revenue\nFROM dataset\nGROUP BY ${catCol}\nORDER BY total_revenue DESC;`;
+      } else if (type === "top10") {
+        sql = `SELECT * \nFROM dataset \nWHERE ${numCol} IS NOT NULL \nORDER BY ${numCol} DESC \nLIMIT 10;`;
+      } else if (type === "case_tiers") {
+        sql = `SELECT \n  CustomerID,\n  ${catCol},\n  ${numCol},\n  CASE \n    WHEN ${numCol} >= 80 THEN 'High Value'\n    WHEN ${numCol} >= 40 THEN 'Moderate Value'\n    ELSE 'Budget Value'\n  END AS value_tier\nFROM dataset\nLIMIT 20;`;
+      } else if (type === "having_filter") {
+        sql = `SELECT \n  ${catCol},\n  COUNT(*) AS records_count,\n  ROUND(AVG(${numCol}), 2) AS avg_charge\nFROM dataset\nGROUP BY ${catCol}\nHAVING records_count >= 2\nORDER BY avg_charge DESC;`;
+      } else if (type === "join_plans") {
+        sql = `SELECT \n  d.CustomerID,\n  d.Contract,\n  d.MonthlyCharges,\n  p.PlanName,\n  p.Tier,\n  p.MaxSpeed\nFROM dataset AS d\nLEFT JOIN plans AS p \n  ON d.Contract = p.PlanName\nLIMIT 15;`;
+      } else if (type === "union_cohorts") {
+        sql = `SELECT CustomerID, Contract, ${numCol}, 'High Spend' AS cohort \nFROM dataset \nWHERE ${numCol} >= 70\nUNION ALL\nSELECT CustomerID, Contract, ${numCol}, 'Standard Spend' AS cohort \nFROM dataset \nWHERE ${numCol} < 70\nLIMIT 25;`;
+      } else if (type === "cte_pipeline") {
+        sql = `WITH filtered_cohort AS (\n  SELECT * FROM dataset WHERE ${numCol} > 30\n)\nSELECT \n  ${catCol},\n  COUNT(*) AS cohort_size,\n  ROUND(SUM(${numCol}), 2) AS cohort_revenue\nFROM filtered_cohort\nGROUP BY ${catCol}\nORDER BY cohort_revenue DESC;`;
+      } else if (type === "window_rank") {
+        sql = `SELECT \n  CustomerID,\n  ${catCol},\n  ${numCol},\n  ROW_NUMBER() OVER (PARTITION BY ${catCol} ORDER BY ${numCol} DESC) AS rank_in_category\nFROM dataset\nLIMIT 30;`;
+      } else if (type === "string_dates") {
+        sql = `SELECT \n  CustomerID,\n  UPPER(${catCol}) AS upper_category,\n  CONCAT(CustomerID, ' - ', ${catCol}) AS cust_label,\n  ROUND(${numCol}, 0) AS rounded_fee\nFROM dataset\nLIMIT 15;`;
       }
-      document.getElementById("sqlInput").value = sql;
-      document.getElementById("sqlExplanationBox").style.display = "none";
+
+      setSqlEditorContent(sql);
+      const explBox = document.getElementById("sqlExplanationBox");
+      if (explBox) explBox.style.display = "none";
+      const optBox = document.getElementById("sqlOptimizationBox");
+      if (optBox) optBox.style.display = "none";
     }
 
     function loadSqlTemplate(type) {
       applySqlTemplate(type);
-      document.getElementById("sqlTemplateSelect").value = type;
+      const sel = document.getElementById("sqlTemplateSelect");
+      if (sel) sel.value = type;
     }
 
     function clearSqlEditor() {
-      document.getElementById("sqlInput").value = "";
-      document.getElementById("sqlInput").focus();
+      setSqlEditorContent("");
+      const explBox = document.getElementById("sqlExplanationBox");
+      if (explBox) explBox.style.display = "none";
+      const optBox = document.getElementById("sqlOptimizationBox");
+      if (optBox) optBox.style.display = "none";
     }
 
-    function explainBrowserSQL() {
-      const sql = document.getElementById("sqlInput").value.trim();
+    function formatSqlQuery() {
+      let sql = getSqlEditorContent();
+      if (!sql.trim()) return;
+      const keywords = ["SELECT", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "LIMIT", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "JOIN", "ON", "UNION ALL", "UNION", "CASE", "WHEN", "THEN", "ELSE", "END", "WITH", "AS"];
+      keywords.forEach(kw => {
+        const regex = new RegExp(`\\b${kw}\\b`, "gi");
+        sql = sql.replace(regex, kw);
+      });
+      sql = sql.replace(/\b(FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|LEFT JOIN|RIGHT JOIN|INNER JOIN|JOIN|UNION ALL|UNION)\b/g, "\n$1");
+      setSqlEditorContent(sql.trim());
+      notifyTaskSuccess("Format SQL", "Query formatted with standardized uppercase keywords.");
+    }
+
+    function applyAiPromptPreset(type) {
+      const presets = {
+        revenue: "Write SQL to calculate monthly revenue.",
+        top10: "Find the top 10 customers by lifetime revenue.",
+        churn_group: "Show average charges and churn rate grouped by contract.",
+        case_tiers: "Categorize customer spend tiers using a CASE statement.",
+        join_plans: "Join dataset with plans catalog to inspect tier speeds.",
+        window_rank: "Rank customers within each contract cohort by charges using ROW_NUMBER().",
+        cte_pipeline: "Create a CTE pipeline filtering active customers then calculating average spend."
+      };
+      const input = document.getElementById("aiSqlPrompt");
+      if (input && presets[type]) {
+        input.value = presets[type];
+        generateBrowserAISQL();
+      }
+    }
+
+    function showSqlAiFeedback(msgHtml) {
       const explBox = document.getElementById("sqlExplanationBox");
-      if (!sql) {
+      if (explBox) {
         explBox.style.display = "block";
-        explBox.innerHTML = "⚠️ Please enter an SQL query first.";
-        return;
+        explBox.innerHTML = msgHtml;
       }
-
-      let explanation = "<b>Query Analysis:</b><br>";
-      const upper = sql.toUpperCase();
-      if (upper.includes("SELECT *")) {
-        explanation += "• Retrieves all available columns from the active dataset.<br>";
-      } else if (upper.includes("SELECT")) {
-        explanation += "• Projections: extracts specific target columns and aggregations.<br>";
-      }
-      if (upper.includes("WHERE")) {
-        explanation += "• Row filtering: applies selective predicate conditions before aggregation.<br>";
-      }
-      if (upper.includes("GROUP BY")) {
-        explanation += "• Aggregation: groups records across discrete categorical dimensions.<br>";
-      }
-      if (upper.includes("ORDER BY")) {
-        explanation += `• Sorting: orders results ${upper.includes("DESC") ? "in descending (highest to lowest)" : "in ascending (lowest to highest)"} order.<br>`;
-      }
-      if (upper.includes("LIMIT")) {
-        explanation += "• Output limiter: caps maximum rows returned for optimal performance.<br>";
-      }
-
-      explBox.style.display = "block";
-      explBox.innerHTML = explanation;
     }
 
     function generateBrowserAISQL() {
-      const prompt = (document.getElementById("aiSqlPrompt")?.value || "").trim().toLowerCase();
+      const prompt = (document.getElementById("aiSqlPrompt")?.value || "").trim();
       if (!prompt) {
-        alert("Please enter a question or prompt (e.g. 'Show top 5 by charges').");
+        notifyTaskFailed("AI SQL Generation", "Please enter an inquiry in the AI prompt box.");
+        return;
+      }
+      notifyTaskStart("AI SQL Generation");
+
+      const geminiKey = (typeof getGeminiApiKey === "function" ? getGeminiApiKey() : null) || localStorage.getItem("datamind_gemini_key");
+
+      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number" || isColNumeric(c));
+      const catCols = columns.filter(c => !numCols.includes(c));
+      const dateCols = columns.filter(c => /date|time|day|month|year/i.test(c));
+
+      const numCol1 = numCols[0] || "MonthlyCharges";
+      const numCol2 = numCols[1] || numCols[0] || "TotalCharges";
+      const catCol1 = catCols[0] || "Contract";
+      const dateCol = dateCols[0] || "OrderDate";
+
+      if (geminiKey) {
+        const aiInstruction = `Write executable ANSI SQL for table 'dataset' with columns: ${columns.join(', ')}. Auxiliary tables: 'plans' (PlanID, PlanName, BaseFee, Tier, MaxSpeed), 'regions' (RegionID, RegionName, TaxRate). Return ONLY the executable SQL query code, no markdown backticks, no comments. User request: ${prompt}`;
+        callGeminiAPI(aiInstruction, geminiKey, (resText) => {
+          let cleanSql = resText.replace(/```sql|```/gi, '').trim();
+          setSqlEditorContent(cleanSql);
+          showSqlAiFeedback(`✨ <b>Gemini 2.5 Flash Generated SQL</b> for: "<i>${escapeHtml(prompt)}</i>"`);
+          notifyTaskSuccess("AI SQL Generation", "Generated SQL using Gemini 2.5 Flash.");
+        });
         return;
       }
 
-      const numCols = columns.filter(c => typeof currentDataset[0]?.[c] === "number");
-      const catCols = columns.filter(c => typeof currentDataset[0]?.[c] !== "number");
+      // Intelligent Semantic Rule Engine
+      const p = prompt.toLowerCase();
+      let sql = "";
 
-      // Match number for limit
-      const matchLimit = prompt.match(/\b(\d+)\b/);
-      const limit = matchLimit ? matchLimit[1] : "10";
-
-      // Match column
-      let matchedNum = numCols.find(c => prompt.includes(c.toLowerCase()));
-      if (!matchedNum && numCols.length) matchedNum = numCols[0];
-
-      let matchedCat = catCols.find(c => prompt.includes(c.toLowerCase()));
-      if (!matchedCat && catCols.length) matchedCat = catCols[0];
-
-      let generated = "";
-      if (prompt.includes("group") || prompt.includes("by") || prompt.includes("per") || prompt.includes("average") || prompt.includes("avg")) {
-        generated = `SELECT \n  ${matchedCat},\n  COUNT(*) AS record_count,\n  ROUND(AVG(${matchedNum}), 2) AS avg_${matchedNum.toLowerCase()}\nFROM dataset\nGROUP BY ${matchedCat}\nORDER BY avg_${matchedNum.toLowerCase()} DESC\nLIMIT ${limit};`;
-      } else if (prompt.includes("top") || prompt.includes("highest") || prompt.includes("max") || prompt.includes("most")) {
-        generated = `SELECT * \nFROM dataset \nWHERE ${matchedNum} IS NOT NULL \nORDER BY ${matchedNum} DESC \nLIMIT ${limit};`;
-      } else if (prompt.includes("lowest") || prompt.includes("bottom") || prompt.includes("min")) {
-        generated = `SELECT * \nFROM dataset \nWHERE ${matchedNum} IS NOT NULL \nORDER BY ${matchedNum} ASC \nLIMIT ${limit};`;
+      if (p.includes("monthly") || p.includes("month") || p.includes("revenue per month") || (p.includes("revenue") && p.includes("monthly"))) {
+        const revCol = numCols.find(c => /charge|revenue|amount|total|sales|pay|price|val/i.test(c)) || numCol1;
+        if (dateCols.length) {
+          sql = `SELECT \n  STRFTIME('%Y-%m', ${dateCol}) AS billing_month,\n  COUNT(*) AS total_orders,\n  ROUND(SUM(${revCol}), 2) AS monthly_revenue,\n  ROUND(AVG(${revCol}), 2) AS avg_order_value\nFROM dataset\nGROUP BY billing_month\nORDER BY billing_month ASC;`;
+        } else {
+          sql = `SELECT \n  ${catCol1},\n  COUNT(*) AS active_accounts,\n  ROUND(SUM(${revCol}), 2) AS total_revenue,\n  ROUND(AVG(${revCol}), 2) AS avg_revenue_per_user\nFROM dataset\nGROUP BY ${catCol1}\nORDER BY total_revenue DESC;`;
+        }
+      } else if (p.includes("top") || p.includes("lifetime") || p.includes("highest revenue") || p.includes("best customer")) {
+        const custCol = columns.find(c => /cust|user|id|client|name/i.test(c)) || "CustomerID";
+        const revCol = columns.find(c => /total|lifetime|charges|spend|revenue/i.test(c)) || numCol2;
+        const limitMatch = p.match(/\b(\d+)\b/);
+        const limit = limitMatch ? limitMatch[1] : "10";
+        sql = `SELECT \n  ${custCol},\n  ${catCol1},\n  ROUND(SUM(${revCol}), 2) AS lifetime_revenue,\n  COUNT(*) AS transaction_count\nFROM dataset\nWHERE ${revCol} IS NOT NULL\nGROUP BY ${custCol}, ${catCol1}\nORDER BY lifetime_revenue DESC\nLIMIT ${limit};`;
+      } else if (p.includes("churn") || p.includes("rate") || p.includes("group by")) {
+        const catCol = catCols.find(c => p.includes(c.toLowerCase())) || catCol1;
+        sql = `SELECT \n  ${catCol},\n  COUNT(*) AS total_records,\n  ROUND(AVG(${numCol1}), 2) AS avg_${numCol1.toLowerCase()},\n  ROUND(SUM(CASE WHEN Churn = 'Yes' THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) AS churn_rate_pct\nFROM dataset\nGROUP BY ${catCol}\nORDER BY total_records DESC;`;
+      } else if (p.includes("tier") || p.includes("case") || p.includes("classify") || p.includes("segment")) {
+        sql = `SELECT \n  CustomerID,\n  ${numCol1},\n  CASE \n    WHEN ${numCol1} >= 80 THEN 'High Spend Tier'\n    WHEN ${numCol1} >= 40 THEN 'Medium Spend Tier'\n    ELSE 'Low Spend Tier'\n  END AS customer_spend_tier\nFROM dataset\nLIMIT 25;`;
+      } else if (p.includes("join") || p.includes("plan") || p.includes("catalog")) {
+        sql = `SELECT \n  d.CustomerID,\n  d.Contract,\n  d.MonthlyCharges,\n  p.PlanName,\n  p.Tier,\n  p.MaxSpeed\nFROM dataset AS d\nLEFT JOIN plans AS p \n  ON d.Contract = p.PlanName\nLIMIT 20;`;
+      } else if (p.includes("window") || p.includes("rank") || p.includes("row_number") || p.includes("over")) {
+        sql = `SELECT \n  CustomerID,\n  ${catCol1},\n  ${numCol1},\n  ROW_NUMBER() OVER (PARTITION BY ${catCol1} ORDER BY ${numCol1} DESC) AS rank_in_category\nFROM dataset\nLIMIT 30;`;
+      } else if (p.includes("cte") || p.includes("with") || p.includes("pipeline")) {
+        sql = `WITH high_value_cohort AS (\n  SELECT * FROM dataset WHERE ${numCol1} > 50\n)\nSELECT \n  ${catCol1},\n  COUNT(*) AS cohort_count,\n  ROUND(AVG(${numCol1}), 2) AS cohort_avg_spend\nFROM high_value_cohort\nGROUP BY ${catCol1}\nORDER BY cohort_avg_spend DESC;`;
       } else {
-        generated = `SELECT * FROM dataset LIMIT ${limit};`;
+        const limitMatch = p.match(/\b(\d+)\b/);
+        const limit = limitMatch ? limitMatch[1] : "15";
+        sql = `SELECT * \nFROM dataset \nWHERE ${numCol1} IS NOT NULL \nORDER BY ${numCol1} DESC \nLIMIT ${limit};`;
       }
 
-      document.getElementById("sqlInput").value = generated;
-      document.getElementById("sqlExplanationBox").style.display = "block";
-      document.getElementById("sqlExplanationBox").innerHTML = `✨ <b>AI Generated SQL</b> for prompt: "<i>${prompt}</i>"`;
+      setSqlEditorContent(sql);
+      showSqlAiFeedback(`✨ <b>AI Semantic Engine Generated SQL</b> for: "<i>${escapeHtml(prompt)}</i>"`);
+      notifyTaskSuccess("AI SQL Generation", "Executable SQL synthesized successfully.");
     }
 
-    // Client-side ANSI SQL Parser & Executor
+    function explainBrowserSQL() {
+      const sql = getSqlEditorContent().trim();
+      const explBox = document.getElementById("sqlExplanationBox");
+      if (!explBox) return;
+      if (!sql) {
+        explBox.style.display = "block";
+        explBox.innerHTML = "⚠️ Please enter an SQL query to explain.";
+        return;
+      }
+
+      const upper = sql.toUpperCase();
+      let bullets = [];
+
+      if (upper.includes("GROUP BY") && (upper.includes("SUM(") || upper.includes("AVG(") || upper.includes("COUNT("))) {
+        bullets.push(`<b>🎯 Business Objective:</b> Aggregates and rolls up metrics across business segments to reveal summary patterns.`);
+      } else if (upper.includes("ORDER BY") && upper.includes("LIMIT")) {
+        bullets.push(`<b>🎯 Business Objective:</b> Identifies and ranks top-performing or outlier records by specific target metrics.`);
+      } else {
+        bullets.push(`<b>🎯 Business Objective:</b> Retrieves filtered subsets of rows and column attributes from the active database.`);
+      }
+
+      let sources = [];
+      if (upper.includes("FROM DATASET")) sources.push("Active Platform Dataset (<code>dataset</code>)");
+      if (upper.includes("JOIN PLANS")) sources.push("Subscription Plans Catalog (<code>plans</code>)");
+      if (upper.includes("JOIN REGIONS")) sources.push("Geographic Regions Lookup (<code>regions</code>)");
+      if (upper.includes("WITH ")) sources.push("Common Table Expressions (<code>CTE</code> pipeline)");
+      if (sources.length) bullets.push(`<b>📁 Source Tables:</b> ${sources.join(", ")}.`);
+
+      if (upper.includes("SELECT *")) {
+        bullets.push(`<b>👁️ Columns Projected:</b> Wildcard scan selecting all available dataset attributes.`);
+      } else {
+        bullets.push(`<b>👁️ Columns Projected:</b> Targeted attribute projections with mathematical/aggregate calculations.`);
+      }
+
+      if (upper.includes("WHERE")) {
+        bullets.push(`<b>🔍 Row Filtering (WHERE):</b> Pre-filters records before aggregation, excluding non-matching or null records.`);
+      }
+      if (upper.includes("HAVING")) {
+        bullets.push(`<b>⚖️ Group Filtering (HAVING):</b> Applies post-aggregation threshold conditions on grouped summary records.`);
+      }
+      if (upper.includes("JOIN")) {
+        bullets.push(`<b>🔗 Relational Joins:</b> Joins records across tables using key matching.`);
+      }
+      if (upper.includes("CASE WHEN")) {
+        bullets.push(`<b>🔀 Conditional Logic (CASE):</b> Categorizes records into discrete logical tiers based on conditional criteria.`);
+      }
+      if (upper.includes("ROW_NUMBER()") || upper.includes("OVER (")) {
+        bullets.push(`<b>🪟 Window Function:</b> Computes dynamic ranks and running aggregations partitioned across discrete cohorts.`);
+      }
+      if (upper.includes("ORDER BY")) {
+        bullets.push(`<b>📊 Sorting:</b> Arranges final results in ${upper.includes("DESC") ? "descending (highest first)" : "ascending (lowest first)"} order.`);
+      }
+      if (upper.includes("LIMIT")) {
+        bullets.push(`<b>⏱️ Output Cap (LIMIT):</b> Caps row delivery for optimal in-browser rendering responsiveness.`);
+      }
+
+      explBox.style.display = "block";
+      explBox.innerHTML = `
+        <div style="font-weight:700; color:var(--champagne-gold); margin-bottom:6px; font-size:0.92rem;">🔍 AI SQL Query Analysis:</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          ${bullets.map(b => `<div>${b}</div>`).join("")}
+        </div>
+      `;
+    }
+
+    function optimizeBrowserSQL() {
+      const sql = getSqlEditorContent().trim();
+      const optBox = document.getElementById("sqlOptimizationBox");
+      if (!optBox) return;
+      if (!sql) {
+        optBox.style.display = "block";
+        optBox.innerHTML = "⚠️ Please enter an SQL query to analyze for optimization.";
+        return;
+      }
+
+      const upper = sql.toUpperCase();
+      let recommendations = [];
+      let optimized = sql;
+
+      if (/SELECT\s+\*\s+FROM/i.test(sql)) {
+        recommendations.push("<b>Avoid SELECT * on wide tables:</b> Specifying only needed columns reduces memory footprint and boosts query execution speeds.");
+        const topCols = columns.slice(0, 4).join(", ");
+        optimized = optimized.replace(/SELECT\s+\*\s+FROM/i, `SELECT ${topCols || 'CustomerID, MonthlyCharges'} FROM`);
+      }
+
+      if (!/\bLIMIT\s+\d+/i.test(sql) && !upper.includes("GROUP BY")) {
+        recommendations.push("<b>Unbounded Query:</b> Query has no LIMIT clause. Adding <code>LIMIT 100</code> prevents browser memory exhaustion on datasets with 100k+ rows.");
+        optimized += "\nLIMIT 100;";
+      }
+
+      if (/\bHAVING\s+([a-zA-Z0-9_]+)\s*([>=<!]+)\s*(\d+)/i.test(sql)) {
+        const havingCol = sql.match(/\bHAVING\s+([a-zA-Z0-9_]+)\s*([>=<!]+)\s*(\d+)/i);
+        if (havingCol && !havingCol[1].includes("(") && !havingCol[1].includes(")")) {
+          recommendations.push(`<b>Push filter from HAVING to WHERE:</b> Filtering <code>${havingCol[1]}</code> in WHERE filters rows <i>before</i> aggregation rather than after, reducing grouping overhead.`);
+        }
+      }
+
+      if (/\(\s*SELECT[\s\S]*?ORDER\s+BY[\s\S]*?\)\s*AS/i.test(sql)) {
+        recommendations.push("<b>Redundant Inner ORDER BY:</b> Subqueries and CTEs do not guarantee order preservation. Remove inner ORDER BY and keep only top-level sorting.");
+      }
+
+      if (!recommendations.length) {
+        recommendations.push("<b>Query Structure Optimal:</b> Query follows ANSI best practices with selective projections, targeted grouping, and bounded output limits.");
+      }
+
+      optBox.style.display = "block";
+      optBox.innerHTML = `
+        <div style="font-weight:700; color:#34d399; margin-bottom:6px; font-size:0.92rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>⚡ AI Query Performance Optimization:</span>
+          ${optimized !== sql ? `<button class="btn btn-primary" style="width:auto; padding:3px 10px; font-size:0.75rem;" onclick="applyOptimizedSql()">Apply Optimization</button>` : ''}
+        </div>
+        <ul style="margin:0 0 10px 18px; padding:0; font-size:0.82rem;">
+          ${recommendations.map(r => `<li style="margin-bottom:4px;">${r}</li>`).join("")}
+        </ul>
+        ${optimized !== sql ? `
+          <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Proposed Optimized SQL:</div>
+          <pre style="background:#070a12; border:1px solid rgba(16,185,129,0.3); border-radius:6px; padding:8px 12px; font-family:monospace; font-size:0.80rem; color:#a7f3d0; margin:0; overflow-x:auto;">${escapeHtml(optimized)}</pre>
+        ` : ''}
+      `;
+      window.__pendingOptimizedSql = optimized;
+    }
+
+    function applyOptimizedSql() {
+      if (window.__pendingOptimizedSql) {
+        setSqlEditorContent(window.__pendingOptimizedSql);
+        notifyTaskSuccess("Query Optimization", "Applied optimized SQL query to editor.");
+      }
+    }
+
+    function prepareAlaSqlDatabase() {
+      if (!window.alasql) return false;
+      try {
+        window.alasql.fn.NOW = () => new Date().toISOString().slice(0, 19).replace('T', ' ');
+        window.alasql.fn.DATE = (d) => d ? String(d).split('T')[0].split(' ')[0] : null;
+        window.alasql.fn.YEAR = (d) => d ? new Date(d).getFullYear() || null : null;
+        window.alasql.fn.MONTH = (d) => d ? new Date(d).getMonth() + 1 || null : null;
+        window.alasql.fn.DAY = (d) => d ? new Date(d).getDate() || null : null;
+        window.alasql.fn.DATEDIFF = (d1, d2) => {
+          if (!d1 || !d2) return null;
+          const diffMs = Math.abs(new Date(d1) - new Date(d2));
+          return Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        };
+        window.alasql.fn.STRFTIME = (fmt, d) => {
+          if (!d) return null;
+          const date = new Date(d);
+          if (isNaN(date)) return String(d);
+          const y = date.getFullYear();
+          const m = String(date.getMonth() + 1).padStart(2, '0');
+          return `${y}-${m}`;
+        };
+        window.alasql.fn.CONCAT = (...args) => args.filter(a => a !== null && a !== undefined).join('');
+        window.alasql.fn.COALESCE = (...args) => {
+          for (let a of args) {
+            if (a !== null && a !== undefined && a !== '') return a;
+          }
+          return null;
+        };
+
+        window.alasql.tables = window.alasql.tables || {};
+        window.alasql.tables.dataset = {
+          data: (currentDataset && currentDataset.length) ? currentDataset.map(r => ({ ...r })) : []
+        };
+        window.alasql.tables.plans = {
+          data: sqlAuxiliaryTables.plans.map(r => ({ ...r }))
+        };
+        window.alasql.tables.regions = {
+          data: sqlAuxiliaryTables.regions.map(r => ({ ...r }))
+        };
+        return true;
+      } catch (err) {
+        console.warn("AlaSQL prep warning:", err);
+        return false;
+      }
+    }
+
+    function executeAdvancedSQL(queryStr) {
+      prepareAlaSqlDatabase();
+      let sql = queryStr.trim().replace(/;+$/, "");
+
+      // Handle CTEs: WITH cte_name AS (SELECT ...) [,...] SELECT ...
+      if (/^\s*WITH\s+/i.test(sql)) {
+        const withBody = sql.replace(/^\s*WITH\s+/i, "");
+        const mainSelectIdx = withBody.search(/\bSELECT\b(?![\s\S]*\))/i);
+        if (mainSelectIdx !== -1) {
+          const cteDefinitions = withBody.slice(0, mainSelectIdx).trim();
+          const mainQuery = withBody.slice(mainSelectIdx).trim();
+
+          const cteRegex = /([a-zA-Z0-9_]+)\s+AS\s*\(([\s\S]*?)\)(?:,|$)/gi;
+          let m;
+          while ((m = cteRegex.exec(cteDefinitions)) !== null) {
+            const cteName = m[1].trim();
+            const cteQuery = m[2].trim();
+            const cteRes = window.alasql ? window.alasql(cteQuery) : executePureJsSQL(cteQuery);
+            if (window.alasql) {
+              window.alasql.tables[cteName] = { data: cteRes };
+            }
+          }
+          sql = mainQuery;
+        }
+      }
+
+      // Check for Window Functions: ROW_NUMBER() OVER (...) etc.
+      const hasWindow = /\b(ROW_NUMBER|RANK|DENSE_RANK|SUM|AVG|COUNT)\s*\([^)]*\)\s*OVER\s*\(([^)]*)\)/i.test(sql);
+      let windowSpecs = [];
+      let sanitizedSql = sql;
+
+      if (hasWindow) {
+        let winCounter = 0;
+        sanitizedSql = sql.replace(/\b(ROW_NUMBER|RANK|DENSE_RANK|SUM|AVG|COUNT)\s*\(([^)]*)\)\s*OVER\s*\(([^)]*)\)(?:\s+AS\s+([a-zA-Z0-9_]+))?/gi, (match, fn, arg, overClause, explicitAlias) => {
+          winCounter++;
+          const targetKey = explicitAlias ? explicitAlias.trim() : `__win_col_${winCounter}`;
+          windowSpecs.push({
+            targetKey,
+            fn: fn.toUpperCase(),
+            arg: arg.trim(),
+            overClause: overClause.trim(),
+            fullMatch: match
+          });
+          return `1 AS ${targetKey}`;
+        });
+      }
+
+      let results = [];
+      if (window.alasql) {
+        results = window.alasql(sanitizedSql);
+      } else {
+        results = executePureJsSQL(sanitizedSql);
+      }
+
+      if (!Array.isArray(results)) {
+        results = results ? [results] : [];
+      }
+
+      // Apply Window Function Post-Processing
+      if (hasWindow && windowSpecs.length && results.length) {
+        windowSpecs.forEach(spec => {
+          const partitionMatch = spec.overClause.match(/\bPARTITION\s+BY\s+(.*?)(?=\bORDER\s+BY\b|$)/i);
+          const orderMatch = spec.overClause.match(/\bORDER\s+BY\s+(.*?)$/i);
+          const partCol = partitionMatch ? partitionMatch[1].trim().split(',')[0].trim().replace(/[`'"]/g, '') : null;
+          
+          let orderCol = null;
+          let isDesc = false;
+          if (orderMatch) {
+            const orderStr = orderMatch[1].trim();
+            isDesc = /\bDESC\b/i.test(orderStr);
+            orderCol = orderStr.replace(/\b(ASC|DESC)\b/ig, '').trim().split(',')[0].trim().replace(/[`'"]/g, '');
+          }
+
+          if (partCol) {
+            const parts = {};
+            results.forEach((row, idx) => {
+              const k = String(row[partCol] ?? 'NULL');
+              if (!parts[k]) parts[k] = [];
+              parts[k].push({ row, origIdx: idx });
+            });
+
+            Object.values(parts).forEach(group => {
+              if (orderCol) {
+                group.sort((a, b) => {
+                  let vA = a.row[orderCol], vB = b.row[orderCol];
+                  if (vA === null || vA === undefined) return 1;
+                  if (vB === null || vB === undefined) return -1;
+                  if (typeof vA === 'number' && typeof vB === 'number') {
+                    return isDesc ? vB - vA : vA - vB;
+                  }
+                  return isDesc ? String(vB).localeCompare(String(vA)) : String(vA).localeCompare(String(vB));
+                });
+              }
+              let runningSum = 0;
+              group.forEach((item, rIdx) => {
+                if (spec.fn === 'ROW_NUMBER' || spec.fn === 'RANK' || spec.fn === 'DENSE_RANK') {
+                  item.row[spec.targetKey] = rIdx + 1;
+                } else if (spec.fn === 'SUM') {
+                  const numVal = parseFloat(item.row[spec.arg]) || 0;
+                  runningSum += numVal;
+                  item.row[spec.targetKey] = parseFloat(runningSum.toFixed(2));
+                } else {
+                  item.row[spec.targetKey] = rIdx + 1;
+                }
+              });
+            });
+          } else {
+            let runningSum = 0;
+            results.forEach((row, rIdx) => {
+              if (spec.fn === 'ROW_NUMBER' || spec.fn === 'RANK' || spec.fn === 'DENSE_RANK') {
+                row[spec.targetKey] = rIdx + 1;
+              } else if (spec.fn === 'SUM') {
+                const numVal = parseFloat(row[spec.arg]) || 0;
+                runningSum += numVal;
+                row[spec.targetKey] = parseFloat(runningSum.toFixed(2));
+              } else {
+                row[spec.targetKey] = rIdx + 1;
+              }
+            });
+          }
+        });
+      }
+
+      return results;
+    }
+
+    // Pure JavaScript Fallback Engine
+    function executePureJsSQL(rawSql) {
+      const upper = rawSql.toUpperCase();
+      if (!upper.startsWith("SELECT")) {
+        throw new Error("Only SELECT queries are supported in fallback mode.");
+      }
+
+      let datasetToQuery = currentDataset.map(r => ({ ...r }));
+
+      let limit = Infinity;
+      const limitMatch = rawSql.match(/\bLIMIT\s+(\d+)\b/i);
+      if (limitMatch) limit = parseInt(limitMatch[1], 10);
+
+      const whereMatch = rawSql.match(/\bWHERE\s+(.*?)(?=\bGROUP\s+BY\b|\bORDER\s+BY\b|\bLIMIT\b|$)/is);
+      if (whereMatch) {
+        const conditionStr = whereMatch[1].trim();
+        datasetToQuery = datasetToQuery.filter(row => evaluateWhereCondition(row, conditionStr));
+      }
+
+      const groupByMatch = rawSql.match(/\bGROUP\s+BY\s+(.*?)(?=\bORDER\s+BY\b|\bLIMIT\b|$)/is);
+      const selectPartMatch = rawSql.match(/^SELECT\s+(.*?)\s+FROM\b/is);
+      if (!selectPartMatch) {
+        throw new Error("Invalid SQL syntax. Expected: SELECT ... FROM dataset");
+      }
+      const selectColsRaw = selectPartMatch[1].trim();
+      let results = [];
+
+      if (groupByMatch) {
+        const groupCol = groupByMatch[1].trim().split(",")[0].trim().replace(/^[`'"]|[`'"]$/g, "");
+        const groups = {};
+        datasetToQuery.forEach(row => {
+          const key = row[groupCol] !== null && row[groupCol] !== undefined ? String(row[groupCol]) : "NULL";
+          if (!groups[key]) groups[key] = [];
+          groups[key].push(row);
+        });
+
+        const selectSpecs = parseSelectProjections(selectColsRaw);
+        results = Object.entries(groups).map(([groupVal, rows]) => {
+          const outRow = {};
+          selectSpecs.forEach(spec => {
+            if (spec.isStar) {
+              outRow[groupCol] = groupVal;
+            } else if (spec.fn) {
+              outRow[spec.alias] = computeSqlAggregation(spec.fn, spec.col, rows, spec.roundDecimals);
+            } else {
+              outRow[spec.alias] = rows[0]?.[spec.col] ?? groupVal;
+            }
+          });
+          return outRow;
+        });
+      } else {
+        const selectSpecs = parseSelectProjections(selectColsRaw);
+        const hasAgg = selectSpecs.some(s => s.fn !== null);
+        if (selectSpecs.length === 1 && selectSpecs[0].isStar) {
+          results = datasetToQuery;
+        } else if (hasAgg) {
+          const outRow = {};
+          selectSpecs.forEach(spec => {
+            if (spec.fn) {
+              outRow[spec.alias] = computeSqlAggregation(spec.fn, spec.col, datasetToQuery, spec.roundDecimals);
+            } else {
+              outRow[spec.alias] = datasetToQuery[0]?.[spec.col] ?? null;
+            }
+          });
+          results = [outRow];
+        } else {
+          results = datasetToQuery.map(row => {
+            const outRow = {};
+            selectSpecs.forEach(spec => {
+              outRow[spec.alias] = row[spec.col] ?? null;
+            });
+            return outRow;
+          });
+        }
+      }
+
+      const orderByMatch = rawSql.match(/\bORDER\s+BY\s+(.*?)(?=\bLIMIT\b|$)/is);
+      if (orderByMatch) {
+        const orderParts = orderByMatch[1].trim().split(",");
+        const primaryOrder = orderParts[0].trim();
+        const isDesc = primaryOrder.toUpperCase().includes("DESC");
+        const orderCol = primaryOrder.replace(/\b(ASC|DESC)\b/ig, "").trim().replace(/^[`'"]|[`'"]$/g, "");
+
+        results.sort((a, b) => {
+          let valA = a[orderCol], valB = b[orderCol];
+          if (valA === null || valA === undefined) return 1;
+          if (valB === null || valB === undefined) return -1;
+          if (typeof valA === "number" && typeof valB === "number") {
+            return isDesc ? valB - valA : valA - valB;
+          }
+          return isDesc ? String(valB).localeCompare(String(valA)) : String(valA).localeCompare(String(valB));
+        });
+      }
+
+      if (isFinite(limit)) {
+        results = results.slice(0, limit);
+      }
+      return results;
+    }
+
     function runBrowserSQL() {
-      const rawSql = document.getElementById("sqlInput").value.trim().replace(/;$/, "");
+      const rawSql = getSqlEditorContent().trim();
       if (!rawSql) {
         notifyTaskFailed("SQL Execution", "Please enter an SQL query first.");
         return;
       }
       if (!currentDataset || !currentDataset.length) {
-        notifyTaskFailed("SQL Execution", "No dataset loaded to query. Please upload a CSV first.");
+        notifyTaskFailed("SQL Execution", "No active dataset loaded. Upload a CSV or load demo data first.");
         return;
       }
-      notifyTaskStart("SQL Query Execution");
 
+      notifyTaskStart("SQL Query Execution");
       const statusEl = document.getElementById("sqlExecutionStatus");
+      const timingBadge = document.getElementById("sqlQueryTimingBadge");
       const t0 = performance.now();
 
       try {
-        const upper = rawSql.toUpperCase();
-        if (!upper.startsWith("SELECT")) {
-          throw new Error("Only SELECT queries are currently supported.");
-        }
-
-        let datasetToQuery = currentDataset.map(r => ({ ...r }));
-
-        // 1. Parse LIMIT
-        let limit = Infinity;
-        const limitMatch = rawSql.match(/\bLIMIT\s+(\d+)\b/i);
-        if (limitMatch) {
-          limit = parseInt(limitMatch[1], 10);
-        }
-
-        // 2. Parse WHERE
-        const whereMatch = rawSql.match(/\bWHERE\s+(.*?)(?=\bGROUP\s+BY\b|\bORDER\s+BY\b|\bLIMIT\b|$)/is);
-        if (whereMatch) {
-          const conditionStr = whereMatch[1].trim();
-          datasetToQuery = datasetToQuery.filter(row => evaluateWhereCondition(row, conditionStr));
-        }
-
-        // 3. Parse GROUP BY
-        const groupByMatch = rawSql.match(/\bGROUP\s+BY\s+(.*?)(?=\bORDER\s+BY\b|\bLIMIT\b|$)/is);
-        
-        // 4. Parse SELECT columns & aggregations
-        const selectPartMatch = rawSql.match(/^SELECT\s+(.*?)\s+FROM\b/is);
-        if (!selectPartMatch) {
-          throw new Error("Invalid SQL syntax. Expected: SELECT ... FROM dataset");
-        }
-        const selectColsRaw = selectPartMatch[1].trim();
-
-        let results = [];
-
-        if (groupByMatch) {
-          const groupCol = groupByMatch[1].trim().split(",")[0].trim().replace(/^[`'"]|[`'"]$/g, "");
-          const groups = {};
-
-          datasetToQuery.forEach(row => {
-            const key = row[groupCol] !== null && row[groupCol] !== undefined ? String(row[groupCol]) : "NULL";
-            if (!groups[key]) groups[key] = [];
-            groups[key].push(row);
-          });
-
-          // Compute projections per group
-          const selectSpecs = parseSelectProjections(selectColsRaw);
-
-          results = Object.entries(groups).map(([groupVal, rows]) => {
-            const outRow = {};
-            selectSpecs.forEach(spec => {
-              if (spec.isStar) {
-                outRow[groupCol] = groupVal;
-              } else if (spec.fn) {
-                outRow[spec.alias] = computeSqlAggregation(spec.fn, spec.col, rows, spec.roundDecimals);
-              } else {
-                outRow[spec.alias] = rows[0]?.[spec.col] ?? groupVal;
-              }
-            });
-            return outRow;
-          });
-        } else {
-          // No GROUP BY
-          const selectSpecs = parseSelectProjections(selectColsRaw);
-          const hasAgg = selectSpecs.some(s => s.fn !== null);
-
-          if (selectSpecs.length === 1 && selectSpecs[0].isStar) {
-            results = datasetToQuery;
-          } else if (hasAgg) {
-            const outRow = {};
-            selectSpecs.forEach(spec => {
-              if (spec.fn) {
-                outRow[spec.alias] = computeSqlAggregation(spec.fn, spec.col, datasetToQuery, spec.roundDecimals);
-              } else {
-                outRow[spec.alias] = datasetToQuery[0]?.[spec.col] ?? null;
-              }
-            });
-            results = [outRow];
-          } else {
-            results = datasetToQuery.map(row => {
-              const outRow = {};
-              selectSpecs.forEach(spec => {
-                outRow[spec.alias] = row[spec.col] ?? null;
-              });
-              return outRow;
-            });
-          }
-        }
-
-        // 5. Parse ORDER BY
-        const orderByMatch = rawSql.match(/\bORDER\s+BY\s+(.*?)(?=\bLIMIT\b|$)/is);
-        if (orderByMatch) {
-          const orderParts = orderByMatch[1].trim().split(",");
-          const primaryOrder = orderParts[0].trim();
-          const isDesc = primaryOrder.toUpperCase().includes("DESC");
-          const orderCol = primaryOrder.replace(/\b(ASC|DESC)\b/ig, "").trim().replace(/^[`'"]|[`'"]$/g, "");
-
-          results.sort((a, b) => {
-            let valA = a[orderCol];
-            let valB = b[orderCol];
-            if (valA === null || valA === undefined) return 1;
-            if (valB === null || valB === undefined) return -1;
-            if (typeof valA === "number" && typeof valB === "number") {
-              return isDesc ? valB - valA : valA - valB;
-            }
-            return isDesc ? String(valB).localeCompare(String(valA)) : String(valA).localeCompare(String(valB));
-          });
-        }
-
-        // Apply LIMIT
-        if (isFinite(limit)) {
-          results = results.slice(0, limit);
-        }
-
+        const results = executeAdvancedSQL(rawSql);
         const elapsed = (performance.now() - t0).toFixed(1);
+        sqlExecutionElapsed = elapsed;
         lastQueryResult = results;
         lastQueryColumns = results.length ? Object.keys(results[0]) : [];
 
-        // Render Results Table
-        renderSqlResultsTable(results, elapsed);
-        statusEl.innerHTML = `<span style="color:var(--success);">✅ Query executed successfully in ${elapsed} ms.</span>`;
-        notifyTaskSuccess("SQL Query Execution", `Returned ${results.length} record(s) in ${elapsed} ms.`);
+        const curTab = sqlTabsState.find(t => t.id === activeSqlTabId);
+        if (curTab) {
+          curTab.lastResult = results;
+          curTab.lastColumns = lastQueryColumns;
+          curTab.executionTime = elapsed;
+        }
 
-        // Render Instant Chart Preview
+        sqlHistory.unshift({
+          id: Date.now(),
+          sql: rawSql,
+          timestamp: new Date().toLocaleTimeString(),
+          rows: results.length,
+          elapsed: elapsed,
+          status: "success"
+        });
+        if (sqlHistory.length > 50) sqlHistory.pop();
+        try { localStorage.setItem("datamind_sql_history", JSON.stringify(sqlHistory)); } catch (e) {}
+
+        renderSqlResultsTable(results, elapsed);
+
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:var(--success);font-weight:600;">✅ Executed in ${elapsed} ms &bull; ${results.length.toLocaleString()} rows</span>`;
+        }
+        if (timingBadge) {
+          timingBadge.textContent = `⚡ ${elapsed} ms`;
+        }
+        notifyTaskSuccess("SQL Query Execution", `Returned ${results.length.toLocaleString()} row(s) in ${elapsed} ms.`);
+
         renderSqlQueryChart();
       } catch (err) {
         const elapsed = (performance.now() - t0).toFixed(1);
-        statusEl.innerHTML = `<span style="color:var(--danger);">❌ ${err.message}</span>`;
-        document.getElementById("sqlResultsContainer").innerHTML = `<div style="padding:20px;color:var(--danger);background:rgba(239,68,68,0.1);border-radius:8px;"><b>SQL Error:</b> ${err.message}</div>`;
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:var(--danger);font-weight:600;">❌ ${escapeHtml(err.message)}</span>`;
+        }
+        document.getElementById("sqlResultsContainer").innerHTML = `
+          <div style="padding:20px; color:#f87171; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:8px; line-height:1.6;">
+            <b>SQL Execution Error:</b> ${escapeHtml(err.message)}
+          </div>
+        `;
         notifyTaskFailed("SQL Query Execution", err.message);
       }
     }
@@ -15998,85 +16893,132 @@ result = df.describe()
       } else if (fn === "MAX") {
         val = safeMax(nums);
       }
-      return roundDecimals !== null ? parseFloat(val.toFixed(roundDecimals)) : (Number.isInteger(val) ? val : parseFloat(val.toFixed(2)));
+      return roundDecimals !== null ? parseFloat(val.toFixed(roundDecimals)) : parseFloat(val.toFixed(2));
     }
 
     function renderSqlResultsTable(results, elapsed) {
       const container = document.getElementById("sqlResultsContainer");
       const countBadge = document.getElementById("sqlResultCountBadge");
+      const colBadge = document.getElementById("sqlResultColCountBadge");
       const timingBadge = document.getElementById("sqlQueryTimingBadge");
 
-      countBadge.textContent = `${results.length.toLocaleString()} Rows`;
-      timingBadge.textContent = `${elapsed} ms`;
+      if (countBadge) countBadge.textContent = `${(results || []).length.toLocaleString()} Rows`;
+      if (timingBadge) timingBadge.textContent = `⚡ ${elapsed || 0} ms`;
 
-      if (!results.length) {
-        container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--text-muted);">Query executed successfully, but returned 0 records.</div>`;
+      if (!container) return;
+      if (!results || !results.length) {
+        if (colBadge) colBadge.textContent = "0 Columns";
+        container.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">Query executed successfully with 0 rows returned.</div>`;
         return;
       }
 
       const cols = Object.keys(results[0]);
-      let html = '<table><thead><tr>' + cols.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-      results.slice(0, 100).forEach(r => {
-        html += '<tr>' + cols.map(c => {
-          const v = r[c];
-          return `<td>${v === null || v === undefined ? '<span class="badge badge-warning">null</span>' : v}</td>`;
-        }).join('') + '</tr>';
+      if (colBadge) colBadge.textContent = `${cols.length} Columns`;
+
+      const maxDisplay = 100;
+      const displayRows = results.slice(0, maxDisplay);
+
+      let html = '<table style="width:100%;border-collapse:collapse;font-size:0.82rem;">';
+      html += '<thead><tr style="background:#0f172a;position:sticky;top:0;z-index:10;">';
+      cols.forEach(c => {
+        const sampleVal = results[0]?.[c];
+        const isNum = typeof sampleVal === "number";
+        html += `<th style="padding:10px 12px;border-bottom:2px solid var(--table-border);color:var(--champagne-gold);text-align:left;white-space:nowrap;">
+          <div>${escapeHtml(c)}</div>
+          <span class="badge ${isNum ? 'badge-info' : 'badge-warning'}" style="font-size:0.60rem;padding:0 4px;">${isNum ? 'NUM' : 'TEXT'}</span>
+        </th>`;
       });
+      html += '</tr></thead><tbody>';
+
+      displayRows.forEach((r, idx) => {
+        html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:${idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.015)'}">`;
+        cols.forEach(c => {
+          const val = r[c];
+          if (val === null || val === undefined) {
+            html += `<td style="padding:8px 12px;color:#64748b;font-style:italic;">NULL</td>`;
+          } else if (typeof val === "number") {
+            html += `<td style="padding:8px 12px;font-family:monospace;color:#38bdf8;">${val.toLocaleString()}</td>`;
+          } else {
+            html += `<td style="padding:8px 12px;">${escapeHtml(String(val))}</td>`;
+          }
+        });
+        html += '</tr>';
+      });
+
       html += '</tbody></table>';
-      if (results.length > 100) {
-        html += `<div style="padding:8px 12px;font-size:0.75rem;color:var(--text-muted);text-align:center;">Displaying top 100 of ${results.length.toLocaleString()} rows. Use "Export Results (CSV)" to download all rows.</div>`;
+      if (results.length > maxDisplay) {
+        html += `<div style="padding:10px;text-align:center;font-size:0.75rem;color:var(--text-muted);background:rgba(0,0,0,0.2);">Showing first ${maxDisplay} of ${results.length.toLocaleString()} rows. Export CSV to view entire result set.</div>`;
       }
       container.innerHTML = html;
+
+      const chartPanel = document.getElementById("sqlChartPanel");
+      if (chartPanel) chartPanel.style.display = results.length > 1 ? "block" : "none";
+    }
+
+    function filterSqlResultsTable(filterText) {
+      const q = (filterText || "").toLowerCase().trim();
+      if (!lastQueryResult || !lastQueryResult.length) return;
+      if (!q) {
+        renderSqlResultsTable(lastQueryResult, sqlExecutionElapsed);
+        return;
+      }
+      const filtered = lastQueryResult.filter(row => {
+        return Object.values(row).some(v => String(v ?? "").toLowerCase().includes(q));
+      });
+      renderSqlResultsTable(filtered, sqlExecutionElapsed);
     }
 
     function renderSqlQueryChart() {
-      const panel = document.getElementById("sqlChartPanel");
-      if (!lastQueryResult || lastQueryResult.length < 2) {
-        if (panel) panel.style.display = "none";
-        return;
-      }
-      if (panel) panel.style.display = "block";
-
       const canvas = document.getElementById("sqlResultCanvas");
-      if (!canvas) return;
-      canvas.width = canvas.parentElement.clientWidth || 600;
-      canvas.height = 250;
+      if (!canvas || !lastQueryResult || lastQueryResult.length < 2) return;
+      const type = document.getElementById("sqlChartTypeSel")?.value || "bar";
       const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth || 500;
+      canvas.height = 280;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const cols = Object.keys(lastQueryResult[0]);
       const numCol = cols.find(c => typeof lastQueryResult[0][c] === "number") || cols[1] || cols[0];
       const catCol = cols.find(c => typeof lastQueryResult[0][c] !== "number") || cols[0];
-
-      const chartType = document.getElementById("sqlChartTypeSel")?.value || "bar";
       const sample = lastQueryResult.slice(0, 10);
-      const maxVal = Math.max(...sample.map(d => parseFloat(d[numCol]) || 0), 1);
 
-      if (chartType === "bar") {
-        const barW = (canvas.width - 60) / sample.length;
+      const PALETTE = ["#d4af37", "#38bdf8", "#10b981", "#f59e0b", "#a855f7", "#ec4899", "#6366f1", "#14b8a6"];
+
+      if (type === "bar") {
+        const maxVal = Math.max(...sample.map(d => parseFloat(d[numCol]) || 0), 1);
+        const padL = 60, padB = 40, padT = 20, padR = 20;
+        const chartW = canvas.width - padL - padR;
+        const chartH = canvas.height - padT - padB;
+        const barW = chartW / sample.length;
+
         sample.forEach((d, i) => {
           const val = parseFloat(d[numCol]) || 0;
-          const h = (val / maxVal) * (canvas.height - 50);
-          const x = 30 + i * barW + 5;
-          const y = canvas.height - 30 - h;
-
+          const barH = (val / maxVal) * chartH;
+          const x = padL + i * barW + barW * 0.15;
+          const y = padT + chartH - barH;
           ctx.fillStyle = PALETTE[i % PALETTE.length];
-          ctx.fillRect(x, y, barW - 10, h);
+          ctx.fillRect(x, y, barW * 0.7, barH);
 
-          ctx.fillStyle = "#cbd5e1";
+          ctx.fillStyle = "#94a3b8";
           ctx.font = "10px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(String(d[catCol] || i).slice(0, 6), x + (barW - 10) / 2, canvas.height - 15);
+          const label = String(d[catCol] || "").slice(0, 8);
+          ctx.fillText(label, x + (barW * 0.7) / 2, canvas.height - 15);
         });
-      } else if (chartType === "line") {
-        ctx.strokeStyle = "#38bdf8";
+      } else if (type === "line") {
+        const maxVal = Math.max(...sample.map(d => parseFloat(d[numCol]) || 0), 1);
+        const padL = 60, padB = 40, padT = 20, padR = 20;
+        const chartW = canvas.width - padL - padR;
+        const chartH = canvas.height - padT - padB;
+        const step = chartW / (sample.length - 1 || 1);
+
+        ctx.strokeStyle = "#d4af37";
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-        const stepX = (canvas.width - 60) / (sample.length - 1 || 1);
         sample.forEach((d, i) => {
           const val = parseFloat(d[numCol]) || 0;
-          const x = 30 + i * stepX;
-          const y = canvas.height - 30 - (val / maxVal) * (canvas.height - 50);
+          const x = padL + i * step;
+          const y = padT + chartH - (val / maxVal) * chartH;
           if (i === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         });
@@ -16084,15 +17026,17 @@ result = df.describe()
 
         sample.forEach((d, i) => {
           const val = parseFloat(d[numCol]) || 0;
-          const x = 30 + i * stepX;
-          const y = canvas.height - 30 - (val / maxVal) * (canvas.height - 50);
-          ctx.fillStyle = "#6366f1";
-          ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+          const x = padL + i * step;
+          const y = padT + chartH - (val / maxVal) * chartH;
+          ctx.fillStyle = "#f5f5f2";
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
         });
-      } else {
+      } else if (type === "pie") {
         const cx = canvas.width / 2;
         const cy = canvas.height / 2;
-        const r = Math.min(cx, cy) - 20;
+        const r = Math.min(cx, cy) - 25;
         const total = sample.reduce((acc, d) => acc + Math.max(0, parseFloat(d[numCol]) || 0), 0) || 1;
         let startAngle = 0;
         sample.forEach((d, i) => {
@@ -16136,9 +17080,31 @@ result = df.describe()
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        notifyTaskSuccess("Export SQL Results CSV", `Exported ${lastQueryResult.length} records.`);
+        notifyTaskSuccess("Export SQL Results CSV", `Exported ${lastQueryResult.length.toLocaleString()} records.`);
       } catch (err) {
         notifyTaskFailed("Export SQL Results CSV", err && err.message ? err.message : String(err));
+      }
+    }
+
+    function exportSqlResultJSON() {
+      notifyTaskStart("Export SQL Results JSON");
+      if (!lastQueryResult || !lastQueryResult.length) {
+        notifyTaskFailed("Export SQL Results JSON", "No query results to export.");
+        return;
+      }
+      try {
+        const jsonStr = JSON.stringify(lastQueryResult, null, 2);
+        const blob = new Blob([jsonStr], { type: "application/json;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `query_results_${new Date().getTime()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        notifyTaskSuccess("Export SQL Results JSON", `Exported ${lastQueryResult.length.toLocaleString()} records as JSON.`);
+      } catch (err) {
+        notifyTaskFailed("Export SQL Results JSON", err && err.message ? err.message : String(err));
       }
     }
 
@@ -16153,9 +17119,173 @@ result = df.describe()
         columns = Object.keys(currentDataset[0] || {});
         cleaningLogList.push(`SQL Query applied: dataset replaced with ${currentDataset.length} rows.`);
         updateUI();
-        notifyTaskSuccess("Set Active Dataset", `Switched active dataset to SQL query results (${currentDataset.length} rows).`);
+        notifyTaskSuccess("Set Active Dataset", `Switched active platform dataset to SQL query results (${currentDataset.length} rows).`);
       }
     }
+
+    // Saved Queries & Query History Modals
+    function saveCurrentQuery(customTitle) {
+      const sql = getSqlEditorContent().trim();
+      if (!sql) {
+        notifyTaskFailed("Save Query", "Query editor is empty.");
+        return;
+      }
+      const title = (typeof customTitle === 'string' && customTitle) ? customTitle : prompt("Enter a name for this saved query:", "Monthly Revenue Rollup");
+      if (!title || !title.trim()) return;
+
+      sqlSavedQueries.unshift({
+        id: Date.now(),
+        title: title.trim(),
+        sql: sql,
+        timestamp: new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString()
+      });
+      try { localStorage.setItem("datamind_sql_saved", JSON.stringify(sqlSavedQueries)); } catch (e) {}
+      notifyTaskSuccess("Save Query", `Saved query '${title.trim()}' successfully.`);
+    }
+
+    function showSqlSavedQueriesModal() {
+      const modal = document.getElementById("sqlSavedQueriesModal");
+      const listEl = document.getElementById("sqlSavedQueriesList");
+      if (!modal || !listEl) return;
+
+      if (!sqlSavedQueries || !sqlSavedQueries.length) {
+        listEl.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);">No saved queries found. Use '⭐ Save' in the editor to save your favorite queries.</div>`;
+      } else {
+        listEl.innerHTML = sqlSavedQueries.map((q, idx) => `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(212,175,55,0.25);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-weight:700;color:var(--champagne-gold);">${escapeHtml(q.title)}</span>
+              <span style="font-size:0.72rem;color:var(--text-muted);">${escapeHtml(q.timestamp)}</span>
+            </div>
+            <pre style="background:#070a12;border-radius:4px;padding:6px 10px;font-family:monospace;font-size:0.78rem;color:#93c5fd;margin:0;max-height:80px;overflow:hidden;">${escapeHtml(q.sql)}</pre>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:4px;">
+              <button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:0.75rem;" onclick="loadSavedQuery(${q.id})">📂 Load to Editor</button>
+              <button class="btn btn-primary" style="width:auto;padding:3px 10px;font-size:0.75rem;" onclick="runSavedQuery(${q.id})">🚀 Run</button>
+              <button class="btn btn-outline" style="width:auto;padding:3px 8px;font-size:0.75rem;color:#f87171;" onclick="deleteSavedQuery(${q.id})">🗑️</button>
+            </div>
+          </div>
+        `).join("");
+      }
+      modal.style.display = "flex";
+    }
+
+    function closeSqlSavedQueriesModal() {
+      const modal = document.getElementById("sqlSavedQueriesModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    function loadSavedQuery(id) {
+      const q = sqlSavedQueries.find(item => item.id === id);
+      if (q) {
+        setSqlEditorContent(q.sql);
+        closeSqlSavedQueriesModal();
+        notifyTaskSuccess("Load Query", `Loaded query '${q.title}' into editor.`);
+      }
+    }
+
+    function runSavedQuery(id) {
+      const q = sqlSavedQueries.find(item => item.id === id);
+      if (q) {
+        setSqlEditorContent(q.sql);
+        closeSqlSavedQueriesModal();
+        runBrowserSQL();
+      }
+    }
+
+    function deleteSavedQuery(id) {
+      sqlSavedQueries = sqlSavedQueries.filter(item => item.id !== id);
+      try { localStorage.setItem("datamind_sql_saved", JSON.stringify(sqlSavedQueries)); } catch (e) {}
+      showSqlSavedQueriesModal();
+    }
+
+    function showSqlHistoryModal() {
+      const modal = document.getElementById("sqlHistoryModal");
+      const listEl = document.getElementById("sqlHistoryList");
+      if (!modal || !listEl) return;
+
+      if (!sqlHistory || !sqlHistory.length) {
+        listEl.innerHTML = `<div style="padding:24px;text-align:center;color:var(--text-muted);">No queries executed yet in this session.</div>`;
+      } else {
+        listEl.innerHTML = sqlHistory.map(h => `
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge ${h.status === 'success' ? 'badge-success' : 'badge-danger'}" style="font-size:0.68rem;">${h.status === 'success' ? 'SUCCESS' : 'ERROR'}</span>
+                <span style="font-size:0.75rem;font-family:monospace;color:var(--text-muted);">⚡ ${h.elapsed || 0} ms &bull; ${h.rows || 0} rows</span>
+              </div>
+              <span style="font-size:0.72rem;color:var(--text-muted);">${escapeHtml(h.timestamp)}</span>
+            </div>
+            <pre style="background:#070a12;border-radius:4px;padding:6px 10px;font-family:monospace;font-size:0.78rem;color:#cbd5e1;margin:0;max-height:80px;overflow:hidden;">${escapeHtml(h.sql)}</pre>
+            <div style="display:flex;justify-content:flex-end;">
+              <button class="btn btn-outline" style="width:auto;padding:3px 10px;font-size:0.75rem;" onclick="reuseHistoryQuery(${h.id})">↩️ Reuse Query</button>
+            </div>
+          </div>
+        `).join("");
+      }
+      modal.style.display = "flex";
+    }
+
+    function closeSqlHistoryModal() {
+      const modal = document.getElementById("sqlHistoryModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    function clearSqlHistory() {
+      sqlHistory = [];
+      try { localStorage.removeItem("datamind_sql_history"); } catch (e) {}
+      showSqlHistoryModal();
+    }
+
+    function reuseHistoryQuery(id) {
+      const h = sqlHistory.find(item => item.id === id);
+      if (h) {
+        setSqlEditorContent(h.sql);
+        closeSqlHistoryModal();
+        notifyTaskSuccess("Reuse Query", "Restored historical query to editor.");
+      }
+    }
+
+    // Expose SQL IDE methods on window for global access, event handlers, and test harnesses
+    window.initSqlModule = initSqlModule;
+    window.initCodeMirrorSql = initCodeMirrorSql;
+    window.getSqlEditorContent = getSqlEditorContent;
+    window.setSqlEditorContent = setSqlEditorContent;
+    window.getSqlQuery = getSqlEditorContent;
+    window.setSqlQuery = setSqlEditorContent;
+    window.renderSqlTabsBar = renderSqlTabsBar;
+    window.switchSqlTab = switchSqlTab;
+    window.addNewSqlTab = addNewSqlTab;
+    window.closeSqlTab = closeSqlTab;
+    window.renameSqlTab = renameSqlTab;
+    window.refreshSqlSchemaUI = refreshSqlSchemaUI;
+    window.switchSqlSchemaTable = switchSqlSchemaTable;
+    window.filterSqlSchemaList = filterSqlSchemaList;
+    window.insertSqlToken = insertSqlToken;
+    window.insertSqlSnippet = insertSqlSnippet;
+    window.applySqlTemplate = applySqlTemplate;
+    window.loadSqlTemplate = loadSqlTemplate;
+    window.clearSqlEditor = clearSqlEditor;
+    window.formatSqlQuery = formatSqlQuery;
+    window.applyAiPromptPreset = applyAiPromptPreset;
+    window.generateBrowserAISQL = generateBrowserAISQL;
+    window.explainBrowserSQL = explainBrowserSQL;
+    window.optimizeBrowserSQL = optimizeBrowserSQL;
+    window.applyOptimizedSql = applyOptimizedSql;
+    window.runBrowserSQL = runBrowserSQL;
+    window.exportSqlResultCSV = exportSqlResultCSV;
+    window.exportSqlResultJSON = exportSqlResultJSON;
+    window.setQueryResultAsActive = setQueryResultAsActive;
+    window.saveCurrentQuery = saveCurrentQuery;
+    window.saveCurrentSqlQuery = saveCurrentQuery;
+    window.showSqlSavedQueriesModal = showSqlSavedQueriesModal;
+    window.closeSqlSavedQueriesModal = closeSqlSavedQueriesModal;
+    window.loadSavedQuery = loadSavedQuery;
+    window.runSavedQuery = runSavedQuery;
+    window.deleteSavedQuery = deleteSavedQuery;
+    window.showSqlHistoryModal = showSqlHistoryModal;
+    window.closeSqlHistoryModal = closeSqlHistoryModal;
+    window.clearSqlHistory = clearSqlHistory;
+    window.reuseHistoryQuery = reuseHistoryQuery;
 
     // -----------------------------------------------------------------
     // LUXURY THEME SYSTEM: DAYLIGHT STUDIO MODE & MIDNIGHT VELVET MODE
