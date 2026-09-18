@@ -179,23 +179,47 @@
       margin-top: 1px;
     }
 
-    /* App Shell Layout */
+    /* App Shell Layout - Fixed Space Sidebar Column Architecture */
     .app-wrapper {
       display: grid;
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 340px minmax(0, 1fr);
       flex: 1;
       height: calc(100vh - 84px);
       min-height: 0;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       width: 100%;
       box-sizing: border-box;
     }
-    @media (max-width: 1024px) {
-      .app-wrapper { grid-template-columns: 1fr; }
+    @media (max-width: 1200px) {
+      .app-wrapper {
+        grid-template-columns: 300px minmax(0, 1fr);
+      }
+      .sidebar {
+        width: 300px !important;
+        min-width: 300px !important;
+        max-width: 300px !important;
+        padding: 16px 14px !important;
+      }
+    }
+    @media (max-width: 768px) {
+      .app-wrapper {
+        grid-template-columns: 280px minmax(560px, 1fr);
+      }
+      .sidebar {
+        width: 280px !important;
+        min-width: 280px !important;
+        max-width: 280px !important;
+        padding: 14px 10px !important;
+      }
     }
 
-    /* Left Sidebar */
+    /* Left Sidebar - Permanent Fixed Space Column (Never Collapses or Hides on Tap) */
     .sidebar {
+      width: 340px;
+      min-width: 340px;
+      max-width: 340px;
+      flex-shrink: 0;
       background: var(--sidebar-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
@@ -214,6 +238,7 @@
       scrollbar-gutter: stable;
       scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
       transition: background 0.3s ease, border-color 0.3s ease;
+      z-index: 10;
     }
     .sidebar::-webkit-scrollbar {
       width: 6px;
