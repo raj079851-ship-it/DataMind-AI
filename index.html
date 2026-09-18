@@ -565,6 +565,29 @@
     .badge-warning { background: rgba(245, 158, 11, 0.18); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
     .badge-danger { background: rgba(239, 68, 68, 0.18); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
     .badge-info { background: rgba(212, 175, 55, 0.18); color: #E5BE48; border: 1px solid rgba(212, 175, 55, 0.35); }
+    .badge-primary { background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.1) 100%); color: var(--champagne-gold); border: 1px solid rgba(212, 175, 55, 0.45); font-weight: 700; }
+
+    /* Module 5: Insert Column Layout & Box Enhancements */
+    .insert-col-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+      min-width: 0;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .insert-col-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+    #insertColGeneratorBox {
+      min-width: 0;
+      position: relative;
+      z-index: 2;
+      border: 1.5px solid rgba(212, 175, 55, 0.45) !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 0 16px rgba(212, 175, 55, 0.08) !important;
+    }
 
     /* Module Views */
     .module-view { display: none; }
@@ -3826,11 +3849,14 @@ result = df.describe()
       <div id="moduleInsertCol" class="module-view">
 
         <!-- Hero Box -->
-        <div class="banner-box" style="border-left-color:#6366f1; margin-bottom:18px;">
+        <div class="banner-box" style="border-left-color:var(--champagne-gold); margin-bottom:16px; padding:14px 18px;">
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
             <div>
-              <h4 style="color:#818cf8; margin-bottom:4px; font-size:1.15rem; font-weight:700;">➕ Insert &amp; Synthesize New Column Studio</h4>
-              <p style="font-size:0.86rem; color:var(--text-muted); margin:0;">
+              <h4 style="color:var(--champagne-gold); margin-bottom:4px; font-size:1.1rem; font-weight:700; display:flex; align-items:center; gap:8px;">
+                <span>➕</span>
+                <span>Insert &amp; Synthesize New Column Studio</span>
+              </h4>
+              <p style="font-size:0.84rem; color:var(--text-muted); margin:0;">
                 Synthesize, calculate, and append new columns into your active dataset using mathematical operators, custom formulas, scaling, conditional thresholds, text combinations, or column duplication.
               </p>
             </div>
@@ -3841,13 +3867,16 @@ result = df.describe()
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:18px; margin-bottom:18px;">
+        <div class="insert-col-grid">
 
           <!-- Left Column: Column Synthesizer & Builder Form -->
-          <div class="panel" style="margin-bottom:0;">
-            <div class="panel-header" style="margin-bottom:12px;">
-              <span>🛠️ Column Generator &amp; Expression Builder</span>
-              <span class="badge badge-primary">Builder</span>
+          <div class="panel" id="insertColGeneratorBox" style="margin-bottom:0; min-width:0;">
+            <div class="panel-header" style="margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(212, 175, 55, 0.18); display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-weight:700; display:flex; align-items:center; gap:8px; color:var(--text);">
+                <span style="color:var(--champagne-gold);">🛠️</span>
+                <span>Column Generator &amp; Expression Builder</span>
+              </span>
+              <span class="badge badge-primary">Builder Studio</span>
             </div>
 
             <div style="display:flex; flex-direction:column; gap:12px;">
@@ -3856,11 +3885,11 @@ result = df.describe()
               <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                 <div>
                   <label style="font-size:0.78rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">New Column Name:</label>
-                  <input type="text" id="newColName" placeholder="e.g. bonus_pay, margin_ratio, tier" style="margin:0;" />
+                  <input type="text" id="newColName" placeholder="e.g. bonus_pay, margin_ratio, tier" style="margin:0; width:100%; box-sizing:border-box;" />
                 </div>
                 <div>
                   <label style="font-size:0.78rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Generation Method:</label>
-                  <select id="newColMethod" onchange="updateInsertColUI()" style="margin:0;">
+                  <select id="newColMethod" onchange="updateInsertColUI()" style="margin:0; width:100%; box-sizing:border-box;">
                     <option value="math">1. Math Operation (Col A &amp; Col B)</option>
                     <option value="formula">2. Custom Formula / Python Expression</option>
                     <option value="scale">3. Scale / Markup Percentage (+15%, etc.)</option>
@@ -3887,15 +3916,15 @@ result = df.describe()
 
               <!-- Options: 1. Math Operation -->
               <div id="insertMathOptions" style="background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:8px;">Compute Mathematical Operation between Two Numeric Columns:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:8px;">Compute Mathematical Operation between Two Numeric Columns:</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;">
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Column A:</label>
-                    <select id="newColA" style="margin:0;"></select>
+                    <select id="newColA" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Col A --</option></select>
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Operator:</label>
-                    <select id="newColOp" style="margin:0;">
+                    <select id="newColOp" style="margin:0; width:100%; box-sizing:border-box;">
                       <option value="divide">Divide (A ÷ B)</option>
                       <option value="pct_ratio">Percentage Ratio ((A ÷ B) × 100)%</option>
                       <option value="multiply">Multiply (A × B)</option>
@@ -3906,7 +3935,7 @@ result = df.describe()
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Column B:</label>
-                    <select id="newColB" style="margin:0;"></select>
+                    <select id="newColB" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Col B --</option></select>
                   </div>
                 </div>
               </div>
@@ -3914,10 +3943,10 @@ result = df.describe()
               <!-- Options: 2. Custom Formula -->
               <div id="insertFormulaOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <span style="font-size:0.8rem; font-weight:600; color:#818cf8;">Custom Row Expression (Use <code>row['Column']</code>):</span>
+                  <span style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold);">Custom Row Expression (Use <code>row['Column']</code>):</span>
                   <span style="font-size:0.72rem; color:var(--text-muted);">Math functions: Math.round, Math.log, Math.max</span>
                 </div>
-                <input type="text" id="newColFormulaExpr" placeholder="e.g. row['MonthlyCharges'] * 1.15" style="font-family:monospace; margin-bottom:8px;" />
+                <input type="text" id="newColFormulaExpr" placeholder="e.g. row['MonthlyCharges'] * 1.15" style="font-family:monospace; margin-bottom:8px; width:100%; box-sizing:border-box;" />
                 <div style="font-size:0.72rem; color:var(--text-muted);">
                   Click any column chip below to automatically insert its identifier into the formula.
                 </div>
@@ -3925,30 +3954,30 @@ result = df.describe()
 
               <!-- Options: 3. Scale Column -->
               <div id="insertScaleOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:8px;">Scale Numeric Column by Multiplier:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:8px;">Scale Numeric Column by Multiplier:</div>
                 <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:10px;">
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Numeric Column to Scale:</label>
-                    <select id="newColScaleSrc" style="margin:0;"></select>
+                    <select id="newColScaleSrc" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Numeric Col --</option></select>
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Multiplier / Factor (e.g. 1.15 for +15%):</label>
-                    <input type="number" id="newColScaleFactor" step="0.01" value="1.15" style="margin:0;" />
+                    <input type="number" id="newColScaleFactor" step="0.01" value="1.15" style="margin:0; width:100%; box-sizing:border-box;" />
                   </div>
                 </div>
               </div>
 
               <!-- Options: 4. Condition / Threshold -->
               <div id="insertConditionOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:8px;">Segment &amp; Categorize Rows by Threshold:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:8px;">Segment &amp; Categorize Rows by Threshold:</div>
                 <div style="display:grid; grid-template-columns:1.2fr 0.8fr 1fr; gap:10px; margin-bottom:8px;">
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Test Column:</label>
-                    <select id="newColCondCol" style="margin:0;"></select>
+                    <select id="newColCondCol" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Test Col --</option></select>
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Operator:</label>
-                    <select id="newColCondOp" style="margin:0;">
+                    <select id="newColCondOp" style="margin:0; width:100%; box-sizing:border-box;">
                       <option value=">=">&gt;= (Greater or Equal)</option>
                       <option value=">">&gt; (Greater Than)</option>
                       <option value="<=">&lt;= (Less or Equal)</option>
@@ -3959,52 +3988,52 @@ result = df.describe()
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Threshold Value:</label>
-                    <input type="text" id="newColCondVal" placeholder="e.g. 50 or High" style="margin:0;" />
+                    <input type="text" id="newColCondVal" placeholder="e.g. 50 or High" style="margin:0; width:100%; box-sizing:border-box;" />
                   </div>
                 </div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Value if Condition TRUE:</label>
-                    <input type="text" id="newColCondTrue" value="High" style="margin:0;" />
+                    <input type="text" id="newColCondTrue" value="High" style="margin:0; width:100%; box-sizing:border-box;" />
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Value if Condition FALSE:</label>
-                    <input type="text" id="newColCondFalse" value="Standard" style="margin:0;" />
+                    <input type="text" id="newColCondFalse" value="Standard" style="margin:0; width:100%; box-sizing:border-box;" />
                   </div>
                 </div>
               </div>
 
               <!-- Options: 5. Text Concat -->
               <div id="insertConcatOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:8px;">Merge Two Columns as Text:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:8px;">Merge Two Columns as Text:</div>
                 <div style="display:grid; grid-template-columns:1fr 0.6fr 1fr; gap:10px;">
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">First Column:</label>
-                    <select id="newColConcatA" style="margin:0;"></select>
+                    <select id="newColConcatA" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Col 1 --</option></select>
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Separator:</label>
-                    <input type="text" id="newColConcatSep" value=" - " style="margin:0;" />
+                    <input type="text" id="newColConcatSep" value=" - " style="margin:0; width:100%; box-sizing:border-box;" />
                   </div>
                   <div>
                     <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Second Column:</label>
-                    <select id="newColConcatB" style="margin:0;"></select>
+                    <select id="newColConcatB" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Col 2 --</option></select>
                   </div>
                 </div>
               </div>
 
               <!-- Options: 6. Constant Value -->
               <div id="insertConstOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:6px;">Assign Fixed Constant to All Rows:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:6px;">Assign Fixed Constant to All Rows:</div>
                 <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Constant Value:</label>
-                <input type="text" id="newColConstVal" placeholder="e.g. Standard, Active, 2026, 0.0" style="margin:0;" />
+                <input type="text" id="newColConstVal" placeholder="e.g. Standard, Active, 2026, 0.0" style="margin:0; width:100%; box-sizing:border-box;" />
               </div>
 
               <!-- Options: 7. Copy / Duplicate Column -->
               <div id="insertDupOptions" style="display:none; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:12px;">
-                <div style="font-size:0.8rem; font-weight:600; color:#818cf8; margin-bottom:6px;">Clone Existing Column:</div>
+                <div style="font-size:0.8rem; font-weight:600; color:var(--champagne-gold); margin-bottom:6px;">Clone Existing Column:</div>
                 <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:3px;">Source Column to Copy:</label>
-                <select id="newColCopySrc" style="margin:0;"></select>
+                <select id="newColCopySrc" style="margin:0; width:100%; box-sizing:border-box;"><option value="">-- Select Source Col --</option></select>
               </div>
 
               <!-- Clickable Column Chips for formula or quick copy -->
@@ -8782,6 +8811,8 @@ result = df.describe()
       initBrightnessTheme();
       initSpeechSynthesis();
       updateUI();
+      try { populateDropdowns(); } catch (e) { console.warn("Populate dropdowns init:", e); }
+      try { refreshInsertColUI(); } catch (e) { console.warn("Insert col init:", e); }
       try { initConnectorsModuleUI(); } catch (e) { console.warn("Connectors init:", e); }
       try { initMLModuleUI(); } catch (e) { console.warn("ML init:", e); }
       try { initSecurityModuleUI(); } catch (e) { console.warn("Security init:", e); }
@@ -8789,6 +8820,11 @@ result = df.describe()
 
     // Switch active module from left sidebar
     function switchModule(moduleId) {
+      // Universal scroll-to-top reset: guarantees top of active module and its builder panels are immediately visible
+      const contentArea = document.querySelector(".content-area");
+      if (contentArea) contentArea.scrollTop = 0;
+      window.scrollTo(0, 0);
+
       // Remove top workspace cards on Platform Settings
       const topMetrics = document.querySelector(".metrics-grid");
       if (topMetrics) {
@@ -8857,7 +8893,12 @@ result = df.describe()
       }
       else if (moduleId === 'moduleInsertCol') {
         document.getElementById('navBtnInsertCol').classList.add('active');
-        setTimeout(() => { refreshInsertColUI(); }, 30);
+        setTimeout(() => {
+          populateDropdowns();
+          refreshInsertColUI();
+          const ca = document.querySelector(".content-area");
+          if (ca) ca.scrollTop = 0;
+        }, 20);
       }
       else if (moduleId === 'moduleConnectors') {
         const btn = document.getElementById('navBtnConnectors');
@@ -9494,6 +9535,7 @@ result = df.describe()
 
         colNameInput.value = "";
         updateUI();
+        refreshInsertColUI();
         notifyTaskSuccess("Insert New Column", `Column '${name}' created successfully (${currentDataset.length.toLocaleString()} rows aligned).`);
       } catch (err) {
         notifyTaskFailed("Insert New Column", err && err.message ? err.message : String(err));
@@ -9697,11 +9739,11 @@ result = df.describe()
       const numCols = columns.filter(c => isColNumeric(c));
       const catCols = columns.filter(c => !numCols.includes(c));
 
-      function fillSelect(id, list) {
+      function fillSelect(id, list, placeholder = '-- No Columns --') {
         const el = document.getElementById(id);
         if (!el) return;
         if (!list || !list.length) {
-          el.innerHTML = '<option value="">-- No Columns --</option>';
+          el.innerHTML = `<option value="">${placeholder}</option>`;
           return;
         }
         el.innerHTML = list.map(c => `<option value="${c}">${c}</option>`).join("");
@@ -9752,13 +9794,13 @@ result = df.describe()
       fillSelect("dashDimCol", catCols.length ? catCols : columns);
 
       // Insert Column selects
-      fillSelect("newColA", numCols);
-      fillSelect("newColB", numCols);
-      fillSelect("newColCopySrc", columns);
-      fillSelect("newColScaleSrc", numCols);
-      fillSelect("newColCondCol", columns);
-      fillSelect("newColConcatA", columns);
-      fillSelect("newColConcatB", columns);
+      fillSelect("newColA", numCols, "-- Select Numeric Col A --");
+      fillSelect("newColB", numCols, "-- Select Numeric Col B --");
+      fillSelect("newColCopySrc", columns, "-- Select Source Col --");
+      fillSelect("newColScaleSrc", numCols, "-- Select Numeric Col --");
+      fillSelect("newColCondCol", columns, "-- Select Test Col --");
+      fillSelect("newColConcatA", columns, "-- Select First Col --");
+      fillSelect("newColConcatB", columns, "-- Select Second Col --");
     }
 
     function renderCleaningPreviewTable() {
