@@ -179,6 +179,42 @@
       margin-top: 1px;
     }
 
+    /* Sidebar Fullscreen Toggle & Hidden State */
+    .sidebar-hide-btn {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--champagne-gold);
+      padding: 3px 8px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      border-radius: 5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      text-transform: none;
+      letter-spacing: 0.02em;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .sidebar-hide-btn:hover {
+      background: rgba(212, 175, 55, 0.22);
+      border-color: var(--champagne-gold);
+      color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.30);
+    }
+    .app-wrapper.sidebar-hidden {
+      grid-template-columns: 1fr !important;
+    }
+    .app-wrapper.sidebar-hidden .sidebar {
+      display: none !important;
+    }
+    .app-wrapper.sidebar-hidden .content-area {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+
     /* App Shell Layout - Fixed Space Sidebar Column Architecture */
     .app-wrapper {
       display: grid;
@@ -909,6 +945,11 @@
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;margin-left:auto;">
+      <!-- Fullscreen Restore Sidebar Button (appears when sidebar is hidden) -->
+      <button id="headerSidebarRestoreBtn" class="btn btn-outline" onclick="toggleSidebarFullscreen()" style="display:none; padding:6px 12px; font-size:0.78rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold); background:rgba(212,175,55,0.12); border-radius:8px; align-items:center; gap:6px; cursor:pointer; font-weight:700; white-space:nowrap; box-shadow:0 0 12px rgba(212,175,55,0.18);" title="Show Sidebar Column">
+        <span>⮞</span>
+        <span>Show Sidebar</span>
+      </button>
       <span id="activeDatasetTag" class="badge badge-info" style="font-size:0.80rem;padding:6px 12px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:20px;white-space:nowrap;">Dataset: None</span>
       <button class="btn btn-primary" style="width:auto;margin:0;padding:7px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(99,102,241,0.35);font-weight:600;font-size:0.80rem;white-space:nowrap;" onclick="exportCurrentCSV()">
         <span>📥</span>
@@ -1038,6 +1079,12 @@
   <!-- App Wrapper -->
   <div class="app-wrapper">
 
+    <!-- Floating Left Edge Restore Sidebar Tab (appears when sidebar is hidden) -->
+    <button id="sidebarRestoreFloatingBtn" onclick="toggleSidebarFullscreen()" style="display:none; position:fixed; left:0; top:120px; z-index:99999; background:rgba(15,23,42,0.95); border:1.5px solid rgba(212,175,55,0.55); border-left:none; color:var(--champagne-gold); padding:9px 14px 9px 12px; border-radius:0 8px 8px 0; font-size:0.80rem; font-weight:700; cursor:pointer; box-shadow:4px 6px 20px rgba(0,0,0,0.65); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); align-items:center; gap:6px; transition:all 0.15s ease;" title="Click to show sidebar column">
+      <span style="font-size:0.88rem;">⮞</span>
+      <span>Show Sidebar</span>
+    </button>
+
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
 
@@ -1045,6 +1092,10 @@
       <div class="sidebar-section">
         <div class="sidebar-title">
           <span>📂 1. Data Ingestion</span>
+          <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Hide Sidebar Column for Fullscreen Mode">
+            <span>Sidebar Hidden</span>
+            <span style="font-size:0.75rem;">⮜</span>
+          </button>
         </div>
 
         <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
@@ -9240,6 +9291,35 @@ result = df.describe()
       try { initSecurityModuleUI(); } catch (e) { console.warn("Security init:", e); }
       try { initSqlModule(); } catch (e) { console.warn("SQL studio init:", e); }
     }
+
+    // Toggle Sidebar Visibility for Fullscreen Workspace Mode
+    function toggleSidebarFullscreen() {
+      const wrapper = document.querySelector(".app-wrapper");
+      const restoreBtn = document.getElementById("sidebarRestoreFloatingBtn");
+      const headerBtn = document.getElementById("headerSidebarRestoreBtn");
+      if (!wrapper) return;
+
+      const isHidden = wrapper.classList.toggle("sidebar-hidden");
+
+      if (restoreBtn) {
+        restoreBtn.style.display = isHidden ? "inline-flex" : "none";
+      }
+      if (headerBtn) {
+        headerBtn.style.display = isHidden ? "inline-flex" : "none";
+      }
+
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 60);
+
+      if (typeof notifyTaskSuccess === "function") {
+        notifyTaskSuccess(
+          isHidden ? "Fullscreen Workspace" : "Standard View",
+          isHidden ? "Sidebar column hidden for full screen workspace." : "Sidebar column restored to normal view."
+        );
+      }
+    }
+    window.toggleSidebarFullscreen = toggleSidebarFullscreen;
 
     // Switch active module from left sidebar
     function switchModule(moduleId) {
