@@ -186,10 +186,12 @@
       flex: 1;
       height: calc(100vh - 84px);
       min-height: 0;
-      overflow-x: auto;
+      overflow-x: hidden;
       overflow-y: hidden;
       width: 100%;
+      max-width: 100vw;
       box-sizing: border-box;
+      position: relative;
     }
     @media (max-width: 1200px) {
       .app-wrapper {
@@ -204,7 +206,7 @@
     }
     @media (max-width: 768px) {
       .app-wrapper {
-        grid-template-columns: 280px minmax(560px, 1fr);
+        grid-template-columns: 280px minmax(0, 1fr);
       }
       .sidebar {
         width: 280px !important;
@@ -216,6 +218,9 @@
 
     /* Left Sidebar - Permanent Fixed Space Column (Never Collapses or Hides on Tap) */
     .sidebar {
+      position: sticky;
+      left: 0;
+      top: 0;
       width: 340px;
       min-width: 340px;
       max-width: 340px;
@@ -238,7 +243,8 @@
       scrollbar-gutter: stable;
       scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
       transition: background 0.3s ease, border-color 0.3s ease;
-      z-index: 10;
+      z-index: 100;
+      transform: none !important;
     }
     .sidebar::-webkit-scrollbar {
       width: 6px;
@@ -310,18 +316,20 @@
       padding: 11px 14px;
       background: rgba(16, 20, 30, 0.55);
       border: 1px solid rgba(255, 255, 255, 0.06);
+      border-left: 3.5px solid transparent;
       border-radius: 8px;
       color: var(--text);
       font-size: 0.89rem;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
       text-align: left;
+      transform: none !important;
     }
     .nav-item:hover {
       background: rgba(212, 175, 55, 0.08);
       border-color: rgba(212, 175, 55, 0.35);
-      transform: translateX(3px);
+      transform: none !important;
       color: #FFFFFF;
     }
     .nav-item.active {
@@ -329,7 +337,17 @@
       color: #FFFFFF;
       border-color: rgba(212, 175, 55, 0.55);
       border-left: 3.5px solid var(--champagne-gold);
+      border-left-color: var(--champagne-gold);
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(212, 175, 55, 0.08);
+      transform: none !important;
+    }
+    /* Steady Sidebar Column Buttons - zero shift on hover, tap, or click */
+    .sidebar .nav-item,
+    .sidebar button,
+    .sidebar-section button,
+    .nav-item.btn-clicked-animation {
+      animation: none !important;
+      transform: none !important;
     }
     .nav-item-content {
       display: flex;
@@ -3293,7 +3311,6 @@
         </div>
       </div>
 
-      </div>
 
       <!-- MODULE 6: PYTHON CODING ENVIRONMENT -->
       <div id="modulePython" class="module-view">
@@ -9229,7 +9246,8 @@ result = df.describe()
       // Universal scroll-to-top reset: guarantees top of active module and its builder panels are immediately visible
       const contentArea = document.querySelector(".content-area");
       if (contentArea) contentArea.scrollTop = 0;
-      window.scrollTo(0, 0);
+      const appWrapper = document.querySelector(".app-wrapper");
+      if (appWrapper) appWrapper.scrollLeft = 0;
 
       // Remove top workspace cards on Platform Settings
       const topMetrics = document.querySelector(".metrics-grid");
@@ -9844,7 +9862,7 @@ result = df.describe()
       if (!fInput) return;
       const token = `row['${c}']`;
       fInput.value = fInput.value ? `${fInput.value} ${token}` : token;
-      fInput.focus();
+      fInput.focus({ preventScroll: true });
     }
 
     function insertNewColumn() {
@@ -10108,7 +10126,7 @@ result = df.describe()
         const textarea = document.getElementById("sqlInput");
         if (!textarea) return;
         textarea.value = textarea.value.trim() + ` ${col}`;
-        textarea.focus();
+        textarea.focus({ preventScroll: true });
       }
     }
 
@@ -16301,7 +16319,7 @@ result = df.describe()
         const end = textarea.selectionEnd;
         const val = textarea.value;
         textarea.value = val.substring(0, start) + token + val.substring(end);
-        textarea.focus();
+        textarea.focus({ preventScroll: true });
         textarea.selectionStart = textarea.selectionEnd = start + token.length;
       }
     }
@@ -20847,7 +20865,7 @@ result = df.describe()
       if (expr) {
         const pos = expr.selectionStart;
         expr.value = expr.value.slice(0, pos) + colName + expr.value.slice(pos);
-        expr.focus();
+        expr.focus({ preventScroll: true });
       }
     }
 
@@ -22040,6 +22058,8 @@ result = df.describe()
       const target = e.target;
       // Do not animate on text input fields, textareas, selects, or dropdown options
       if (target.matches("input:not([type='button']):not([type='submit']), select, textarea, option")) return;
+      // Do not animate on sidebar items or sidebar buttons to keep them completely steady at their position
+      if (target.closest(".sidebar, .nav-item")) return;
 
       // Match all buttons, interactive keys, pills, badges, tabs, cards, and clickable controls
       const btn = target.closest(
