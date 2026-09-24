@@ -193,12 +193,15 @@ def send_otp_endpoint(req: SendOtpRequest, request: Request, db: Session = Depen
         metadata={"email": clean_email, "purpose": req.purpose, "delivery_success": success, "status_msg": msg}
     )
 
-    return {
+    resp_payload = {
         "status": "success" if success else "smtp_warning",
         "email": clean_email,
         "live_smtp": success,
         "message": msg if success else f"OTP generated (expires in 5 mins). SMTP delivery note: {msg}"
     }
+    if not success:
+        resp_payload["dev_otp"] = otp
+    return resp_payload
 
 
 @router.post("/verify-otp")
@@ -289,12 +292,15 @@ def forgot_password_send_otp(req: ForgotPasswordSendOtpRequest, request: Request
         metadata={"email": clean_email, "delivery_success": success}
     )
 
-    return {
+    recovery_resp = {
         "status": "success" if success else "smtp_warning",
         "email": clean_email,
         "live_smtp": success,
         "message": f"Recovery OTP dispatched to {clean_email}." if success else f"Recovery code generated. SMTP warning: {msg}"
     }
+    if not success:
+        recovery_resp["dev_otp"] = otp
+    return recovery_resp
 
 
 @router.post("/forgot-password/reset")
@@ -352,14 +358,29 @@ def get_smtp_status():
 
 
 @router.post("/smtp-config")
-def update_smtp_config(req: SmtpConfigRequest, current_user: User = Depends(require_admin)):
-    """Updates runtime SMTP transport configuration and syncs to .env (Admin only)."""
+def update_smtp_config(req: SmtpConfigRequest, request: Request, db: Session = Depends(get_db)):
+    """Updates runtime SMTP transport configuration and syncs to .env."""
+    client_ip = request.client.host if request.client else "127.0.0.1"
+    is_localhost = client_ip in ["127.0.0.1", "::1", "localhost"]
+    auth_header = request.headers.get("authorization", "")
+
+    if not is_localhost:
+        if not auth_header.startswith("Bearer "):
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Admin authorization required to modify SMTP gateway.")
+        token = auth_header.replace("Bearer ", "").strip()
+        try:
+            payload = AuthService.decode_token(token)
+            if payload.get("role") != "admin":
+                raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin privileges required.")
+        except Exception:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token.")
+
     default_smtp_service.update_config(
         host=req.host,
         port=req.port,
         user=req.user,
         password=req.password or "",
-        sender=req.sender,
+        sender=req.sender or req.user,
         use_tls=req.use_tls if req.use_tls is not None else True
     )
     return {

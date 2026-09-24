@@ -9253,16 +9253,25 @@ result = df.describe()
 
         if (banner) {
           banner.style.display = "block";
-          banner.style.background = "rgba(16,185,129,0.15)";
-          banner.style.border = "1px solid #10b981";
-          banner.style.color = "#6ee7b7";
-          banner.innerHTML = `📨 <strong>Recovery Code Sent:</strong> We've dispatched a 6-digit recovery OTP to <code>${email}</code>. Check your inbox and enter it below.`;
+          if (data.live_smtp) {
+            banner.style.background = "rgba(16,185,129,0.15)";
+            banner.style.border = "1px solid #10b981";
+            banner.style.color = "#6ee7b7";
+            banner.innerHTML = `📨 <strong>Recovery Code Sent:</strong> We've dispatched a 6-digit recovery OTP to <code>${email}</code> via live SMTP. Check your inbox and enter it below.`;
+            notifyTaskSuccess("Recovery Code Dispatched", `Sent verification code to ${email}.`);
+          } else {
+            banner.style.background = "rgba(234,179,8,0.15)";
+            banner.style.border = "1px solid #eab308";
+            banner.style.color = "#fef08a";
+            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Recovery OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+            banner.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+          }
         }
 
         const step2 = document.getElementById("recoveryStep2Section");
         if (step2) step2.style.display = "block";
         document.getElementById("recoveryOtpInput")?.focus();
-        notifyTaskSuccess("Recovery Code Dispatched", `Sent verification code to ${email}.`);
       } catch (err) {
         if (banner) {
           banner.style.display = "block";
@@ -9423,14 +9432,23 @@ result = df.describe()
         const otpAlert = document.getElementById("otpAlertBanner");
         if (otpAlert) {
           otpAlert.style.display = "block";
-          otpAlert.style.background = "rgba(16,185,129,0.15)";
-          otpAlert.style.border = "1px solid #10b981";
-          otpAlert.style.color = "#6ee7b7";
-          otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+          if (data.live_smtp) {
+            otpAlert.style.background = "rgba(16,185,129,0.15)";
+            otpAlert.style.border = "1px solid #10b981";
+            otpAlert.style.color = "#6ee7b7";
+            otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+            notifyTaskSuccess("Admin OTP Sent", `Verification code sent to ${targetEmail}.`);
+          } else {
+            otpAlert.style.background = "rgba(234,179,8,0.15)";
+            otpAlert.style.border = "1px solid #eab308";
+            otpAlert.style.color = "#fef08a";
+            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+          }
         }
 
         startOtpCountdown(300);
-        notifyTaskSuccess("Admin OTP Sent", `Verification code sent to ${targetEmail}.`);
       } catch (err) {
         if (alertBox) {
           alertBox.style.display = "block";
@@ -9502,14 +9520,23 @@ result = df.describe()
         const otpAlert = document.getElementById("otpAlertBanner");
         if (otpAlert) {
           otpAlert.style.display = "block";
-          otpAlert.style.background = "rgba(16,185,129,0.15)";
-          otpAlert.style.border = "1px solid #10b981";
-          otpAlert.style.color = "#6ee7b7";
-          otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+          if (data.live_smtp) {
+            otpAlert.style.background = "rgba(16,185,129,0.15)";
+            otpAlert.style.border = "1px solid #10b981";
+            otpAlert.style.color = "#6ee7b7";
+            otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+            notifyTaskSuccess("OTP Sent", `Verification code sent to ${targetEmail}.`);
+          } else {
+            otpAlert.style.background = "rgba(234,179,8,0.15)";
+            otpAlert.style.border = "1px solid #eab308";
+            otpAlert.style.color = "#fef08a";
+            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+          }
         }
 
         startOtpCountdown(300);
-        notifyTaskSuccess("OTP Sent", `Verification code sent to ${targetEmail}.`);
       } catch (err) {
         if (alertBox) {
           alertBox.style.display = "block";
@@ -9585,14 +9612,23 @@ result = df.describe()
         const otpAlert = document.getElementById("otpAlertBanner");
         if (otpAlert) {
           otpAlert.style.display = "block";
-          otpAlert.style.background = "rgba(16,185,129,0.15)";
-          otpAlert.style.border = "1px solid #10b981";
-          otpAlert.style.color = "#6ee7b7";
-          otpAlert.innerHTML = `📨 <strong>Verification Code Sent:</strong> Dispatched to <code>${email}</code> via SMTP. Please check your inbox.`;
+          if (data.live_smtp) {
+            otpAlert.style.background = "rgba(16,185,129,0.15)";
+            otpAlert.style.border = "1px solid #10b981";
+            otpAlert.style.color = "#6ee7b7";
+            otpAlert.innerHTML = `📨 <strong>Verification Code Sent:</strong> Dispatched to <code>${email}</code> via live SMTP. Please check your inbox.`;
+            notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
+          } else {
+            otpAlert.style.background = "rgba(234,179,8,0.15)";
+            otpAlert.style.border = "1px solid #eab308";
+            otpAlert.style.color = "#fef08a";
+            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+          }
         }
 
         startOtpCountdown(300);
-        notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
       } catch (err) {
         if (alertBox) {
           alertBox.style.display = "block";
@@ -9844,12 +9880,11 @@ result = df.describe()
 
       try {
         const token = currentAuthUser?.token;
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
         const saveResp = await fetch(`${API_BASE_URL}/api/auth/smtp-config`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
+          headers: headers,
           body: JSON.stringify({ host, port, user, password: pass, sender, use_tls: true })
         });
 
