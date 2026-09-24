@@ -1101,120 +1101,132 @@
 
   <!-- ENTERPRISE AUTHENTICATION & LOGIN GATE MODAL -->
   <div id="authModal" class="auth-modal-backdrop" onclick="if(event.target===this) closeAuthModal();">
-    <div class="auth-modal-card">
+    <div class="auth-modal-card" style="max-width:440px; border-radius:14px; overflow:hidden;">
+      <!-- Modal Header -->
       <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; background:#1e293b; border-bottom:1px solid rgba(255,255,255,0.08);">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.4rem;">🛡️</span>
+          <span style="font-size:1.3rem;">🛡️</span>
           <div>
-            <div style="font-weight:800; font-size:1.05rem; color:#f8fafc;">DataMind AI Enterprise Security Gate</div>
-            <div style="font-size:0.72rem; color:#94a3b8;">SMTP Mode OTP Verification • PBKDF2 Hashing • Role-Based Access Control</div>
+            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">DataMind AI Security Gate</div>
+            <div style="font-size:0.72rem; color:#94a3b8;">Authentication &amp; Enterprise Access</div>
           </div>
         </div>
-        <button onclick="closeAuthModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;">✕</button>
+        <button onclick="closeAuthModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; line-height:1;">✕</button>
       </div>
 
-      <div style="padding:18px 20px; flex:1; overflow-y:auto;">
-        <!-- Auth Sub-tabs -->
-        <div style="display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--card-border); padding-bottom:8px; flex-wrap:wrap;">
-          <button id="authTabBtn1" class="btn btn-primary" style="width:auto; padding:5px 12px; font-size:0.76rem;" onclick="switchAuthTab('password')">🔑 Existing User Sign-In</button>
-          <button id="authTabBtnNew" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.76rem;" onclick="switchAuthTab('register')">✨ New User Register</button>
-          <button id="authTabBtn2" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.76rem;" onclick="switchAuthTab('oauth')">🌐 OAuth 2.0</button>
-          <button id="authTabBtnSMTP" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.76rem;" onclick="switchAuthTab('smtp')">⚙️ SMTP Mode</button>
-          <button id="authTabBtn3" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.76rem;" onclick="switchAuthTab('rbac')">📋 RBAC Matrix</button>
-        </div>
-
-        <!-- Tab 1: Existing User Password & SMTP OTP Sign-In -->
-        <div id="authTabPassword">
-          <!-- 1-Click Persona Chips -->
-          <div style="margin-bottom:14px; background:rgba(255,255,255,0.03); padding:10px 12px; border-radius:8px; border:1px solid var(--card-border);">
-            <div style="font-size:0.74rem; color:var(--text-muted); margin-bottom:6px; font-weight:600;">⚡ 1-Click Persona Selection:</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button type="button" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.74rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold);" onclick="fillLoginPersona('raj079851@gmail.com', 'Admin@123', 'Admin')">👑 Admin (raj079851@gmail.com)</button>
-              <button type="button" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.74rem;" onclick="fillLoginPersona('analyst@datamind.ai', 'Analyst@123', 'Analyst')">📊 Data Analyst</button>
-              <button type="button" class="btn btn-outline" style="width:auto; padding:4px 10px; font-size:0.74rem;" onclick="fillLoginPersona('viewer@datamind.ai', 'Viewer@123', 'Viewer')">👁️ Viewer</button>
-            </div>
-          </div>
-
-          <div style="margin-bottom:12px;">
-            <label style="display:block; font-size:0.76rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Admin / Corporate Email or Username:</label>
-            <input type="text" id="authUsernameInput" value="raj079851@gmail.com" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:8px 12px; font-size:0.85rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-          </div>
-          <div style="margin-bottom:12px;">
-            <label style="display:block; font-size:0.76rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Master Password:</label>
-            <input type="password" id="authPasswordInput" value="Admin@123" placeholder="••••••••" style="width:100%; padding:8px 12px; font-size:0.85rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-          </div>
-
-          <!-- SMTP Dispatch Mode Pill Indicator -->
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; padding:6px 10px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:6px; font-size:0.73rem;">
-            <div style="display:flex; align-items:center; gap:6px; color:#10b981;">
-              <span>🟢</span>
-              <span style="font-weight:600;">SMTP Mode Active:</span>
-              <span style="color:var(--text-muted);" id="authSmtpStatusSummary">smtp.gmail.com:587 (TLS Relay)</span>
-            </div>
-            <a href="javascript:void(0)" onclick="switchAuthTab('smtp')" style="color:var(--champagne-gold); text-decoration:none; font-weight:600;">Configure</a>
-          </div>
-
-          <div id="authAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:12px;"></div>
-
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn btn-primary" style="flex:1; min-width:200px; padding:10px; font-weight:700; background:linear-gradient(135deg, #d4af37 0%, #b89628 100%); color:#07080B;" onclick="initiateSmtpOtpLogin()">
-              📧 Send OTP via SMTP &amp; Verify
-            </button>
-            <button class="btn btn-outline" style="width:auto; padding:10px 14px;" onclick="submitDirectPasswordLogin()" title="Instant Bypass Sign-In">
-              ⚡ Direct Login
-            </button>
-            <button class="btn btn-outline" style="width:auto; padding:10px 14px;" onclick="submitLogoutAuth()">
-              🚪 Sign Out
-            </button>
-          </div>
-        </div>
-
-        <!-- Tab: New User Registration & SMTP OTP Verification -->
-        <div id="authTabRegister" style="display:none;">
-          <div style="margin-bottom:12px; background:rgba(99,102,241,0.06); border:1px solid rgba(99,102,241,0.25); border-radius:8px; padding:10px 12px; font-size:0.76rem; color:#a5b4fc;">
-            ✨ Register a new enterprise user. A 6-digit cryptographic verification code will be dispatched to your email via SMTP.
-          </div>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-            <div>
-              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Full Name:</label>
-              <input type="text" id="regFullNameInput" placeholder="e.g. Sarah Connor" style="width:100%; padding:8px 12px; font-size:0.83rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-            </div>
-            <div>
-              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Role Permission:</label>
-              <select id="regRoleSelect" style="width:100%; padding:8px 12px; font-size:0.83rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);">
-                <option value="Analyst" selected>Data Analyst</option>
-                <option value="Admin">Admin (Full Access)</option>
-                <option value="Data Engineer">Data Engineer</option>
-                <option value="Viewer">Viewer (Read-Only)</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="margin-bottom:10px;">
-            <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Address (For SMTP OTP Dispatch):</label>
-            <input type="email" id="regEmailInput" placeholder="e.g. s.connor@cyberdyne.com" style="width:100%; padding:8px 12px; font-size:0.83rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-          </div>
-
-          <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Create Password (min 6 characters):</label>
-            <input type="password" id="regPasswordInput" placeholder="••••••••" style="width:100%; padding:8px 12px; font-size:0.83rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-          </div>
-
-          <div id="regAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:12px;"></div>
-
-          <button class="btn btn-primary" style="width:100%; padding:10px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="initiateSmtpNewUserRegister()">
-            🚀 Register &amp; Send OTP via SMTP
+      <div style="padding:20px; flex:1; overflow-y:auto;">
+        <!-- Two Primary Options: 1 Admin Login, 2 User Login -->
+        <div id="authPrimaryTabs" style="display:flex; gap:8px; margin-bottom:18px; background:rgba(15,23,42,0.6); padding:4px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);">
+          <button id="authMainTabAdmin" type="button" class="btn btn-primary" style="flex:1; padding:8px 12px; font-size:0.82rem; font-weight:700; border-radius:8px;" onclick="switchAuthMainMode('admin')">
+            👑 1. Admin Login
+          </button>
+          <button id="authMainTabUser" type="button" class="btn btn-outline" style="flex:1; padding:8px 12px; font-size:0.82rem; font-weight:700; border-radius:8px;" onclick="switchAuthMainMode('user')">
+            👤 2. User Login
           </button>
         </div>
 
-        <!-- Shared OTP Verification Screen (Used by both Existing and New Users) -->
+        <!-- 1. ADMIN LOGIN SECTION (Essential Functions Only) -->
+        <div id="authSectionAdmin">
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Email or Username:</label>
+            <input type="text" id="authUsernameInput" value="raj079851@gmail.com" placeholder="raj079851@gmail.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          </div>
+
+          <div style="margin-bottom:16px;">
+            <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Password:</label>
+            <input type="password" id="authPasswordInput" value="Admin@123" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          </div>
+
+          <div id="authAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
+
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-primary" style="flex:1; padding:11px; font-weight:700; background:linear-gradient(135deg, #d4af37 0%, #b89628 100%); color:#07080B;" onclick="initiateSmtpOtpLogin()">
+              📧 Send OTP via Email &amp; Verify
+            </button>
+            <button class="btn btn-outline" style="width:auto; padding:11px 16px;" onclick="submitDirectPasswordLogin()" title="Instant Direct Login">
+              ⚡ Direct Login
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. USER LOGIN SECTION (Two Options: 1. Existing User, 2. New User) -->
+        <div id="authSectionUser" style="display:none;">
+          <!-- User Sub-tabs -->
+          <div style="display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--card-border); padding-bottom:8px;">
+            <button id="userSubTabExistingBtn" type="button" class="btn btn-primary" style="flex:1; padding:6px 10px; font-size:0.78rem; font-weight:600;" onclick="switchUserSubTab('existing')">
+              🔑 1. Existing User
+            </button>
+            <button id="userSubTabNewBtn" type="button" class="btn btn-outline" style="flex:1; padding:6px 10px; font-size:0.78rem; font-weight:600;" onclick="switchUserSubTab('new')">
+              ✨ 2. New User
+            </button>
+          </div>
+
+          <!-- Sub-option 1: Existing User -->
+          <div id="userSubTabExisting">
+            <div style="margin-bottom:14px;">
+              <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Email or Username:</label>
+              <input type="text" id="userUsernameInput" placeholder="e.g. analyst@datamind.ai" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Password:</label>
+              <input type="password" id="userPasswordInput" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <div id="userAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
+
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-primary" style="flex:1; padding:11px; font-weight:700; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:#ffffff;" onclick="initiateUserSmtpOtpLogin()">
+                📧 Send OTP via Email &amp; Verify
+              </button>
+              <button class="btn btn-outline" style="width:auto; padding:11px 16px;" onclick="submitUserDirectLogin()" title="Instant Direct Login">
+                ⚡ Direct Login
+              </button>
+            </div>
+          </div>
+
+          <!-- Sub-option 2: New User -->
+          <div id="userSubTabNew" style="display:none;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+              <div>
+                <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Full Name:</label>
+                <input type="text" id="regFullNameInput" placeholder="e.g. Sarah Connor" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+              </div>
+              <div>
+                <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Role Permission:</label>
+                <select id="regRoleSelect" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);">
+                  <option value="Analyst" selected>Data Analyst</option>
+                  <option value="Data Engineer">Data Engineer</option>
+                  <option value="Viewer">Viewer (Read-Only)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Address (For OTP):</label>
+              <input type="email" id="regEmailInput" placeholder="e.g. s.connor@cyberdyne.org" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Create Password (min 6 characters):</label>
+              <input type="password" id="regPasswordInput" placeholder="••••••••" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <div id="regAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:12px;"></div>
+
+            <button class="btn btn-primary" style="width:100%; padding:11px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="initiateSmtpNewUserRegister()">
+              🚀 Register &amp; Send OTP
+            </button>
+          </div>
+        </div>
+
+        <!-- SHARED OTP VERIFICATION SCREEN -->
         <div id="authOtpView" style="display:none;">
           <div style="text-align:center; margin-bottom:14px;">
             <div style="font-size:2.2rem; margin-bottom:4px;">✉️</div>
             <div style="font-weight:800; font-size:1.05rem; color:#f8fafc;">Enter OTP Verification Code</div>
             <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">
-              A 6-digit One-Time Password has been dispatched via SMTP to:
+              A 6-digit One-Time Password has been dispatched to:
               <br><strong id="otpTargetEmailBadge" style="color:var(--champagne-gold); font-size:0.85rem;">raj079851@gmail.com</strong>
             </div>
           </div>
@@ -1247,17 +1259,11 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:0.74rem;">
             <span id="otpCountdownTimer" style="color:#ef4444; font-weight:700;">⏱️ Expires in: 05:00</span>
             <button type="button" id="otpResendBtn" class="btn btn-outline" style="width:auto; padding:3px 10px; font-size:0.72rem;" onclick="resendSmtpOtp()">
-              🔄 Resend OTP via SMTP
+              🔄 Resend OTP via Email
             </button>
           </div>
 
           <div id="otpAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:12px;"></div>
-
-          <!-- Expandable Live SMTP Protocol Trace -->
-          <details style="margin-bottom:14px; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 10px; font-size:0.72rem;">
-            <summary style="cursor:pointer; color:var(--champagne-gold); font-weight:600; user-select:none;">📋 View Live SMTP RFC 5321 Handshake Log</summary>
-            <pre id="otpSmtpProtocolLog" style="margin-top:6px; font-family:monospace; font-size:0.68rem; color:#94a3b8; white-space:pre-wrap; max-height:100px; overflow-y:auto; background:#070a12; padding:8px; border-radius:4px;"></pre>
-          </details>
 
           <div style="display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1; padding:10px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="verifyOtpAndLaunchSession()">
@@ -1267,94 +1273,6 @@
               ← Back
             </button>
           </div>
-        </div>
-
-        <!-- Tab 4: SMTP Mode Configuration -->
-        <div id="authTabSMTP" style="display:none;">
-          <div style="margin-bottom:12px; font-size:0.78rem; color:var(--text-muted);">
-            Configure the SMTP transport gateway for enterprise One-Time Password dispatches:
-          </div>
-
-          <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:10px;">
-            <div>
-              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">SMTP Server Host:</label>
-              <input type="text" id="cfgSmtpHost" value="smtp.gmail.com" style="width:100%; padding:6px 10px; font-size:0.80rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-            </div>
-            <div>
-              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Port:</label>
-              <input type="number" id="cfgSmtpPort" value="587" style="width:100%; padding:6px 10px; font-size:0.80rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-            </div>
-          </div>
-
-          <div style="margin-bottom:10px;">
-            <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Sender Identity / Service Account:</label>
-            <input type="email" id="cfgSmtpSender" value="security-gate@datamind.ai" style="width:100%; padding:6px 10px; font-size:0.80rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
-          </div>
-
-          <div style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-            <input type="checkbox" id="cfgSmtpTls" checked style="accent-color:var(--champagne-gold);" />
-            <label for="cfgSmtpTls" style="font-size:0.76rem; color:var(--text-primary); cursor:pointer;">Require STARTTLS / RFC 3207 Encrypted Envelope</label>
-          </div>
-
-          <div id="smtpTestAlert" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.76rem; margin-bottom:12px;"></div>
-
-          <div style="display:flex; gap:10px;">
-            <button type="button" class="btn btn-outline" style="flex:1; padding:8px;" onclick="testSmtpConnection()">
-              ⚡ Test SMTP Connection Handshake
-            </button>
-            <button type="button" class="btn btn-primary" style="flex:1; padding:8px;" onclick="saveSmtpSettings()">
-              💾 Save SMTP Settings
-            </button>
-          </div>
-        </div>
-
-        <!-- Tab 5: OAuth 2.0 SSO -->
-        <div id="authTabOAuth" style="display:none;">
-          <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:14px;">Connect with your enterprise identity provider via OAuth 2.0 / SAML with cryptographic state tokens:</p>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-            <button class="btn btn-outline" style="padding:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="simulateOAuthLogin('Google')">
-              <span>🔵</span> <span>Google Workspace</span>
-            </button>
-            <button class="btn btn-outline" style="padding:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="simulateOAuthLogin('GitHub')">
-              <span>🐙</span> <span>GitHub Enterprise</span>
-            </button>
-            <button class="btn btn-outline" style="padding:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="simulateOAuthLogin('Microsoft')">
-              <span>🟦</span> <span>Microsoft Azure AD</span>
-            </button>
-            <button class="btn btn-outline" style="padding:10px; display:flex; align-items:center; justify-content:center; gap:8px;" onclick="simulateOAuthLogin('Okta')">
-              <span>🟡</span> <span>Okta OIDC / SAML</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Tab 6: RBAC Matrix -->
-        <div id="authTabRBAC" style="display:none;">
-          <table style="width:100%; font-size:0.75rem; border-collapse:collapse;">
-            <thead>
-              <tr style="border-bottom:1px solid var(--card-border); color:var(--text-muted); text-align:left;">
-                <th style="padding:8px 6px;">Role</th>
-                <th style="padding:8px 6px;">Permissions</th>
-                <th style="padding:8px 6px;">Access Scope</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                <td style="padding:8px 6px; font-weight:700; color:#38bdf8;">👑 Admin (raj079851@gmail.com)</td>
-                <td style="padding:8px 6px;">Full Access, Encryption, API Keys, Audit Logs, ML</td>
-                <td style="padding:8px 6px;">Enterprise Wide</td>
-              </tr>
-              <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
-                <td style="padding:8px 6px; font-weight:700; color:#10b981;">📊 Data Analyst</td>
-                <td style="padding:8px 6px;">EDA, ML Training, SQL Studio, BI Dashboards</td>
-                <td style="padding:8px 6px;">Departmental Datasets</td>
-              </tr>
-              <tr>
-                <td style="padding:8px 6px; font-weight:700; color:#a78bfa;">👁️ Viewer</td>
-                <td style="padding:8px 6px;">Read-Only Dashboards, Reports, Model Inferences</td>
-                <td style="padding:8px 6px;">Read-Only</td>
-              </tr>
-            </tbody>
-          </table>
         </div>
       </div>
     </div>
@@ -8695,7 +8613,7 @@ result = df.describe()
     function openAuthModal() {
       const modal = document.getElementById("authModal");
       if (modal) modal.style.display = "flex";
-      switchAuthTab("password");
+      switchAuthMainMode("admin");
     }
 
     function closeAuthModal() {
@@ -8703,32 +8621,72 @@ result = df.describe()
       if (modal) modal.style.display = "none";
     }
 
+    // Two Primary Options: 'admin' or 'user', and 'otp' view
+    function switchAuthMainMode(mode) {
+      const adminSec = document.getElementById("authSectionAdmin");
+      const userSec = document.getElementById("authSectionUser");
+      const otpSec = document.getElementById("authOtpView");
+      const primaryTabs = document.getElementById("authPrimaryTabs");
+      const btnAdmin = document.getElementById("authMainTabAdmin");
+      const btnUser = document.getElementById("authMainTabUser");
+
+      if (mode === "otp") {
+        if (adminSec) adminSec.style.display = "none";
+        if (userSec) userSec.style.display = "none";
+        if (otpSec) otpSec.style.display = "block";
+        if (primaryTabs) primaryTabs.style.display = "none";
+        return;
+      }
+
+      if (primaryTabs) primaryTabs.style.display = "flex";
+      if (otpSec) otpSec.style.display = "none";
+
+      if (mode === "admin") {
+        if (adminSec) adminSec.style.display = "block";
+        if (userSec) userSec.style.display = "none";
+        if (btnAdmin) btnAdmin.className = "btn btn-primary";
+        if (btnUser) btnUser.className = "btn btn-outline";
+      } else {
+        if (adminSec) adminSec.style.display = "none";
+        if (userSec) userSec.style.display = "block";
+        if (btnAdmin) btnAdmin.className = "btn btn-outline";
+        if (btnUser) btnUser.className = "btn btn-primary";
+        switchUserSubTab("existing");
+      }
+    }
+
+    // User Sub-options: 'existing' or 'new'
+    function switchUserSubTab(subTab) {
+      const existSec = document.getElementById("userSubTabExisting");
+      const newSec = document.getElementById("userSubTabNew");
+      const existBtn = document.getElementById("userSubTabExistingBtn");
+      const newBtn = document.getElementById("userSubTabNewBtn");
+
+      if (subTab === "existing") {
+        if (existSec) existSec.style.display = "block";
+        if (newSec) newSec.style.display = "none";
+        if (existBtn) existBtn.className = "btn btn-primary";
+        if (newBtn) newBtn.className = "btn btn-outline";
+      } else {
+        if (existSec) existSec.style.display = "none";
+        if (newSec) newSec.style.display = "block";
+        if (existBtn) existBtn.className = "btn btn-outline";
+        if (newBtn) newBtn.className = "btn btn-primary";
+      }
+    }
+
+    // Compatibility wrapper
     function switchAuthTab(tab) {
-      const p = document.getElementById("authTabPassword");
-      const reg = document.getElementById("authTabRegister");
-      const o = document.getElementById("authTabOAuth");
-      const s = document.getElementById("authTabSMTP");
-      const r = document.getElementById("authTabRBAC");
-      const otp = document.getElementById("authOtpView");
-
-      if (otp) otp.style.display = tab === "otp" ? "block" : "none";
-      if (p) p.style.display = tab === "password" ? "block" : "none";
-      if (reg) reg.style.display = tab === "register" ? "block" : "none";
-      if (o) o.style.display = tab === "oauth" ? "block" : "none";
-      if (s) s.style.display = tab === "smtp" ? "block" : "none";
-      if (r) r.style.display = tab === "rbac" ? "block" : "none";
-
-      const b1 = document.getElementById("authTabBtn1");
-      const bReg = document.getElementById("authTabBtnNew");
-      const b2 = document.getElementById("authTabBtn2");
-      const bSmtp = document.getElementById("authTabBtnSMTP");
-      const b3 = document.getElementById("authTabBtn3");
-
-      if (b1) b1.className = tab === "password" ? "btn btn-primary" : "btn btn-outline";
-      if (bReg) bReg.className = tab === "register" ? "btn btn-primary" : "btn btn-outline";
-      if (b2) b2.className = tab === "oauth" ? "btn btn-primary" : "btn btn-outline";
-      if (bSmtp) bSmtp.className = tab === "smtp" ? "btn btn-primary" : "btn btn-outline";
-      if (b3) b3.className = tab === "rbac" ? "btn btn-primary" : "btn btn-outline";
+      if (tab === "otp") switchAuthMainMode("otp");
+      else if (tab === "register") {
+        switchAuthMainMode("user");
+        switchUserSubTab("new");
+      } else if (tab === "user") {
+        switchAuthMainMode("user");
+        switchUserSubTab("existing");
+      } else {
+        switchAuthMainMode("admin");
+      }
     }
 
     // SMTP Protocol Handshake Simulator & Delivery Engine
@@ -8875,7 +8833,7 @@ result = df.describe()
       otpCountdownInterval = setInterval(updateDisplay, 1000);
     }
 
-    // 1. Existing User: Initiate SMTP OTP Login
+    // 1. Admin Login: Initiate Email OTP
     function initiateSmtpOtpLogin() {
       const uname = (document.getElementById("authUsernameInput")?.value || "").trim();
       const pwd = document.getElementById("authPasswordInput")?.value || "";
@@ -8887,22 +8845,21 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Please enter username/email and password.";
+          alertBox.textContent = "Please enter admin email and password.";
         }
         return;
       }
 
-      // Check if user is raj079851@gmail.com or admin
-      const isRajAdmin = uname.toLowerCase() === "raj079851@gmail.com" || uname.toLowerCase() === "admin";
-      const targetEmail = isRajAdmin ? "raj079851@gmail.com" : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
-      const assignedRole = isRajAdmin ? "Admin" : (enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase())?.role || "Analyst");
-      const fullName = isRajAdmin ? "Raj (Enterprise Admin)" : (uname.split("@")[0]);
+      const isRaj = uname.toLowerCase() === "raj079851@gmail.com" || uname.toLowerCase() === "admin";
+      const targetEmail = isRaj ? "raj079851@gmail.com" : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
+      const assignedRole = "Admin";
+      const fullName = isRaj ? "Raj (Enterprise Admin)" : uname;
 
       const otp = generateSecureOtp();
-      const dispatch = dispatchSmtpOtpEnvelope(targetEmail, otp, "Existing User Sign-In");
+      const dispatch = dispatchSmtpOtpEnvelope(targetEmail, otp, "Admin Sign-In");
 
       pendingOtpSession = {
-        type: "existing_user",
+        type: "admin",
         username: uname,
         email: targetEmail,
         role: assignedRole,
@@ -8914,30 +8871,123 @@ result = df.describe()
       };
 
       // Switch to OTP view
-      switchAuthTab("otp");
+      switchAuthMainMode("otp");
       document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
       const targetLive = document.getElementById("otpLiveTargetEmail");
       if (targetLive) targetLive.textContent = targetEmail;
       const backupEl = document.getElementById("otpBackupDisplay");
       if (backupEl) backupEl.textContent = otp;
       document.getElementById("otpInputCode").value = "";
-      document.getElementById("otpSmtpProtocolLog").textContent = dispatch.protocolLog;
       const otpAlert = document.getElementById("otpAlertBanner");
       if (otpAlert) {
         otpAlert.style.display = "block";
         otpAlert.style.background = "rgba(16,185,129,0.15)";
         otpAlert.style.border = "1px solid #10b981";
         otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `📨 <strong>SMTP Dispatched:</strong> 6-Digit OTP sent directly to <code>${targetEmail}</code>. Please check your email inbox.`;
+        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${targetEmail}</code>. Please check your email inbox.`;
       }
 
       startOtpCountdown(300);
-      sendLiveEmailDispatch(targetEmail, otp, "Existing User Sign-In");
-      logAuditEvent("AUTH_OTP_SENT", uname, assignedRole, "SUCCESS", `OTP sent via SMTP to ${targetEmail} (ID: ${dispatch.messageId})`);
-      notifyTaskSuccess("SMTP OTP Dispatched", `Verification code sent to ${targetEmail}.`);
+      sendLiveEmailDispatch(targetEmail, otp, "Admin Sign-In");
+      logAuditEvent("AUTH_OTP_SENT", uname, assignedRole, "SUCCESS", `Admin OTP sent to ${targetEmail} (ID: ${dispatch.messageId})`);
+      notifyTaskSuccess("Admin OTP Dispatched", `Verification code sent to ${targetEmail}.`);
     }
 
-    // 2. New User: Initiate SMTP OTP Registration
+    // 2. User Existing: Initiate Email OTP
+    function initiateUserSmtpOtpLogin() {
+      const uname = (document.getElementById("userUsernameInput")?.value || "").trim();
+      const pwd = document.getElementById("userPasswordInput")?.value || "";
+      const alertBox = document.getElementById("userAlertBanner");
+
+      if (!uname || !pwd) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Please enter your username/email and password.";
+        }
+        return;
+      }
+
+      const matched = enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase() || u.email.toLowerCase() === uname.toLowerCase());
+      const targetEmail = matched ? matched.email : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
+      const assignedRole = matched ? matched.role : "Analyst";
+      const fullName = matched ? matched.full_name : uname.split("@")[0];
+
+      const otp = generateSecureOtp();
+      const dispatch = dispatchSmtpOtpEnvelope(targetEmail, otp, "User Sign-In");
+
+      pendingOtpSession = {
+        type: "user_existing",
+        username: uname,
+        email: targetEmail,
+        role: assignedRole,
+        fullName: fullName,
+        otp: otp,
+        isExpired: false,
+        expiresAt: Date.now() + 300000,
+        dispatch: dispatch
+      };
+
+      // Switch to OTP view
+      switchAuthMainMode("otp");
+      document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+      const targetLive = document.getElementById("otpLiveTargetEmail");
+      if (targetLive) targetLive.textContent = targetEmail;
+      const backupEl = document.getElementById("otpBackupDisplay");
+      if (backupEl) backupEl.textContent = otp;
+      document.getElementById("otpInputCode").value = "";
+      const otpAlert = document.getElementById("otpAlertBanner");
+      if (otpAlert) {
+        otpAlert.style.display = "block";
+        otpAlert.style.background = "rgba(16,185,129,0.15)";
+        otpAlert.style.border = "1px solid #10b981";
+        otpAlert.style.color = "#6ee7b7";
+        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${targetEmail}</code>. Please check your email inbox.`;
+      }
+
+      startOtpCountdown(300);
+      sendLiveEmailDispatch(targetEmail, otp, "User Sign-In");
+      logAuditEvent("AUTH_OTP_SENT", uname, assignedRole, "SUCCESS", `User OTP sent to ${targetEmail}`);
+      notifyTaskSuccess("OTP Dispatched", `Verification code sent to ${targetEmail}.`);
+    }
+
+    // 3. User Existing: Direct Login
+    function submitUserDirectLogin() {
+      const uname = (document.getElementById("userUsernameInput")?.value || "").trim();
+      const alertBox = document.getElementById("userAlertBanner");
+
+      if (!uname) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Please enter your username or email.";
+        }
+        return;
+      }
+
+      const matched = enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase() || u.email.toLowerCase() === uname.toLowerCase());
+      const role = matched ? matched.role : "Analyst";
+      const email = matched ? matched.email : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
+      const fullName = matched ? matched.full_name : uname.split("@")[0];
+
+      currentAuthUser = {
+        username: uname,
+        role: role,
+        email: email,
+        full_name: fullName,
+        token: `dmk_session_${uname}_direct`
+      };
+      applyUserSessionUI();
+      closeAuthModal();
+      notifyTaskSuccess("Direct Sign-In", `Session initialized for ${fullName} (${role}).`);
+      logAuditEvent("AUTH_LOGIN_DIRECT", uname, role, "SUCCESS", "User direct session opened");
+    }
+
+    // 4. New User: Initiate Registration with OTP
     function initiateSmtpNewUserRegister() {
       const fname = (document.getElementById("regFullNameInput")?.value || "").trim();
       const email = (document.getElementById("regEmailInput")?.value || "").trim();
@@ -8984,27 +9034,26 @@ result = df.describe()
       };
 
       // Switch to OTP view
-      switchAuthTab("otp");
+      switchAuthMainMode("otp");
       document.getElementById("otpTargetEmailBadge").textContent = email;
       const targetLive = document.getElementById("otpLiveTargetEmail");
       if (targetLive) targetLive.textContent = email;
       const backupEl = document.getElementById("otpBackupDisplay");
       if (backupEl) backupEl.textContent = otp;
       document.getElementById("otpInputCode").value = "";
-      document.getElementById("otpSmtpProtocolLog").textContent = dispatch.protocolLog;
       const otpAlert = document.getElementById("otpAlertBanner");
       if (otpAlert) {
         otpAlert.style.display = "block";
         otpAlert.style.background = "rgba(16,185,129,0.15)";
         otpAlert.style.border = "1px solid #10b981";
         otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `📨 <strong>SMTP Dispatched:</strong> 6-Digit OTP sent directly to <code>${email}</code>. Please check your email inbox.`;
+        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${email}</code>. Please check your email inbox.`;
       }
 
       startOtpCountdown(300);
       sendLiveEmailDispatch(email, otp, "New User Registration");
-      logAuditEvent("NEW_USER_OTP_SENT", email, role, "SUCCESS", `Registration OTP dispatched via SMTP to ${email}`);
-      notifyTaskSuccess("Registration OTP Sent", `SMTP code dispatched to ${email}.`);
+      logAuditEvent("NEW_USER_OTP_SENT", email, role, "SUCCESS", `Registration OTP dispatched to ${email}`);
+      notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
     }
 
     // Quick auto-fill button for emergency backup
@@ -9018,7 +9067,7 @@ result = df.describe()
       }
     }
 
-    // Resend OTP via SMTP
+    // Resend OTP via Email
     function resendSmtpOtp() {
       if (!pendingOtpSession) return;
       const newOtp = generateSecureOtp();
@@ -9030,27 +9079,35 @@ result = df.describe()
 
       const backupEl = document.getElementById("otpBackupDisplay");
       if (backupEl) backupEl.textContent = newOtp;
-      document.getElementById("otpSmtpProtocolLog").textContent = dispatch.protocolLog;
       const otpAlert = document.getElementById("otpAlertBanner");
       if (otpAlert) {
         otpAlert.style.display = "block";
         otpAlert.style.background = "rgba(16,185,129,0.15)";
         otpAlert.style.border = "1px solid #10b981";
         otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `🔄 <strong>SMTP Resent:</strong> Fresh code sent directly to <code>${pendingOtpSession.email}</code>.`;
+        otpAlert.innerHTML = `🔄 <strong>OTP Resent:</strong> Fresh code sent directly to <code>${pendingOtpSession.email}</code>.`;
       }
       startOtpCountdown(300);
       sendLiveEmailDispatch(pendingOtpSession.email, newOtp, "Resend OTP");
-      notifyTaskSuccess("OTP Resent", `Fresh SMTP code dispatched to ${pendingOtpSession.email}.`);
-      logAuditEvent("AUTH_OTP_RESENT", pendingOtpSession.username, pendingOtpSession.role, "SUCCESS", `Resent SMTP OTP to ${pendingOtpSession.email}`);
+      notifyTaskSuccess("OTP Resent", `Fresh code dispatched to ${pendingOtpSession.email}.`);
+      logAuditEvent("AUTH_OTP_RESENT", pendingOtpSession.username, pendingOtpSession.role, "SUCCESS", `Resent OTP to ${pendingOtpSession.email}`);
     }
 
-    // Cancel OTP Verification and return
+    // Cancel OTP Verification and return to previous mode
     function cancelOtpVerification() {
       if (otpCountdownInterval) clearInterval(otpCountdownInterval);
       const isNew = pendingOtpSession?.type === "new_user";
+      const isUserExist = pendingOtpSession?.type === "user_existing";
       pendingOtpSession = null;
-      switchAuthTab(isNew ? "register" : "password");
+      if (isNew) {
+        switchAuthMainMode("user");
+        switchUserSubTab("new");
+      } else if (isUserExist) {
+        switchAuthMainMode("user");
+        switchUserSubTab("existing");
+      } else {
+        switchAuthMainMode("admin");
+      }
     }
 
     // Verify OTP and complete sign-in / registration
@@ -9075,7 +9132,7 @@ result = df.describe()
           otpAlert.style.background = "rgba(239,68,68,0.15)";
           otpAlert.style.border = "1px solid #ef4444";
           otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "The OTP code has expired. Please click 'Resend OTP via SMTP'.";
+          otpAlert.textContent = "The OTP code has expired. Please click 'Resend OTP via Email'.";
         }
         logAuditEvent("AUTH_OTP_FAIL", pendingOtpSession.username, pendingOtpSession.role, "BLOCKED", "Expired OTP attempt");
         return;
@@ -9087,7 +9144,7 @@ result = df.describe()
           otpAlert.style.background = "rgba(239,68,68,0.15)";
           otpAlert.style.border = "1px solid #ef4444";
           otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "Incorrect OTP code. Please enter the valid 6-digit code received via SMTP.";
+          otpAlert.textContent = "Incorrect OTP code. Please enter the valid 6-digit code received in your email.";
         }
         logAuditEvent("AUTH_OTP_FAIL", pendingOtpSession.username, pendingOtpSession.role, "BLOCKED", `Invalid OTP code '${enteredCode}'`);
         return;
@@ -9097,7 +9154,6 @@ result = df.describe()
       if (otpCountdownInterval) clearInterval(otpCountdownInterval);
 
       if (pendingOtpSession.type === "new_user") {
-        // Register new user in enterprise directory
         const newUserObj = {
           username: pendingOtpSession.username,
           full_name: pendingOtpSession.fullName,
@@ -9116,23 +9172,30 @@ result = df.describe()
           full_name: newUserObj.full_name,
           token: `dmk_session_${Date.now()}`
         };
-        logAuditEvent("USER_REGISTERED", newUserObj.username, newUserObj.role, "SUCCESS", `New user verified and registered via SMTP OTP`);
-      } else {
-        // Existing user sign in
-        const isRaj = pendingOtpSession.email.toLowerCase() === "raj079851@gmail.com" || pendingOtpSession.username.toLowerCase() === "admin";
+        logAuditEvent("USER_REGISTERED", newUserObj.username, newUserObj.role, "SUCCESS", `New user verified and registered via OTP`);
+      } else if (pendingOtpSession.type === "admin" || pendingOtpSession.email.toLowerCase() === "raj079851@gmail.com" || pendingOtpSession.username.toLowerCase() === "admin") {
         currentAuthUser = {
-          username: isRaj ? "raj079851@gmail.com" : pendingOtpSession.username,
-          role: isRaj ? "Admin" : pendingOtpSession.role,
-          email: pendingOtpSession.email,
-          full_name: isRaj ? "Raj (Enterprise Admin)" : pendingOtpSession.fullName,
+          username: "raj079851@gmail.com",
+          role: "Admin",
+          email: "raj079851@gmail.com",
+          full_name: "Raj (Enterprise Admin)",
           token: `dmk_session_${Date.now()}`
         };
-        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Authenticated via SMTP OTP verification`);
+        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Admin authenticated via OTP verification`);
+      } else {
+        currentAuthUser = {
+          username: pendingOtpSession.username,
+          role: pendingOtpSession.role,
+          email: pendingOtpSession.email,
+          full_name: pendingOtpSession.fullName,
+          token: `dmk_session_${Date.now()}`
+        };
+        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `User authenticated via OTP verification`);
       }
 
       applyUserSessionUI();
       closeAuthModal();
-      notifyTaskSuccess("Security Verified", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}) via SMTP OTP.`);
+      notifyTaskSuccess("Security Verified", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}) via OTP.`);
       pendingOtpSession = null;
     }
 
