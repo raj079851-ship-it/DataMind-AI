@@ -172,12 +172,40 @@ class UserManager:
         if not valid:
             user["failed_attempts"] = user.get("failed_attempts", 0) + 1
             self._save()
+            try:
+                from modules.security.database import default_auth_db
+                default_auth_db.record_login(
+                    username=uname,
+                    email=user.get("email"),
+                    role=user.get("role"),
+                    full_name=user.get("full_name"),
+                    login_method="PASSWORD",
+                    status="FAILED",
+                    details="Invalid password attempt"
+                )
+            except Exception:
+                pass
             return AuthResult(None, "Invalid username or password.")
 
         # Success - reset failed attempts & update last login
         user["failed_attempts"] = 0
         user["last_login"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         self._save()
+
+        # Persist login to SQLite database in the background
+        try:
+            from modules.security.database import default_auth_db
+            default_auth_db.record_login(
+                username=uname,
+                email=user.get("email"),
+                role=user.get("role"),
+                full_name=user.get("full_name"),
+                login_method="PASSWORD",
+                status="SUCCESS",
+                details="PBKDF2 cryptographic password verified"
+            )
+        except Exception:
+            pass
 
         # Return sanitized profile
         safe_profile = self.get_sanitized_profile(uname)
@@ -238,6 +266,21 @@ class UserManager:
         }
         self.users[uname] = user_data
         self._save()
+
+        # Persist user in SQLite database
+        try:
+            from modules.security.database import default_auth_db
+            default_auth_db.upsert_user(
+                username=uname,
+                email=user_data["email"],
+                password_hash=user_data["password_hash"],
+                role=role_str,
+                full_name=user_data["full_name"],
+                tenant_id=tenant_id
+            )
+        except Exception:
+            pass
+
         safe_profile = self.get_sanitized_profile(uname)
         return AuthResult(User(safe_profile), None)
 

@@ -56,4 +56,8 @@ from modules.security.sanitizer import (
     is_sensitive_key,
     CredentialSanitizer
 )
+from modules.security.database import (
+    AuthDatabase,
+    default_auth_db
+)
 

@@ -90,7 +90,9 @@ from modules.security import (
     default_api_rate_limiter,
     auth_rate_limiter,
     default_audit_logger,
-    CredentialSanitizer
+    CredentialSanitizer,
+    AuthDatabase,
+    default_auth_db
 )
 from modules.ai_chart_recommender import default_chart_recommender
 
@@ -133,6 +135,16 @@ def get_current_df() -> pd.DataFrame:
 class AuthLoginRequest(BaseModel):
     username: str = "admin"
     password: str = "Admin@123"
+
+class LoginEventRequest(BaseModel):
+    username: str
+    email: Optional[str] = None
+    role: Optional[str] = "Viewer"
+    full_name: Optional[str] = None
+    login_method: str = "DIRECT"
+    status: str = "SUCCESS"
+    session_token: Optional[str] = None
+    details: Optional[str] = None
 
 class OAuthCallbackRequest(BaseModel):
     provider: str = "google"
@@ -314,6 +326,71 @@ def logout(request: Request, authorization: Optional[str] = Header(None)):
         ip_address=client_ip
     )
     return {"status": "success", "message": "Session revoked successfully."}
+
+
+@app.post("/auth/login-event", tags=["Authentication"])
+def record_login_event(req: LoginEventRequest, request: Request):
+    """
+    Persistently saves a user login event into the background SQLite database (datamind.db).
+    Called by web client or services when users authenticate via OTP, Direct, or SSO.
+    """
+    client_ip = request.client.host if request and request.client else "127.0.0.1"
+    user_agent = request.headers.get("user-agent", "Web Client")
+
+    record = default_auth_db.record_login(
+        username=req.username,
+        email=req.email,
+        role=req.role,
+        full_name=req.full_name,
+        login_method=req.login_method,
+        ip_address=client_ip,
+        user_agent=user_agent,
+        status=req.status,
+        session_token=req.session_token,
+        details=req.details or f"Authenticated via {req.login_method}"
+    )
+
+    default_audit_logger.log(
+        event_type=f"AUTH_{req.login_method}",
+        user=req.username,
+        role=req.role or "Viewer",
+        status=req.status,
+        resource="DATABASE:user_logins",
+        details={"login_id": record.get("id"), "method": req.login_method},
+        ip_address=client_ip
+    )
+
+    return {
+        "status": "success",
+        "message": "Login event recorded in SQLite database.",
+        "record": record,
+        "db_metrics": default_auth_db.get_login_metrics()
+    }
+
+
+@app.get("/auth/login-history", tags=["Authentication"])
+def get_login_history(
+    limit: int = 50,
+    username: Optional[str] = None,
+    status: Optional[str] = None
+):
+    """Retrieves chronological user login history directly from the SQLite database."""
+    records = default_auth_db.get_login_history(limit=limit, username=username, status=status)
+    return {
+        "status": "success",
+        "total": len(records),
+        "logins": records,
+        "metrics": default_auth_db.get_login_metrics()
+    }
+
+
+@app.get("/auth/db-status", tags=["Authentication"])
+def get_database_status():
+    """Returns background SQLite database operational health, table schema stats, and login metrics."""
+    return {
+        "status": "success",
+        "database": default_auth_db.get_db_status()
+    }
 
 
 @app.post("/auth/send-smtp-otp", tags=["Authentication"])

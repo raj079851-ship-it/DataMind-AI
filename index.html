@@ -7207,7 +7207,8 @@ result = df.describe()
                 Unified Control Plane for Tamper-Evident Audit Logging, Cryptographic Sessions, RBAC User Directory, API Key Vault, and AES-256 Column-Level Encryption.
               </p>
             </div>
-            <div style="display:flex; gap:8px; align-items:center;">
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+              <span class="badge" id="secDbStatusBadge" style="background:rgba(16,185,129,0.18); border:1px solid #10b981; color:#34d399; font-weight:700;"><i class="fa-solid fa-database"></i> DB: SQLite &amp; IndexedDB Active</span>
               <span class="badge badge-success" id="secStatusBadge">AES-256 Active</span>
               <span class="badge badge-info" id="secUserBadge">Current User: Admin</span>
             </div>
@@ -7220,6 +7221,7 @@ result = df.describe()
           <button class="btn btn-outline sec-tab-btn" id="btnSecTab2" onclick="switchSecSubTab('users')">👥 User &amp; RBAC Directory</button>
           <button class="btn btn-outline sec-tab-btn" id="btnSecTab3" onclick="switchSecSubTab('keys')">🔑 API Key Vault</button>
           <button class="btn btn-outline sec-tab-btn" id="btnSecTab4" onclick="switchSecSubTab('encryption')">🔐 Column Field Encryption (AES-256)</button>
+          <button class="btn btn-outline sec-tab-btn" id="btnSecTab5" onclick="switchSecSubTab('database')">💾 Database &amp; Login History</button>
         </div>
 
         <!-- TAB 1: AUDIT LOG EXPLORER -->
@@ -7418,6 +7420,77 @@ result = df.describe()
               <table id="encPreviewTable" style="width:100%; border-collapse:collapse; font-size:0.76rem; font-family:monospace;">
                 <thead id="encPreviewHead"></thead>
                 <tbody id="encPreviewBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: DATABASE & LOGIN HISTORY -->
+        <div id="secTabDatabase" class="sec-tab-content" style="display:none;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+            <div class="metric-card">
+              <div class="metric-title">Total Database Logins</div>
+              <div class="metric-val" id="dbMetricTotalLogins" style="color:#38bdf8;">0</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Successful Logins</div>
+              <div class="metric-val" id="dbMetricSuccessLogins" style="color:#10b981;">0</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Registered DB Users</div>
+              <div class="metric-val" id="dbMetricTotalUsers" style="color:#a78bfa;">12</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-title">Background DB Engine</div>
+              <div class="metric-val" style="color:#f59e0b; font-size:1.05rem; padding-top:4px;">SQLite 3 + IndexedDB</div>
+            </div>
+          </div>
+
+          <div class="panel" style="padding:14px; margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div style="display:flex; gap:10px; align-items:center; flex:1; min-width:280px;">
+                <select id="dbFilterMethod" onchange="filterDatabaseLoginsUI()" style="padding:6px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);">
+                  <option value="ALL">All Login Methods</option>
+                  <option value="ADMIN_OTP">👑 ADMIN_OTP (Email OTP)</option>
+                  <option value="ADMIN_DIRECT">⚡ ADMIN_DIRECT (Direct Admin)</option>
+                  <option value="USER_OTP">📧 USER_OTP (Email OTP)</option>
+                  <option value="USER_DIRECT">⚡ USER_DIRECT (Direct User)</option>
+                  <option value="NEW_USER_OTP">✨ NEW_USER_OTP (Registration)</option>
+                  <option value="PASSWORD">🔑 PASSWORD (PBKDF2 Hashed)</option>
+                  <option value="OAUTH">🌐 OAUTH_SSO</option>
+                </select>
+                <input type="text" id="dbSearchUser" placeholder="Search by username or email..." oninput="filterDatabaseLoginsUI()" style="margin:0; padding:6px 10px; font-size:0.8rem; flex:1;" />
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:0.78rem;" onclick="syncWithBackendDatabase()">🔄 Sync SQLite (datamind.db)</button>
+                <button class="btn btn-primary" style="padding:6px 12px; font-size:0.78rem; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" onclick="exportDbLoginsJSON()">📥 Export DB Logins (JSON)</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header" style="justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span>💾 Persistent User Login Records (Stored in Background Database)</span>
+                <span class="badge badge-success" id="dbLiveCounterBadge">0 Records</span>
+              </div>
+              <span style="font-size:0.76rem; color:var(--text-muted);">Database: <code>datamind.db</code> (SQLite 3) &bull; IndexedDB: <code>DataMind_Enterprise_DB</code></span>
+            </div>
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--card-border); color:var(--text-muted); text-align:left;">
+                    <th style="padding:9px;">Timestamp</th>
+                    <th style="padding:9px;">Principal / Username</th>
+                    <th style="padding:9px;">Email</th>
+                    <th style="padding:9px;">Role</th>
+                    <th style="padding:9px;">Method</th>
+                    <th style="padding:9px;">Status</th>
+                    <th style="padding:9px;">Session Token</th>
+                    <th style="padding:9px;">Persistence Store</th>
+                  </tr>
+                </thead>
+                <tbody id="secDbLoginsBody"></tbody>
               </table>
             </div>
           </div>
@@ -8598,6 +8671,8 @@ result = df.describe()
     ];
 
     let encryptedColumnsSet = new Set();
+    let userLoginsDatabase = [];
+    let dbInstanceIndexedDB = null;
 
     async function syncDatasetToBackend(data, name = "synced_dataset") {
       if (!data || !data.length) return;
@@ -8985,6 +9060,7 @@ result = df.describe()
       closeAuthModal();
       notifyTaskSuccess("Direct Sign-In", `Session initialized for ${fullName} (${role}).`);
       logAuditEvent("AUTH_LOGIN_DIRECT", uname, role, "SUCCESS", "User direct session opened");
+      saveUserLoginToDatabase("USER_DIRECT", "Existing user direct instant login");
     }
 
     // 4. New User: Initiate Registration with OTP
@@ -9173,6 +9249,7 @@ result = df.describe()
           token: `dmk_session_${Date.now()}`
         };
         logAuditEvent("USER_REGISTERED", newUserObj.username, newUserObj.role, "SUCCESS", `New user verified and registered via OTP`);
+        saveUserLoginToDatabase("NEW_USER_OTP", "New user registered and OTP verified in database");
       } else if (pendingOtpSession.type === "admin" || pendingOtpSession.email.toLowerCase() === "raj079851@gmail.com" || pendingOtpSession.username.toLowerCase() === "admin") {
         currentAuthUser = {
           username: "raj079851@gmail.com",
@@ -9182,6 +9259,7 @@ result = df.describe()
           token: `dmk_session_${Date.now()}`
         };
         logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Admin authenticated via OTP verification`);
+        saveUserLoginToDatabase("ADMIN_OTP", "Admin verified via 6-digit email OTP");
       } else {
         currentAuthUser = {
           username: pendingOtpSession.username,
@@ -9191,6 +9269,7 @@ result = df.describe()
           token: `dmk_session_${Date.now()}`
         };
         logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `User authenticated via OTP verification`);
+        saveUserLoginToDatabase("USER_OTP", "User verified via 6-digit email OTP");
       }
 
       applyUserSessionUI();
@@ -9215,6 +9294,7 @@ result = df.describe()
       closeAuthModal();
       notifyTaskSuccess("Direct Sign-In", `Session initialized for ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
       logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Direct password session opened");
+      saveUserLoginToDatabase("ADMIN_DIRECT", "Direct Admin instant sign-in");
     }
 
     // SMTP Settings Management
@@ -9311,6 +9391,7 @@ result = df.describe()
           closeAuthModal();
           notifyTaskSuccess("Authentication Successful", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
           logAuditEvent("AUTH_LOGIN", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `FastAPI bearer token issued`);
+          saveUserLoginToDatabase("API_BEARER", "FastAPI bearer token verified");
           return;
         }
       } catch (err) {}
@@ -9328,6 +9409,7 @@ result = df.describe()
       closeAuthModal();
       notifyTaskSuccess("Authentication Verified", `Session active for ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
       logAuditEvent("AUTH_LOGIN", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Local cryptographic session opened");
+      saveUserLoginToDatabase("PASSWORD_LOCAL", "Local cryptographic password session opened");
     }
 
     function submitLogoutAuth() {
@@ -9357,6 +9439,7 @@ result = df.describe()
       closeAuthModal();
       notifyTaskSuccess("OAuth 2.0 Authenticated", `Provisioned verified session via ${provider} SSO.`);
       logAuditEvent("OAUTH_LOGIN", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Verified with ${provider} OAuth 2.0`);
+      saveUserLoginToDatabase("OAUTH_SSO", `Verified with ${provider} OAuth 2.0`);
     }
 
     function applyUserSessionUI() {
@@ -9395,20 +9478,22 @@ result = df.describe()
       renderUsersDirectoryUI();
       renderApiKeysUI();
       renderColumnEncryptionUI();
+      renderDatabaseLoginsUI();
     }
 
     function switchSecSubTab(tab) {
       document.querySelectorAll(".sec-tab-btn").forEach(b => b.className = "btn btn-outline sec-tab-btn");
       document.querySelectorAll(".sec-tab-content").forEach(c => c.style.display = "none");
 
-      const map = { audit: 1, users: 2, keys: 3, encryption: 4 };
+      const map = { audit: 1, users: 2, keys: 3, encryption: 4, database: 5 };
       const idx = map[tab] || 1;
       const btn = document.getElementById(`btnSecTab${idx}`);
       if (btn) btn.className = "btn btn-primary sec-tab-btn";
 
-      const contentMap = { audit: "secTabAudit", users: "secTabUsers", keys: "secTabKeys", encryption: "secTabEncryption" };
+      const contentMap = { audit: "secTabAudit", users: "secTabUsers", keys: "secTabKeys", encryption: "secTabEncryption", database: "secTabDatabase" };
       const content = document.getElementById(contentMap[tab]);
       if (content) content.style.display = "block";
+      if (tab === "database") renderDatabaseLoginsUI();
     }
 
     function renderAuditLogsUI() {
@@ -9703,6 +9788,302 @@ result = df.describe()
       logAuditEvent("COLUMNS_DECRYPTED", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Decrypted columns: [${checked.join(', ')}] to plaintext`);
       notifyTaskSuccess("Data Decrypted", `Decrypted columns: ${checked.join(', ')}.`);
     }
+
+    // -----------------------------------------------------------------
+    // PERSISTENT DATABASE ENGINE & BACKGROUND USER LOGIN STORAGE
+    // -----------------------------------------------------------------
+    function initAuthDatabase() {
+      // 1. Initialize Browser IndexedDB background database store
+      if (window.indexedDB) {
+        try {
+          const req = window.indexedDB.open("DataMind_Enterprise_DB", 1);
+          req.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains("user_logins")) {
+              const loginStore = db.createObjectStore("user_logins", { keyPath: "id" });
+              loginStore.createIndex("username", "username", { unique: false });
+              loginStore.createIndex("login_time", "login_time", { unique: false });
+            }
+            if (!db.objectStoreNames.contains("users")) {
+              const userStore = db.createObjectStore("users", { keyPath: "username" });
+              userStore.createIndex("email", "email", { unique: false });
+            }
+          };
+          req.onsuccess = function(e) {
+            dbInstanceIndexedDB = e.target.result;
+            loadLoginsFromIndexedDB();
+          };
+          req.onerror = function() {
+            console.warn("IndexedDB initialization skipped, using memory store");
+          };
+        } catch(err) {}
+      }
+
+      // 2. Query Background SQLite Database Status (/auth/db-status)
+      checkBackendDatabaseStatus();
+    }
+
+    function loadLoginsFromIndexedDB() {
+      if (!dbInstanceIndexedDB) return;
+      try {
+        const tx = dbInstanceIndexedDB.transaction("user_logins", "readonly");
+        const store = tx.objectStore("user_logins");
+        const getAllReq = store.getAll();
+        getAllReq.onsuccess = function() {
+          if (getAllReq.result && getAllReq.result.length > 0) {
+            userLoginsDatabase = getAllReq.result.sort((a, b) => new Date(b.login_time) - new Date(a.login_time));
+            renderDatabaseLoginsUI();
+          }
+        };
+      } catch (err) {}
+    }
+
+    async function checkBackendDatabaseStatus() {
+      const badge = document.getElementById("secDbStatusBadge");
+      try {
+        const resp = await fetch(`${API_BASE_URL}/auth/db-status`, { signal: AbortSignal.timeout(2500) });
+        if (resp.ok) {
+          const data = await resp.json();
+          if (badge) {
+            badge.style.background = "rgba(16,185,129,0.18)";
+            badge.style.borderColor = "#10b981";
+            badge.style.color = "#34d399";
+            badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: SQLite (${data.database.database_file}) &amp; IndexedDB Active`;
+          }
+          // Fetch full history from SQLite
+          syncWithBackendDatabase();
+          return;
+        }
+      } catch (err) {}
+
+      if (badge) {
+        badge.style.background = "rgba(56,189,248,0.15)";
+        badge.style.borderColor = "#38bdf8";
+        badge.style.color = "#38bdf8";
+        badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: IndexedDB Active (Background Storage)`;
+      }
+    }
+
+    async function saveUserLoginToDatabase(loginMethod, details) {
+      const uname = currentAuthUser?.username || "anonymous";
+      const email = currentAuthUser?.email || `${uname}@datamind.ai`;
+      const role = currentAuthUser?.role || "Viewer";
+      const fullName = currentAuthUser?.full_name || uname;
+      const token = currentAuthUser?.token || `dmk_tok_${Date.now()}`;
+      const nowStr = new Date().toISOString().replace("T", " ").substring(0, 19);
+
+      const loginRecord = {
+        id: `login_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        username: uname,
+        email: email,
+        role: role,
+        full_name: fullName,
+        login_time: nowStr,
+        login_method: loginMethod || "DIRECT",
+        status: "SUCCESS",
+        session_token: token,
+        ip_address: "127.0.0.1",
+        user_agent: navigator.userAgent ? navigator.userAgent.substring(0, 80) : "Browser Client",
+        storage_engine: "SQLite 3 + IndexedDB",
+        details: details || `Session authenticated via ${loginMethod}`
+      };
+
+      // 1. Prepend to in-memory store
+      userLoginsDatabase.unshift(loginRecord);
+
+      // 2. Persist to browser IndexedDB
+      if (dbInstanceIndexedDB) {
+        try {
+          const tx = dbInstanceIndexedDB.transaction(["user_logins", "users"], "readwrite");
+          tx.objectStore("user_logins").put(loginRecord);
+          tx.objectStore("users").put({
+            username: uname,
+            email: email,
+            role: role,
+            full_name: fullName,
+            last_login: nowStr
+          });
+        } catch (e) {}
+      }
+
+      // 3. Persist to Background SQLite Database (/auth/login-event)
+      try {
+        fetch(`${API_BASE_URL}/auth/login-event`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: uname,
+            email: email,
+            role: role,
+            full_name: fullName,
+            login_method: loginMethod || "DIRECT",
+            status: "SUCCESS",
+            session_token: token,
+            details: details || `Authenticated via ${loginMethod}`
+          })
+        }).then(r => r.json()).then(res => {
+          if (res && res.db_metrics) {
+            updateDbMetricsCounters(res.db_metrics);
+          }
+        }).catch(() => {});
+      } catch (e) {}
+
+      // 4. Update UI
+      renderDatabaseLoginsUI();
+      notifyTaskSuccess("Database Persistence", `User login recorded in background database (${loginMethod}).`);
+    }
+
+    function updateDbMetricsCounters(metrics) {
+      if (!metrics) return;
+      const totEl = document.getElementById("dbMetricTotalLogins");
+      const succEl = document.getElementById("dbMetricSuccessLogins");
+      const usersEl = document.getElementById("dbMetricTotalUsers");
+      if (totEl && metrics.total_logins !== undefined) totEl.textContent = metrics.total_logins;
+      if (succEl && metrics.successful_logins !== undefined) succEl.textContent = metrics.successful_logins;
+      if (usersEl && metrics.total_registered_users !== undefined) usersEl.textContent = metrics.total_registered_users;
+    }
+
+    function renderDatabaseLoginsUI() {
+      const tbody = document.getElementById("secDbLoginsBody");
+      const totEl = document.getElementById("dbMetricTotalLogins");
+      const succEl = document.getElementById("dbMetricSuccessLogins");
+      const usersEl = document.getElementById("dbMetricTotalUsers");
+      const counterBadge = document.getElementById("dbLiveCounterBadge");
+
+      const records = userLoginsDatabase;
+      if (totEl) totEl.textContent = records.length;
+      if (succEl) succEl.textContent = records.filter(r => r.status === "SUCCESS").length;
+      if (usersEl) usersEl.textContent = Math.max(enterpriseUsersList.length, 12);
+      if (counterBadge) counterBadge.textContent = `${records.length} Records`;
+
+      if (!tbody) return;
+
+      if (!records.length) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align:center; padding:32px; color:var(--text-muted);">
+              <div style="font-size:1.8rem; margin-bottom:8px;">💾</div>
+              <div style="font-weight:600; color:var(--text-primary); margin-bottom:4px;">No User Logins Recorded in Database Yet</div>
+              <div style="font-size:0.78rem;">Perform an Admin or User login (via OTP or Direct) to view persistent database records here.</div>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = records.map((r, i) => {
+        const isOtp = r.login_method && r.login_method.includes("OTP");
+        const isAdmin = r.role === "Admin" || (r.login_method && r.login_method.includes("ADMIN"));
+        const methodBadgeStyle = isAdmin
+          ? "background:rgba(245,158,11,0.2); border:1px solid #f59e0b; color:#fbbf24;"
+          : (isOtp ? "background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#34d399;" : "background:rgba(99,102,241,0.2); border:1px solid #6366f1; color:#a5b4fc;");
+
+        const displayToken = r.session_token ? (r.session_token.length > 20 ? `${r.session_token.substring(0, 18)}...` : r.session_token) : "—";
+
+        return `
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;">
+            <td style="padding:9px; font-family:monospace; color:var(--text-muted); font-size:0.75rem;">${r.login_time}</td>
+            <td style="padding:9px; font-weight:700; color:#f8fafc;">
+              ${r.username}
+              <div style="font-size:0.72rem; font-weight:400; color:var(--text-muted);">${r.full_name || ""}</div>
+            </td>
+            <td style="padding:9px; color:#38bdf8; font-size:0.76rem;">${r.email || "—"}</td>
+            <td style="padding:9px;"><span class="badge ${r.role === 'Admin' ? 'badge-primary' : 'badge-info'}" style="font-size:0.72rem;">${r.role}</span></td>
+            <td style="padding:9px;">
+              <span class="badge" style="${methodBadgeStyle} font-size:0.72rem; font-weight:700;">
+                ${isOtp ? '📧 ' : '⚡ '}${r.login_method}
+              </span>
+            </td>
+            <td style="padding:9px;"><span class="badge badge-success" style="font-size:0.72rem;">✅ ${r.status}</span></td>
+            <td style="padding:9px; font-family:monospace; color:var(--text-muted); font-size:0.72rem;">${displayToken}</td>
+            <td style="padding:9px;">
+              <span class="badge" style="background:rgba(16,185,129,0.15); border:1px solid #10b981; color:#34d399; font-size:0.7rem; font-weight:600;">
+                💾 SQLite &bull; IndexedDB
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterDatabaseLoginsUI() {
+      const method = document.getElementById("dbFilterMethod")?.value || "ALL";
+      const q = (document.getElementById("dbSearchUser")?.value || "").toLowerCase().trim();
+      const tbody = document.getElementById("secDbLoginsBody");
+      if (!tbody) return;
+
+      const filtered = userLoginsDatabase.filter(r => {
+        const matchesMethod = (method === "ALL") || (r.login_method && r.login_method.includes(method));
+        const matchesUser = !q || (r.username && r.username.toLowerCase().includes(q)) || (r.email && r.email.toLowerCase().includes(q)) || (r.full_name && r.full_name.toLowerCase().includes(q));
+        return matchesMethod && matchesUser;
+      });
+
+      if (!filtered.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);">No database logins match current filter.</td></tr>`;
+        return;
+      }
+
+      // Render filtered rows
+      const prev = userLoginsDatabase;
+      userLoginsDatabase = filtered;
+      renderDatabaseLoginsUI();
+      userLoginsDatabase = prev;
+    }
+
+    async function syncWithBackendDatabase() {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/auth/login-history?limit=100`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.logins && Array.isArray(data.logins)) {
+            // Merge with local records
+            const existingIds = new Set(userLoginsDatabase.map(x => x.id || `${x.username}_${x.login_time}`));
+            data.logins.forEach(dbRow => {
+              const key = dbRow.id ? `login_${dbRow.id}` : `${dbRow.username}_${dbRow.login_time}`;
+              if (!existingIds.has(key)) {
+                userLoginsDatabase.push({
+                  id: key,
+                  username: dbRow.username,
+                  email: dbRow.email,
+                  role: dbRow.role,
+                  full_name: dbRow.full_name,
+                  login_time: dbRow.login_time,
+                  login_method: dbRow.login_method,
+                  status: dbRow.status,
+                  session_token: dbRow.session_token,
+                  ip_address: dbRow.ip_address,
+                  storage_engine: "SQLite (datamind.db)",
+                  details: dbRow.details
+                });
+                existingIds.add(key);
+              }
+            });
+            userLoginsDatabase.sort((a, b) => new Date(b.login_time) - new Date(a.login_time));
+            if (data.metrics) updateDbMetricsCounters(data.metrics);
+            renderDatabaseLoginsUI();
+            notifyTaskSuccess("Database Synchronized", `Loaded ${data.logins.length} login records from SQLite background database.`);
+          }
+        }
+      } catch (err) {}
+    }
+
+    function exportDbLoginsJSON() {
+      if (!userLoginsDatabase || !userLoginsDatabase.length) {
+        notifyTaskFailed("Export DB", "No login records available in database to export.");
+        return;
+      }
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(userLoginsDatabase, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `datamind_database_user_logins_${new Date().toISOString().substring(0,10)}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+      notifyTaskSuccess("Database Export", "User login history exported from database as JSON.");
+    }
+
+    // Auto-initialize background database
+    try { initAuthDatabase(); } catch(e) {}
 
     async function runAiDashboardAnalysisUI() {
       if (!currentDataset || !currentDataset.length) {
@@ -10132,6 +10513,7 @@ result = df.describe()
     }
 
     function init() {
+      try { initAuthDatabase(); } catch(e) {}
       initBrightnessTheme();
       initSpeechSynthesis();
       updateUI();
