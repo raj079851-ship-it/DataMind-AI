@@ -275,6 +275,126 @@ def test_4_cleaning_analysis_dashboards_insights_audit():
     print(" [+] /api/datasets/{id} (DELETE) OK: Dataset cleaned up successfully.")
 
 
+def test_5_security_and_smtp_auth_workflows():
+    """
+    Validates:
+    1. Rejection of unauthenticated/unregistered user login (HTTP 404).
+    2. Rejection of invalid password for registered user (HTTP 401).
+    3. Proper login with valid credentials (HTTP 200).
+    4. Forgot password flow:
+       - 404 on unrecognised email
+       - 200 and OTP generation for registered user
+       - 400 on wrong OTP
+       - 200 on valid OTP + password reset
+       - Old password rejected (401)
+       - New password accepted (200)
+    5. SMTP diagnostics endpoint (/api/auth/smtp-status).
+    """
+    print("\n--- [TEST 5] Testing Security & Forgot-Password Recovery Workflows ---")
+    from backend.services.smtp_service import default_smtp_service
+
+    # 1. Unregistered user login rejection
+    unregistered_email = f"ghost_{uuid.uuid4().hex[:8]}@unregistered.org"
+    res_unreg = client.post("/api/auth/login", json={
+        "email": unregistered_email,
+        "password": "AnyPassword123!"
+    })
+    assert res_unreg.status_code == 404, f"Expected 404 for unregistered user, got {res_unreg.status_code}"
+    assert "No account found with this email" in res_unreg.json()["detail"]
+    print(" [+] Security Verified: Unregistered user login blocked with HTTP 404.")
+
+    # 2. Register a dedicated test account
+    recovery_email = f"recov_{uuid.uuid4().hex[:6]}@datamind.ai"
+    initial_pass = "InitialPass@1234"
+    new_pass = "RecoveredPass@5678"
+
+    reg_res = client.post("/api/auth/register", json={
+        "full_name": "Recovery Test User",
+        "email": recovery_email,
+        "password": initial_pass,
+        "role": "user"
+    })
+    assert reg_res.status_code == 201
+
+    # 3. Invalid password rejection for existing user
+    bad_pass_res = client.post("/api/auth/login", json={
+        "email": recovery_email,
+        "password": "WrongPassword@999"
+    })
+    assert bad_pass_res.status_code == 401, f"Expected 401 for wrong password, got {bad_pass_res.status_code}"
+    assert "Invalid password" in bad_pass_res.json()["detail"]
+    print(" [+] Security Verified: Invalid password blocked with HTTP 401.")
+
+    # 4. Valid password login succeeds
+    good_login_res = client.post("/api/auth/login", json={
+        "email": recovery_email,
+        "password": initial_pass
+    })
+    assert good_login_res.status_code == 200
+    print(" [+] Security Verified: Correct credentials authenticate with HTTP 200.")
+
+    # 5. Forgot password request for unregistered user -> 404
+    forgot_unreg = client.post("/api/auth/forgot-password/send-otp", json={
+        "email": unregistered_email
+    })
+    assert forgot_unreg.status_code == 404
+    print(" [+] Forgot Password Verified: Unregistered email request rejected with HTTP 404.")
+
+    # 6. Forgot password request for registered user -> 200 + OTP generated
+    forgot_req = client.post("/api/auth/forgot-password/send-otp", json={
+        "email": recovery_email
+    })
+    assert forgot_req.status_code == 200
+    store_key = recovery_email.strip().lower()
+    assert store_key in default_smtp_service._otp_store
+    server_otp = default_smtp_service._otp_store[store_key]["otp"]
+    assert len(server_otp) == 6
+    print(f" [+] Forgot Password Verified: Recovery OTP issued ({server_otp}) with 5-minute TTL.")
+
+    # 7. Reset password with invalid OTP -> 400
+    bad_otp_res = client.post("/api/auth/forgot-password/reset", json={
+        "email": recovery_email,
+        "otp": "000000" if server_otp != "000000" else "111111",
+        "new_password": new_pass
+    })
+    assert bad_otp_res.status_code == 400
+    print(" [+] Forgot Password Verified: Invalid OTP rejected with HTTP 400.")
+
+    # 8. Reset password with correct OTP -> 200
+    reset_ok_res = client.post("/api/auth/forgot-password/reset", json={
+        "email": recovery_email,
+        "otp": server_otp,
+        "new_password": new_pass
+    })
+    assert reset_ok_res.status_code == 200
+    assert reset_ok_res.json()["status"] == "success"
+    print(" [+] Forgot Password Verified: Password reset successfully completed.")
+
+    # 9. Old password now rejected
+    old_pass_fail = client.post("/api/auth/login", json={
+        "email": recovery_email,
+        "password": initial_pass
+    })
+    assert old_pass_fail.status_code == 401
+    print(" [+] Forgot Password Verified: Previous password is now invalid (HTTP 401).")
+
+    # 10. New password now accepted
+    new_pass_ok = client.post("/api/auth/login", json={
+        "email": recovery_email,
+        "password": new_pass
+    })
+    assert new_pass_ok.status_code == 200
+    print(" [+] Forgot Password Verified: Login with newly recovered password succeeded (HTTP 200).")
+
+    # 11. SMTP status diagnostic check
+    smtp_status_res = client.get("/api/auth/smtp-status")
+    assert smtp_status_res.status_code == 200
+    smtp_data = smtp_status_res.json()
+    assert "host" in smtp_data
+    assert "port" in smtp_data
+    print(f" [+] SMTP Diagnostics Verified: Host: {smtp_data['host']}, Port: {smtp_data['port']}.")
+
+
 if __name__ == "__main__":
     print("=================================================================")
     print("  DataMind AI - PostgreSQL End-to-End Automated Test Suite")
@@ -283,6 +403,7 @@ if __name__ == "__main__":
     test_2_auth_and_session_lifecycle()
     test_3_dataset_lifecycle_and_column_profiling()
     test_4_cleaning_analysis_dashboards_insights_audit()
+    test_5_security_and_smtp_auth_workflows()
     print("\n=================================================================")
     print("  [SUCCESS] All PostgreSQL End-to-End Tests Passed Cleanly!")
     print("=================================================================")

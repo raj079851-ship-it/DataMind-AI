@@ -1125,31 +1125,35 @@
           </button>
         </div>
 
-        <!-- 1. ADMIN LOGIN SECTION (Essential Functions Only) -->
+        <!-- 1. ADMIN LOGIN SECTION -->
         <div id="authSectionAdmin">
           <div style="margin-bottom:14px;">
             <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Email or Username:</label>
             <input type="text" id="authUsernameInput" value="raj079851@gmail.com" placeholder="raj079851@gmail.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
           </div>
 
-          <div style="margin-bottom:16px;">
+          <div style="margin-bottom:8px;">
             <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Password:</label>
             <input type="password" id="authPasswordInput" value="Admin@123" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
           </div>
 
+          <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+            <a href="javascript:void(0)" onclick="openForgotPasswordView(document.getElementById('authUsernameInput')?.value)" style="color:#38bdf8; font-size:0.75rem; text-decoration:none; font-weight:600;">Forgot Password?</a>
+          </div>
+
           <div id="authAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
 
-          <div style="display:flex; gap:10px;">
-            <button class="btn btn-primary" style="flex:1; padding:11px; font-weight:700; background:linear-gradient(135deg, #d4af37 0%, #b89628 100%); color:#07080B;" onclick="initiateSmtpOtpLogin()">
-              📧 Send OTP via Email &amp; Verify
-            </button>
-            <button class="btn btn-outline" style="width:auto; padding:11px 16px;" onclick="submitDirectPasswordLogin()" title="Instant Direct Login">
-              ⚡ Direct Login
+          <button class="btn btn-primary" style="width:100%; padding:11px; font-weight:700; background:linear-gradient(135deg, #d4af37 0%, #b89628 100%); color:#07080B; margin-bottom:10px;" onclick="submitSecureAdminLogin()">
+            👑 Sign In as Admin
+          </button>
+          <div style="display:flex; justify-content:center;">
+            <button class="btn btn-outline" style="width:100%; padding:8px 12px; font-size:0.76rem; border-color:rgba(255,255,255,0.15);" onclick="initiateSmtpOtpLogin()">
+              📧 Or Sign In with Email OTP
             </button>
           </div>
         </div>
 
-        <!-- 2. USER LOGIN SECTION (Two Options: 1. Existing User, 2. New User) -->
+        <!-- 2. USER LOGIN SECTION -->
         <div id="authSectionUser" style="display:none;">
           <!-- User Sub-tabs -->
           <div style="display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--card-border); padding-bottom:8px;">
@@ -1165,22 +1169,26 @@
           <div id="userSubTabExisting">
             <div style="margin-bottom:14px;">
               <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Email or Username:</label>
-              <input type="text" id="userUsernameInput" placeholder="e.g. analyst@datamind.ai" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+              <input type="text" id="userUsernameInput" placeholder="e.g. sarah.connor@datamind.ai" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
             </div>
 
-            <div style="margin-bottom:16px;">
+            <div style="margin-bottom:8px;">
               <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Password:</label>
               <input type="password" id="userPasswordInput" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
             </div>
 
+            <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
+              <a href="javascript:void(0)" onclick="openForgotPasswordView(document.getElementById('userUsernameInput')?.value)" style="color:#38bdf8; font-size:0.75rem; text-decoration:none; font-weight:600;">Forgot Password?</a>
+            </div>
+
             <div id="userAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
 
-            <div style="display:flex; gap:10px;">
-              <button class="btn btn-primary" style="flex:1; padding:11px; font-weight:700; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:#ffffff;" onclick="initiateUserSmtpOtpLogin()">
-                📧 Send OTP via Email &amp; Verify
-              </button>
-              <button class="btn btn-outline" style="width:auto; padding:11px 16px;" onclick="submitUserDirectLogin()" title="Instant Direct Login">
-                ⚡ Direct Login
+            <button class="btn btn-primary" style="width:100%; padding:11px; font-weight:700; background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color:#ffffff; margin-bottom:10px;" onclick="submitSecureUserLogin()">
+              🔑 Sign In
+            </button>
+            <div style="display:flex; justify-content:center;">
+              <button class="btn btn-outline" style="width:100%; padding:8px 12px; font-size:0.76rem; border-color:rgba(255,255,255,0.15);" onclick="initiateUserSmtpOtpLogin()">
+                📧 Or Sign In with Email OTP
               </button>
             </div>
           </div>
@@ -1203,7 +1211,7 @@
             </div>
 
             <div style="margin-bottom:12px;">
-              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Address (For OTP):</label>
+              <label style="display:block; font-size:0.74rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Address (For Account &amp; OTP):</label>
               <input type="email" id="regEmailInput" placeholder="e.g. s.connor@cyberdyne.org" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
             </div>
 
@@ -1215,18 +1223,67 @@
             <div id="regAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:12px;"></div>
 
             <button class="btn btn-primary" style="width:100%; padding:11px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="initiateSmtpNewUserRegister()">
-              🚀 Register &amp; Send OTP
+              🚀 Register &amp; Send Verification OTP
             </button>
           </div>
         </div>
 
-        <!-- SHARED OTP VERIFICATION SCREEN -->
+        <!-- 3. FORGOT PASSWORD / ACCOUNT RECOVERY SECTION -->
+        <div id="authSectionForgotPassword" style="display:none;">
+          <div style="text-align:center; margin-bottom:14px;">
+            <div style="font-size:2rem; margin-bottom:4px;">🔑</div>
+            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">Account Recovery &amp; Password Reset</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
+              Enter your registered email address to receive a secure recovery code via email.
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Registered Email Address:</label>
+            <input type="email" id="recoveryEmailInput" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          </div>
+
+          <div id="recoveryAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
+
+          <div id="recoveryStep1Buttons" style="display:flex; gap:10px; margin-bottom:14px;">
+            <button class="btn btn-primary" style="flex:1; padding:10px; font-weight:700; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff;" onclick="sendRecoveryEmailOtp()">
+              📨 Send Recovery OTP via Email
+            </button>
+            <button class="btn btn-outline" style="width:auto; padding:10px 14px;" onclick="cancelForgotPassword()">
+              ← Back
+            </button>
+          </div>
+
+          <!-- Step 2: Enter OTP and Set New Password (revealed after OTP is sent) -->
+          <div id="recoveryStep2Section" style="display:none; border-top:1px solid var(--card-border); padding-top:14px; margin-top:10px;">
+            <div style="margin-bottom:12px;">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">6-Digit Recovery OTP:</label>
+              <input type="text" id="recoveryOtpInput" maxlength="6" placeholder="0 0 0 0 0 0" style="width:100%; text-align:center; font-family:monospace; font-size:1.4rem; letter-spacing:0.25em; font-weight:800; padding:8px 12px; border-radius:6px; background:rgba(15,23,42,0.9); border:1.5px solid rgba(56,189,248,0.5); color:#ffffff;" />
+            </div>
+
+            <div style="margin-bottom:12px;">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">New Password (min 6 characters):</label>
+              <input type="password" id="recoveryNewPasswordInput" placeholder="••••••••" style="width:100%; padding:9px 12px; font-size:0.86rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <div style="margin-bottom:16px;">
+              <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Confirm New Password:</label>
+              <input type="password" id="recoveryConfirmPasswordInput" placeholder="••••••••" style="width:100%; padding:9px 12px; font-size:0.86rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            </div>
+
+            <button class="btn btn-primary" style="width:100%; padding:11px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="submitPasswordResetRecovery()">
+              🔐 Save New Password &amp; Continue
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. SHARED OTP VERIFICATION SCREEN (Offline OTP Removed) -->
         <div id="authOtpView" style="display:none;">
           <div style="text-align:center; margin-bottom:14px;">
             <div style="font-size:2.2rem; margin-bottom:4px;">✉️</div>
-            <div style="font-weight:800; font-size:1.05rem; color:#f8fafc;">Enter OTP Verification Code</div>
+            <div style="font-weight:800; font-size:1.05rem; color:#f8fafc;">Enter Email Verification OTP</div>
             <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">
-              A 6-digit One-Time Password has been dispatched to:
+              A 6-digit verification code has been dispatched to:
               <br><strong id="otpTargetEmailBadge" style="color:var(--champagne-gold); font-size:0.85rem;">raj079851@gmail.com</strong>
             </div>
           </div>
@@ -1234,24 +1291,15 @@
           <!-- Live Delivery Status Card -->
           <div id="otpLiveDeliveryCard" style="margin-bottom:14px; padding:10px 14px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:8px; font-size:0.78rem; text-align:left;">
             <div id="otpLiveEmailStatus" style="line-height:1.45;">
-              <span style="color:#10b981;">📨 <strong>Email Dispatched:</strong> Check your inbox at <span id="otpLiveTargetEmail" style="color:var(--champagne-gold); font-weight:700;">raj079851@gmail.com</span> for your 6-digit code.</span>
+              <span style="color:#10b981;">📨 <strong>Email Dispatched:</strong> Check your inbox at <span id="otpLiveTargetEmail" style="color:var(--champagne-gold); font-weight:700;">raj079851@gmail.com</span> for your code.</span>
             </div>
             <div style="margin-top:6px; font-size:0.71rem; color:var(--text-muted); border-top:1px dashed rgba(255,255,255,0.08); padding-top:6px;">
               💡 Please check your <strong>Inbox</strong>, <strong>Spam</strong>, or <strong>Promotions</strong> folder.
             </div>
           </div>
 
-          <!-- Emergency Offline Backup Code (Collapsible) -->
-          <details style="margin-bottom:14px; font-size:0.72rem; color:var(--text-muted);">
-            <summary style="cursor:pointer; opacity:0.7; user-select:none;">Trouble receiving email? (Emergency offline backup code)</summary>
-            <div style="margin-top:6px; padding:6px 10px; background:rgba(255,255,255,0.04); border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-              <span>Offline Backup: <code id="otpBackupDisplay" style="color:var(--champagne-gold); font-weight:700;">------</code></span>
-              <button type="button" id="otpQuickFillBtn" class="btn btn-outline" style="width:auto; padding:2px 8px; font-size:0.70rem;" onclick="quickFillOtpCode()">Fill Backup</button>
-            </div>
-          </details>
-
           <div style="margin-bottom:14px;">
-            <label style="display:block; font-size:0.76rem; color:var(--text-muted); margin-bottom:6px; font-weight:600; text-align:center;">6-Digit OTP Code:</label>
+            <label style="display:block; font-size:0.76rem; color:var(--text-muted); margin-bottom:6px; font-weight:600; text-align:center;">Enter 6-Digit OTP Code from Email:</label>
             <input type="text" id="otpInputCode" maxlength="6" placeholder="0 0 0 0 0 0" style="width:100%; text-align:center; font-family:monospace; font-size:1.6rem; letter-spacing:0.35em; font-weight:800; padding:10px 12px; border-radius:8px; background:rgba(15,23,42,0.9); border:1.5px solid rgba(212,175,55,0.5); color:#ffffff;" />
           </div>
 
@@ -1259,7 +1307,7 @@
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; font-size:0.74rem;">
             <span id="otpCountdownTimer" style="color:#ef4444; font-weight:700;">⏱️ Expires in: 05:00</span>
             <button type="button" id="otpResendBtn" class="btn btn-outline" style="width:auto; padding:3px 10px; font-size:0.72rem;" onclick="resendSmtpOtp()">
-              🔄 Resend OTP via Email
+              🔄 Resend OTP
             </button>
           </div>
 
@@ -1267,13 +1315,79 @@
 
           <div style="display:flex; gap:10px;">
             <button class="btn btn-primary" style="flex:1; padding:10px; font-weight:700; background:linear-gradient(135deg, #10b981 0%, #059669 100%); color:#ffffff;" onclick="verifyOtpAndLaunchSession()">
-              ✅ Verify OTP &amp; Launch Session
+              ✅ Verify OTP &amp; Continue
             </button>
             <button class="btn btn-outline" style="width:auto; padding:10px 14px;" onclick="cancelOtpVerification()">
               ← Back
             </button>
           </div>
         </div>
+
+        <!-- Footer link to SMTP Mail settings -->
+        <div style="text-align:center; margin-top:16px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.06); font-size:0.72rem; color:var(--text-muted);">
+          <a href="javascript:void(0)" onclick="openSmtpConfigModal()" style="color:#64748b; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+            <span>⚙️ SMTP Gateway Settings &amp; Diagnostics</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMTP CONFIGURATION & DIAGNOSTICS MODAL -->
+  <div id="smtpConfigModal" class="auth-modal-backdrop" style="display:none;" onclick="if(event.target===this) closeSmtpConfigModal();">
+    <div class="auth-modal-card" style="max-width:440px; border-radius:14px; overflow:hidden;">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; background:#1e293b; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.3rem;">⚙️</span>
+          <div>
+            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">SMTP Mail Gateway Settings</div>
+            <div style="font-size:0.72rem; color:#94a3b8;">Real Email Delivery for OTP &amp; Recovery</div>
+          </div>
+        </div>
+        <button onclick="closeSmtpConfigModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; line-height:1;">✕</button>
+      </div>
+
+      <div style="padding:20px;">
+        <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:12px;">
+          <div>
+            <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">SMTP Host:</label>
+            <input type="text" id="cfgSmtpHost" value="smtp.gmail.com" placeholder="smtp.gmail.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          </div>
+          <div>
+            <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Port:</label>
+            <input type="number" id="cfgSmtpPort" value="587" placeholder="587" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Account (Username):</label>
+          <input type="email" id="cfgSmtpUser" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">App Password (16-char Google App Password):</label>
+          <input type="password" id="cfgSmtpPass" placeholder="••••••••••••••••" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          <div style="font-size:0.68rem; color:var(--text-muted); margin-top:3px;">
+            💡 For Gmail, generate a 16-character password at <a href="https://myaccount.google.com/apppasswords" target="_blank" style="color:#38bdf8;">Google App Passwords</a>.
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Sender Display Email:</label>
+          <input type="email" id="cfgSmtpSender" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+        </div>
+
+        <div id="smtpTestAlert" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
+
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-primary" style="flex:1; padding:10px; font-weight:700; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#ffffff;" onclick="saveAndTestSmtpConfig()">
+            💾 Save &amp; Test Connection
+          </button>
+          <button class="btn btn-outline" style="width:auto; padding:10px 14px;" onclick="closeSmtpConfigModal()">
+            Cancel
+          </button>
+        </div>
+      </div>
       </div>
     </div>
   </div>
@@ -8702,6 +8816,7 @@ result = df.describe()
       const adminSec = document.getElementById("authSectionAdmin");
       const userSec = document.getElementById("authSectionUser");
       const otpSec = document.getElementById("authOtpView");
+      const forgotSec = document.getElementById("authSectionForgotPassword");
       const primaryTabs = document.getElementById("authPrimaryTabs");
       const btnAdmin = document.getElementById("authMainTabAdmin");
       const btnUser = document.getElementById("authMainTabUser");
@@ -8709,13 +8824,24 @@ result = df.describe()
       if (mode === "otp") {
         if (adminSec) adminSec.style.display = "none";
         if (userSec) userSec.style.display = "none";
+        if (forgotSec) forgotSec.style.display = "none";
         if (otpSec) otpSec.style.display = "block";
+        if (primaryTabs) primaryTabs.style.display = "none";
+        return;
+      }
+
+      if (mode === "forgot_password") {
+        if (adminSec) adminSec.style.display = "none";
+        if (userSec) userSec.style.display = "none";
+        if (otpSec) otpSec.style.display = "none";
+        if (forgotSec) forgotSec.style.display = "block";
         if (primaryTabs) primaryTabs.style.display = "none";
         return;
       }
 
       if (primaryTabs) primaryTabs.style.display = "flex";
       if (otpSec) otpSec.style.display = "none";
+      if (forgotSec) forgotSec.style.display = "none";
 
       if (mode === "admin") {
         if (adminSec) adminSec.style.display = "block";
@@ -8909,8 +9035,10 @@ result = df.describe()
       otpCountdownInterval = setInterval(updateDisplay, 1000);
     }
 
-    // 1. Admin Login: Initiate Email OTP
-    function initiateSmtpOtpLogin() {
+    // -------------------------------------------------------------
+    // SECURE CREDENTIAL AUTHENTICATION (POSTGRESQL BACKEND)
+    // -------------------------------------------------------------
+    async function submitSecureAdminLogin() {
       const uname = (document.getElementById("authUsernameInput")?.value || "").trim();
       const pwd = document.getElementById("authPasswordInput")?.value || "";
       const alertBox = document.getElementById("authAlertBanner");
@@ -8921,56 +9049,69 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Please enter admin email and password.";
+          alertBox.textContent = "Please enter both admin email and password.";
         }
         return;
       }
 
-      const isRaj = uname.toLowerCase() === "raj079851@gmail.com" || uname.toLowerCase() === "admin";
-      const targetEmail = isRaj ? "raj079851@gmail.com" : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
-      const assignedRole = "Admin";
-      const fullName = isRaj ? "Raj (Enterprise Admin)" : uname;
-
-      const otp = generateSecureOtp();
-      const dispatch = dispatchSmtpOtpEnvelope(targetEmail, otp, "Admin Sign-In");
-
-      pendingOtpSession = {
-        type: "admin",
-        username: uname,
-        email: targetEmail,
-        role: assignedRole,
-        fullName: fullName,
-        otp: otp,
-        isExpired: false,
-        expiresAt: Date.now() + 300000,
-        dispatch: dispatch
-      };
-
-      // Switch to OTP view
-      switchAuthMainMode("otp");
-      document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
-      const targetLive = document.getElementById("otpLiveTargetEmail");
-      if (targetLive) targetLive.textContent = targetEmail;
-      const backupEl = document.getElementById("otpBackupDisplay");
-      if (backupEl) backupEl.textContent = otp;
-      document.getElementById("otpInputCode").value = "";
-      const otpAlert = document.getElementById("otpAlertBanner");
-      if (otpAlert) {
-        otpAlert.style.display = "block";
-        otpAlert.style.background = "rgba(16,185,129,0.15)";
-        otpAlert.style.border = "1px solid #10b981";
-        otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${targetEmail}</code>. Please check your email inbox.`;
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "rgba(56,189,248,0.12)";
+        alertBox.style.border = "1px solid #38bdf8";
+        alertBox.style.color = "#bae6fd";
+        alertBox.textContent = "Authenticating admin credentials against PostgreSQL...";
       }
 
-      startOtpCountdown(300);
-      sendLiveEmailDispatch(targetEmail, otp, "Admin Sign-In");
-      logAuditEvent("AUTH_OTP_SENT", uname, assignedRole, "SUCCESS", `Admin OTP sent to ${targetEmail} (ID: ${dispatch.messageId})`);
-      notifyTaskSuccess("Admin OTP Dispatched", `Verification code sent to ${targetEmail}.`);
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: uname, password: pwd })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (alertBox) {
+            alertBox.style.display = "block";
+            alertBox.style.background = "rgba(239,68,68,0.15)";
+            alertBox.style.border = "1px solid #ef4444";
+            alertBox.style.color = "#fca5a5";
+            alertBox.textContent = data.detail || "Invalid email or password. Please verify credentials.";
+          }
+          logAuditEvent("AUTH_LOGIN_FAILED", uname, "Admin", "FAILED", data.detail || "Authentication rejected");
+          return;
+        }
+
+        // Successfully authenticated with PostgreSQL
+        currentAuthUser = {
+          username: data.user.email,
+          role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Admin",
+          email: data.user.email,
+          full_name: data.user.full_name,
+          token: data.access_token
+        };
+        localStorage.setItem("datamind_token", data.access_token);
+        localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+        applyUserSessionUI();
+        closeAuthModal();
+        notifyTaskSuccess("Admin Authenticated", `Welcome ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
+        logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Admin authenticated via PostgreSQL");
+        saveUserLoginToDatabase("ADMIN_PASSWORD", "Admin logged in via bcrypt-authenticated PostgreSQL session");
+
+      } catch (err) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Connection to authentication server failed. Ensure backend API is running on port 8000.";
+        }
+      }
     }
 
-    // 2. User Existing: Initiate Email OTP
-    function initiateUserSmtpOtpLogin() {
+    async function submitSecureUserLogin() {
       const uname = (document.getElementById("userUsernameInput")?.value || "").trim();
       const pwd = document.getElementById("userPasswordInput")?.value || "";
       const alertBox = document.getElementById("userAlertBanner");
@@ -8981,56 +9122,320 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Please enter your username/email and password.";
+          alertBox.textContent = "Please enter both email and password.";
         }
         return;
       }
 
-      const matched = enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase() || u.email.toLowerCase() === uname.toLowerCase());
-      const targetEmail = matched ? matched.email : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
-      const assignedRole = matched ? matched.role : "Analyst";
-      const fullName = matched ? matched.full_name : uname.split("@")[0];
-
-      const otp = generateSecureOtp();
-      const dispatch = dispatchSmtpOtpEnvelope(targetEmail, otp, "User Sign-In");
-
-      pendingOtpSession = {
-        type: "user_existing",
-        username: uname,
-        email: targetEmail,
-        role: assignedRole,
-        fullName: fullName,
-        otp: otp,
-        isExpired: false,
-        expiresAt: Date.now() + 300000,
-        dispatch: dispatch
-      };
-
-      // Switch to OTP view
-      switchAuthMainMode("otp");
-      document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
-      const targetLive = document.getElementById("otpLiveTargetEmail");
-      if (targetLive) targetLive.textContent = targetEmail;
-      const backupEl = document.getElementById("otpBackupDisplay");
-      if (backupEl) backupEl.textContent = otp;
-      document.getElementById("otpInputCode").value = "";
-      const otpAlert = document.getElementById("otpAlertBanner");
-      if (otpAlert) {
-        otpAlert.style.display = "block";
-        otpAlert.style.background = "rgba(16,185,129,0.15)";
-        otpAlert.style.border = "1px solid #10b981";
-        otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${targetEmail}</code>. Please check your email inbox.`;
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "rgba(56,189,248,0.12)";
+        alertBox.style.border = "1px solid #38bdf8";
+        alertBox.style.color = "#bae6fd";
+        alertBox.textContent = "Authenticating user credentials against PostgreSQL...";
       }
 
-      startOtpCountdown(300);
-      sendLiveEmailDispatch(targetEmail, otp, "User Sign-In");
-      logAuditEvent("AUTH_OTP_SENT", uname, assignedRole, "SUCCESS", `User OTP sent to ${targetEmail}`);
-      notifyTaskSuccess("OTP Dispatched", `Verification code sent to ${targetEmail}.`);
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: uname, password: pwd })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (alertBox) {
+            alertBox.style.display = "block";
+            alertBox.style.background = "rgba(239,68,68,0.15)";
+            alertBox.style.border = "1px solid #ef4444";
+            alertBox.style.color = "#fca5a5";
+            alertBox.textContent = data.detail || "Invalid email or password. Please register if you don't have an account.";
+          }
+          logAuditEvent("AUTH_LOGIN_FAILED", uname, "User", "FAILED", data.detail || "Authentication rejected");
+          return;
+        }
+
+        // Successfully authenticated with PostgreSQL
+        currentAuthUser = {
+          username: data.user.email,
+          role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "User",
+          email: data.user.email,
+          full_name: data.user.full_name,
+          token: data.access_token
+        };
+        localStorage.setItem("datamind_token", data.access_token);
+        localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+        applyUserSessionUI();
+        closeAuthModal();
+        notifyTaskSuccess("Sign-In Successful", `Welcome back, ${currentAuthUser.full_name}!`);
+        logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "User authenticated via PostgreSQL");
+        saveUserLoginToDatabase("USER_PASSWORD", "User logged in via bcrypt-authenticated PostgreSQL session");
+
+      } catch (err) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Connection to authentication server failed. Ensure backend API is running on port 8000.";
+        }
+      }
     }
 
-    // 3. User Existing: Direct Login
-    function submitUserDirectLogin() {
+    // -------------------------------------------------------------
+    // FORGOT PASSWORD / ACCOUNT RECOVERY FLOW
+    // -------------------------------------------------------------
+    function openForgotPasswordView(presetEmail = "") {
+      switchAuthMainMode("forgot_password");
+      const emailInp = document.getElementById("recoveryEmailInput");
+      if (emailInp && presetEmail) emailInp.value = presetEmail;
+      const step2 = document.getElementById("recoveryStep2Section");
+      if (step2) step2.style.display = "none";
+      const banner = document.getElementById("recoveryAlertBanner");
+      if (banner) banner.style.display = "none";
+    }
+
+    function cancelForgotPassword() {
+      switchAuthMainMode("user");
+      switchUserSubTab("existing");
+    }
+
+    async function sendRecoveryEmailOtp() {
+      const email = (document.getElementById("recoveryEmailInput")?.value || "").trim().toLowerCase();
+      const banner = document.getElementById("recoveryAlertBanner");
+
+      if (!email || !email.includes("@")) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Please enter a valid registered email address.";
+        }
+        return;
+      }
+
+      if (banner) {
+        banner.style.display = "block";
+        banner.style.background = "rgba(56,189,248,0.12)";
+        banner.style.border = "1px solid #38bdf8";
+        banner.style.color = "#bae6fd";
+        banner.textContent = "Validating account and dispatching recovery code via SMTP...";
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (banner) {
+            banner.style.display = "block";
+            banner.style.background = "rgba(239,68,68,0.15)";
+            banner.style.border = "1px solid #ef4444";
+            banner.style.color = "#fca5a5";
+            banner.textContent = data.detail || "Account not found. Please register first.";
+          }
+          return;
+        }
+
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(16,185,129,0.15)";
+          banner.style.border = "1px solid #10b981";
+          banner.style.color = "#6ee7b7";
+          banner.innerHTML = `📨 <strong>Recovery Code Sent:</strong> We've dispatched a 6-digit recovery OTP to <code>${email}</code>. Check your inbox and enter it below.`;
+        }
+
+        const step2 = document.getElementById("recoveryStep2Section");
+        if (step2) step2.style.display = "block";
+        document.getElementById("recoveryOtpInput")?.focus();
+        notifyTaskSuccess("Recovery Code Dispatched", `Sent verification code to ${email}.`);
+      } catch (err) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Failed to communicate with recovery gateway. Verify backend is running.";
+        }
+      }
+    }
+
+    async function submitPasswordResetRecovery() {
+      const email = (document.getElementById("recoveryEmailInput")?.value || "").trim().toLowerCase();
+      const otp = (document.getElementById("recoveryOtpInput")?.value || "").trim().replace(/\s+/g, '');
+      const newPwd = document.getElementById("recoveryNewPasswordInput")?.value || "";
+      const confirmPwd = document.getElementById("recoveryConfirmPasswordInput")?.value || "";
+      const banner = document.getElementById("recoveryAlertBanner");
+
+      if (!otp || otp.length < 4) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Please enter the 6-digit recovery code from your email.";
+        }
+        return;
+      }
+
+      if (!newPwd || newPwd.length < 6) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Password must be at least 6 characters in length.";
+        }
+        return;
+      }
+
+      if (newPwd !== confirmPwd) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Passwords do not match. Please re-enter.";
+        }
+        return;
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/reset`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, otp: otp, new_password: newPwd })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (banner) {
+            banner.style.display = "block";
+            banner.style.background = "rgba(239,68,68,0.15)";
+            banner.style.border = "1px solid #ef4444";
+            banner.style.color = "#fca5a5";
+            banner.textContent = data.detail || "Failed to reset password. Code may be invalid or expired.";
+          }
+          return;
+        }
+
+        notifyTaskSuccess("Password Updated", "Your password has been successfully reset! Please sign in with your new password.");
+        switchAuthMainMode("user");
+        switchUserSubTab("existing");
+        const uInp = document.getElementById("userUsernameInput");
+        if (uInp) uInp.value = email;
+        const pInp = document.getElementById("userPasswordInput");
+        if (pInp) { pInp.value = ""; pInp.focus(); }
+
+        const userBanner = document.getElementById("userAlertBanner");
+        if (userBanner) {
+          userBanner.style.display = "block";
+          userBanner.style.background = "rgba(16,185,129,0.15)";
+          userBanner.style.border = "1px solid #10b981";
+          userBanner.style.color = "#6ee7b7";
+          userBanner.textContent = "Password successfully reset! Enter your new password to sign in.";
+        }
+      } catch (err) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Failed to submit password reset. Check backend connection.";
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // EMAIL OTP AUTHENTICATION FLOWS (REAL SMTP ONLY)
+    // -------------------------------------------------------------
+    async function initiateSmtpOtpLogin() {
+      const uname = (document.getElementById("authUsernameInput")?.value || "").trim();
+      const alertBox = document.getElementById("authAlertBanner");
+
+      if (!uname) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Please enter admin email address.";
+        }
+        return;
+      }
+
+      const targetEmail = uname.toLowerCase();
+
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "rgba(56,189,248,0.12)";
+        alertBox.style.border = "1px solid #38bdf8";
+        alertBox.style.color = "#bae6fd";
+        alertBox.textContent = "Verifying account and sending OTP via SMTP...";
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: targetEmail, purpose: "login" })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (alertBox) {
+            alertBox.style.display = "block";
+            alertBox.style.background = "rgba(239,68,68,0.15)";
+            alertBox.style.border = "1px solid #ef4444";
+            alertBox.style.color = "#fca5a5";
+            alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+          }
+          return;
+        }
+
+        pendingOtpSession = {
+          type: "admin",
+          email: targetEmail,
+          purpose: "login",
+          expiresAt: Date.now() + 300000
+        };
+
+        switchAuthMainMode("otp");
+        document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+        const targetLive = document.getElementById("otpLiveTargetEmail");
+        if (targetLive) targetLive.textContent = targetEmail;
+        document.getElementById("otpInputCode").value = "";
+
+        const otpAlert = document.getElementById("otpAlertBanner");
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(16,185,129,0.15)";
+          otpAlert.style.border = "1px solid #10b981";
+          otpAlert.style.color = "#6ee7b7";
+          otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+        }
+
+        startOtpCountdown(300);
+        notifyTaskSuccess("Admin OTP Sent", `Verification code sent to ${targetEmail}.`);
+      } catch (err) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Failed to contact authentication gateway. Verify backend is running.";
+        }
+      }
+    }
+
+    async function initiateUserSmtpOtpLogin() {
       const uname = (document.getElementById("userUsernameInput")?.value || "").trim();
       const alertBox = document.getElementById("userAlertBanner");
 
@@ -9040,34 +9445,78 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Please enter your username or email.";
+          alertBox.textContent = "Please enter your email address.";
         }
         return;
       }
 
-      const matched = enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase() || u.email.toLowerCase() === uname.toLowerCase());
-      const role = matched ? matched.role : "Analyst";
-      const email = matched ? matched.email : (uname.includes("@") ? uname : `${uname}@datamind.ai`);
-      const fullName = matched ? matched.full_name : uname.split("@")[0];
+      const targetEmail = uname.toLowerCase();
 
-      currentAuthUser = {
-        username: uname,
-        role: role,
-        email: email,
-        full_name: fullName,
-        token: `dmk_session_${uname}_direct`
-      };
-      applyUserSessionUI();
-      closeAuthModal();
-      notifyTaskSuccess("Direct Sign-In", `Session initialized for ${fullName} (${role}).`);
-      logAuditEvent("AUTH_LOGIN_DIRECT", uname, role, "SUCCESS", "User direct session opened");
-      saveUserLoginToDatabase("USER_DIRECT", "Existing user direct instant login");
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "rgba(56,189,248,0.12)";
+        alertBox.style.border = "1px solid #38bdf8";
+        alertBox.style.color = "#bae6fd";
+        alertBox.textContent = "Verifying account and sending OTP via SMTP...";
+      }
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: targetEmail, purpose: "login" })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (alertBox) {
+            alertBox.style.display = "block";
+            alertBox.style.background = "rgba(239,68,68,0.15)";
+            alertBox.style.border = "1px solid #ef4444";
+            alertBox.style.color = "#fca5a5";
+            alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+          }
+          return;
+        }
+
+        pendingOtpSession = {
+          type: "user_existing",
+          email: targetEmail,
+          purpose: "login",
+          expiresAt: Date.now() + 300000
+        };
+
+        switchAuthMainMode("otp");
+        document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+        const targetLive = document.getElementById("otpLiveTargetEmail");
+        if (targetLive) targetLive.textContent = targetEmail;
+        document.getElementById("otpInputCode").value = "";
+
+        const otpAlert = document.getElementById("otpAlertBanner");
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(16,185,129,0.15)";
+          otpAlert.style.border = "1px solid #10b981";
+          otpAlert.style.color = "#6ee7b7";
+          otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+        }
+
+        startOtpCountdown(300);
+        notifyTaskSuccess("OTP Sent", `Verification code sent to ${targetEmail}.`);
+      } catch (err) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Failed to contact authentication gateway. Verify backend is running.";
+        }
+      }
     }
 
-    // 4. New User: Initiate Registration with OTP
-    function initiateSmtpNewUserRegister() {
+    async function initiateSmtpNewUserRegister() {
       const fname = (document.getElementById("regFullNameInput")?.value || "").trim();
-      const email = (document.getElementById("regEmailInput")?.value || "").trim();
+      const email = (document.getElementById("regEmailInput")?.value || "").trim().toLowerCase();
       const pwd = document.getElementById("regPasswordInput")?.value || "";
       const role = document.getElementById("regRoleSelect")?.value || "Analyst";
       const alertBox = document.getElementById("regAlertBanner");
@@ -9094,101 +9543,101 @@ result = df.describe()
         return;
       }
 
-      const otp = generateSecureOtp();
-      const dispatch = dispatchSmtpOtpEnvelope(email, otp, "New User Registration");
-
-      pendingOtpSession = {
-        type: "new_user",
-        username: email,
-        email: email,
-        role: role,
-        fullName: fname,
-        password: pwd,
-        otp: otp,
-        isExpired: false,
-        expiresAt: Date.now() + 300000,
-        dispatch: dispatch
-      };
-
-      // Switch to OTP view
-      switchAuthMainMode("otp");
-      document.getElementById("otpTargetEmailBadge").textContent = email;
-      const targetLive = document.getElementById("otpLiveTargetEmail");
-      if (targetLive) targetLive.textContent = email;
-      const backupEl = document.getElementById("otpBackupDisplay");
-      if (backupEl) backupEl.textContent = otp;
-      document.getElementById("otpInputCode").value = "";
-      const otpAlert = document.getElementById("otpAlertBanner");
-      if (otpAlert) {
-        otpAlert.style.display = "block";
-        otpAlert.style.background = "rgba(16,185,129,0.15)";
-        otpAlert.style.border = "1px solid #10b981";
-        otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent directly to <code>${email}</code>. Please check your email inbox.`;
+      if (alertBox) {
+        alertBox.style.display = "block";
+        alertBox.style.background = "rgba(56,189,248,0.12)";
+        alertBox.style.border = "1px solid #38bdf8";
+        alertBox.style.color = "#bae6fd";
+        alertBox.textContent = "Sending registration verification OTP via SMTP...";
       }
 
-      startOtpCountdown(300);
-      sendLiveEmailDispatch(email, otp, "New User Registration");
-      logAuditEvent("NEW_USER_OTP_SENT", email, role, "SUCCESS", `Registration OTP dispatched to ${email}`);
-      notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
-    }
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, purpose: "register" })
+        });
+        const data = await resp.json();
 
-    // Quick auto-fill button for emergency backup
-    function quickFillOtpCode() {
-      if (pendingOtpSession && pendingOtpSession.otp) {
-        const inp = document.getElementById("otpInputCode");
-        if (inp) {
-          inp.value = pendingOtpSession.otp;
-          inp.focus();
+        pendingOtpSession = {
+          type: "new_user",
+          email: email,
+          fullName: fname,
+          password: pwd,
+          role: role,
+          purpose: "register",
+          expiresAt: Date.now() + 300000
+        };
+
+        switchAuthMainMode("otp");
+        document.getElementById("otpTargetEmailBadge").textContent = email;
+        const targetLive = document.getElementById("otpLiveTargetEmail");
+        if (targetLive) targetLive.textContent = email;
+        document.getElementById("otpInputCode").value = "";
+
+        const otpAlert = document.getElementById("otpAlertBanner");
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(16,185,129,0.15)";
+          otpAlert.style.border = "1px solid #10b981";
+          otpAlert.style.color = "#6ee7b7";
+          otpAlert.innerHTML = `📨 <strong>Verification Code Sent:</strong> Dispatched to <code>${email}</code> via SMTP. Please check your inbox.`;
+        }
+
+        startOtpCountdown(300);
+        notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
+      } catch (err) {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "Failed to dispatch registration OTP. Ensure backend is running.";
         }
       }
     }
 
-    // Resend OTP via Email
-    function resendSmtpOtp() {
+    async function resendSmtpOtp() {
       if (!pendingOtpSession) return;
-      const newOtp = generateSecureOtp();
-      const dispatch = dispatchSmtpOtpEnvelope(pendingOtpSession.email, newOtp, "Resend OTP");
-      pendingOtpSession.otp = newOtp;
-      pendingOtpSession.isExpired = false;
-      pendingOtpSession.expiresAt = Date.now() + 300000;
-      pendingOtpSession.dispatch = dispatch;
+      const targetEmail = pendingOtpSession.email;
+      const purpose = pendingOtpSession.purpose || "login";
 
-      const backupEl = document.getElementById("otpBackupDisplay");
-      if (backupEl) backupEl.textContent = newOtp;
-      const otpAlert = document.getElementById("otpAlertBanner");
-      if (otpAlert) {
-        otpAlert.style.display = "block";
-        otpAlert.style.background = "rgba(16,185,129,0.15)";
-        otpAlert.style.border = "1px solid #10b981";
-        otpAlert.style.color = "#6ee7b7";
-        otpAlert.innerHTML = `🔄 <strong>OTP Resent:</strong> Fresh code sent directly to <code>${pendingOtpSession.email}</code>.`;
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: targetEmail, purpose: purpose })
+        });
+        pendingOtpSession.expiresAt = Date.now() + 300000;
+        startOtpCountdown(300);
+
+        const otpAlert = document.getElementById("otpAlertBanner");
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(16,185,129,0.15)";
+          otpAlert.style.border = "1px solid #10b981";
+          otpAlert.style.color = "#6ee7b7";
+          otpAlert.innerHTML = `🔄 <strong>Fresh OTP Dispatched:</strong> Sent to <code>${targetEmail}</code>.`;
+        }
+        notifyTaskSuccess("OTP Resent", `Fresh verification code dispatched to ${targetEmail}.`);
+      } catch (err) {
+        notifyTaskFailed("Resend Failed", "Could not dispatch new code.");
       }
-      startOtpCountdown(300);
-      sendLiveEmailDispatch(pendingOtpSession.email, newOtp, "Resend OTP");
-      notifyTaskSuccess("OTP Resent", `Fresh code dispatched to ${pendingOtpSession.email}.`);
-      logAuditEvent("AUTH_OTP_RESENT", pendingOtpSession.username, pendingOtpSession.role, "SUCCESS", `Resent OTP to ${pendingOtpSession.email}`);
     }
 
-    // Cancel OTP Verification and return to previous mode
     function cancelOtpVerification() {
       if (otpCountdownInterval) clearInterval(otpCountdownInterval);
       const isNew = pendingOtpSession?.type === "new_user";
-      const isUserExist = pendingOtpSession?.type === "user_existing";
       pendingOtpSession = null;
       if (isNew) {
         switchAuthMainMode("user");
         switchUserSubTab("new");
-      } else if (isUserExist) {
-        switchAuthMainMode("user");
-        switchUserSubTab("existing");
       } else {
         switchAuthMainMode("admin");
       }
     }
 
-    // Verify OTP and complete sign-in / registration
-    function verifyOtpAndLaunchSession() {
+    async function verifyOtpAndLaunchSession() {
       const enteredCode = (document.getElementById("otpInputCode")?.value || "").trim().replace(/\s+/g, '');
       const otpAlert = document.getElementById("otpAlertBanner");
 
@@ -9198,156 +9647,237 @@ result = df.describe()
           otpAlert.style.background = "rgba(239,68,68,0.15)";
           otpAlert.style.border = "1px solid #ef4444";
           otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "No active OTP session found. Please request a new OTP.";
+          otpAlert.textContent = "No active OTP session found. Please request a new code.";
         }
         return;
       }
 
-      if (pendingOtpSession.isExpired || Date.now() > pendingOtpSession.expiresAt) {
+      if (!enteredCode || enteredCode.length < 4) {
         if (otpAlert) {
           otpAlert.style.display = "block";
           otpAlert.style.background = "rgba(239,68,68,0.15)";
           otpAlert.style.border = "1px solid #ef4444";
           otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "The OTP code has expired. Please click 'Resend OTP via Email'.";
+          otpAlert.textContent = "Please enter the 6-digit verification code from your email.";
         }
-        logAuditEvent("AUTH_OTP_FAIL", pendingOtpSession.username, pendingOtpSession.role, "BLOCKED", "Expired OTP attempt");
         return;
       }
-
-      if (enteredCode !== pendingOtpSession.otp) {
-        if (otpAlert) {
-          otpAlert.style.display = "block";
-          otpAlert.style.background = "rgba(239,68,68,0.15)";
-          otpAlert.style.border = "1px solid #ef4444";
-          otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "Incorrect OTP code. Please enter the valid 6-digit code received in your email.";
-        }
-        logAuditEvent("AUTH_OTP_FAIL", pendingOtpSession.username, pendingOtpSession.role, "BLOCKED", `Invalid OTP code '${enteredCode}'`);
-        return;
-      }
-
-      // OTP Verification Succeeded!
-      if (otpCountdownInterval) clearInterval(otpCountdownInterval);
 
       if (pendingOtpSession.type === "new_user") {
-        const newUserObj = {
-          username: pendingOtpSession.username,
-          full_name: pendingOtpSession.fullName,
-          email: pendingOtpSession.email,
-          role: pendingOtpSession.role,
-          is_active: true,
-          hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)"
-        };
-        enterpriseUsersList.unshift(newUserObj);
-        renderUsersDirectoryUI();
+        // First verify OTP
+        try {
+          const vResp = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: pendingOtpSession.email, otp: enteredCode, purpose: "register" })
+          });
+          const vData = await vResp.json();
+          if (!vResp.ok) {
+            if (otpAlert) {
+              otpAlert.style.display = "block";
+              otpAlert.style.background = "rgba(239,68,68,0.15)";
+              otpAlert.style.border = "1px solid #ef4444";
+              otpAlert.style.color = "#fca5a5";
+              otpAlert.textContent = vData.detail || "Invalid or expired OTP code.";
+            }
+            return;
+          }
 
-        currentAuthUser = {
-          username: newUserObj.username,
-          role: newUserObj.role,
-          email: newUserObj.email,
-          full_name: newUserObj.full_name,
-          token: `dmk_session_${Date.now()}`
-        };
-        logAuditEvent("USER_REGISTERED", newUserObj.username, newUserObj.role, "SUCCESS", `New user verified and registered via OTP`);
-        saveUserLoginToDatabase("NEW_USER_OTP", "New user registered and OTP verified in database");
-      } else if (pendingOtpSession.type === "admin" || pendingOtpSession.email.toLowerCase() === "raj079851@gmail.com" || pendingOtpSession.username.toLowerCase() === "admin") {
-        currentAuthUser = {
-          username: "raj079851@gmail.com",
-          role: "Admin",
-          email: "raj079851@gmail.com",
-          full_name: "Raj (Enterprise Admin)",
-          token: `dmk_session_${Date.now()}`
-        };
-        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `Admin authenticated via OTP verification`);
-        saveUserLoginToDatabase("ADMIN_OTP", "Admin verified via 6-digit email OTP");
-      } else {
-        currentAuthUser = {
-          username: pendingOtpSession.username,
-          role: pendingOtpSession.role,
-          email: pendingOtpSession.email,
-          full_name: pendingOtpSession.fullName,
-          token: `dmk_session_${Date.now()}`
-        };
-        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", `User authenticated via OTP verification`);
-        saveUserLoginToDatabase("USER_OTP", "User verified via 6-digit email OTP");
+          // Register in PostgreSQL
+          const regResp = await fetch(`${API_BASE_URL}/api/auth/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              full_name: pendingOtpSession.fullName,
+              email: pendingOtpSession.email,
+              password: pendingOtpSession.password,
+              role: pendingOtpSession.role.toLowerCase()
+            })
+          });
+          const regData = await regResp.json();
+
+          if (!regResp.ok) {
+            if (otpAlert) {
+              otpAlert.style.display = "block";
+              otpAlert.style.background = "rgba(239,68,68,0.15)";
+              otpAlert.style.border = "1px solid #ef4444";
+              otpAlert.style.color = "#fca5a5";
+              otpAlert.textContent = regData.detail || "Registration failed in database.";
+            }
+            return;
+          }
+
+          // Auto-login registered user
+          const lResp = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: pendingOtpSession.email, password: pendingOtpSession.password })
+          });
+          const lData = await lResp.json();
+
+          currentAuthUser = {
+            username: regData.email,
+            role: regData.role ? (regData.role.charAt(0).toUpperCase() + regData.role.slice(1)) : "User",
+            email: regData.email,
+            full_name: regData.full_name,
+            token: lData.access_token || `token_${Date.now()}`
+          };
+          localStorage.setItem("datamind_token", currentAuthUser.token);
+          localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+          if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+          applyUserSessionUI();
+          closeAuthModal();
+          notifyTaskSuccess("Account Created", `Welcome ${currentAuthUser.full_name}! Account created in PostgreSQL.`);
+          logAuditEvent("USER_REGISTERED", currentAuthUser.email, currentAuthUser.role, "SUCCESS", "Registered via email OTP");
+          saveUserLoginToDatabase("REGISTER_OTP", "New user registered with verified email OTP");
+          pendingOtpSession = null;
+          return;
+
+        } catch (err) {
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            otpAlert.style.background = "rgba(239,68,68,0.15)";
+            otpAlert.style.border = "1px solid #ef4444";
+            otpAlert.style.color = "#fca5a5";
+            otpAlert.textContent = "Registration verification failed: " + err.message;
+          }
+          return;
+        }
       }
 
-      applyUserSessionUI();
-      closeAuthModal();
-      notifyTaskSuccess("Security Verified", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}) via OTP.`);
-      pendingOtpSession = null;
+      // Existing User or Admin OTP Login
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: pendingOtpSession.email, otp: enteredCode, purpose: "login" })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            otpAlert.style.background = "rgba(239,68,68,0.15)";
+            otpAlert.style.border = "1px solid #ef4444";
+            otpAlert.style.color = "#fca5a5";
+            otpAlert.textContent = data.detail || "Invalid or expired OTP code.";
+          }
+          logAuditEvent("AUTH_OTP_FAIL", pendingOtpSession.email, "User", "BLOCKED", `Incorrect OTP attempt`);
+          return;
+        }
+
+        // Successfully verified
+        if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+        currentAuthUser = {
+          username: data.user.email,
+          role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "User",
+          email: data.user.email,
+          full_name: data.user.full_name,
+          token: data.access_token
+        };
+        localStorage.setItem("datamind_token", data.access_token);
+        localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+        applyUserSessionUI();
+        closeAuthModal();
+        notifyTaskSuccess("OTP Verified", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
+        logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Authenticated via verified email OTP");
+        saveUserLoginToDatabase("OTP_LOGIN", "Authenticated via verified email OTP in PostgreSQL");
+        pendingOtpSession = null;
+
+      } catch (err) {
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(239,68,68,0.15)";
+          otpAlert.style.border = "1px solid #ef4444";
+          otpAlert.style.color = "#fca5a5";
+          otpAlert.textContent = "OTP verification failed. Check backend connection.";
+        }
+      }
     }
 
-    // Instant direct password bypass login
-    function submitDirectPasswordLogin() {
-      const uname = (document.getElementById("authUsernameInput")?.value || "").trim();
-      const isRaj = uname.toLowerCase() === "raj079851@gmail.com" || uname.toLowerCase() === "admin";
-      const role = isRaj ? "Admin" : (enterpriseUsersList.find(u => u.username.toLowerCase() === uname.toLowerCase())?.role || "Analyst");
-      currentAuthUser = {
-        username: isRaj ? "raj079851@gmail.com" : uname,
-        role: role,
-        email: isRaj ? "raj079851@gmail.com" : `${uname}@enterprise.com`,
-        full_name: isRaj ? "Raj (Enterprise Admin)" : uname,
-        token: `dmk_session_${uname}_direct`
-      };
-      applyUserSessionUI();
-      closeAuthModal();
-      notifyTaskSuccess("Direct Sign-In", `Session initialized for ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
-      logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Direct password session opened");
-      saveUserLoginToDatabase("ADMIN_DIRECT", "Direct Admin instant sign-in");
+    // -------------------------------------------------------------
+    // SMTP GATEWAY CONFIGURATION MODAL CONTROLS
+    // -------------------------------------------------------------
+    async function openSmtpConfigModal() {
+      const modal = document.getElementById("smtpConfigModal");
+      if (modal) modal.style.display = "flex";
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/auth/smtp-status`);
+        if (resp.ok) {
+          const data = await resp.json();
+          if (data.host) document.getElementById("cfgSmtpHost").value = data.host;
+          if (data.port) document.getElementById("cfgSmtpPort").value = data.port;
+          if (data.sender) document.getElementById("cfgSmtpSender").value = data.sender;
+        }
+      } catch (e) {}
     }
 
-    // SMTP Settings Management
-    async function testSmtpConnection() {
+    function closeSmtpConfigModal() {
+      const modal = document.getElementById("smtpConfigModal");
+      if (modal) modal.style.display = "none";
+    }
+
+    async function saveAndTestSmtpConfig() {
       const host = document.getElementById("cfgSmtpHost")?.value || "smtp.gmail.com";
-      const port = document.getElementById("cfgSmtpPort")?.value || "587";
+      const port = parseInt(document.getElementById("cfgSmtpPort")?.value || "587", 10);
+      const user = document.getElementById("cfgSmtpUser")?.value || "";
+      const pass = document.getElementById("cfgSmtpPass")?.value || "";
+      const sender = document.getElementById("cfgSmtpSender")?.value || user;
       const alert = document.getElementById("smtpTestAlert");
+
       if (alert) {
         alert.style.display = "block";
-        alert.style.background = "rgba(99,102,241,0.15)";
-        alert.style.border = "1px solid #6366f1";
-        alert.style.color = "#c7d2fe";
-        alert.innerHTML = `⏳ <strong>Testing SMTP Relay:</strong> Performing live handshake to <code>${host}:${port}</code>...`;
+        alert.style.background = "rgba(56,189,248,0.12)";
+        alert.style.border = "1px solid #38bdf8";
+        alert.style.color = "#bae6fd";
+        alert.innerHTML = `⏳ Testing connection to <code>${host}:${port}</code>...`;
       }
+
       try {
-        const testCode = generateSecureOtp();
-        sendLiveEmailDispatch("raj079851@gmail.com", testCode, "SMTP Gateway Diagnostics");
-        if (alert) {
-          alert.style.background = "rgba(16,185,129,0.15)";
-          alert.style.border = "1px solid #10b981";
-          alert.style.color = "#6ee7b7";
-          alert.innerHTML = `✅ <strong>SMTP Relay Active:</strong> Handshake to <code>${host}:${port}</code> verified! Live test envelope dispatched to <code>raj079851@gmail.com</code>.`;
+        const token = currentAuthUser?.token;
+        const saveResp = await fetch(`${API_BASE_URL}/api/auth/smtp-config`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ host, port, user, password: pass, sender, use_tls: true })
+        });
+
+        // Test connection
+        const testResp = await fetch(`${API_BASE_URL}/api/auth/test-smtp`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: user || sender || "raj079851@gmail.com" })
+        });
+        const testData = await testResp.json();
+
+        if (testData.success) {
+          if (alert) {
+            alert.style.background = "rgba(16,185,129,0.15)";
+            alert.style.border = "1px solid #10b981";
+            alert.style.color = "#6ee7b7";
+            alert.innerHTML = `✅ <strong>SMTP Connected!</strong> Live test email delivered to <code>${testData.recipient}</code>. Settings saved!`;
+          }
+          notifyTaskSuccess("SMTP Verified", `Connected to ${host}:${port}. Test email sent successfully.`);
+        } else {
+          if (alert) {
+            alert.style.background = "rgba(239,68,68,0.15)";
+            alert.style.border = "1px solid #ef4444";
+            alert.style.color = "#fca5a5";
+            alert.innerHTML = `⚠️ <strong>Connection Note:</strong> ${testData.message}`;
+          }
         }
-        notifyTaskSuccess("SMTP Connection Verified", `Connected to ${host}:${port} with TLS handshake OK.`);
       } catch (err) {
         if (alert) {
-          alert.style.background = "rgba(16,185,129,0.15)";
-          alert.style.border = "1px solid #10b981";
-          alert.style.color = "#6ee7b7";
-          alert.innerHTML = `✅ <strong>SMTP Handshake Successful:</strong> Connected to <code>${host}:${port}</code>. 250 OK: STARTTLS cipher negotiated.`;
+          alert.style.background = "rgba(239,68,68,0.15)";
+          alert.style.border = "1px solid #ef4444";
+          alert.style.color = "#fca5a5";
+          alert.textContent = "Error testing SMTP: " + err.message;
         }
       }
-    }
-
-    function saveSmtpSettings() {
-      smtpConfig.host = document.getElementById("cfgSmtpHost")?.value || "smtp.gmail.com";
-      smtpConfig.port = parseInt(document.getElementById("cfgSmtpPort")?.value || "587", 10);
-      smtpConfig.sender = document.getElementById("cfgSmtpSender")?.value || "security-gate@datamind.ai";
-      smtpConfig.tls = document.getElementById("cfgSmtpTls")?.checked ?? true;
-
-      const summary = document.getElementById("authSmtpStatusSummary");
-      if (summary) summary.textContent = `${smtpConfig.host}:${smtpConfig.port} (${smtpConfig.tls ? 'TLS' : 'Plain'} Relay)`;
-
-      const alert = document.getElementById("smtpTestAlert");
-      if (alert) {
-        alert.style.display = "block";
-        alert.style.background = "rgba(16,185,129,0.15)";
-        alert.style.border = "1px solid #10b981";
-        alert.style.color = "#6ee7b7";
-        alert.textContent = "✅ SMTP Configuration saved successfully.";
-      }
-      notifyTaskSuccess("SMTP Settings Saved", `Updated transport to ${smtpConfig.host}:${smtpConfig.port}.`);
     }
 
     function fillLoginPersona(uname, pwd, role) {

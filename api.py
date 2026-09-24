@@ -480,43 +480,20 @@ def send_smtp_otp(req: SmtpOtpRequest, request: Request):
         ip_address=client_ip
     )
 
-    smtp_host = os.environ.get("SMTP_HOST", "")
-    smtp_port = int(os.environ.get("SMTP_PORT", 587))
-    smtp_user = os.environ.get("SMTP_USER", "")
-    smtp_pass = os.environ.get("SMTP_PASS", "")
-    smtp_sender = os.environ.get("SMTP_SENDER", smtp_user or "security-gate@datamind.ai")
-
-    sent_via_live_smtp = False
-    if smtp_host and smtp_user and smtp_pass:
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
-        try:
-            msg = MIMEMultipart()
-            msg['From'] = f"DataMind AI Security Gate <{smtp_sender}>"
-            msg['To'] = req.email
-            msg['Subject'] = f"DataMind AI Security Gate - Your OTP Verification Code is {req.otp}"
-            body = (
-                f"Your DataMind AI 6-digit verification code is: {req.otp}\n\n"
-                f"Flow: {req.flow}\n"
-                f"Valid for 5 minutes. Enter this code on the verification screen to authenticate.\n\n"
-                f"Security Notice: Never share this OTP with anyone."
-            )
-            msg.attach(MIMEText(body, 'plain'))
-            with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
-                server.starttls()
-                server.login(smtp_user, smtp_pass)
-                server.sendmail(smtp_sender, [req.email], msg.as_string())
-            sent_via_live_smtp = True
-        except Exception as e:
-            print(f"SMTP send failed: {e}")
+    from backend.services.smtp_service import default_smtp_service
+    default_smtp_service.store_otp(req.email, req.otp, purpose="login", ttl_seconds=300)
+    success, msg = default_smtp_service.dispatch_otp_email(
+        to_email=req.email,
+        otp=req.otp,
+        purpose_label=req.flow or "Sign-In"
+    )
 
     return {
-        "status": "success",
+        "status": "success" if success else "smtp_warning",
         "email": req.email,
         "dispatched": True,
-        "live_smtp": sent_via_live_smtp,
-        "message": f"OTP successfully dispatched to {req.email}"
+        "live_smtp": success,
+        "message": msg if success else f"OTP registered in server memory (valid 5 min). SMTP notice: {msg}"
     }
 
 

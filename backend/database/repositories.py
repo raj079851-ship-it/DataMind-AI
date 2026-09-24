@@ -67,6 +67,16 @@ class UserRepository:
         return user
 
     @staticmethod
+    def update_password(db: Session, email: str, new_password_hash: str) -> Optional[User]:
+        user = UserRepository.get_by_email(db, email)
+        if user:
+            user.password_hash = new_password_hash
+            user.updated_at = datetime.now()
+            db.commit()
+            db.refresh(user)
+        return user
+
+    @staticmethod
     def list_users(db: Session, skip: int = 0, limit: int = 50) -> List[User]:
         return db.query(User).order_by(desc(User.created_at)).offset(skip).limit(limit).all()
 

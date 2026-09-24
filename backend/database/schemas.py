@@ -45,6 +45,41 @@ class TokenData(BaseModel):
     role: Optional[str] = None
 
 
+# ---------------- OTP & RECOVERY SCHEMAS ----------------
+class SendOtpRequest(BaseModel):
+    email: EmailStr = Field(..., example="raj079851@gmail.com")
+    purpose: Optional[str] = Field("login", example="login")
+
+
+class VerifyOtpRequest(BaseModel):
+    email: EmailStr = Field(..., example="raj079851@gmail.com")
+    otp: str = Field(..., min_length=4, max_length=10, example="123456")
+    purpose: Optional[str] = Field("login", example="login")
+
+
+class ForgotPasswordSendOtpRequest(BaseModel):
+    email: EmailStr = Field(..., example="raj079851@gmail.com")
+
+
+class ForgotPasswordResetRequest(BaseModel):
+    email: EmailStr = Field(..., example="raj079851@gmail.com")
+    otp: str = Field(..., min_length=4, max_length=10, example="123456")
+    new_password: str = Field(..., min_length=6, max_length=128, example="NewPass@2026!")
+
+
+class SmtpConfigRequest(BaseModel):
+    host: str = Field(..., example="smtp.gmail.com")
+    port: int = Field(587, example=587)
+    user: str = Field(..., example="raj079851@gmail.com")
+    password: Optional[str] = Field("", example="abcd efgh ijkl mnop")
+    sender: Optional[str] = Field(None, example="raj079851@gmail.com")
+    use_tls: Optional[bool] = Field(True, example=True)
+
+
+class SmtpTestRequest(BaseModel):
+    email: Optional[EmailStr] = Field(None, example="raj079851@gmail.com")
+
+
 # ---------------- DATASET SCHEMAS ----------------
 class DatasetColumnSchema(BaseModel):
     id: Optional[str] = None
