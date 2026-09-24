@@ -7462,6 +7462,7 @@ result = df.describe()
                 <input type="text" id="dbSearchUser" placeholder="Search by username or email..." oninput="filterDatabaseLoginsUI()" style="margin:0; padding:6px 10px; font-size:0.8rem; flex:1;" />
               </div>
               <div style="display:flex; gap:8px;">
+                <button class="btn btn-outline" style="padding:6px 12px; font-size:0.78rem; border-color:#38bdf8; color:#38bdf8;" onclick="checkPostgreSqlHealthUI()">🐘 PostgreSQL Status</button>
                 <button class="btn btn-outline" style="padding:6px 12px; font-size:0.78rem;" onclick="syncWithBackendDatabase()">🔄 Sync SQLite (datamind.db)</button>
                 <button class="btn btn-primary" style="padding:6px 12px; font-size:0.78rem; background:linear-gradient(135deg, #0284c7 0%, #0369a1 100%);" onclick="exportDbLoginsJSON()">📥 Export DB Logins (JSON)</button>
               </div>
@@ -7474,7 +7475,7 @@ result = df.describe()
                 <span>💾 Persistent User Login Records (Stored in Background Database)</span>
                 <span class="badge badge-success" id="dbLiveCounterBadge">0 Records</span>
               </div>
-              <span style="font-size:0.76rem; color:var(--text-muted);">Database: <code>datamind.db</code> (SQLite 3) &bull; IndexedDB: <code>DataMind_Enterprise_DB</code></span>
+              <span style="font-size:0.76rem; color:var(--text-muted);">Relational: <code style="color:#38bdf8;">PostgreSQL 18 (analytics_platform)</code> &bull; Local: <code>datamind.db</code> (SQLite) &bull; IndexedDB: <code>DataMind_Enterprise_DB</code></span>
             </div>
             <div style="overflow-x:auto;">
               <table style="width:100%; border-collapse:collapse; font-size:0.78rem;">
@@ -10065,6 +10066,24 @@ result = df.describe()
           }
         }
       } catch (err) {}
+    }
+
+    async function checkPostgreSqlHealthUI() {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/health`);
+        if (resp.ok) {
+          const data = await resp.json();
+          const poolInfo = data.pool ? `${data.pool.checked_in} idle, ${data.pool.checked_out} active` : 'Ready';
+          notifyTaskSuccess(
+            "🐘 PostgreSQL 18 Online",
+            `DB: ${data.database} | Host: ${data.host}:${data.port} | Tables: ${data.tables_count} | Pool: ${poolInfo}`
+          );
+        } else {
+          notifyTaskFailed("PostgreSQL Health", "Database health endpoint returned status: " + resp.status);
+        }
+      } catch (err) {
+        notifyTaskFailed("PostgreSQL Connection", "Could not reach PostgreSQL backend API on port 8000. Ensure backend is running.");
+      }
     }
 
     function exportDbLoginsJSON() {

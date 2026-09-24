@@ -13,7 +13,7 @@ import json
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional
-from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File, Request, Header
+from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File, Request, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -113,6 +113,79 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------- POSTGRESQL RELATIONAL BACKEND ROUTERS ----------------
+try:
+    from backend.api.auth_routes import router as pg_auth_router
+    from backend.api.dataset_routes import router as pg_dataset_router
+    from backend.api.analysis_routes import router as pg_analysis_router
+    from backend.api.dashboard_routes import router as pg_dashboard_router
+    from backend.api.insight_routes import router as pg_insight_router
+    from backend.api.audit_routes import router as pg_audit_router
+    from backend.database.connection import check_db_connection, engine as pg_engine, get_db as get_pg_db
+    from backend.database.schemas import DatabaseHealthResponse
+    from sqlalchemy import text
+
+    app.include_router(pg_auth_router)
+    app.include_router(pg_dataset_router)
+    app.include_router(pg_analysis_router)
+    app.include_router(pg_dashboard_router)
+    app.include_router(pg_insight_router)
+    app.include_router(pg_audit_router)
+
+    @app.get("/api/health", response_model=DatabaseHealthResponse, tags=["PostgreSQL Health"])
+    def pg_health_check(db=Depends(get_pg_db)):
+        diag = check_db_connection()
+        if diag.get("status") != "healthy":
+            raise HTTPException(status_code=503, detail=f"Database connectivity failure: {diag.get('error')}")
+        version_row = db.execute(text("SELECT version();")).fetchone()
+        version_str = version_row[0] if version_row else "Unknown"
+        pool = pg_engine.pool
+        pool_stats = {
+            "size": pool.size(),
+            "checked_in": pool.checkedin(),
+            "checked_out": pool.checkedout(),
+            "overflow": pool.overflow()
+        }
+        return DatabaseHealthResponse(
+            status="healthy",
+            engine="PostgreSQL",
+            version=version_str,
+            database=diag.get("database", "analytics_platform"),
+            user=diag.get("user", "postgres"),
+            host=diag.get("host", "localhost"),
+            port=diag.get("port", "5432"),
+            tables_count=diag.get("tables_count", 0),
+            tables=diag.get("tables", []),
+            pool=pool_stats
+        )
+
+    @app.get("/api/db-status", tags=["PostgreSQL Health"])
+    def pg_database_status(db=Depends(get_pg_db)):
+        import time
+        t0 = time.time()
+        tables = [
+            "users", "datasets", "dataset_columns", "data_cleaning_operations",
+            "analysis_jobs", "analysis_results", "dashboards", "ai_insights", "audit_logs"
+        ]
+        counts = {}
+        for tbl in tables:
+            try:
+                res = db.execute(text(f"SELECT COUNT(*) FROM {tbl};")).fetchone()
+                counts[tbl] = res[0] if res else 0
+            except Exception:
+                counts[tbl] = 0
+        return {
+            "status": "online",
+            "database": "analytics_platform",
+            "engine": "PostgreSQL 18",
+            "latency_ms": round((time.time() - t0) * 1000, 2),
+            "table_row_counts": counts,
+            "active_pool_connections": pg_engine.pool.checkedout(),
+            "total_records_tracked": sum(counts.values())
+        }
+except Exception as _pg_err:
+    print(f"[WARN] PostgreSQL routers mounting skipped: {_pg_err}")
 
 # Shared In-Memory Server State
 project_manager = ProjectManager()
