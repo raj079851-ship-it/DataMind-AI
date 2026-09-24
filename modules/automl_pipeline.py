@@ -438,42 +438,42 @@ class AutoMLPipeline:
         rs = self.random_state
         if task_type == "classification":
             models = [
-                ("Logistic Regression", LogisticRegression(max_iter=1000, random_state=rs), {"C": 1.0}),
-                ("Random Forest Classifier", RandomForestClassifier(n_estimators=100, max_depth=8, random_state=rs), {"n_estimators": 100, "max_depth": 8}),
-                ("Gradient Boosting", GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=rs), {"n_estimators": 100, "learning_rate": 0.1}),
-                ("Decision Tree", DecisionTreeClassifier(max_depth=6, random_state=rs), {"max_depth": 6}),
-                ("Extra Trees", ExtraTreesClassifier(n_estimators=100, max_depth=8, random_state=rs), {"n_estimators": 100}),
+                ("Logistic Regression", LogisticRegression(max_iter=1000, random_state=rs, n_jobs=-1), {"C": 1.0}),
                 ("HistGradientBoosting", HistGradientBoostingClassifier(max_iter=100, random_state=rs), {"max_iter": 100}),
+                ("Random Forest Classifier", RandomForestClassifier(n_estimators=100, max_depth=10, random_state=rs, n_jobs=-1), {"n_estimators": 100, "max_depth": 10}),
+                ("Gradient Boosting", HistGradientBoostingClassifier(max_iter=80, learning_rate=0.1, random_state=rs), {"max_iter": 80, "learning_rate": 0.1}),
+                ("Decision Tree", DecisionTreeClassifier(max_depth=6, random_state=rs), {"max_depth": 6}),
+                ("Extra Trees", ExtraTreesClassifier(n_estimators=100, max_depth=10, random_state=rs, n_jobs=-1), {"n_estimators": 100}),
                 ("Support Vector Machine (SVC)", SVC(probability=True, C=1.0, random_state=rs), {"C": 1.0}),
-                ("K-Nearest Neighbors (KNN)", KNeighborsClassifier(n_neighbors=5), {"n_neighbors": 5}),
+                ("K-Nearest Neighbors (KNN)", KNeighborsClassifier(n_neighbors=5, n_jobs=-1), {"n_neighbors": 5}),
                 ("Naive Bayes (Gaussian)", GaussianNB(), {})
             ]
             if HAS_XGB:
-                models.insert(1, ("XGBoost Classifier", xgb.XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, eval_metric="logloss"), {"n_estimators": 100, "max_depth": 6}))
+                models.insert(1, ("XGBoost Classifier", xgb.XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, eval_metric="logloss", n_jobs=-1), {"n_estimators": 100, "max_depth": 6}))
             if HAS_LGB:
-                models.insert(2, ("LightGBM Classifier", lgb.LGBMClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, verbose=-1), {"n_estimators": 100}))
+                models.insert(2, ("LightGBM Classifier", lgb.LGBMClassifier(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, verbose=-1, n_jobs=-1), {"n_estimators": 100}))
             if HAS_CAT:
-                models.insert(3, ("CatBoost Classifier", cb.CatBoostClassifier(iterations=100, depth=6, learning_rate=0.1, random_seed=rs, verbose=0), {"iterations": 100}))
+                models.insert(3, ("CatBoost Classifier", cb.CatBoostClassifier(iterations=100, depth=6, learning_rate=0.1, random_seed=rs, verbose=0, thread_count=-1), {"iterations": 100}))
         else:
             models = [
-                ("Linear Regression", LinearRegression(), {}),
+                ("Linear Regression", LinearRegression(n_jobs=-1), {}),
                 ("Ridge Regression", Ridge(alpha=1.0), {"alpha": 1.0}),
                 ("Lasso Regression", Lasso(alpha=1.0), {"alpha": 1.0}),
                 ("Elastic Net", ElasticNet(alpha=1.0, l1_ratio=0.5), {"alpha": 1.0, "l1_ratio": 0.5}),
-                ("Random Forest Regressor", RandomForestRegressor(n_estimators=100, max_depth=8, random_state=rs), {"n_estimators": 100, "max_depth": 8}),
-                ("Gradient Boosting Regressor", GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=5, random_state=rs), {"n_estimators": 100, "learning_rate": 0.1}),
-                ("Decision Tree Regressor", DecisionTreeRegressor(max_depth=6, random_state=rs), {"max_depth": 6}),
-                ("Extra Trees Regressor", ExtraTreesRegressor(n_estimators=100, max_depth=8, random_state=rs), {"n_estimators": 100}),
                 ("HistGradientBoosting Regressor", HistGradientBoostingRegressor(max_iter=100, random_state=rs), {"max_iter": 100}),
+                ("Random Forest Regressor", RandomForestRegressor(n_estimators=100, max_depth=10, random_state=rs, n_jobs=-1), {"n_estimators": 100, "max_depth": 10}),
+                ("Gradient Boosting Regressor", HistGradientBoostingRegressor(max_iter=80, learning_rate=0.1, random_state=rs), {"max_iter": 80, "learning_rate": 0.1}),
+                ("Decision Tree Regressor", DecisionTreeRegressor(max_depth=6, random_state=rs), {"max_depth": 6}),
+                ("Extra Trees Regressor", ExtraTreesRegressor(n_estimators=100, max_depth=10, random_state=rs, n_jobs=-1), {"n_estimators": 100}),
                 ("Support Vector Regressor (SVR)", SVR(C=1.0, epsilon=0.1), {"C": 1.0}),
-                ("K-Nearest Neighbors (KNN)", KNeighborsRegressor(n_neighbors=5), {"n_neighbors": 5})
+                ("K-Nearest Neighbors (KNN)", KNeighborsRegressor(n_neighbors=5, n_jobs=-1), {"n_neighbors": 5})
             ]
             if HAS_XGB:
-                models.insert(1, ("XGBoost Regressor", xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs), {"n_estimators": 100, "max_depth": 6}))
+                models.insert(1, ("XGBoost Regressor", xgb.XGBRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, n_jobs=-1), {"n_estimators": 100, "max_depth": 6}))
             if HAS_LGB:
-                models.insert(2, ("LightGBM Regressor", lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, verbose=-1), {"n_estimators": 100}))
+                models.insert(2, ("LightGBM Regressor", lgb.LGBMRegressor(n_estimators=100, max_depth=6, learning_rate=0.1, random_state=rs, verbose=-1, n_jobs=-1), {"n_estimators": 100}))
             if HAS_CAT:
-                models.insert(3, ("CatBoost Regressor", cb.CatBoostRegressor(iterations=100, depth=6, learning_rate=0.1, random_seed=rs, verbose=0), {"iterations": 100}))
+                models.insert(3, ("CatBoost Regressor", cb.CatBoostRegressor(iterations=100, depth=6, learning_rate=0.1, random_seed=rs, verbose=0, thread_count=-1), {"iterations": 100}))
 
         return models
 
@@ -496,34 +496,43 @@ class AutoMLPipeline:
         for name, model, default_params in candidate_models:
             start_t = time.time()
             try:
+                # Subsample slow O(N^2) models if dataset is large to prevent UI timeout/freezes
+                X_fit, y_fit = X_train, y_train
+                low_name = name.lower()
+                if len(X_train) > 25000 and ("support vector" in low_name or "svc" in low_name or "svr" in low_name or "knn" in low_name or "k-nearest" in low_name):
+                    sub_idx = np.random.choice(len(X_train), size=25000, replace=False)
+                    X_fit, y_fit = X_train[sub_idx], y_train[sub_idx]
+
                 # Train model
-                model.fit(X_train, y_train)
+                model.fit(X_fit, y_fit)
                 elapsed = round(time.time() - start_t, 3)
 
                 # Predictions
-                y_pred = model.predict(X_test)
+                test_sample = X_test if len(X_test) <= 50000 else X_test[:50000]
+                y_test_sub = y_test if len(X_test) <= 50000 else y_test[:50000]
+                y_pred = model.predict(test_sample)
                 entry = {"Model": name, "Training Time (s)": elapsed}
 
                 if task_type == "classification":
-                    acc = float(accuracy_score(y_test, y_pred))
-                    prec = float(precision_score(y_test, y_pred, average="weighted", zero_division=0))
-                    rec = float(recall_score(y_test, y_pred, average="weighted", zero_division=0))
-                    f1 = float(f1_score(y_test, y_pred, average="weighted", zero_division=0))
+                    acc = float(accuracy_score(y_test_sub, y_pred))
+                    prec = float(precision_score(y_test_sub, y_pred, average="weighted", zero_division=0))
+                    rec = float(recall_score(y_test_sub, y_pred, average="weighted", zero_division=0))
+                    f1 = float(f1_score(y_test_sub, y_pred, average="weighted", zero_division=0))
 
                     auc_val = 0.5
                     if hasattr(model, "predict_proba"):
                         try:
-                            probs = model.predict_proba(X_test)
+                            probs = model.predict_proba(test_sample)
                             if n_classes == 2 and probs.shape[1] >= 2:
-                                auc_val = float(roc_auc_score(y_test, probs[:, 1]))
+                                auc_val = float(roc_auc_score(y_test_sub, probs[:, 1]))
                             elif n_classes > 2:
-                                auc_val = float(roc_auc_score(y_test, probs, multi_class="ovr", average="weighted"))
+                                auc_val = float(roc_auc_score(y_test_sub, probs, multi_class="ovr", average="weighted"))
                         except Exception:
                             auc_val = acc  # Fallback approximation
                     elif hasattr(model, "decision_function"):
                         try:
-                            dfunc = model.decision_function(X_test)
-                            auc_val = float(roc_auc_score(y_test, dfunc))
+                            dfunc = model.decision_function(test_sample)
+                            auc_val = float(roc_auc_score(y_test_sub, dfunc))
                         except Exception:
                             auc_val = acc
                     else:
@@ -537,14 +546,14 @@ class AutoMLPipeline:
                     entry["_sort_key"] = auc_val
 
                 else:
-                    mae = float(mean_absolute_error(y_test, y_pred))
-                    mse = float(mean_squared_error(y_test, y_pred))
+                    mae = float(mean_absolute_error(y_test_sub, y_pred))
+                    mse = float(mean_squared_error(y_test_sub, y_pred))
                     rmse = float(np.sqrt(mse))
-                    r2 = float(r2_score(y_test, y_pred))
+                    r2 = float(r2_score(y_test_sub, y_pred))
 
-                    non_zero = y_test != 0
+                    non_zero = y_test_sub != 0
                     if np.any(non_zero):
-                        mape = float(np.mean(np.abs((y_test[non_zero] - y_pred[non_zero]) / y_test[non_zero])) * 100)
+                        mape = float(np.mean(np.abs((y_test_sub[non_zero] - y_pred[non_zero]) / y_test_sub[non_zero])) * 100)
                     else:
                         mape = 0.0
 

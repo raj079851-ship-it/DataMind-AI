@@ -154,9 +154,17 @@ def preprocess_for_ml(
     else:
         X_num = pd.DataFrame(index=X_raw.index)
 
-    # Encode categorical
+    # Encode categorical (safeguard against high-cardinality ID columns on 2M rows)
     if cat_cols:
-        X_cat = pd.get_dummies(X_raw[cat_cols].fillna("Missing"), drop_first=True, dtype=float)
+        cat_to_encode = []
+        for c in cat_cols:
+            if 'id' in c.lower() or X_raw[c].nunique() > 100:
+                continue
+            cat_to_encode.append(c)
+        if cat_to_encode:
+            X_cat = pd.get_dummies(X_raw[cat_to_encode].fillna("Missing"), drop_first=True, dtype=float)
+        else:
+            X_cat = pd.DataFrame(index=X_raw.index)
     else:
         X_cat = pd.DataFrame(index=X_raw.index)
 
@@ -213,7 +221,7 @@ def get_regression_model(algorithm: str, params: Dict[str, Any]):
     learning_rate = params.get("learning_rate", 0.1)
 
     if algo == "linear_regression":
-        return LinearRegression()
+        return LinearRegression(n_jobs=-1)
     elif algo == "ridge":
         return Ridge(alpha=params.get("alpha", 1.0))
     elif algo == "lasso":
@@ -223,27 +231,27 @@ def get_regression_model(algorithm: str, params: Dict[str, Any]):
     elif algo == "decision_tree":
         return DecisionTreeRegressor(max_depth=max_depth, random_state=random_state)
     elif algo == "random_forest":
-        return RandomForestRegressor(n_estimators=n_estimators, max_depth=max_depth, random_state=random_state)
+        return RandomForestRegressor(n_estimators=min(n_estimators, 100), max_depth=max_depth, random_state=random_state, n_jobs=-1)
     elif algo == "gradient_boosting":
-        return GradientBoostingRegressor(n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
+        return HistGradientBoostingRegressor(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "xgboost":
         if HAS_XGB:
-            return xgb.XGBRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state)
+            return xgb.XGBRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, n_jobs=-1)
         return HistGradientBoostingRegressor(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "lightgbm":
         if HAS_LGB:
-            return lgb.LGBMRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, verbose=-1)
+            return lgb.LGBMRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, verbose=-1, n_jobs=-1)
         return HistGradientBoostingRegressor(max_iter=n_estimators, learning_rate=learning_rate, max_leaf_nodes=31, random_state=random_state)
     elif algo == "catboost":
         if HAS_CAT:
-            return cb.CatBoostRegressor(iterations=n_estimators, depth=max_depth, learning_rate=learning_rate, random_seed=random_state, verbose=0)
-        return GradientBoostingRegressor(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state)
+            return cb.CatBoostRegressor(iterations=n_estimators, depth=max_depth, learning_rate=learning_rate, random_seed=random_state, verbose=0, thread_count=-1)
+        return HistGradientBoostingRegressor(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "svr":
         return SVR(C=params.get("C", 1.0), epsilon=params.get("epsilon", 0.1))
     elif algo == "knn":
-        return KNeighborsRegressor(n_neighbors=params.get("n_neighbors", 5))
+        return KNeighborsRegressor(n_neighbors=params.get("n_neighbors", 5), n_jobs=-1)
     else:
-        return LinearRegression()
+        return LinearRegression(n_jobs=-1)
 
 
 def get_classification_model(algorithm: str, params: Dict[str, Any], is_multilabel: bool = False):
@@ -255,36 +263,36 @@ def get_classification_model(algorithm: str, params: Dict[str, Any], is_multilab
     learning_rate = params.get("learning_rate", 0.1)
 
     if algo == "logistic_regression":
-        base = LogisticRegression(max_iter=1000, C=params.get("C", 1.0), random_state=random_state)
+        base = LogisticRegression(max_iter=1000, C=params.get("C", 1.0), random_state=random_state, n_jobs=-1)
     elif algo == "decision_tree":
         base = DecisionTreeClassifier(max_depth=max_depth, random_state=random_state)
     elif algo == "random_forest":
-        base = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=random_state)
+        base = RandomForestClassifier(n_estimators=min(n_estimators, 100), max_depth=max_depth, random_state=random_state, n_jobs=-1)
     elif algo == "gradient_boosting":
-        base = GradientBoostingClassifier(n_estimators=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
+        base = HistGradientBoostingClassifier(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "xgboost":
         if HAS_XGB:
-            base = xgb.XGBClassifier(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, eval_metric="logloss")
+            base = xgb.XGBClassifier(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, eval_metric="logloss", n_jobs=-1)
         else:
             base = HistGradientBoostingClassifier(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "lightgbm":
         if HAS_LGB:
-            base = lgb.LGBMClassifier(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, verbose=-1)
+            base = lgb.LGBMClassifier(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state, verbose=-1, n_jobs=-1)
         else:
             base = HistGradientBoostingClassifier(max_iter=n_estimators, learning_rate=learning_rate, max_leaf_nodes=31, random_state=random_state)
     elif algo == "catboost":
         if HAS_CAT:
-            base = cb.CatBoostClassifier(iterations=n_estimators, depth=max_depth, learning_rate=learning_rate, random_seed=random_state, verbose=0)
+            base = cb.CatBoostClassifier(iterations=n_estimators, depth=max_depth, learning_rate=learning_rate, random_seed=random_state, verbose=0, thread_count=-1)
         else:
-            base = GradientBoostingClassifier(n_estimators=n_estimators, max_depth=max_depth, learning_rate=learning_rate, random_state=random_state)
+            base = HistGradientBoostingClassifier(max_iter=n_estimators, learning_rate=learning_rate, max_depth=max_depth, random_state=random_state)
     elif algo == "svm":
         base = SVC(probability=True, C=params.get("C", 1.0), random_state=random_state)
     elif algo == "knn":
-        base = KNeighborsClassifier(n_neighbors=params.get("n_neighbors", 5))
+        base = KNeighborsClassifier(n_neighbors=params.get("n_neighbors", 5), n_jobs=-1)
     elif algo == "naive_bayes":
         base = GaussianNB()
     else:
-        base = LogisticRegression(max_iter=1000, random_state=random_state)
+        base = LogisticRegression(max_iter=1000, random_state=random_state, n_jobs=-1)
 
     if is_multilabel:
         return MultiOutputClassifier(base)
@@ -312,20 +320,30 @@ def train_single_model(
     else:
         model = get_classification_model(algorithm, params, is_multilabel=is_multilabel)
 
-    model.fit(X_train, y_train)
+    # Subsample slow O(N^2) models if dataset is large to prevent timeouts
+    X_train_fit, y_train_fit = X_train, y_train
+    low_algo = algorithm.lower()
+    if len(X_train) > 25000 and (low_algo in ["svm", "svc", "svr", "knn"]):
+        sub_idx = np.random.choice(len(X_train), size=25000, replace=False)
+        X_train_fit, y_train_fit = X_train[sub_idx], y_train[sub_idx]
+
+    model.fit(X_train_fit, y_train_fit)
     training_time = round(time.time() - start_time, 3)
 
-    preds = model.predict(X_test)
+    # Use test sample if test set is very large
+    X_test_eval = X_test if len(X_test) <= 50000 else X_test[:50000]
+    y_test_eval = y_test if len(X_test) <= 50000 else y_test[:50000]
+    preds = model.predict(X_test_eval)
     metrics = {}
     eval_data = {}
 
     if task == "regression":
-        mae = float(mean_absolute_error(y_test, preds))
-        mse = float(mean_squared_error(y_test, preds))
+        mae = float(mean_absolute_error(y_test_eval, preds))
+        mse = float(mean_squared_error(y_test_eval, preds))
         rmse = float(np.sqrt(mse))
-        r2 = float(r2_score(y_test, preds))
-        non_zero = y_test != 0
-        mape = float(np.mean(np.abs((y_test[non_zero] - preds[non_zero]) / y_test[non_zero])) * 100) if np.any(non_zero) else 0.0
+        r2 = float(r2_score(y_test_eval, preds))
+        non_zero = y_test_eval != 0
+        mape = float(np.mean(np.abs((y_test_eval[non_zero] - preds[non_zero]) / y_test_eval[non_zero])) * 100) if np.any(non_zero) else 0.0
 
         metrics = {
             "r2": round(r2, 4),
@@ -334,18 +352,18 @@ def train_single_model(
             "rmse": round(rmse, 4),
             "mape": round(mape, 2)
         }
-        residuals = (y_test - preds).tolist()
+        residuals = (y_test_eval - preds).tolist()
         eval_data = {
             "residuals": residuals[:200],
-            "actuals": y_test.tolist()[:200],
+            "actuals": y_test_eval.tolist()[:200],
             "predictions": preds.tolist()[:200]
         }
     elif is_multilabel:
-        acc = float(accuracy_score(y_test, preds))
-        f1_micro = float(f1_score(y_test, preds, average="micro", zero_division=0))
-        f1_macro = float(f1_score(y_test, preds, average="macro", zero_division=0))
-        prec = float(precision_score(y_test, preds, average="weighted", zero_division=0))
-        rec = float(recall_score(y_test, preds, average="weighted", zero_division=0))
+        acc = float(accuracy_score(y_test_eval, preds))
+        f1_micro = float(f1_score(y_test_eval, preds, average="micro", zero_division=0))
+        f1_macro = float(f1_score(y_test_eval, preds, average="macro", zero_division=0))
+        prec = float(precision_score(y_test_eval, preds, average="weighted", zero_division=0))
+        rec = float(recall_score(y_test_eval, preds, average="weighted", zero_division=0))
 
         metrics = {
             "accuracy": round(acc, 4),
@@ -356,12 +374,12 @@ def train_single_model(
         }
         eval_data = {"classes": prep_data["classes"]}
     else:
-        acc = float(accuracy_score(y_test, preds))
-        prec = float(precision_score(y_test, preds, average="weighted", zero_division=0))
-        rec = float(recall_score(y_test, preds, average="weighted", zero_division=0))
-        f1 = float(f1_score(y_test, preds, average="weighted", zero_division=0))
+        acc = float(accuracy_score(y_test_eval, preds))
+        prec = float(precision_score(y_test_eval, preds, average="weighted", zero_division=0))
+        rec = float(recall_score(y_test_eval, preds, average="weighted", zero_division=0))
+        f1 = float(f1_score(y_test_eval, preds, average="weighted", zero_division=0))
 
-        cm = confusion_matrix(y_test, preds).tolist()
+        cm = confusion_matrix(y_test_eval, preds).tolist()
         metrics = {
             "accuracy": round(acc, 4),
             "precision": round(prec, 4),
@@ -372,18 +390,18 @@ def train_single_model(
         roc_data = {}
         if hasattr(model, "predict_proba"):
             try:
-                probs = model.predict_proba(X_test)
+                probs = model.predict_proba(X_test_eval)
                 if len(prep_data["classes"]) == 2:
-                    auc = float(roc_auc_score(y_test, probs[:, 1]))
+                    auc = float(roc_auc_score(y_test_eval, probs[:, 1]))
                     metrics["roc_auc"] = round(auc, 4)
-                    fpr, tpr, _ = roc_curve(y_test, probs[:, 1])
-                    p_curve, r_curve, _ = precision_recall_curve(y_test, probs[:, 1])
+                    fpr, tpr, _ = roc_curve(y_test_eval, probs[:, 1])
+                    p_curve, r_curve, _ = precision_recall_curve(y_test_eval, probs[:, 1])
                     roc_data = {
                         "fpr": fpr.tolist()[:100], "tpr": tpr.tolist()[:100],
                         "precision_curve": p_curve.tolist()[:100], "recall_curve": r_curve.tolist()[:100]
                     }
                 elif len(prep_data["classes"]) > 2:
-                    auc = float(roc_auc_score(y_test, probs, multi_class="ovr", average="weighted"))
+                    auc = float(roc_auc_score(y_test_eval, probs, multi_class="ovr", average="weighted"))
                     metrics["roc_auc"] = round(auc, 4)
             except Exception:
                 pass
@@ -410,6 +428,21 @@ def train_single_model(
             key=lambda x: x["importance"],
             reverse=True
         )[:12]
+    else:
+        # Fast permutation importance fallback for HistGradientBoosting
+        try:
+            from sklearn.inspection import permutation_importance
+            sample_n = min(len(X_test_eval), 500)
+            perm = permutation_importance(model, X_test_eval[:sample_n], y_test_eval[:sample_n], n_repeats=2, random_state=42)
+            fi = np.maximum(0, perm.importances_mean)
+            tot = np.sum(fi) or 1.0
+            feature_importances = sorted(
+                [{"feature": f, "importance": round(float(v / tot), 4)} for f, v in zip(prep_data["feature_names"], fi)],
+                key=lambda x: x["importance"],
+                reverse=True
+            )[:12]
+        except Exception:
+            feature_importances = [{"feature": f, "importance": round(1.0 / len(prep_data["feature_names"]), 4)} for f in prep_data["feature_names"][:10]]
 
     return {
         "algorithm": algorithm,

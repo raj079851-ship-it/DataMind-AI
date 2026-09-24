@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File, Request, Header, Depends
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -136,6 +137,10 @@ def serve_autodata_html():
     if os.path.exists(root_file):
         return FileResponse(root_file)
     raise HTTPException(status_code=404, detail="autodata_platform.html not found")
+
+assets_dir = os.path.join(os.path.dirname(__file__), "assets")
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
 
 # ---------------- POSTGRESQL RELATIONAL BACKEND ROUTERS ----------------
 try:
@@ -771,7 +776,32 @@ async def upload_dataset_file(file: UploadFile = File(...)):
     contents = await file.read()
     df, meta = load_dataset(contents, filename=file.filename)
     active_datasets["default"] = df
-    return {"status": "uploaded", "filename": file.filename, "metadata": meta}
+    return {
+        "status": "uploaded",
+        "filename": file.filename,
+        "total_rows": len(df),
+        "columns": list(df.columns),
+        "metadata": meta,
+        "sample": df.head(100).to_dict(orient="records")
+    }
+
+@app.post("/datasets/load-hr-2m", tags=["Datasets"])
+def load_kaggle_hr_dataset_endpoint(rows: int = 2_000_000):
+    """Loads or generates the 2,000,000-row Kaggle HR dataset directly into backend memory without browser freezing."""
+    from modules.kaggle_hr_dataset import get_or_create_hr_dataset_2m
+    df = get_or_create_hr_dataset_2m(target_rows=rows)
+    active_datasets["default"] = df
+    profile = get_dataset_quick_profile(df)
+    return {
+        "status": "loaded",
+        "dataset_name": f"Kaggle HR Dataset ({len(df):,} Rows)",
+        "source_url": "https://www.kaggle.com/datasets/rashadalaa/hr-dataset-clean-and-raw-2m-rows",
+        "total_rows": len(df),
+        "columns": list(df.columns),
+        "profile": profile,
+        "sample": df.head(100).to_dict(orient="records"),
+        "memory_mb": round(df.memory_usage().sum() / (1024 * 1024), 2)
+    }
 
 @app.post("/datasets/sync", tags=["Datasets"])
 def sync_dataset_records(req: DatasetSyncRequest):
