@@ -8739,9 +8739,16 @@ result = df.describe()
     // -----------------------------------------------------------------
     // ENTERPRISE BACKEND, AUTHENTICATION & SECURITY STATE
     // -----------------------------------------------------------------
-    const API_BASE_URL = (window.location.port === "8000" || window.location.port === "")
-      ? window.location.origin
-      : "http://localhost:8000";
+    const API_BASE_URL = (() => {
+      const loc = window.location;
+      const isHttp = loc.protocol === "http:" || loc.protocol === "https:";
+      const isBackendPort = loc.port === "8000";
+      const isCustomDomain = isHttp && loc.hostname && loc.hostname !== "localhost" && loc.hostname !== "127.0.0.1" && loc.hostname !== "";
+      if (isHttp && (isBackendPort || isCustomDomain)) {
+        return loc.origin;
+      }
+      return "http://127.0.0.1:8000";
+    })();
 
     let currentAuthUser = {
       username: "raj079851@gmail.com",
@@ -9106,7 +9113,7 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Connection to authentication server failed. Ensure backend API is running on port 8000.";
+          alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
         }
       }
     }
@@ -9179,7 +9186,7 @@ result = df.describe()
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Connection to authentication server failed. Ensure backend API is running on port 8000.";
+          alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
         }
       }
     }

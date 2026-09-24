@@ -14,6 +14,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional
 from fastapi import FastAPI, HTTPException, Query, Body, UploadFile, File, Request, Header, Depends
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -113,6 +114,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ---------------- STATIC FRONTEND APPLICATION ----------------
+@app.get("/", tags=["Frontend"])
+def serve_root():
+    root_file = os.path.join(os.path.dirname(__file__), "index.html")
+    if os.path.exists(root_file):
+        return FileResponse(root_file)
+    return {"message": "DataMind AI Enterprise API is running. View API docs at /docs"}
+
+@app.get("/index.html", tags=["Frontend"])
+def serve_index_html():
+    root_file = os.path.join(os.path.dirname(__file__), "index.html")
+    if os.path.exists(root_file):
+        return FileResponse(root_file)
+    raise HTTPException(status_code=404, detail="index.html not found")
+
+@app.get("/autodata_platform.html", tags=["Frontend"])
+def serve_autodata_html():
+    root_file = os.path.join(os.path.dirname(__file__), "autodata_platform.html")
+    if os.path.exists(root_file):
+        return FileResponse(root_file)
+    raise HTTPException(status_code=404, detail="autodata_platform.html not found")
 
 # ---------------- POSTGRESQL RELATIONAL BACKEND ROUTERS ----------------
 try:
@@ -1143,3 +1166,8 @@ def export_html_report(report_type: str = "Executive Summary"):
 @app.get("/health", tags=["Health"])
 def health_check():
     return {"status": "online", "version": "2.0.0", "engine": "DuckDB + Scikit-Learn + FastAPI"}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("api:app", host="0.0.0.0", port=8000, reload=True)
