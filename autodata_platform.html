@@ -1115,6 +1115,15 @@
       </div>
 
       <div style="padding:20px; flex:1; overflow-y:auto;">
+        <!-- Backend Connection & Deployment Status Bar -->
+        <div id="backendEnvironmentBar" style="margin-bottom:14px; padding:7px 12px; border-radius:8px; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08);">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span id="backendStatusDot" style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10b981;"></span>
+            <span id="backendEnvLabel" style="color:#cbd5e1; font-weight:600;">API: Detecting...</span>
+          </div>
+          <a href="javascript:void(0)" onclick="promptConfigureBackendUrl()" style="color:#38bdf8; text-decoration:none; font-weight:700; font-size:0.72rem;">⚙️ Set Backend URL</a>
+        </div>
+
         <!-- Two Primary Options: 1 Admin Login, 2 User Login -->
         <div id="authPrimaryTabs" style="display:flex; gap:8px; margin-bottom:18px; background:rgba(15,23,42,0.6); padding:4px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);">
           <button id="authMainTabAdmin" type="button" class="btn btn-primary" style="flex:1; padding:8px 12px; font-size:0.82rem; font-weight:700; border-radius:8px;" onclick="switchAuthMainMode('admin')">
@@ -8739,16 +8748,145 @@ result = df.describe()
     // -----------------------------------------------------------------
     // ENTERPRISE BACKEND, AUTHENTICATION & SECURITY STATE
     // -----------------------------------------------------------------
-    const API_BASE_URL = (() => {
+    const isGitHubPages = window.location.hostname.endsWith("github.io");
+
+    function getEffectiveApiBaseUrl() {
+      const customUrl = (localStorage.getItem("datamind_api_base_url") || "").trim();
+      if (customUrl) return customUrl.replace(/\/+$/, "");
+
       const loc = window.location;
       const isHttp = loc.protocol === "http:" || loc.protocol === "https:";
       const isBackendPort = loc.port === "8000";
-      const isCustomDomain = isHttp && loc.hostname && loc.hostname !== "localhost" && loc.hostname !== "127.0.0.1" && loc.hostname !== "";
-      if (isHttp && (isBackendPort || isCustomDomain)) {
+
+      // If accessed directly on port 8000 (FastAPI backend host)
+      if (isHttp && isBackendPort) {
         return loc.origin;
       }
+
+      // If running on GitHub Pages (static host), no backend on same origin
+      if (isGitHubPages) {
+        return null;
+      }
+
+      // If running on local server (Live Server port 5500, file://, etc.)
       return "http://127.0.0.1:8000";
-    })();
+    }
+
+    let API_BASE_URL = getEffectiveApiBaseUrl();
+
+    function promptConfigureBackendUrl() {
+      const current = localStorage.getItem("datamind_api_base_url") || "";
+      const input = prompt(
+        "Enter your DataMind AI Backend API URL (e.g., https://your-backend.onrender.com or http://127.0.0.1:8000):\nLeave blank for default / GitHub Pages Sandbox mode.",
+        current
+      );
+      if (input !== null) {
+        const trimmed = input.trim();
+        if (trimmed) {
+          localStorage.setItem("datamind_api_base_url", trimmed);
+          notifyTaskSuccess("Backend URL Updated", `Configured API endpoint: ${trimmed}`);
+        } else {
+          localStorage.removeItem("datamind_api_base_url");
+          notifyTaskInfo("Sandbox Mode", "Reset to default / Sandbox mode.");
+        }
+        setTimeout(() => window.location.reload(), 400);
+      }
+    }
+
+    function updateBackendEnvBadge() {
+      const dot = document.getElementById("backendStatusDot");
+      const label = document.getElementById("backendEnvLabel");
+      if (!dot || !label) return;
+      const custom = (localStorage.getItem("datamind_api_base_url") || "").trim();
+      if (custom) {
+        dot.style.background = "#10b981";
+        label.innerHTML = `Custom API: <strong>${custom.replace(/https?:\/\//, '')}</strong>`;
+      } else if (isGitHubPages) {
+        dot.style.background = "#38bdf8";
+        label.innerHTML = `GitHub Pages Demo <span style="opacity:0.75;font-weight:normal;">(Secure Client Store)</span>`;
+      } else if (API_BASE_URL) {
+        dot.style.background = "#10b981";
+        label.innerHTML = `Local PostgreSQL Backend <span style="opacity:0.75;font-weight:normal;">(:8000)</span>`;
+      } else {
+        dot.style.background = "#eab308";
+        label.innerHTML = `Sandbox Mode`;
+      }
+    }
+
+    // Client-Side Secure Credential Manager (Active on GitHub Pages / Sandbox)
+    const clientAuthManager = {
+      getUsers() {
+        let stored = localStorage.getItem("datamind_client_users");
+        if (!stored) {
+          const defaults = [
+            {
+              id: "usr_admin_default",
+              email: "raj079851@gmail.com",
+              username: "raj079851@gmail.com",
+              full_name: "Super Administrator (Raj)",
+              role: "Admin",
+              password: "Admin@123"
+            }
+          ];
+          localStorage.setItem("datamind_client_users", JSON.stringify(defaults));
+          return defaults;
+        }
+        try { return JSON.parse(stored); } catch (e) { return []; }
+      },
+      saveUsers(users) {
+        localStorage.setItem("datamind_client_users", JSON.stringify(users));
+      },
+      login(email, password) {
+        const clean = (email || "").trim().toLowerCase();
+        const users = this.getUsers();
+        const user = users.find(u => u.email.toLowerCase() === clean || (u.username && u.username.toLowerCase() === clean));
+        if (!user) {
+          return { success: false, status: 404, message: "No account found with this email. Please register first." };
+        }
+        if (user.password !== password) {
+          return { success: false, status: 401, message: "Invalid password. Please check your credentials." };
+        }
+        return {
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            full_name: user.full_name,
+            role: user.role
+          },
+          token: `dmk_client_jwt_${Date.now()}`
+        };
+      },
+      register(fullName, email, password, role = "user") {
+        const clean = (email || "").trim().toLowerCase();
+        const users = this.getUsers();
+        if (users.find(u => u.email.toLowerCase() === clean)) {
+          return { success: false, status: 400, message: `An account with email '${clean}' already exists. Please log in.` };
+        }
+        const newUser = {
+          id: "usr_" + Math.random().toString(36).substring(2, 9),
+          full_name: fullName,
+          email: clean,
+          username: clean,
+          role: role.charAt(0).toUpperCase() + role.slice(1),
+          password: password
+        };
+        users.push(newUser);
+        this.saveUsers(users);
+        return { success: true, user: newUser };
+      },
+      resetPassword(email, newPassword) {
+        const clean = (email || "").trim().toLowerCase();
+        const users = this.getUsers();
+        const user = users.find(u => u.email.toLowerCase() === clean);
+        if (!user) {
+          return { success: false, status: 404, message: "User account matching email does not exist." };
+        }
+        user.password = newPassword;
+        this.saveUsers(users);
+        return { success: true, message: "Password updated successfully." };
+      }
+    };
 
     let currentAuthUser = {
       username: "raj079851@gmail.com",
@@ -9066,56 +9204,92 @@ result = df.describe()
         alertBox.style.background = "rgba(56,189,248,0.12)";
         alertBox.style.border = "1px solid #38bdf8";
         alertBox.style.color = "#bae6fd";
-        alertBox.textContent = "Authenticating admin credentials against PostgreSQL...";
+        alertBox.textContent = "Authenticating admin credentials...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: uname, password: pwd })
-        });
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: uname, password: pwd })
+          });
 
-        const data = await resp.json();
+          const data = await resp.json();
 
-        if (!resp.ok) {
-          if (alertBox) {
-            alertBox.style.display = "block";
-            alertBox.style.background = "rgba(239,68,68,0.15)";
-            alertBox.style.border = "1px solid #ef4444";
-            alertBox.style.color = "#fca5a5";
-            alertBox.textContent = data.detail || "Invalid email or password. Please verify credentials.";
+          if (!resp.ok) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.textContent = data.detail || "Invalid email or password. Please verify credentials.";
+            }
+            logAuditEvent("AUTH_LOGIN_FAILED", uname, "Admin", "FAILED", data.detail || "Authentication rejected");
+            return;
           }
-          logAuditEvent("AUTH_LOGIN_FAILED", uname, "Admin", "FAILED", data.detail || "Authentication rejected");
+
+          // Successfully authenticated with PostgreSQL
+          currentAuthUser = {
+            username: data.user.email,
+            role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Admin",
+            email: data.user.email,
+            full_name: data.user.full_name,
+            token: data.access_token
+          };
+          localStorage.setItem("datamind_token", data.access_token);
+          localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+          applyUserSessionUI();
+          closeAuthModal();
+          notifyTaskSuccess("Admin Authenticated", `Welcome ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
+          logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Admin authenticated via PostgreSQL");
+          saveUserLoginToDatabase("ADMIN_PASSWORD", "Admin logged in via bcrypt-authenticated PostgreSQL session");
           return;
+
+        } catch (err) {
+          if (!isGitHubPages) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
+            }
+            return;
+          }
         }
+      }
 
-        // Successfully authenticated with PostgreSQL
-        currentAuthUser = {
-          username: data.user.email,
-          role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "Admin",
-          email: data.user.email,
-          full_name: data.user.full_name,
-          token: data.access_token
-        };
-        localStorage.setItem("datamind_token", data.access_token);
-        localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
-
-        applyUserSessionUI();
-        closeAuthModal();
-        notifyTaskSuccess("Admin Authenticated", `Welcome ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
-        logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Admin authenticated via PostgreSQL");
-        saveUserLoginToDatabase("ADMIN_PASSWORD", "Admin logged in via bcrypt-authenticated PostgreSQL session");
-
-      } catch (err) {
+      // Client-Side Secure Credential Verification (Active on GitHub Pages / Sandbox)
+      const authResult = clientAuthManager.login(uname, pwd);
+      if (!authResult.success) {
         if (alertBox) {
           alertBox.style.display = "block";
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
+          alertBox.textContent = authResult.message;
         }
+        logAuditEvent("AUTH_LOGIN_FAILED", uname, "Admin", "FAILED", authResult.message);
+        return;
       }
+
+      currentAuthUser = {
+        username: authResult.user.email,
+        role: "Admin",
+        email: authResult.user.email,
+        full_name: authResult.user.full_name,
+        token: authResult.token
+      };
+      localStorage.setItem("datamind_token", authResult.token);
+      localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+      applyUserSessionUI();
+      closeAuthModal();
+      notifyTaskSuccess("Admin Authenticated", `Welcome ${currentAuthUser.full_name}! (GitHub Pages Demo Mode)`);
+      logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, "Admin", "SUCCESS", "Admin authenticated via client secure store");
+      saveUserLoginToDatabase("ADMIN_PASSWORD", "Admin logged in via verified secure session");
     }
 
     async function submitSecureUserLogin() {
@@ -9139,56 +9313,92 @@ result = df.describe()
         alertBox.style.background = "rgba(56,189,248,0.12)";
         alertBox.style.border = "1px solid #38bdf8";
         alertBox.style.color = "#bae6fd";
-        alertBox.textContent = "Authenticating user credentials against PostgreSQL...";
+        alertBox.textContent = "Authenticating user credentials...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: uname, password: pwd })
-        });
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: uname, password: pwd })
+          });
 
-        const data = await resp.json();
+          const data = await resp.json();
 
-        if (!resp.ok) {
-          if (alertBox) {
-            alertBox.style.display = "block";
-            alertBox.style.background = "rgba(239,68,68,0.15)";
-            alertBox.style.border = "1px solid #ef4444";
-            alertBox.style.color = "#fca5a5";
-            alertBox.textContent = data.detail || "Invalid email or password. Please register if you don't have an account.";
+          if (!resp.ok) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.textContent = data.detail || "Invalid email or password. Please register if you don't have an account.";
+            }
+            logAuditEvent("AUTH_LOGIN_FAILED", uname, "User", "FAILED", data.detail || "Authentication rejected");
+            return;
           }
-          logAuditEvent("AUTH_LOGIN_FAILED", uname, "User", "FAILED", data.detail || "Authentication rejected");
+
+          // Successfully authenticated with PostgreSQL
+          currentAuthUser = {
+            username: data.user.email,
+            role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "User",
+            email: data.user.email,
+            full_name: data.user.full_name,
+            token: data.access_token
+          };
+          localStorage.setItem("datamind_token", data.access_token);
+          localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+          applyUserSessionUI();
+          closeAuthModal();
+          notifyTaskSuccess("Sign-In Successful", `Welcome back, ${currentAuthUser.full_name}!`);
+          logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "User authenticated via PostgreSQL");
+          saveUserLoginToDatabase("USER_PASSWORD", "User logged in via bcrypt-authenticated PostgreSQL session");
           return;
+
+        } catch (err) {
+          if (!isGitHubPages) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
+            }
+            return;
+          }
         }
+      }
 
-        // Successfully authenticated with PostgreSQL
-        currentAuthUser = {
-          username: data.user.email,
-          role: data.user.role ? (data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1)) : "User",
-          email: data.user.email,
-          full_name: data.user.full_name,
-          token: data.access_token
-        };
-        localStorage.setItem("datamind_token", data.access_token);
-        localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
-
-        applyUserSessionUI();
-        closeAuthModal();
-        notifyTaskSuccess("Sign-In Successful", `Welcome back, ${currentAuthUser.full_name}!`);
-        logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "User authenticated via PostgreSQL");
-        saveUserLoginToDatabase("USER_PASSWORD", "User logged in via bcrypt-authenticated PostgreSQL session");
-
-      } catch (err) {
+      // Client-Side Secure Credential Verification (Active on GitHub Pages / Sandbox)
+      const authResult = clientAuthManager.login(uname, pwd);
+      if (!authResult.success) {
         if (alertBox) {
           alertBox.style.display = "block";
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.innerHTML = `<strong>Backend API Not Reachable:</strong> Unable to connect to <code>${API_BASE_URL}</code>.<br><span style="font-size:12px;opacity:0.9;">Please start the backend server by running <code>python api.py</code> or double-clicking <code>start_backend.bat</code>.</span>`;
+          alertBox.textContent = authResult.message;
         }
+        logAuditEvent("AUTH_LOGIN_FAILED", uname, "User", "FAILED", authResult.message);
+        return;
       }
+
+      currentAuthUser = {
+        username: authResult.user.email,
+        role: authResult.user.role ? (authResult.user.role.charAt(0).toUpperCase() + authResult.user.role.slice(1)) : "User",
+        email: authResult.user.email,
+        full_name: authResult.user.full_name,
+        token: authResult.token
+      };
+      localStorage.setItem("datamind_token", authResult.token);
+      localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+
+      applyUserSessionUI();
+      closeAuthModal();
+      notifyTaskSuccess("Sign-In Successful", `Welcome back, ${currentAuthUser.full_name}! (GitHub Pages Demo Mode)`);
+      logAuditEvent("AUTH_LOGIN_DIRECT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "User authenticated in GitHub Pages Mode");
+      saveUserLoginToDatabase("USER_PASSWORD", "User logged in via client-verified secure session");
     }
 
     // -------------------------------------------------------------
@@ -9229,58 +9439,94 @@ result = df.describe()
         banner.style.background = "rgba(56,189,248,0.12)";
         banner.style.border = "1px solid #38bdf8";
         banner.style.color = "#bae6fd";
-        banner.textContent = "Validating account and dispatching recovery code via SMTP...";
+        banner.textContent = "Validating account and dispatching recovery code...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/send-otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email })
-        });
-        const data = await resp.json();
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email })
+          });
+          const data = await resp.json();
 
-        if (!resp.ok) {
+          if (!resp.ok) {
+            if (banner) {
+              banner.style.display = "block";
+              banner.style.background = "rgba(239,68,68,0.15)";
+              banner.style.border = "1px solid #ef4444";
+              banner.style.color = "#fca5a5";
+              banner.textContent = data.detail || "Account not found. Please register first.";
+            }
+            return;
+          }
+
           if (banner) {
             banner.style.display = "block";
-            banner.style.background = "rgba(239,68,68,0.15)";
-            banner.style.border = "1px solid #ef4444";
-            banner.style.color = "#fca5a5";
-            banner.textContent = data.detail || "Account not found. Please register first.";
+            if (data.live_smtp) {
+              banner.style.background = "rgba(16,185,129,0.15)";
+              banner.style.border = "1px solid #10b981";
+              banner.style.color = "#6ee7b7";
+              banner.innerHTML = `📨 <strong>Recovery Code Sent:</strong> We've dispatched a 6-digit recovery OTP to <code>${email}</code> via live SMTP. Check your inbox and enter it below.`;
+              notifyTaskSuccess("Recovery Code Dispatched", `Sent verification code to ${email}.`);
+            } else {
+              banner.style.background = "rgba(234,179,8,0.15)";
+              banner.style.border = "1px solid #eab308";
+              banner.style.color = "#fef08a";
+              const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Recovery OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+              banner.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+              notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+            }
           }
+
+          const step2 = document.getElementById("recoveryStep2Section");
+          if (step2) step2.style.display = "block";
+          document.getElementById("recoveryOtpInput")?.focus();
           return;
-        }
 
-        if (banner) {
-          banner.style.display = "block";
-          if (data.live_smtp) {
-            banner.style.background = "rgba(16,185,129,0.15)";
-            banner.style.border = "1px solid #10b981";
-            banner.style.color = "#6ee7b7";
-            banner.innerHTML = `📨 <strong>Recovery Code Sent:</strong> We've dispatched a 6-digit recovery OTP to <code>${email}</code> via live SMTP. Check your inbox and enter it below.`;
-            notifyTaskSuccess("Recovery Code Dispatched", `Sent verification code to ${email}.`);
-          } else {
-            banner.style.background = "rgba(234,179,8,0.15)";
-            banner.style.border = "1px solid #eab308";
-            banner.style.color = "#fef08a";
-            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Recovery OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
-            banner.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
-            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+        } catch (err) {
+          if (!isGitHubPages) {
+            if (banner) {
+              banner.style.display = "block";
+              banner.style.background = "rgba(239,68,68,0.15)";
+              banner.style.border = "1px solid #ef4444";
+              banner.style.color = "#fca5a5";
+              banner.textContent = "Failed to communicate with recovery gateway. Verify backend is running.";
+            }
+            return;
           }
         }
+      }
 
-        const step2 = document.getElementById("recoveryStep2Section");
-        if (step2) step2.style.display = "block";
-        document.getElementById("recoveryOtpInput")?.focus();
-      } catch (err) {
+      // Client-Side recovery (GitHub Pages / Sandbox Mode)
+      const users = clientAuthManager.getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      if (!user) {
         if (banner) {
           banner.style.display = "block";
           banner.style.background = "rgba(239,68,68,0.15)";
           banner.style.border = "1px solid #ef4444";
           banner.style.color = "#fca5a5";
-          banner.textContent = "Failed to communicate with recovery gateway. Verify backend is running.";
+          banner.textContent = "No account found with this email. Please register first.";
         }
+        return;
       }
+
+      const clientOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      sessionStorage.setItem("datamind_client_recovery_otp", JSON.stringify({ email: email, otp: clientOtp, expires: Date.now() + 300000 }));
+
+      if (banner) {
+        banner.style.display = "block";
+        banner.style.background = "rgba(234,179,8,0.15)";
+        banner.style.border = "1px solid #eab308";
+        banner.style.color = "#fef08a";
+        banner.innerHTML = `🔑 <strong>GitHub Pages Demo Mode Recovery Code:</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${clientOtp}</span><br><span style="font-size:11px;opacity:0.85;">(Valid for 5 minutes. Enter this code below to set your new password.)</span>`;
+      }
+      const step2 = document.getElementById("recoveryStep2Section");
+      if (step2) step2.style.display = "block";
+      document.getElementById("recoveryOtpInput")?.focus();
+      notifyTaskSuccess("Recovery Code Dispatched", `Generated recovery code for ${email}.`);
     }
 
     async function submitPasswordResetRecovery() {
@@ -9323,49 +9569,100 @@ result = df.describe()
         return;
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/reset`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email, otp: otp, new_password: newPwd })
-        });
-        const data = await resp.json();
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/forgot-password/reset`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, otp: otp, new_password: newPwd })
+          });
+          const data = await resp.json();
 
-        if (!resp.ok) {
-          if (banner) {
-            banner.style.display = "block";
-            banner.style.background = "rgba(239,68,68,0.15)";
-            banner.style.border = "1px solid #ef4444";
-            banner.style.color = "#fca5a5";
-            banner.textContent = data.detail || "Failed to reset password. Code may be invalid or expired.";
+          if (!resp.ok) {
+            if (banner) {
+              banner.style.display = "block";
+              banner.style.background = "rgba(239,68,68,0.15)";
+              banner.style.border = "1px solid #ef4444";
+              banner.style.color = "#fca5a5";
+              banner.textContent = data.detail || "Failed to reset password. Code may be invalid or expired.";
+            }
+            return;
+          }
+
+          notifyTaskSuccess("Password Updated", "Your password has been successfully reset! Please sign in with your new password.");
+          switchAuthMainMode("user");
+          switchUserSubTab("existing");
+          const uInp = document.getElementById("userUsernameInput");
+          if (uInp) uInp.value = email;
+          const pInp = document.getElementById("userPasswordInput");
+          if (pInp) { pInp.value = ""; pInp.focus(); }
+
+          const userBanner = document.getElementById("userAlertBanner");
+          if (userBanner) {
+            userBanner.style.display = "block";
+            userBanner.style.background = "rgba(16,185,129,0.15)";
+            userBanner.style.border = "1px solid #10b981";
+            userBanner.style.color = "#6ee7b7";
+            userBanner.textContent = "Password successfully reset! Enter your new password to sign in.";
           }
           return;
-        }
 
-        notifyTaskSuccess("Password Updated", "Your password has been successfully reset! Please sign in with your new password.");
-        switchAuthMainMode("user");
-        switchUserSubTab("existing");
-        const uInp = document.getElementById("userUsernameInput");
-        if (uInp) uInp.value = email;
-        const pInp = document.getElementById("userPasswordInput");
-        if (pInp) { pInp.value = ""; pInp.focus(); }
-
-        const userBanner = document.getElementById("userAlertBanner");
-        if (userBanner) {
-          userBanner.style.display = "block";
-          userBanner.style.background = "rgba(16,185,129,0.15)";
-          userBanner.style.border = "1px solid #10b981";
-          userBanner.style.color = "#6ee7b7";
-          userBanner.textContent = "Password successfully reset! Enter your new password to sign in.";
+        } catch (err) {
+          if (!isGitHubPages) {
+            if (banner) {
+              banner.style.display = "block";
+              banner.style.background = "rgba(239,68,68,0.15)";
+              banner.style.border = "1px solid #ef4444";
+              banner.style.color = "#fca5a5";
+              banner.textContent = "Failed to submit password reset. Check backend connection.";
+            }
+            return;
+          }
         }
-      } catch (err) {
+      }
+
+      // Client-Side password reset (GitHub Pages / Sandbox Mode)
+      const storedRecovery = sessionStorage.getItem("datamind_client_recovery_otp");
+      if (!storedRecovery) {
         if (banner) {
           banner.style.display = "block";
           banner.style.background = "rgba(239,68,68,0.15)";
           banner.style.border = "1px solid #ef4444";
           banner.style.color = "#fca5a5";
-          banner.textContent = "Failed to submit password reset. Check backend connection.";
+          banner.textContent = "Recovery session expired. Please request a new code.";
         }
+        return;
+      }
+
+      const rec = JSON.parse(storedRecovery);
+      if (rec.email !== email || rec.otp !== otp || Date.now() > rec.expires) {
+        if (banner) {
+          banner.style.display = "block";
+          banner.style.background = "rgba(239,68,68,0.15)";
+          banner.style.border = "1px solid #ef4444";
+          banner.style.color = "#fca5a5";
+          banner.textContent = "Incorrect or expired recovery code. Please check code or request a new one.";
+        }
+        return;
+      }
+
+      clientAuthManager.resetPassword(email, newPwd);
+      sessionStorage.removeItem("datamind_client_recovery_otp");
+      notifyTaskSuccess("Password Updated", "Your password has been successfully reset! Please sign in with your new password.");
+      switchAuthMainMode("user");
+      switchUserSubTab("existing");
+      const uInp = document.getElementById("userUsernameInput");
+      if (uInp) uInp.value = email;
+      const pInp = document.getElementById("userPasswordInput");
+      if (pInp) { pInp.value = ""; pInp.focus(); }
+
+      const userBanner = document.getElementById("userAlertBanner");
+      if (userBanner) {
+        userBanner.style.display = "block";
+        userBanner.style.background = "rgba(16,185,129,0.15)";
+        userBanner.style.border = "1px solid #10b981";
+        userBanner.style.color = "#6ee7b7";
+        userBanner.textContent = "Password successfully reset! Enter your new password to sign in.";
       }
     }
 
@@ -9397,67 +9694,115 @@ result = df.describe()
         alertBox.textContent = "Verifying account and sending OTP via SMTP...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: targetEmail, purpose: "login" })
-        });
-        const data = await resp.json();
+      // Try PostgreSQL backend first if API_BASE_URL is available
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: targetEmail, purpose: "login" })
+          });
+          const data = await resp.json();
 
-        if (!resp.ok) {
-          if (alertBox) {
-            alertBox.style.display = "block";
-            alertBox.style.background = "rgba(239,68,68,0.15)";
-            alertBox.style.border = "1px solid #ef4444";
-            alertBox.style.color = "#fca5a5";
-            alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+          if (!resp.ok) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+            }
+            return;
           }
+
+          pendingOtpSession = {
+            type: "admin",
+            email: targetEmail,
+            purpose: "login",
+            expiresAt: Date.now() + 300000
+          };
+
+          switchAuthMainMode("otp");
+          document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+          const targetLive = document.getElementById("otpLiveTargetEmail");
+          if (targetLive) targetLive.textContent = targetEmail;
+          document.getElementById("otpInputCode").value = "";
+
+          const otpAlert = document.getElementById("otpAlertBanner");
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            if (data.live_smtp) {
+              otpAlert.style.background = "rgba(16,185,129,0.15)";
+              otpAlert.style.border = "1px solid #10b981";
+              otpAlert.style.color = "#6ee7b7";
+              otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+              notifyTaskSuccess("Admin OTP Sent", `Verification code sent to ${targetEmail}.`);
+            } else {
+              otpAlert.style.background = "rgba(234,179,8,0.15)";
+              otpAlert.style.border = "1px solid #eab308";
+              otpAlert.style.color = "#fef08a";
+              const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+              otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+              notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+            }
+          }
+
+          startOtpCountdown(300);
           return;
+        } catch (backendErr) {
+          console.warn("Backend unavailable for OTP dispatch, evaluating client store:", backendErr);
         }
+      }
 
-        pendingOtpSession = {
-          type: "admin",
-          email: targetEmail,
-          purpose: "login",
-          expiresAt: Date.now() + 300000
-        };
-
-        switchAuthMainMode("otp");
-        document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
-        const targetLive = document.getElementById("otpLiveTargetEmail");
-        if (targetLive) targetLive.textContent = targetEmail;
-        document.getElementById("otpInputCode").value = "";
-
-        const otpAlert = document.getElementById("otpAlertBanner");
-        if (otpAlert) {
-          otpAlert.style.display = "block";
-          if (data.live_smtp) {
-            otpAlert.style.background = "rgba(16,185,129,0.15)";
-            otpAlert.style.border = "1px solid #10b981";
-            otpAlert.style.color = "#6ee7b7";
-            otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
-            notifyTaskSuccess("Admin OTP Sent", `Verification code sent to ${targetEmail}.`);
-          } else {
-            otpAlert.style.background = "rgba(234,179,8,0.15)";
-            otpAlert.style.border = "1px solid #eab308";
-            otpAlert.style.color = "#fef08a";
-            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
-            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
-            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
-          }
-        }
-
-        startOtpCountdown(300);
-      } catch (err) {
+      // Standalone / GitHub Pages Client Store validation
+      const clientUser = clientAuthManager.findUser(targetEmail);
+      if (!clientUser) {
         if (alertBox) {
           alertBox.style.display = "block";
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Failed to contact authentication gateway. Verify backend is running.";
+          alertBox.textContent = `No account found with email '${targetEmail}'. Please register first.`;
         }
+        return;
       }
+
+      if (clientUser.role.toLowerCase() !== "admin") {
+        if (alertBox) {
+          alertBox.style.display = "block";
+          alertBox.style.background = "rgba(239,68,68,0.15)";
+          alertBox.style.border = "1px solid #ef4444";
+          alertBox.style.color = "#fca5a5";
+          alertBox.textContent = "This email is registered as User, not Administrator. Please use User Login tab.";
+        }
+        return;
+      }
+
+      const clientOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingOtpSession = {
+        type: "admin",
+        email: targetEmail,
+        purpose: "login",
+        clientOtp: clientOtpCode,
+        expiresAt: Date.now() + 300000
+      };
+
+      switchAuthMainMode("otp");
+      document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+      const targetLive = document.getElementById("otpLiveTargetEmail");
+      if (targetLive) targetLive.textContent = targetEmail;
+      document.getElementById("otpInputCode").value = "";
+
+      const otpAlert = document.getElementById("otpAlertBanner");
+      if (otpAlert) {
+        otpAlert.style.display = "block";
+        otpAlert.style.background = "rgba(16,185,129,0.15)";
+        otpAlert.style.border = "1px solid #10b981";
+        otpAlert.style.color = "#6ee7b7";
+        otpAlert.innerHTML = `🌐 <strong>GitHub Pages Sandbox Verification:</strong> Verification OTP generated for <code>${targetEmail}</code>:<br><div style="margin-top:8px;padding:6px 10px;background:rgba(16,185,129,0.25);border:1px dashed #10b981;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Your Verification Code:</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#6ee7b7;">${clientOtpCode}</span></div>`;
+      }
+      startOtpCountdown(300);
+      notifyTaskSuccess("OTP Generated", `Verification code generated for ${targetEmail}.`);
     }
 
     async function initiateUserSmtpOtpLogin() {
@@ -9485,67 +9830,103 @@ result = df.describe()
         alertBox.textContent = "Verifying account and sending OTP via SMTP...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: targetEmail, purpose: "login" })
-        });
-        const data = await resp.json();
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: targetEmail, purpose: "login" })
+          });
+          const data = await resp.json();
 
-        if (!resp.ok) {
-          if (alertBox) {
-            alertBox.style.display = "block";
-            alertBox.style.background = "rgba(239,68,68,0.15)";
-            alertBox.style.border = "1px solid #ef4444";
-            alertBox.style.color = "#fca5a5";
-            alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+          if (!resp.ok) {
+            if (alertBox) {
+              alertBox.style.display = "block";
+              alertBox.style.background = "rgba(239,68,68,0.15)";
+              alertBox.style.border = "1px solid #ef4444";
+              alertBox.style.color = "#fca5a5";
+              alertBox.textContent = data.detail || "Account not found in database. Please register first.";
+            }
+            return;
           }
+
+          pendingOtpSession = {
+            type: "user_existing",
+            email: targetEmail,
+            purpose: "login",
+            expiresAt: Date.now() + 300000
+          };
+
+          switchAuthMainMode("otp");
+          document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+          const targetLive = document.getElementById("otpLiveTargetEmail");
+          if (targetLive) targetLive.textContent = targetEmail;
+          document.getElementById("otpInputCode").value = "";
+
+          const otpAlert = document.getElementById("otpAlertBanner");
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            if (data.live_smtp) {
+              otpAlert.style.background = "rgba(16,185,129,0.15)";
+              otpAlert.style.border = "1px solid #10b981";
+              otpAlert.style.color = "#6ee7b7";
+              otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
+              notifyTaskSuccess("OTP Sent", `Verification code sent to ${targetEmail}.`);
+            } else {
+              otpAlert.style.background = "rgba(234,179,8,0.15)";
+              otpAlert.style.border = "1px solid #eab308";
+              otpAlert.style.color = "#fef08a";
+              const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+              otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+              notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+            }
+          }
+
+          startOtpCountdown(300);
           return;
+        } catch (backendErr) {
+          console.warn("Backend unavailable for OTP dispatch, evaluating client store:", backendErr);
         }
+      }
 
-        pendingOtpSession = {
-          type: "user_existing",
-          email: targetEmail,
-          purpose: "login",
-          expiresAt: Date.now() + 300000
-        };
-
-        switchAuthMainMode("otp");
-        document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
-        const targetLive = document.getElementById("otpLiveTargetEmail");
-        if (targetLive) targetLive.textContent = targetEmail;
-        document.getElementById("otpInputCode").value = "";
-
-        const otpAlert = document.getElementById("otpAlertBanner");
-        if (otpAlert) {
-          otpAlert.style.display = "block";
-          if (data.live_smtp) {
-            otpAlert.style.background = "rgba(16,185,129,0.15)";
-            otpAlert.style.border = "1px solid #10b981";
-            otpAlert.style.color = "#6ee7b7";
-            otpAlert.innerHTML = `📨 <strong>OTP Dispatched:</strong> 6-Digit code sent via live SMTP to <code>${targetEmail}</code>. Check your inbox.`;
-            notifyTaskSuccess("OTP Sent", `Verification code sent to ${targetEmail}.`);
-          } else {
-            otpAlert.style.background = "rgba(234,179,8,0.15)";
-            otpAlert.style.border = "1px solid #eab308";
-            otpAlert.style.color = "#fef08a";
-            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
-            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
-            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
-          }
-        }
-
-        startOtpCountdown(300);
-      } catch (err) {
+      // Standalone / GitHub Pages Client Store validation
+      const clientUser = clientAuthManager.findUser(targetEmail);
+      if (!clientUser) {
         if (alertBox) {
           alertBox.style.display = "block";
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Failed to contact authentication gateway. Verify backend is running.";
+          alertBox.textContent = `No account found with email '${targetEmail}'. Please register first.`;
         }
+        return;
       }
+
+      const clientOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingOtpSession = {
+        type: "user_existing",
+        email: targetEmail,
+        purpose: "login",
+        clientOtp: clientOtpCode,
+        expiresAt: Date.now() + 300000
+      };
+
+      switchAuthMainMode("otp");
+      document.getElementById("otpTargetEmailBadge").textContent = targetEmail;
+      const targetLive = document.getElementById("otpLiveTargetEmail");
+      if (targetLive) targetLive.textContent = targetEmail;
+      document.getElementById("otpInputCode").value = "";
+
+      const otpAlert = document.getElementById("otpAlertBanner");
+      if (otpAlert) {
+        otpAlert.style.display = "block";
+        otpAlert.style.background = "rgba(16,185,129,0.15)";
+        otpAlert.style.border = "1px solid #10b981";
+        otpAlert.style.color = "#6ee7b7";
+        otpAlert.innerHTML = `🌐 <strong>GitHub Pages Sandbox Verification:</strong> Verification OTP generated for <code>${targetEmail}</code>:<br><div style="margin-top:8px;padding:6px 10px;background:rgba(16,185,129,0.25);border:1px dashed #10b981;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Your Verification Code:</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#6ee7b7;">${clientOtpCode}</span></div>`;
+      }
+      startOtpCountdown(300);
+      notifyTaskSuccess("OTP Generated", `Verification code generated for ${targetEmail}.`);
     }
 
     async function initiateSmtpNewUserRegister() {
@@ -9585,65 +9966,121 @@ result = df.describe()
         alertBox.textContent = "Sending registration verification OTP via SMTP...";
       }
 
-      try {
-        const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email, purpose: "register" })
-        });
-        const data = await resp.json();
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email, purpose: "register" })
+          });
+          const data = await resp.json();
 
-        pendingOtpSession = {
-          type: "new_user",
-          email: email,
-          fullName: fname,
-          password: pwd,
-          role: role,
-          purpose: "register",
-          expiresAt: Date.now() + 300000
-        };
+          pendingOtpSession = {
+            type: "new_user",
+            email: email,
+            fullName: fname,
+            password: pwd,
+            role: role,
+            purpose: "register",
+            expiresAt: Date.now() + 300000
+          };
 
-        switchAuthMainMode("otp");
-        document.getElementById("otpTargetEmailBadge").textContent = email;
-        const targetLive = document.getElementById("otpLiveTargetEmail");
-        if (targetLive) targetLive.textContent = email;
-        document.getElementById("otpInputCode").value = "";
+          switchAuthMainMode("otp");
+          document.getElementById("otpTargetEmailBadge").textContent = email;
+          const targetLive = document.getElementById("otpLiveTargetEmail");
+          if (targetLive) targetLive.textContent = email;
+          document.getElementById("otpInputCode").value = "";
 
-        const otpAlert = document.getElementById("otpAlertBanner");
-        if (otpAlert) {
-          otpAlert.style.display = "block";
-          if (data.live_smtp) {
-            otpAlert.style.background = "rgba(16,185,129,0.15)";
-            otpAlert.style.border = "1px solid #10b981";
-            otpAlert.style.color = "#6ee7b7";
-            otpAlert.innerHTML = `📨 <strong>Verification Code Sent:</strong> Dispatched to <code>${email}</code> via live SMTP. Please check your inbox.`;
-            notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
-          } else {
-            otpAlert.style.background = "rgba(234,179,8,0.15)";
-            otpAlert.style.border = "1px solid #eab308";
-            otpAlert.style.color = "#fef08a";
-            const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
-            otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
-            notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+          const otpAlert = document.getElementById("otpAlertBanner");
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            if (data.live_smtp) {
+              otpAlert.style.background = "rgba(16,185,129,0.15)";
+              otpAlert.style.border = "1px solid #10b981";
+              otpAlert.style.color = "#6ee7b7";
+              otpAlert.innerHTML = `📨 <strong>Verification Code Sent:</strong> Dispatched to <code>${email}</code> via live SMTP. Please check your inbox.`;
+              notifyTaskSuccess("Registration OTP Sent", `Code dispatched to ${email}.`);
+            } else {
+              otpAlert.style.background = "rgba(234,179,8,0.15)";
+              otpAlert.style.border = "1px solid #eab308";
+              otpAlert.style.color = "#fef08a";
+              const devBadge = data.dev_otp ? `<div style="margin-top:8px;padding:6px 10px;background:rgba(234,179,8,0.25);border:1px dashed #eab308;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Verification OTP (SMTP Inactive):</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#fef08a;">${data.dev_otp}</span></div>` : '';
+              otpAlert.innerHTML = `⚠️ <strong>SMTP Delivery Notice:</strong> ${data.message}<br><button type="button" onclick="openSmtpConfigModal()" style="margin-top:6px;background:#38bdf8;color:#0f172a;border:none;padding:5px 12px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;">⚙️ Configure Gmail / SMTP App Password</button>${devBadge}`;
+              notifyTaskWarning("SMTP Not Configured", "Configure your Gmail App Password to receive real emails.");
+            }
           }
-        }
 
-        startOtpCountdown(300);
-      } catch (err) {
+          startOtpCountdown(300);
+          return;
+        } catch (backendErr) {
+          console.warn("Backend unavailable for registration OTP dispatch, evaluating client store:", backendErr);
+        }
+      }
+
+      // Standalone / GitHub Pages Client Store validation
+      if (clientAuthManager.findUser(email)) {
         if (alertBox) {
           alertBox.style.display = "block";
           alertBox.style.background = "rgba(239,68,68,0.15)";
           alertBox.style.border = "1px solid #ef4444";
           alertBox.style.color = "#fca5a5";
-          alertBox.textContent = "Failed to dispatch registration OTP. Ensure backend is running.";
+          alertBox.textContent = "An account with this email address already exists. Please sign in.";
         }
+        return;
       }
+
+      const clientOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+      pendingOtpSession = {
+        type: "new_user",
+        email: email,
+        fullName: fname,
+        password: pwd,
+        role: role,
+        purpose: "register",
+        clientOtp: clientOtpCode,
+        expiresAt: Date.now() + 300000
+      };
+
+      switchAuthMainMode("otp");
+      document.getElementById("otpTargetEmailBadge").textContent = email;
+      const targetLive = document.getElementById("otpLiveTargetEmail");
+      if (targetLive) targetLive.textContent = email;
+      document.getElementById("otpInputCode").value = "";
+
+      const otpAlert = document.getElementById("otpAlertBanner");
+      if (otpAlert) {
+        otpAlert.style.display = "block";
+        otpAlert.style.background = "rgba(16,185,129,0.15)";
+        otpAlert.style.border = "1px solid #10b981";
+        otpAlert.style.color = "#6ee7b7";
+        otpAlert.innerHTML = `🌐 <strong>GitHub Pages Sandbox Registration:</strong> Verification OTP generated for <code>${email}</code>:<br><div style="margin-top:8px;padding:6px 10px;background:rgba(16,185,129,0.25);border:1px dashed #10b981;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Your Verification Code:</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#6ee7b7;">${clientOtpCode}</span></div>`;
+      }
+      startOtpCountdown(300);
+      notifyTaskSuccess("Registration OTP Generated", `Code generated for ${email}.`);
     }
 
     async function resendSmtpOtp() {
       if (!pendingOtpSession) return;
       const targetEmail = pendingOtpSession.email;
       const purpose = pendingOtpSession.purpose || "login";
+
+      if (pendingOtpSession.clientOtp || !API_BASE_URL) {
+        const clientOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+        pendingOtpSession.clientOtp = clientOtpCode;
+        pendingOtpSession.expiresAt = Date.now() + 300000;
+        startOtpCountdown(300);
+
+        const otpAlert = document.getElementById("otpAlertBanner");
+        if (otpAlert) {
+          otpAlert.style.display = "block";
+          otpAlert.style.background = "rgba(16,185,129,0.15)";
+          otpAlert.style.border = "1px solid #10b981";
+          otpAlert.style.color = "#6ee7b7";
+          otpAlert.innerHTML = `🔄 <strong>Fresh Code Generated:</strong><br><div style="margin-top:8px;padding:6px 10px;background:rgba(16,185,129,0.25);border:1px dashed #10b981;border-radius:4px;font-size:13px;color:#fff;">🔑 <strong>Your New Code:</strong> <span style="font-family:monospace;letter-spacing:3px;font-weight:800;font-size:16px;color:#6ee7b7;">${clientOtpCode}</span></div>`;
+        }
+        notifyTaskSuccess("OTP Refreshed", `New code generated for ${targetEmail}.`);
+        return;
+      }
 
       try {
         const resp = await fetch(`${API_BASE_URL}/api/auth/send-otp`, {
@@ -9701,13 +10138,94 @@ result = df.describe()
           otpAlert.style.background = "rgba(239,68,68,0.15)";
           otpAlert.style.border = "1px solid #ef4444";
           otpAlert.style.color = "#fca5a5";
-          otpAlert.textContent = "Please enter the 6-digit verification code from your email.";
+          otpAlert.textContent = "Please enter the 6-digit verification code.";
         }
         return;
       }
 
+      // Check client OTP session first if active
+      if (pendingOtpSession.clientOtp) {
+        if (Date.now() > pendingOtpSession.expiresAt) {
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            otpAlert.style.background = "rgba(239,68,68,0.15)";
+            otpAlert.style.border = "1px solid #ef4444";
+            otpAlert.style.color = "#fca5a5";
+            otpAlert.textContent = "OTP code has expired. Please click Resend Code.";
+          }
+          return;
+        }
+
+        if (enteredCode !== pendingOtpSession.clientOtp) {
+          if (otpAlert) {
+            otpAlert.style.display = "block";
+            otpAlert.style.background = "rgba(239,68,68,0.15)";
+            otpAlert.style.border = "1px solid #ef4444";
+            otpAlert.style.color = "#fca5a5";
+            otpAlert.textContent = "Invalid verification code. Please check the code and try again.";
+          }
+          return;
+        }
+
+        // Code matched!
+        if (otpCountdownInterval) clearInterval(otpCountdownInterval);
+
+        if (pendingOtpSession.type === "new_user") {
+          const regRes = clientAuthManager.register(
+            pendingOtpSession.fullName,
+            pendingOtpSession.email,
+            pendingOtpSession.password,
+            pendingOtpSession.role
+          );
+          if (!regRes.ok) {
+            if (otpAlert) {
+              otpAlert.style.display = "block";
+              otpAlert.style.background = "rgba(239,68,68,0.15)";
+              otpAlert.style.border = "1px solid #ef4444";
+              otpAlert.style.color = "#fca5a5";
+              otpAlert.textContent = regRes.error;
+            }
+            return;
+          }
+          currentAuthUser = {
+            username: regRes.user.email,
+            role: regRes.user.role,
+            email: regRes.user.email,
+            full_name: regRes.user.full_name,
+            token: `token_${Date.now()}`
+          };
+          localStorage.setItem("datamind_token", currentAuthUser.token);
+          localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+          applyUserSessionUI();
+          closeAuthModal();
+          notifyTaskSuccess("Account Created", `Welcome ${currentAuthUser.full_name}! Account created.`);
+          logAuditEvent("USER_REGISTERED", currentAuthUser.email, currentAuthUser.role, "SUCCESS", "Registered via email OTP");
+          saveUserLoginToDatabase("REGISTER_OTP", "New user registered with verified email OTP");
+          pendingOtpSession = null;
+          return;
+        } else {
+          const clientUser = clientAuthManager.findUser(pendingOtpSession.email);
+          currentAuthUser = {
+            username: clientUser.email,
+            role: clientUser.role,
+            email: clientUser.email,
+            full_name: clientUser.full_name,
+            token: `token_${Date.now()}`
+          };
+          localStorage.setItem("datamind_token", currentAuthUser.token);
+          localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
+          applyUserSessionUI();
+          closeAuthModal();
+          notifyTaskSuccess("OTP Verified", `Signed in as ${currentAuthUser.full_name} (${currentAuthUser.role}).`);
+          logAuditEvent("AUTH_LOGIN_OTP", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "Authenticated via verified OTP");
+          saveUserLoginToDatabase("OTP_LOGIN", "Authenticated via verified OTP");
+          pendingOtpSession = null;
+          return;
+        }
+      }
+
+      // Backend PostgreSQL verification
       if (pendingOtpSession.type === "new_user") {
-        // First verify OTP
         try {
           const vResp = await fetch(`${API_BASE_URL}/api/auth/verify-otp`, {
             method: "POST",
@@ -9839,7 +10357,6 @@ result = df.describe()
         }
       }
     }
-
     // -------------------------------------------------------------
     // SMTP GATEWAY CONFIGURATION MODAL CONTROLS
     // -------------------------------------------------------------
@@ -10413,27 +10930,28 @@ result = df.describe()
 
     async function checkBackendDatabaseStatus() {
       const badge = document.getElementById("secDbStatusBadge");
-      try {
-        const resp = await fetch(`${API_BASE_URL}/auth/db-status`, { signal: AbortSignal.timeout(2500) });
-        if (resp.ok) {
-          const data = await resp.json();
-          if (badge) {
-            badge.style.background = "rgba(16,185,129,0.18)";
-            badge.style.borderColor = "#10b981";
-            badge.style.color = "#34d399";
-            badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: SQLite (${data.database.database_file}) &amp; IndexedDB Active`;
+      if (API_BASE_URL) {
+        try {
+          const resp = await fetch(`${API_BASE_URL}/auth/db-status`, { signal: AbortSignal.timeout(2500) });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (badge) {
+              badge.style.background = "rgba(16,185,129,0.18)";
+              badge.style.borderColor = "#10b981";
+              badge.style.color = "#34d399";
+              badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: PostgreSQL &amp; IndexedDB Active`;
+            }
+            syncWithBackendDatabase();
+            return;
           }
-          // Fetch full history from SQLite
-          syncWithBackendDatabase();
-          return;
-        }
-      } catch (err) {}
+        } catch (err) {}
+      }
 
       if (badge) {
         badge.style.background = "rgba(56,189,248,0.15)";
         badge.style.borderColor = "#38bdf8";
         badge.style.color = "#38bdf8";
-        badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: IndexedDB Active (Background Storage)`;
+        badge.innerHTML = `<i class="fa-solid fa-database"></i> DB: IndexedDB Active (Client Store)`;
       }
     }
 
@@ -10479,9 +10997,10 @@ result = df.describe()
         } catch (e) {}
       }
 
-      // 3. Persist to Background SQLite Database (/auth/login-event)
-      try {
-        fetch(`${API_BASE_URL}/auth/login-event`, {
+      // 3. Persist to Background Database (/auth/login-event) if backend active
+      if (API_BASE_URL) {
+        try {
+          fetch(`${API_BASE_URL}/auth/login-event`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -10494,12 +11013,13 @@ result = df.describe()
             session_token: token,
             details: details || `Authenticated via ${loginMethod}`
           })
-        }).then(r => r.json()).then(res => {
-          if (res && res.db_metrics) {
-            updateDbMetricsCounters(res.db_metrics);
-          }
-        }).catch(() => {});
-      } catch (e) {}
+          }).then(r => r.json()).then(res => {
+            if (res && res.db_metrics) {
+              updateDbMetricsCounters(res.db_metrics);
+            }
+          }).catch(() => {});
+        } catch (e) {}
+      }
 
       // 4. Update UI
       renderDatabaseLoginsUI();
@@ -10604,6 +11124,7 @@ result = df.describe()
     }
 
     async function syncWithBackendDatabase() {
+      if (!API_BASE_URL) return;
       try {
         const resp = await fetch(`${API_BASE_URL}/auth/login-history?limit=100`);
         if (resp.ok) {
@@ -10641,6 +11162,10 @@ result = df.describe()
     }
 
     async function checkPostgreSqlHealthUI() {
+      if (!API_BASE_URL) {
+        notifyTaskWarning("GitHub Pages Standalone", "PostgreSQL is not connected in static hosting mode. To connect, configure a remote Backend API URL.");
+        return;
+      }
       try {
         const resp = await fetch(`${API_BASE_URL}/api/health`);
         if (resp.ok) {
