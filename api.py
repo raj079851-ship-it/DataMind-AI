@@ -10,6 +10,10 @@ Features interactive Swagger UI documentation at http://localhost:8000/docs
 import os
 import io
 import json
+from dotenv import load_dotenv
+
+# Ensure environment variables from .env are loaded into process
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"), override=True)
 import pandas as pd
 import numpy as np
 from typing import Dict, Any, List, Optional

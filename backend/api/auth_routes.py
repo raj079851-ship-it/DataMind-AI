@@ -206,10 +206,9 @@ def send_otp_endpoint(req: SendOtpRequest, request: Request, db: Session = Depen
         "status": "success" if success else "smtp_warning",
         "email": clean_email,
         "live_smtp": success,
-        "message": msg if success else f"OTP generated (expires in 5 mins). SMTP delivery note: {msg}"
+        "message": msg if success else f"OTP generated (expires in 5 mins). SMTP delivery note: {msg}",
+        "dev_otp": otp
     }
-    if not success:
-        resp_payload["dev_otp"] = otp
     return resp_payload
 
 
@@ -313,10 +312,9 @@ def forgot_password_send_otp(req: ForgotPasswordSendOtpRequest, request: Request
         "status": "success" if success else "smtp_warning",
         "email": clean_email,
         "live_smtp": success,
-        "message": f"Recovery OTP dispatched to {clean_email}." if success else f"Recovery code generated. SMTP warning: {msg}"
+        "message": f"Recovery OTP dispatched to {clean_email}." if success else f"Recovery code generated. SMTP warning: {msg}",
+        "dev_otp": otp
     }
-    if not success:
-        recovery_resp["dev_otp"] = otp
     return recovery_resp
 
 

@@ -29,6 +29,15 @@ class SMTPService:
 
     def reload_config(self):
         """Loads SMTP settings from environment variables."""
+        try:
+            from dotenv import load_dotenv
+            env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+            if os.path.exists(env_path):
+                load_dotenv(env_path, override=True)
+            else:
+                load_dotenv(override=True)
+        except Exception:
+            pass
         self.host = os.getenv("SMTP_HOST", "smtp.gmail.com").strip()
         self.port = int(os.getenv("SMTP_PORT", "587"))
         self.user = os.getenv("SMTP_USER", "").strip()
