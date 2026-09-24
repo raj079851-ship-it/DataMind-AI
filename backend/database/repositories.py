@@ -58,13 +58,62 @@ class UserRepository:
         return user
 
     @staticmethod
-    def update_last_login(db: Session, user_id: Union[str, uuid.UUID]) -> Optional[User]:
+    def record_login(
+        db: Session,
+        user_id: Union[str, uuid.UUID],
+        ip_address: Optional[str] = "127.0.0.1",
+        user_agent: Optional[str] = "Unknown",
+        login_method: Optional[str] = "PASSWORD",
+        status: Optional[str] = "SUCCESS",
+        details: Optional[str] = None
+    ) -> Optional[User]:
         user = UserRepository.get_by_id(db, user_id)
         if user:
-            user.last_login = datetime.now()
+            now = datetime.now()
+            user.last_login = now
+            user.login_count = (user.login_count or 0) + 1
+            user.last_login_ip = ip_address or "127.0.0.1"
+            user.last_login_user_agent = user_agent or "Unknown"
+            user.last_login_method = login_method or "PASSWORD"
+            user.last_login_status = status or "SUCCESS"
+            user.last_login_details = details or f"Authenticated via {login_method}"
+
+            history_entry = {
+                "timestamp": now.isoformat(),
+                "ip_address": ip_address or "127.0.0.1",
+                "user_agent": user_agent or "Unknown",
+                "login_method": login_method or "PASSWORD",
+                "status": status or "SUCCESS",
+                "details": details or f"Authenticated via {login_method}"
+            }
+
+            current_history = list(user.login_history or [])
+            current_history.insert(0, history_entry)
+            user.login_history = current_history[:100]
+
             db.commit()
             db.refresh(user)
         return user
+
+    @staticmethod
+    def update_last_login(
+        db: Session,
+        user_id: Union[str, uuid.UUID],
+        ip_address: Optional[str] = "127.0.0.1",
+        user_agent: Optional[str] = "Unknown",
+        login_method: Optional[str] = "PASSWORD",
+        status: Optional[str] = "SUCCESS",
+        details: Optional[str] = None
+    ) -> Optional[User]:
+        return UserRepository.record_login(
+            db=db,
+            user_id=user_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            login_method=login_method,
+            status=status,
+            details=details
+        )
 
     @staticmethod
     def update_password(db: Session, email: str, new_password_hash: str) -> Optional[User]:

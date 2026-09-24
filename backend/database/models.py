@@ -54,6 +54,13 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
     last_login = Column(DateTime(timezone=True), nullable=True)
+    login_count = Column(Integer, nullable=False, default=0, server_default="0")
+    last_login_ip = Column(String(100), nullable=True)
+    last_login_user_agent = Column(Text, nullable=True)
+    last_login_method = Column(String(50), nullable=True)
+    last_login_status = Column(String(50), nullable=True, default="SUCCESS")
+    last_login_details = Column(Text, nullable=True)
+    login_history = Column(JSONB, nullable=False, default=list, server_default=text("'[]'::jsonb"))
 
     __table_args__ = (
         CheckConstraint("role IN ('admin', 'user', 'analyst', 'engineer', 'viewer')", name="check_user_role"),
@@ -76,7 +83,14 @@ class User(Base):
             "is_active": self.is_active,
             "created_at": self.created_at.isoformat() if self.created_at else None,
             "updated_at": self.updated_at.isoformat() if self.updated_at else None,
-            "last_login": self.last_login.isoformat() if self.last_login else None
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "login_count": self.login_count or 0,
+            "last_login_ip": self.last_login_ip,
+            "last_login_user_agent": self.last_login_user_agent,
+            "last_login_method": self.last_login_method,
+            "last_login_status": self.last_login_status,
+            "last_login_details": self.last_login_details,
+            "login_history": self.login_history or []
         }
 
 

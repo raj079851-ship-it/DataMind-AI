@@ -15,6 +15,7 @@ Includes:
 - POST /api/auth/test-smtp (trigger diagnostic SMTP handshake email)
 """
 
+from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 
@@ -119,8 +120,16 @@ def login_user(req: UserLoginRequest, request: Request, db: Session = Depends(ge
             detail="Account has been suspended or deactivated. Contact an administrator."
         )
 
-    # Update last login timestamp in PostgreSQL
-    UserRepository.update_last_login(db, user.id)
+    # Record all login details in PostgreSQL users table
+    user = UserRepository.record_login(
+        db=db,
+        user_id=user.id,
+        ip_address=client_ip,
+        user_agent=user_agent,
+        login_method="DIRECT_PASSWORD",
+        status="SUCCESS",
+        details="Authenticated via direct password in PostgreSQL"
+    ) or user
 
     # Generate JWT token
     token_payload = {
@@ -221,7 +230,15 @@ def verify_otp_endpoint(req: VerifyOtpRequest, request: Request, db: Session = D
     user_agent = request.headers.get("user-agent", "Unknown")
 
     if user:
-        UserRepository.update_last_login(db, user.id)
+        user = UserRepository.record_login(
+            db=db,
+            user_id=user.id,
+            ip_address=client_ip,
+            user_agent=user_agent,
+            login_method="EMAIL_OTP",
+            status="SUCCESS",
+            details="Authenticated via verified email OTP in PostgreSQL"
+        ) or user
         token_payload = {
             "sub": str(user.id),
             "user_id": str(user.id),
@@ -431,5 +448,45 @@ def logout_user(request: Request, current_user: User = Depends(get_current_activ
 
 @router.get("/me", response_model=UserResponse)
 def get_current_profile(current_user: User = Depends(get_current_active_user)):
-    """Returns caller profile from PostgreSQL."""
+    """Returns caller profile including login statistics from PostgreSQL."""
     return UserResponse(**current_user.to_dict())
+
+
+@router.get("/users", response_model=List[UserResponse])
+def get_all_users_with_logins(
+    skip: int = 0,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    admin_user: User = Depends(require_admin)
+):
+    """Returns all users with full login history and details from PostgreSQL table 'users'."""
+    users = UserRepository.list_users(db, skip=skip, limit=limit)
+    return [UserResponse(**u.to_dict()) for u in users]
+
+
+@router.get("/users/{user_id}/logins")
+def get_user_login_history(
+    user_id: str,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user)
+):
+    """Retrieves detailed login history and stats from PostgreSQL table 'users'."""
+    if current_user.role != "admin" and str(current_user.id) != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden: You can only view your own login details.")
+    target_user = UserRepository.get_by_id(db, user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found in table 'users'.")
+    return {
+        "user_id": str(target_user.id),
+        "email": target_user.email,
+        "full_name": target_user.full_name,
+        "role": target_user.role,
+        "login_count": target_user.login_count or 0,
+        "last_login": target_user.last_login.isoformat() if target_user.last_login else None,
+        "last_login_ip": target_user.last_login_ip,
+        "last_login_user_agent": target_user.last_login_user_agent,
+        "last_login_method": target_user.last_login_method,
+        "last_login_status": target_user.last_login_status,
+        "last_login_details": target_user.last_login_details,
+        "login_history": target_user.login_history or []
+    }

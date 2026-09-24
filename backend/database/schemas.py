@@ -30,6 +30,13 @@ class UserResponse(BaseModel):
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
     last_login: Optional[str] = None
+    login_count: Optional[int] = 0
+    last_login_ip: Optional[str] = None
+    last_login_user_agent: Optional[str] = None
+    last_login_method: Optional[str] = None
+    last_login_status: Optional[str] = None
+    last_login_details: Optional[str] = None
+    login_history: Optional[List[Dict[str, Any]]] = None
 
 
 class TokenResponse(BaseModel):

@@ -30,6 +30,13 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
     last_login TIMESTAMP WITH TIME ZONE,
+    login_count INTEGER DEFAULT 0 NOT NULL,
+    last_login_ip VARCHAR(100),
+    last_login_user_agent TEXT,
+    last_login_method VARCHAR(50),
+    last_login_status VARCHAR(50) DEFAULT 'SUCCESS',
+    last_login_details TEXT,
+    login_history JSONB DEFAULT '[]'::jsonb NOT NULL,
     CONSTRAINT check_user_role CHECK (role IN ('admin', 'user', 'analyst', 'engineer', 'viewer'))
 );
 

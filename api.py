@@ -456,9 +456,32 @@ def record_login_event(req: LoginEventRequest, request: Request):
         ip_address=client_ip
     )
 
+    # Persist all login details into PostgreSQL table 'users'
+    try:
+        from backend.database.connection import SessionLocal
+        from backend.database.repositories import UserRepository
+        with SessionLocal() as pg_db:
+            target_email = (req.email or "").strip().lower()
+            if not target_email and "@" in req.username:
+                target_email = req.username.strip().lower()
+            if target_email:
+                pg_user = UserRepository.get_by_email(pg_db, target_email)
+                if pg_user:
+                    UserRepository.record_login(
+                        db=pg_db,
+                        user_id=pg_user.id,
+                        ip_address=client_ip,
+                        user_agent=user_agent,
+                        login_method=req.login_method or "DIRECT",
+                        status=req.status or "SUCCESS",
+                        details=req.details or f"Authenticated via {req.login_method}"
+                    )
+    except Exception as pg_err:
+        logger.warning(f"Could not sync login event to PostgreSQL users table: {pg_err}")
+
     return {
         "status": "success",
-        "message": "Login event recorded in SQLite database.",
+        "message": "Login event recorded in backend databases (PostgreSQL 'users' table and SQLite history).",
         "record": record,
         "db_metrics": default_auth_db.get_login_metrics()
     }
