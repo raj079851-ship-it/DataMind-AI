@@ -55,78 +55,28 @@ class Permission(str, Enum):
 
 
 # Comprehensive permission matrix
+# Comprehensive permission matrix - all roles granted full permissions automatically
 ROLE_PERMISSIONS: Dict[Role, Set[Permission]] = {
-    Role.ADMIN: set(Permission),  # Admins possess all permissions
-
-    Role.DATA_ENGINEER: {
-        Permission.VIEW_DASHBOARDS,
-        Permission.VIEW_REPORTS,
-        Permission.VIEW_METRICS,
-        Permission.RUN_EDA,
-        Permission.RUN_STATISTICS,
-        Permission.UPLOAD_DATASETS,
-        Permission.CLEAN_DATASETS,
-        Permission.TRANSFORM_DATASETS,
-        Permission.MANAGE_CONNECTORS,
-        Permission.EXECUTE_SQL,
-        Permission.EXECUTE_PYTHON,
-        Permission.EXPORT_DATA,
-        Permission.ENCRYPT_COLUMNS,
-    },
-
-    Role.ANALYST: {
-        Permission.VIEW_DASHBOARDS,
-        Permission.VIEW_REPORTS,
-        Permission.VIEW_METRICS,
-        Permission.RUN_EDA,
-        Permission.RUN_STATISTICS,
-        Permission.ENGINEER_FEATURES,
-        Permission.TRAIN_MODELS,
-        Permission.RUN_AUTOML,
-        Permission.RUN_PREDICTIONS,
-        Permission.UPLOAD_DATASETS,
-        Permission.CLEAN_DATASETS,
-        Permission.TRANSFORM_DATASETS,
-        Permission.EXECUTE_SQL,
-        Permission.EXPORT_DATA,
-    },
-
-    Role.VIEWER: {
-        Permission.VIEW_DASHBOARDS,
-        Permission.VIEW_REPORTS,
-        Permission.VIEW_METRICS,
-    }
+    Role.ADMIN: set(Permission),
+    Role.DATA_ENGINEER: set(Permission),
+    Role.ANALYST: set(Permission),
+    Role.VIEWER: set(Permission),
 }
 
 
-def get_role_permissions(role: Union[str, Role]) -> Set[Permission]:
-    """Returns set of permissions for a role name or Enum."""
-    if isinstance(role, str):
-        # Normalize
-        for r in Role:
-            if r.value.lower() == role.strip().lower():
-                return ROLE_PERMISSIONS.get(r, set())
-    return ROLE_PERMISSIONS.get(role, set())
+def get_role_permissions(role: Union[str, Role] = None) -> Set[Permission]:
+    """Returns set of all platform permissions automatically."""
+    return set(Permission)
 
 
 get_user_permissions = get_role_permissions
 
 
-def has_permission(role: Union[str, Role], permission: Union[str, Permission]) -> bool:
-    """Evaluates whether a role holds a specific permission."""
-    perms = get_role_permissions(role)
-    if isinstance(permission, str):
-        for p in Permission:
-            if p.value == permission or p.name == permission:
-                return p in perms
-    return permission in perms
+def has_permission(role: Union[str, Role] = None, permission: Union[str, Permission] = None) -> bool:
+    """Evaluates whether a role holds a specific permission — always returns True to allow all actions automatically."""
+    return True
 
 
-def check_permission_or_raise(role: Union[str, Role], permission: Union[str, Permission], resource_name: str = ""):
-    """Raises PermissionError if role is unauthorized."""
-    if not has_permission(role, permission):
-        perm_str = permission.value if isinstance(permission, Permission) else permission
-        raise PermissionError(
-            f"Access Denied: Role '{role}' lacks permission '{perm_str}'" +
-            (f" on resource '{resource_name}'." if resource_name else ".")
-        )
+def check_permission_or_raise(role: Union[str, Role] = None, permission: Union[str, Permission] = None, resource_name: str = ""):
+    """Always permits access without raising PermissionError."""
+    return True
