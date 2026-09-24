@@ -356,7 +356,11 @@
         width: 300px !important;
         min-width: 300px !important;
         max-width: 300px !important;
-        padding: 16px 14px !important;
+        padding: 0 14px 20px 14px !important;
+      }
+      .sidebar-pinned-header {
+        margin: 0 -14px 0 -14px !important;
+        padding: 10px 14px !important;
       }
     }
     @media (max-width: 768px) {
@@ -367,11 +371,15 @@
         width: 280px !important;
         min-width: 280px !important;
         max-width: 280px !important;
-        padding: 14px 10px !important;
+        padding: 0 10px 18px 10px !important;
+      }
+      .sidebar-pinned-header {
+        margin: 0 -10px 0 -10px !important;
+        padding: 10px 10px !important;
       }
     }
 
-    /* Left Sidebar - Permanent Fixed Space Column (Never Collapses or Hides on Tap) */
+    /* Left Sidebar - Permanent Fixed Space Column with Pinned Top Header */
     .sidebar {
       position: sticky;
       left: 0;
@@ -384,10 +392,10 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-right: 1px solid var(--card-border);
-      padding: 20px 18px;
+      padding: 0 18px 24px 18px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       height: 100%;
       max-height: 100%;
       min-height: 0;
@@ -400,6 +408,58 @@
       transition: background 0.3s ease, border-color 0.3s ease;
       z-index: 100;
       transform: none !important;
+    }
+
+    /* Pinned Upper Sidebar Control Header (Stays Fixed to Top on Scroll) */
+    .sidebar-pinned-header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 200;
+      background: var(--sidebar-bg, #07080B);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      margin: 0 -18px 0 -18px;
+      padding: 12px 18px;
+      border-bottom: 1.5px solid rgba(212, 175, 55, 0.24);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    /* Upper Sidebar Action Controls (Undo & Redo) */
+    .sidebar-ctrl-btn {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      color: var(--champagne-gold, #D4AF37);
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.18s ease;
+      user-select: none;
+      flex-shrink: 0;
+      font-size: 0.74rem;
+      font-family: inherit;
+    }
+    .sidebar-ctrl-btn:hover:not(:disabled) {
+      background: rgba(212, 175, 55, 0.22);
+      border-color: var(--champagne-gold, #D4AF37);
+      color: #FFFFFF;
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+      transform: translateY(-1px);
+    }
+    .sidebar-ctrl-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      border-color: rgba(212, 175, 55, 0.15);
+      transform: none;
     }
     .sidebar::-webkit-scrollbar {
       width: 6px;
@@ -1413,10 +1473,30 @@
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
 
-      <!-- SECTION 1: DATA INGESTION -->
-      <div class="sidebar-section">
-        <div class="sidebar-title">
-          <span>📂 1. Data Ingestion</span>
+      <!-- PINNED UPPER SIDEBAR CONTROLS (UNDO, REDO & SIDEBAR HIDDEN TOGGLE) -->
+      <div class="sidebar-pinned-header" id="sidebarPinnedHeader">
+        <div class="sidebar-pinned-left" style="display:flex; align-items:center; gap:6px;">
+          <!-- Undo Logo & Button -->
+          <button id="sidebarUndoBtn" class="sidebar-ctrl-btn" onclick="undoCleaningStep()" title="Undo Last Transformation / Ingestion (Ctrl+Z)" aria-label="Undo" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <path d="M3 7v6h6"></path>
+              <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+            </svg>
+            <span style="font-size:0.73rem; font-weight:700; letter-spacing:0.02em;">Undo</span>
+          </button>
+
+          <!-- Redo Logo & Button -->
+          <button id="sidebarRedoBtn" class="sidebar-ctrl-btn" onclick="redoCleaningStep()" title="Redo Last Transformation / Ingestion (Ctrl+Y)" aria-label="Redo" disabled>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <path d="M21 7v6h-6"></path>
+              <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
+            </svg>
+            <span style="font-size:0.73rem; font-weight:700; letter-spacing:0.02em;">Redo</span>
+          </button>
+        </div>
+
+        <div class="sidebar-pinned-right" style="display:flex; align-items:center; gap:6px;">
+          <!-- Sidebar Hidden Button -->
           <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Sidebar Hidden (Click to Toggle Fullscreen Workspace)" aria-label="Sidebar Hidden">
             <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -1424,6 +1504,14 @@
               <path d="M14 9l-3 3 3 3"></path>
             </svg>
           </button>
+        </div>
+      </div>
+
+      <!-- SECTION 1: DATA INGESTION (PUSHED DOWN BELOW PINNED CONTROLS) -->
+      <div class="sidebar-section" id="sidebarDataIngestionSection" style="margin-top:14px;">
+        <div class="sidebar-title">
+          <span>📂 1. Data Ingestion</span>
+          <span class="badge badge-info" style="font-size:0.62rem; letter-spacing:0.04em;">Ingest</span>
         </div>
 
         <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
@@ -1433,8 +1521,6 @@
           <input type="file" id="csvInput" accept=".csv,.xlsx,.xls,.json,.tsv,.txt" style="display:none;" onchange="handleFileUpload(event)" />
         </div>
 
-        <button class="btn btn-outline" onclick="loadSampleChurn()">Telecom Customer Churn</button>
-        <button class="btn btn-outline" onclick="loadSampleHousing()">Real Estate Housing</button>
         <button class="btn btn-outline" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
       </div>
 
@@ -13092,8 +13178,17 @@ result = df.describe()
     function updateUndoRedoButtons() {
       const undoBtn = document.getElementById('cleanUndoBtn');
       const redoBtn = document.getElementById('cleanRedoBtn');
-      if (undoBtn) undoBtn.disabled = window.cleaningHistoryStack.length === 0;
-      if (redoBtn) redoBtn.disabled = window.cleaningRedoStack.length === 0;
+      const hasUndo = (window.cleaningHistoryStack || []).length > 0;
+      const hasRedo = (window.cleaningRedoStack || []).length > 0;
+
+      if (undoBtn) undoBtn.disabled = !hasUndo;
+      if (redoBtn) redoBtn.disabled = !hasRedo;
+
+      const sbUndoBtn = document.getElementById('sidebarUndoBtn');
+      const sbRedoBtn = document.getElementById('sidebarRedoBtn');
+      if (sbUndoBtn) sbUndoBtn.disabled = !hasUndo;
+      if (sbRedoBtn) sbRedoBtn.disabled = !hasRedo;
+
       const logBadge = document.getElementById('cleaningLogBadge');
       if (logBadge) logBadge.textContent = `${window.cleaningPipelineSteps.length} actions`;
     }
@@ -29090,8 +29185,11 @@ result = df.describe()
       if (typeof switchModule === 'function') switchModule(modId);
     }
 
-    // Ctrl+K Shortcut
+    // Global Keyboard Shortcuts (Ctrl+K: Search, Ctrl+Z: Undo, Ctrl+Y: Redo)
     window.addEventListener('keydown', function(e) {
+      const targetTag = (e.target.tagName || "").toLowerCase();
+      const isInput = targetTag === "input" || targetTag === "textarea" || e.target.isContentEditable;
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         const searchInp = document.getElementById('globalSearchBar');
@@ -29099,6 +29197,12 @@ result = df.describe()
           searchInp.focus();
           searchInp.select();
         }
+      } else if (!isInput && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (typeof undoCleaningStep === 'function') undoCleaningStep();
+      } else if (!isInput && (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        if (typeof redoCleaningStep === 'function') redoCleaningStep();
       }
     });
 
