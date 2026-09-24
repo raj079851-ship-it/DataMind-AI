@@ -1511,7 +1511,6 @@
       <div class="sidebar-section" id="sidebarDataIngestionSection" style="margin-top:14px;">
         <div class="sidebar-title">
           <span>📂 1. Data Ingestion</span>
-          <span class="badge badge-info" style="font-size:0.62rem; letter-spacing:0.04em;">Ingest</span>
         </div>
 
         <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
@@ -1527,15 +1526,13 @@
       <!-- SECTION 2: CATEGORIZED MODULE NAVIGATION -->
       <div class="sidebar-section">
         <div class="sidebar-title">
-          <span>🧭 Categorized Navigation</span>
-          <span class="badge badge-info" style="font-size:0.65rem;">7 Domains</span>
+          <span>🧭 Navigation</span>
         </div>
         <nav class="nav-list">
 
           <!-- 1. DATA PREPARATION & ENGINEERING -->
           <div class="nav-group-header">
             <span class="category-title">🛠️ Data Engineering</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">6 Modules</span>
           </div>
 
           <button class="nav-item active" id="navBtnOverview" onclick="switchModule('moduleOverview')">
@@ -1543,7 +1540,7 @@
               <span>📋</span>
               <span>Data Preview &amp; Schema</span>
             </span>
-            <span class="badge badge-info" id="navBadgeRows">0 Rows</span>
+            <span class="badge badge-info" id="navBadgeRows" style="display:none;">0 Rows</span>
           </button>
 
           <button class="nav-item" id="navBtnCleaning" onclick="switchModule('moduleCleaning')">
@@ -1551,7 +1548,6 @@
               <span>🧹</span>
               <span>1. Data Cleaning &amp; Audit</span>
             </span>
-            <span class="badge badge-warning" id="navBadgeCleaning">Audit</span>
           </button>
 
           <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
@@ -1559,7 +1555,6 @@
               <span>🔍</span>
               <span>2. Data Quality Audit</span>
             </span>
-            <span class="badge badge-warning">Health</span>
           </button>
 
           <button class="nav-item" id="navBtnProcessing" onclick="switchModule('moduleProcessing')">
@@ -1567,7 +1562,6 @@
               <span>🔄</span>
               <span>3. Data Processing &amp; Transform</span>
             </span>
-            <span class="badge badge-success" id="navBadgeProcessing">17+ Ops</span>
           </button>
 
           <button class="nav-item" id="navBtnFE" onclick="switchModule('moduleFE')">
@@ -1575,7 +1569,6 @@
               <span>⚙️</span>
               <span>4. Feature Engineering</span>
             </span>
-            <span class="badge badge-info">Transform</span>
           </button>
 
           <button class="nav-item" id="navBtnInsertCol" onclick="switchModule('moduleInsertCol')">
@@ -1583,13 +1576,12 @@
               <span>➕</span>
               <span>5. Insert New Column</span>
             </span>
-            <span class="badge badge-info" id="sidebarColCount">0 Cols</span>
+            <span class="badge badge-info" id="sidebarColCount" style="display:none;">0 Cols</span>
           </button>
 
           <!-- 2. ANALYTICS & BUSINESS INTELLIGENCE -->
           <div class="nav-group-header">
             <span class="category-title">📊 Analytics &amp; BI</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">8 Modules</span>
           </div>
 
           <button class="nav-item" id="navBtnEDA" onclick="switchModule('moduleEDA')">
@@ -1597,7 +1589,6 @@
               <span>📊</span>
               <span>6. Exploratory Analysis (EDA)</span>
             </span>
-            <span class="badge badge-success">Charts</span>
           </button>
 
           <button class="nav-item" id="navBtnDashboard" onclick="switchModule('moduleDashboard')">
@@ -1605,7 +1596,6 @@
               <span>📈</span>
               <span>7. Interactive BI Dashboard</span>
             </span>
-            <span class="badge badge-info">8 Charts</span>
           </button>
 
           <button class="nav-item" id="navBtnDashboardBuilder" onclick="switchModule('moduleDashboardBuilder')">
@@ -1613,7 +1603,6 @@
               <span>🎨</span>
               <span>8. Dashboard Builder</span>
             </span>
-            <span class="badge" style="background:#8b5cf6;color:#fff;font-weight:700;">Drag &amp; Drop</span>
           </button>
 
           <button class="nav-item" id="navBtnPowerBI" onclick="switchModule('modulePowerBI')">
@@ -1621,7 +1610,6 @@
               <span>📊</span>
               <span>9. Power BI Dashboard Analysis</span>
             </span>
-            <span class="badge" style="background:#f59e0b;color:#0f172a;font-weight:700;">Power BI</span>
           </button>
 
           <button class="nav-item" id="navBtnVisualization" onclick="switchModule('moduleVisualization')">
@@ -1629,7 +1617,6 @@
               <span>🤖</span>
               <span>10. AI Chart Recommender</span>
             </span>
-            <span class="badge badge-info">NL Query</span>
           </button>
 
           <button class="nav-item" id="navBtnInsights" onclick="switchModule('moduleInsights')">
@@ -1637,7 +1624,6 @@
               <span>💡</span>
               <span>11. Strategic Business Insights</span>
             </span>
-            <span class="badge badge-info">Insights</span>
           </button>
 
           <button class="nav-item" id="navBtnStats" onclick="switchModule('moduleStats')">
@@ -1645,7 +1631,6 @@
               <span>📐</span>
               <span>12. Statistical Analysis</span>
             </span>
-            <span class="badge badge-primary">Stats</span>
           </button>
 
           <button class="nav-item" id="navBtnAB" onclick="switchModule('moduleABTesting')">
@@ -1653,13 +1638,11 @@
               <span>🧪</span>
               <span>13. Experimentation &amp; A/B Testing</span>
             </span>
-            <span class="badge badge-primary">A/B</span>
           </button>
 
           <!-- 3. QUERY & DEVELOPMENT ENGINES -->
           <div class="nav-group-header">
             <span class="category-title">💻 Query &amp; Code Engines</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">3 Modules</span>
           </div>
 
           <button class="nav-item" id="navBtnConnectors" onclick="switchModule('moduleConnectors')">
@@ -1667,7 +1650,6 @@
               <span>🔌</span>
               <span>14. Database Connector</span>
             </span>
-            <span class="badge badge-primary" id="navBadgeConnectors">12 DBs</span>
           </button>
 
           <button class="nav-item" id="navBtnSql" onclick="switchModule('moduleSql')">
@@ -1675,7 +1657,6 @@
               <span>🗄️</span>
               <span>15. SQL &amp; Database Studio</span>
             </span>
-            <span class="badge badge-info">SQL</span>
           </button>
 
           <button class="nav-item" id="navBtnPython" onclick="switchModule('modulePython')">
@@ -1683,13 +1664,11 @@
               <span>🐍</span>
               <span>16. Python Analytics Sandbox</span>
             </span>
-            <span class="badge badge-success">Python</span>
           </button>
 
           <!-- 4. ARTIFICIAL INTELLIGENCE & MACHINE LEARNING -->
           <div class="nav-group-header">
             <span class="category-title">🤖 AI &amp; Machine Learning</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">7 Modules</span>
           </div>
 
           <button class="nav-item" id="navBtnML" onclick="switchModule('moduleML')">
@@ -1697,7 +1676,6 @@
               <span>🤖</span>
               <span>17. Machine Learning Models</span>
             </span>
-            <span class="badge badge-success">AutoML</span>
           </button>
 
           <button class="nav-item" id="navBtnPredictive" onclick="switchModule('modulePredictive')">
@@ -1705,7 +1683,6 @@
               <span>🎯</span>
               <span>18. Predictive Analytics</span>
             </span>
-            <span class="badge badge-primary">What-If</span>
           </button>
 
           <button class="nav-item" id="navBtnForecasting" onclick="switchModule('moduleForecasting')">
@@ -1713,7 +1690,6 @@
               <span>🔮</span>
               <span>19. Forecasting</span>
             </span>
-            <span class="badge badge-info">ARIMA</span>
           </button>
 
           <button class="nav-item" id="navBtnEvaluation" onclick="switchModule('moduleEvaluation')">
@@ -1721,7 +1697,6 @@
               <span>📏</span>
               <span>20. Model Evaluation</span>
             </span>
-            <span class="badge badge-warning">ROC/Resid</span>
           </button>
 
           <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
@@ -1729,7 +1704,6 @@
               <span>🏆</span>
               <span>21. Model Registry</span>
             </span>
-            <span class="badge badge-success">Leaderboard</span>
           </button>
 
           <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
@@ -1737,7 +1711,6 @@
               <span>🧠</span>
               <span>22. NLP &amp; Text Analytics</span>
             </span>
-            <span class="badge badge-info">Sentiment</span>
           </button>
 
           <button class="nav-item" id="navBtnAI" onclick="switchModule('moduleAI')">
@@ -1745,13 +1718,11 @@
               <span>✨</span>
               <span>23. AI Assistant</span>
             </span>
-            <span class="badge badge-info">Copilot</span>
           </button>
 
           <!-- 5. REPORTING & EXECUTIVE DELIVERABLES -->
           <div class="nav-group-header">
             <span class="category-title">📑 Reporting &amp; Deliverables</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">1 Module</span>
           </div>
 
           <button class="nav-item" id="navBtnReport" onclick="switchModule('moduleReport')">
@@ -1759,13 +1730,11 @@
               <span>📑</span>
               <span>24. Executive Report Studio</span>
             </span>
-            <span class="badge badge-primary">Report</span>
           </button>
 
           <!-- 6. ENTERPRISE GOVERNANCE & SECURITY -->
           <div class="nav-group-header">
             <span class="category-title">🛡️ Security &amp; Governance</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">1 Module</span>
           </div>
 
           <button class="nav-item" id="navBtnSecurity" onclick="switchModule('moduleSecurity')">
@@ -1773,13 +1742,11 @@
               <span>🛡️</span>
               <span>25. Security &amp; Governance</span>
             </span>
-            <span class="badge badge-primary">AES-256</span>
           </button>
 
           <!-- 7. PLATFORM SETTINGS & PREFERENCES -->
           <div class="nav-group-header">
             <span class="category-title">⚙️ System &amp; Settings</span>
-            <span class="badge badge-info" style="font-size:0.65rem;">1 Module</span>
           </div>
 
           <button class="nav-item" id="navBtnSettings" onclick="switchModule('moduleSettings')">
@@ -1787,7 +1754,6 @@
               <span>⚙️</span>
               <span>26. Platform Settings</span>
             </span>
-            <span class="badge" style="background:#6366f1;color:#fff;font-weight:700;">Config</span>
           </button>
 
         </nav>
@@ -1850,10 +1816,10 @@
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
                 <span class="badge badge-primary" style="font-size:0.75rem; font-weight:700; padding:3px 8px; border-radius:4px;">Overview</span>
-                <h4 style="color:var(--champagne-gold); margin:0; font-size:1.15rem; font-weight:700;">📋 Data Preview &amp; Schema — Active Dataset Preview &amp; Technology Directory</h4>
+                <h4 style="color:var(--champagne-gold); margin:0; font-size:1.15rem; font-weight:700;">📋 Data Preview &amp; Schema</h4>
               </div>
               <p style="font-size:0.84rem; color:var(--text-muted); margin:0;">
-                High-performance tabular exploration, schema validation, non-null audits, and technology-categorized domain partitioning.
+                Tabular exploration, schema validation, and column data type analysis.
               </p>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
@@ -1880,23 +1846,25 @@
               </select>
             </div>
           </div>
-          <div class="table-container" id="previewTableContainer">Loading preview...</div>
+          <div class="table-container" id="previewTableContainer">
+            <div style="text-align:center;padding:36px;color:var(--text-muted);font-size:0.85rem;">Upload a dataset to preview records.</div>
+          </div>
         </div>
 
         <!-- Categorized Columns by Data Technology & Role -->
         <div class="panel" style="margin-bottom:20px;" id="categorizedColumnsPanel">
           <div class="panel-header" style="flex-wrap:wrap;gap:10px;">
             <div style="display:flex;align-items:center;gap:8px;">
-              <span>🗂️ Categorized Columns by Data Technology</span>
-              <span class="badge badge-info" id="catColsSummaryBadge">0 Technology Domains</span>
+              <span>🗂️ Column Classification</span>
+              <span class="badge badge-info" id="catColsSummaryBadge">0 Categories</span>
             </div>
             <div style="font-size:0.75rem;color:var(--text-muted);">
-              Columns submerged into unified technological categories based on semantic structure
+              Columns categorized by data type and semantic role
             </div>
           </div>
           <div id="categorizedColumnsGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(300px, 1fr));gap:16px;">
             <div style="text-align:center;padding:26px;color:var(--text-muted);font-size:0.85rem;grid-column:1/-1;">
-              Upload or load a dataset to categorize and submerge all columns by similar technology.
+              Upload a dataset to view column classifications.
             </div>
           </div>
         </div>
@@ -1910,7 +1878,7 @@
             </div>
             <!-- Interactive Technology Filter Pills -->
             <div id="schemaTechFilterBar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-              <span style="font-size:0.74rem;color:var(--text-muted);margin-right:2px;">Filter Technology:</span>
+              <span style="font-size:0.74rem;color:var(--text-muted);margin-right:2px;">Filter by Type:</span>
               <button class="btn btn-outline tech-filter-btn active-tech-filter" id="techFilterAll" style="padding:3px 10px;font-size:0.75rem;border-radius:14px;background:#4f46e5;color:white;border-color:#6366f1;" onclick="filterSchemaByTechnology('all')">All Columns</button>
               <button class="btn btn-outline tech-filter-btn" id="techFilterNumeric" style="padding:3px 10px;font-size:0.75rem;border-radius:14px;" onclick="filterSchemaByTechnology('numeric')">🔢 Numeric</button>
               <button class="btn btn-outline tech-filter-btn" id="techFilterCategorical" style="padding:3px 10px;font-size:0.75rem;border-radius:14px;" onclick="filterSchemaByTechnology('categorical')">🏷️ Categorical</button>
@@ -1919,7 +1887,9 @@
               <button class="btn btn-outline tech-filter-btn" id="techFilterText" style="padding:3px 10px;font-size:0.75rem;border-radius:14px;" onclick="filterSchemaByTechnology('text')">📝 Text</button>
             </div>
           </div>
-          <div class="table-container" id="schemaTableContainer">Loading schema...</div>
+          <div class="table-container" id="schemaTableContainer">
+            <div style="text-align:center;padding:36px;color:var(--text-muted);font-size:0.85rem;">Upload a dataset to view schema.</div>
+          </div>
         </div>
       </div>
 
@@ -2254,7 +2224,9 @@
               <button class="btn btn-outline" style="font-size:0.75rem; padding:3px 12px;" onclick="switchModule('moduleOverview')">Full Schema View ➔</button>
             </div>
           </div>
-          <div class="table-container" id="cleaningPreviewTableContainer">Loading preview...</div>
+          <div class="table-container" id="cleaningPreviewTableContainer">
+            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Upload a dataset to preview cleaned records.</div>
+          </div>
         </div>
 
       </div>
@@ -2965,7 +2937,9 @@
             <span>🏆 Segment Performance Leaderboard</span>
             <button class="btn btn-outline" style="width:auto;padding:4px 12px;font-size:0.78rem;" onclick="renderDashboard()">🔄 Refresh</button>
           </div>
-          <div class="table-container" id="dashLeaderboardContainer">Loading leaderboard...</div>
+          <div class="table-container" id="dashLeaderboardContainer">
+            <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Upload a dataset to generate segment leaderboard.</div>
+          </div>
         </div>
 
       </div>
@@ -4384,7 +4358,7 @@ result = df.describe()
                   <span>Pearson Correlation Coefficient Matrix</span>
                 </div>
                 <div class="table-container" id="statsCorrMatrixContainer" style="max-height:380px;">
-                  Loading correlation matrix...
+                  <div style="text-align:center;padding:24px;color:var(--text-muted);font-size:0.85rem;">Upload a dataset with numeric columns to compute correlation matrix.</div>
                 </div>
               </div>
 
@@ -4393,14 +4367,14 @@ result = df.describe()
                   <span>Multicollinearity Diagnostics (VIF)</span>
                 </div>
                 <div class="table-container" id="statsVifContainer" style="max-height:180px; margin-bottom:14px;">
-                  Loading VIF audit...
+                  <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.82rem;">Upload a dataset to compute VIF diagnostics.</div>
                 </div>
 
                 <div style="font-size:0.86rem; font-weight:700; color:#cbd5e1; margin-bottom:8px;">
                   <span>Top Statistically Significant Feature Pairs</span>
                 </div>
                 <div class="table-container" id="statsTopPairsContainer" style="max-height:180px; margin-bottom:14px;">
-                  Loading ranked pairs...
+                  <div style="text-align:center;padding:20px;color:var(--text-muted);font-size:0.82rem;">Upload a dataset to evaluate feature pairs.</div>
                 </div>
               </div>
             </div>
@@ -12796,12 +12770,6 @@ result = df.describe()
                 <button class="btn btn-primary" style="width:auto;padding:8px 22px;font-size:0.84rem;" onclick="document.getElementById('csvInput').click()">
                   📁 Upload Your CSV Dataset
                 </button>
-                <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.84rem;" onclick="loadSampleChurn()">
-                  Load Telecom Churn Demo
-                </button>
-                <button class="btn btn-outline" style="width:auto;padding:8px 16px;font-size:0.84rem;" onclick="loadSampleHousing()">
-                  Load Real Estate Demo
-                </button>
               </div>
             </div>
           `;
@@ -12946,14 +12914,14 @@ result = df.describe()
       if (!columns.length || !currentDataset.length) {
         grid.innerHTML = `
           <div style="text-align:center;padding:26px;color:var(--text-muted);font-size:0.85rem;grid-column:1/-1;">
-            Upload or load a dataset to categorize and submerge all columns by similar technology.
+            Upload a dataset to view column classifications.
           </div>
         `;
-        if (badge) badge.textContent = "0 Technology Domains";
+        if (badge) badge.textContent = "0 Categories";
         return;
       }
 
-      // Submerge columns by technology category
+      // Group columns by category
       const categoriesMap = {
         numeric: {
           key: 'numeric',
@@ -13012,7 +12980,7 @@ result = df.describe()
       });
 
       const activeCategories = Object.values(categoriesMap).filter(cat => cat.columns.length > 0);
-      if (badge) badge.textContent = `${activeCategories.length} Active Technology Domains (${columns.length} Total Columns)`;
+      if (badge) badge.textContent = `${activeCategories.length} Categories (${columns.length} Columns)`;
 
       const stats = getDatasetColumnStats();
       let html = '';
