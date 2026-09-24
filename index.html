@@ -1148,11 +1148,11 @@
       </div>
 
       <!-- Circular Enterprise Admin Avatar -->
-      <div id="topUserContainer" style="width:38px; height:38px; min-width:38px; border-radius:50%; background:linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(16,185,129,0.2) 100%); border:1.5px solid rgba(99,102,241,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; position:relative;" onclick="openAuthModal()" title="Admin User (raj079851@gmail.com) • Role: Admin • Click to manage auth & permissions">
-        <span style="font-size:1.2rem;" id="topUserIcon">👑</span>
-        <span style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:#10b981; border:2px solid #0f172a; border-radius:50%;" title="Online / Active"></span>
-        <span id="topUserName" style="display:none;">Raj (Admin)</span>
-        <span id="topUserRoleBadge" style="display:none;">Role: Admin • PBKDF2</span>
+      <div id="topUserContainer" style="width:38px; height:38px; min-width:38px; border-radius:50%; background:linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(16,185,129,0.2) 100%); border:1.5px solid rgba(99,102,241,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all 0.2s ease; position:relative;" onclick="openAuthModal()" title="User Account • Click to Sign In">
+        <span style="font-size:1.2rem;" id="topUserIcon">👤</span>
+        <span id="topUserStatusDot" style="position:absolute; bottom:0; right:0; width:10px; height:10px; background:#94a3b8; border:2px solid #0f172a; border-radius:50%;" title="Not Signed In"></span>
+        <span id="topUserName" style="display:none;">Sign In</span>
+        <span id="topUserRoleBadge" style="display:none;">Not Authenticated</span>
       </div>
 
 
@@ -1184,6 +1184,22 @@
           <a href="javascript:void(0)" onclick="promptConfigureBackendUrl()" style="color:#38bdf8; text-decoration:none; font-weight:700; font-size:0.72rem;">⚙️ Set Backend URL</a>
         </div>
 
+        <!-- Active Session Card (shown when user is logged in) -->
+        <div id="authActiveSessionCard" style="display:none; margin-bottom:16px; padding:12px 14px; border-radius:10px; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.3);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span id="activeSessionIcon" style="font-size:1.5rem;">👤</span>
+              <div>
+                <div id="activeSessionName" style="font-weight:700; font-size:0.9rem; color:#f8fafc;">User Name</div>
+                <div id="activeSessionRole" style="font-size:0.74rem; color:#94a3b8;">Role: Analyst</div>
+              </div>
+            </div>
+            <button class="btn btn-outline" style="padding:6px 12px; font-size:0.75rem; border-color:rgba(239,68,68,0.4); color:#fca5a5;" onclick="submitLogoutAuth()">
+              🚪 Sign Out
+            </button>
+          </div>
+        </div>
+
         <!-- Two Primary Options: 1 Admin Login, 2 User Login -->
         <div id="authPrimaryTabs" style="display:flex; gap:8px; margin-bottom:18px; background:rgba(15,23,42,0.6); padding:4px; border-radius:10px; border:1px solid rgba(255,255,255,0.08);">
           <button id="authMainTabAdmin" type="button" class="btn btn-primary" style="flex:1; padding:8px 12px; font-size:0.82rem; font-weight:700; border-radius:8px;" onclick="switchAuthMainMode('admin')">
@@ -1198,12 +1214,12 @@
         <div id="authSectionAdmin">
           <div style="margin-bottom:14px;">
             <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Email or Username:</label>
-            <input type="text" id="authUsernameInput" value="raj079851@gmail.com" placeholder="raj079851@gmail.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            <input type="text" id="authUsernameInput" value="" placeholder="Enter admin email or username" autocomplete="username" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
           </div>
 
           <div style="margin-bottom:8px;">
             <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Admin Password:</label>
-            <input type="password" id="authPasswordInput" value="Admin@123" placeholder="••••••••" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            <input type="password" id="authPasswordInput" value="" placeholder="••••••••" autocomplete="current-password" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
           </div>
 
           <div style="display:flex; justify-content:flex-end; margin-bottom:14px;">
@@ -1309,7 +1325,7 @@
 
           <div style="margin-bottom:14px;">
             <label style="display:block; font-size:0.78rem; color:var(--text-muted); margin-bottom:5px; font-weight:600;">Registered Email Address:</label>
-            <input type="email" id="recoveryEmailInput" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+            <input type="email" id="recoveryEmailInput" placeholder="e.g. name@example.com" style="width:100%; padding:10px 12px; font-size:0.88rem; border-radius:8px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
           </div>
 
           <div id="recoveryAlertBanner" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
@@ -1353,14 +1369,14 @@
             <div style="font-weight:800; font-size:1.05rem; color:#f8fafc;">Enter Email Verification OTP</div>
             <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">
               A 6-digit verification code has been dispatched to:
-              <br><strong id="otpTargetEmailBadge" style="color:var(--champagne-gold); font-size:0.85rem;">raj079851@gmail.com</strong>
+              <br><strong id="otpTargetEmailBadge" style="color:var(--champagne-gold); font-size:0.85rem;">your.email@example.com</strong>
             </div>
           </div>
 
           <!-- Live Delivery Status Card -->
           <div id="otpLiveDeliveryCard" style="margin-bottom:14px; padding:10px 14px; background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.3); border-radius:8px; font-size:0.78rem; text-align:left;">
             <div id="otpLiveEmailStatus" style="line-height:1.45;">
-              <span style="color:#10b981;">📨 <strong>Email Dispatched:</strong> Check your inbox at <span id="otpLiveTargetEmail" style="color:var(--champagne-gold); font-weight:700;">raj079851@gmail.com</span> for your code.</span>
+              <span style="color:#10b981;">📨 <strong>Email Dispatched:</strong> Check your inbox at <span id="otpLiveTargetEmail" style="color:var(--champagne-gold); font-weight:700;">your email</span> for your code.</span>
             </div>
             <div style="margin-top:6px; font-size:0.71rem; color:var(--text-muted); border-top:1px dashed rgba(255,255,255,0.08); padding-top:6px;">
               💡 Please check your <strong>Inbox</strong>, <strong>Spam</strong>, or <strong>Promotions</strong> folder.
@@ -1430,7 +1446,7 @@
 
         <div style="margin-bottom:12px;">
           <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Email Account (Username):</label>
-          <input type="email" id="cfgSmtpUser" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          <input type="email" id="cfgSmtpUser" placeholder="e.g. alerts@company.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
         </div>
 
         <div style="margin-bottom:12px;">
@@ -1443,7 +1459,7 @@
 
         <div style="margin-bottom:14px;">
           <label style="display:block; font-size:0.75rem; color:var(--text-muted); margin-bottom:4px; font-weight:600;">Sender Display Email:</label>
-          <input type="email" id="cfgSmtpSender" placeholder="e.g. raj079851@gmail.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
+          <input type="email" id="cfgSmtpSender" placeholder="e.g. alerts@company.com" style="width:100%; padding:9px 12px; font-size:0.84rem; border-radius:6px; background:var(--card-bg); border:1px solid var(--card-border); color:var(--text-primary);" />
         </div>
 
         <div id="smtpTestAlert" style="display:none; padding:8px 12px; border-radius:6px; font-size:0.78rem; margin-bottom:14px;"></div>
@@ -8882,9 +8898,9 @@ result = df.describe()
           const defaults = [
             {
               id: "usr_admin_default",
-              email: "raj079851@gmail.com",
-              username: "raj079851@gmail.com",
-              full_name: "Super Administrator (Raj)",
+              email: "admin@datamind.ai",
+              username: "admin",
+              full_name: "System Administrator",
               role: "Admin",
               password: "Admin@123"
             }
@@ -8949,13 +8965,7 @@ result = df.describe()
       }
     };
 
-    let currentAuthUser = {
-      username: "raj079851@gmail.com",
-      role: "Admin",
-      email: "raj079851@gmail.com",
-      full_name: "Raj (Enterprise Admin)",
-      token: "dmk_session_admin_raj"
-    };
+    let currentAuthUser = null;
 
     // SMTP Mode Configuration State
     let smtpConfig = {
@@ -8971,8 +8981,7 @@ result = df.describe()
     let otpCountdownInterval = null;
 
     let enterpriseUsersList = [
-      { username: "raj079851@gmail.com", full_name: "Raj (Enterprise Admin)", email: "raj079851@gmail.com", role: "Admin", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" },
-      { username: "admin", full_name: "Raj (Admin)", email: "raj079851@gmail.com", role: "Admin", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" },
+      { username: "admin", full_name: "System Administrator", email: "admin@datamind.ai", role: "Admin", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" },
       { username: "analyst", full_name: "Senior Data Scientist", email: "analyst@datamind.ai", role: "Analyst", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" },
       { username: "engineer", full_name: "Lead Pipeline Architect", email: "engineer@datamind.ai", role: "Data Engineer", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" },
       { username: "viewer", full_name: "Executive Stakeholder", email: "viewer@datamind.ai", role: "Viewer", is_active: true, hash_scheme: "PBKDF2-HMAC-SHA256 (200,000 rounds)" }
@@ -9009,6 +9018,22 @@ result = df.describe()
     function openAuthModal() {
       const modal = document.getElementById("authModal");
       if (modal) modal.style.display = "flex";
+
+      const activeCard = document.getElementById("authActiveSessionCard");
+      const activeIcon = document.getElementById("activeSessionIcon");
+      const activeName = document.getElementById("activeSessionName");
+      const activeRole = document.getElementById("activeSessionRole");
+
+      if (currentAuthUser && (currentAuthUser.username || currentAuthUser.email)) {
+        if (activeCard) activeCard.style.display = "block";
+        const roleIcons = { Admin: "👑", Analyst: "📊", "Data Engineer": "⚙️", Viewer: "👁️" };
+        if (activeIcon) activeIcon.textContent = roleIcons[currentAuthUser.role] || "👤";
+        if (activeName) activeName.textContent = currentAuthUser.full_name || currentAuthUser.username;
+        if (activeRole) activeRole.textContent = `${currentAuthUser.email || currentAuthUser.username} • Role: ${currentAuthUser.role} • Active Session`;
+      } else {
+        if (activeCard) activeCard.style.display = "none";
+      }
+
       switchAuthMainMode("admin");
     }
 
@@ -10470,7 +10495,7 @@ result = df.describe()
         const testResp = await fetch(`${API_BASE_URL}/api/auth/test-smtp`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: user || sender || "raj079851@gmail.com" })
+          body: JSON.stringify({ email: user || sender || (currentAuthUser?.email || "admin@datamind.ai") })
         });
         const testData = await testResp.json();
 
@@ -10564,17 +10589,36 @@ result = df.describe()
     }
 
     function submitLogoutAuth() {
-      logAuditEvent("AUTH_LOGOUT", currentAuthUser.username, currentAuthUser.role, "SUCCESS", "User session terminated");
-      currentAuthUser = {
-        username: "guest",
-        role: "Viewer",
-        email: "guest@datamind.ai",
-        full_name: "Guest User",
-        token: null
-      };
+      if (currentAuthUser) {
+        logAuditEvent("AUTH_LOGOUT", currentAuthUser.username || "user", currentAuthUser.role || "Viewer", "SUCCESS", "User session terminated");
+      }
+      localStorage.removeItem("datamind_token");
+      localStorage.removeItem("datamind_user");
+      currentAuthUser = null;
       applyUserSessionUI();
       closeAuthModal();
       notifyTaskSuccess("Session Closed", "Signed out successfully.");
+    }
+
+    function restoreUserSession() {
+      try {
+        const storedToken = localStorage.getItem("datamind_token");
+        const storedUser = localStorage.getItem("datamind_user");
+        if (storedToken && storedUser) {
+          const parsed = JSON.parse(storedUser);
+          if (parsed && (parsed.username || parsed.email)) {
+            currentAuthUser = parsed;
+            currentAuthUser.token = storedToken;
+          } else {
+            currentAuthUser = null;
+          }
+        } else {
+          currentAuthUser = null;
+        }
+      } catch (e) {
+        currentAuthUser = null;
+      }
+      applyUserSessionUI();
     }
 
     function simulateOAuthLogin(provider) {
@@ -10586,6 +10630,8 @@ result = df.describe()
         full_name: `${provider} SSO User`,
         token: `dmk_oauth_${provider.toLowerCase()}_token`
       };
+      localStorage.setItem("datamind_token", currentAuthUser.token);
+      localStorage.setItem("datamind_user", JSON.stringify(currentAuthUser));
       applyUserSessionUI();
       closeAuthModal();
       notifyTaskSuccess("OAuth 2.0 Authenticated", `Provisioned verified session via ${provider} SSO.`);
@@ -10594,18 +10640,38 @@ result = df.describe()
     }
 
     function applyUserSessionUI() {
+      const topContainer = document.getElementById("topUserContainer");
       const iconEl = document.getElementById("topUserIcon");
       const nameEl = document.getElementById("topUserName");
       const badgeEl = document.getElementById("topUserRoleBadge");
       const secBadgeEl = document.getElementById("secUserBadge");
+      const statusDot = document.getElementById("topUserStatusDot");
 
       const roleIcons = { Admin: "👑", Analyst: "📊", "Data Engineer": "⚙️", Viewer: "👁️" };
-      const icon = roleIcons[currentAuthUser.role] || "👤";
 
+      if (!currentAuthUser) {
+        if (iconEl) iconEl.textContent = "👤";
+        if (topContainer) topContainer.title = "User Account • Click to Sign In";
+        if (nameEl) nameEl.textContent = "Sign In";
+        if (badgeEl) badgeEl.textContent = "Not Authenticated";
+        if (secBadgeEl) secBadgeEl.textContent = "Current User: Unauthenticated (Guest)";
+        if (statusDot) {
+          statusDot.style.background = "#94a3b8";
+          statusDot.title = "Not Signed In";
+        }
+        return;
+      }
+
+      const icon = roleIcons[currentAuthUser.role] || "👤";
       if (iconEl) iconEl.textContent = icon;
-      if (nameEl) nameEl.textContent = `${currentAuthUser.full_name}`;
+      if (topContainer) topContainer.title = `Signed in as ${currentAuthUser.full_name || currentAuthUser.username} (${currentAuthUser.role}) • Click to manage account`;
+      if (nameEl) nameEl.textContent = `${currentAuthUser.full_name || currentAuthUser.username}`;
       if (badgeEl) badgeEl.textContent = `Role: ${currentAuthUser.role} • PBKDF2`;
-      if (secBadgeEl) secBadgeEl.textContent = `Current User: ${currentAuthUser.username} (${currentAuthUser.role})`;
+      if (secBadgeEl) secBadgeEl.textContent = `Current User: ${currentAuthUser.username || currentAuthUser.email} (${currentAuthUser.role})`;
+      if (statusDot) {
+        statusDot.style.background = "#10b981";
+        statusDot.title = "Active Session";
+      }
     }
 
     function logAuditEvent(eventType, user, role, status, details) {
@@ -11700,6 +11766,7 @@ result = df.describe()
     }
 
     function init() {
+      try { restoreUserSession(); } catch(e) { console.warn("Restore session init:", e); }
       try { initAuthDatabase(); } catch(e) {}
       initBrightnessTheme();
       initSpeechSynthesis();

@@ -555,24 +555,24 @@ def get_current_user(authorization: Optional[str] = Header(None)):
     all_perms = [p.value for p in Permission]
     if not raw_token:
         return {
-            "user": "Super Administrator",
-            "role": "Admin",
-            "authenticated": True,
-            "permissions": all_perms
+            "user": "Guest",
+            "role": "Viewer",
+            "authenticated": False,
+            "permissions": []
         }
 
     valid, session_data = default_session_manager.validate_session(raw_token)
     if not valid or not session_data:
         return {
-            "user": "Super Administrator",
-            "role": "Admin",
-            "authenticated": True,
-            "permissions": all_perms
+            "user": "Guest",
+            "role": "Viewer",
+            "authenticated": False,
+            "permissions": []
         }
 
-    role = session_data.get("role", "Admin")
+    role = session_data.get("role", "Viewer")
     return {
-        "user": session_data.get("username", "Super Administrator"),
+        "user": session_data.get("username", "Authenticated User"),
         "role": role,
         "tenant_id": session_data.get("tenant_id", "default"),
         "authenticated": True,
