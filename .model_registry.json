@@ -1427,5 +1427,53 @@
     "status": "Production",
     "author": "DataMind AutoML",
     "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
+  },
+  "mod_1790360098_gradient_b": {
+    "id": "mod_1790360098_gradient_b",
+    "name": "AutoML Champion: Gradient Boosting Regressor",
+    "version": "1.0.0",
+    "dataset": "Active Dataset",
+    "target": "Sales",
+    "features": [
+      "Postal_Code",
+      "Order_ID_freq_enc",
+      "Order_Date_freq_enc",
+      "Ship_Date_freq_enc",
+      "Ship_Mode_Same Day",
+      "Ship_Mode_Second Class",
+      "Ship_Mode_Standard Class",
+      "Customer_ID_freq_enc",
+      "Customer_Name_freq_enc",
+      "Segment_Corporate",
+      "Segment_Home Office",
+      "City_freq_enc",
+      "State_freq_enc",
+      "Region_East",
+      "Region_South",
+      "Region_West",
+      "Product_ID_freq_enc",
+      "Category_Office Supplies",
+      "Category_Technology",
+      "Sub_Category_freq_enc",
+      "Product_Name_freq_enc",
+      "Postal_Code_div_Order_ID_freq_enc"
+    ],
+    "algorithm": "Gradient Boosting Regressor",
+    "hyperparameters": {
+      "max_iter": 80,
+      "learning_rate": 0.1
+    },
+    "metrics": {
+      "Training Time (s)": 0.598,
+      "MAE": 254.1983,
+      "MSE": 178363.6385,
+      "RMSE": 422.3312,
+      "R\u00b2": 0.3029,
+      "MAPE": 1037.07
+    },
+    "training_date": "2026-09-25 23:44:58",
+    "status": "Production",
+    "author": "DataMind AutoML",
+    "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
   }
 }
