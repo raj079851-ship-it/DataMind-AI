@@ -16,8 +16,37 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.3.2/alasql.min.js"></script>
+  <!-- Standardized Production Typography (Inter + JetBrains Mono) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
+      /* Standardized Typography System */
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", Consolas, Menlo, Monaco, monospace;
+      --font: var(--font-sans);
+
+      /* Standard Typography Scale */
+      --text-2xs: 0.6875rem; /* 11px */
+      --text-xs: 0.75rem;    /* 12px */
+      --text-sm: 0.8125rem;  /* 13px */
+      --text-base: 0.875rem; /* 14px */
+      --text-md: 0.9375rem;  /* 15px */
+      --text-lg: 1.125rem;   /* 18px */
+      --text-xl: 1.25rem;    /* 20px */
+      --text-2xl: 1.5rem;    /* 24px */
+
+      /* Standard Font Weights */
+      --font-regular: 400;
+      --font-medium: 500;
+      --font-semibold: 600;
+      --font-bold: 700;
+
+      /* High-Performance Hardware-Accelerated Transitions */
+      --transition-fast: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
+      --transition-base: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+
       /* Luxury Rolls-Royce Inspired Core Palette */
       --obsidian-black: #07080B;
       --velvet-black: #020306;
@@ -30,17 +59,17 @@
       --text-secondary: #A5A9B5;
       --border-gold-subtle: rgba(212, 175, 55, 0.18);
       --border-gold-hover: rgba(212, 175, 55, 0.45);
-      --glass-bg: rgba(16, 18, 26, 0.75);
-      --glass-blur: blur(20px);
+      --glass-bg: rgba(16, 18, 26, 0.90);
+      --glass-blur: none;
 
       /* Semantic Theme Variables: Daylight Studio Mode (Default) */
       --bg: #07080B;
       --bg-ambient: radial-gradient(circle at 50% 28%, #151928 0%, #07080B 65%, #020306 100%);
-      --card-bg: rgba(16, 18, 26, 0.75);
+      --card-bg: rgba(16, 18, 26, 0.94);
       --card-border: rgba(212, 175, 55, 0.18);
       --card-hover-border: rgba(212, 175, 55, 0.45);
-      --sidebar-bg: rgba(9, 11, 17, 0.94);
-      --header-bg: rgba(11, 14, 22, 0.90);
+      --sidebar-bg: #090b11;
+      --header-bg: #0b0e16;
       --header-border: rgba(212, 175, 55, 0.20);
       --primary: #D4AF37;
       --primary-hover: #E5BE48;
@@ -55,7 +84,6 @@
       --table-border: rgba(212, 175, 55, 0.15);
       --input-bg: rgba(15, 18, 28, 0.85);
       --input-border: rgba(212, 175, 55, 0.22);
-      --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     /* =========================================================================
@@ -98,22 +126,31 @@
       background-repeat: no-repeat;
       background-size: cover;
       color: var(--text);
-      font-family: var(--font);
+      font-family: var(--font-sans);
+      font-size: var(--text-base);
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
       height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: background-color 0.3s ease, color 0.3s ease;
+      transition: background-color 0.16s ease, color 0.16s ease;
+    }
+
+    /* Standard Monospace Elements (Tabular Figures) */
+    code, pre, .code-font, .schema-type, .sql-keyword, .table-mono, input.mono, .stat-value {
+      font-family: var(--font-mono) !important;
+      font-variant-numeric: tabular-nums;
     }
 
     /* Top Header */
     .header {
       background: var(--header-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       padding: 10px 24px;
       border-bottom: 1px solid var(--header-border);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -125,7 +162,7 @@
       flex-shrink: 0;
       width: 100%;
       box-sizing: border-box;
-      transition: background 0.3s ease, border-color 0.3s ease;
+      transition: background-color 0.16s ease, border-color 0.16s ease;
     }
     .brand {
       display: flex;
@@ -389,8 +426,6 @@
       max-width: 340px;
       flex-shrink: 0;
       background: var(--sidebar-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border-right: 1px solid var(--card-border);
       padding: 0 18px 24px 18px;
       display: flex;
@@ -405,7 +440,7 @@
       scrollbar-width: thin;
       scrollbar-gutter: stable;
       scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
-      transition: background 0.3s ease, border-color 0.3s ease;
+      transition: background-color 0.16s ease, border-color 0.16s ease;
       z-index: 100;
       transform: none !important;
     }
@@ -418,8 +453,6 @@
       right: 0;
       z-index: 200;
       background: var(--sidebar-bg, #07080B);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
       margin: 0 -18px 0 -18px;
       padding: 12px 18px;
       border-bottom: 1.5px solid rgba(212, 175, 55, 0.24);
@@ -427,7 +460,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
     }
 
     /* Upper Sidebar Action Controls (Undo & Redo) */
@@ -572,9 +605,7 @@
 
     /* Column Insert Form in Left Sidebar */
     .insert-col-box {
-      background: rgba(14, 18, 28, 0.75);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      background: rgba(14, 18, 28, 0.95);
       border: 1px solid var(--card-border);
       border-radius: 10px;
       padding: 14px;
@@ -593,18 +624,16 @@
       padding: 22px 14px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-      background: rgba(14, 17, 26, 0.65);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+      background: rgba(14, 17, 26, 0.92);
     }
     .drop-zone:hover {
       border-color: var(--champagne-gold);
       background: rgba(212, 175, 55, 0.06);
-      box-shadow: 0 0 25px rgba(212, 175, 55, 0.15), inset 0 0 15px rgba(212, 175, 55, 0.04);
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.12);
     }
 
-    /* Buttons & Inputs */
+    /* Standard Production Buttons & Inputs */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -612,23 +641,27 @@
       gap: 8px;
       width: 100%;
       padding: 9px 15px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      font-family: var(--font-sans);
       border-radius: 8px;
       cursor: pointer;
       border: none;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
       letter-spacing: 0.01em;
+    }
+    .btn:active {
+      transform: scale(0.98);
     }
     .btn-primary {
       background: linear-gradient(135deg, #D4AF37 0%, #C5A059 100%);
       color: #07080B;
-      font-weight: 700;
+      font-weight: var(--font-bold);
       box-shadow: 0 4px 14px rgba(212, 175, 55, 0.28);
     }
     .btn-primary:hover {
       background: linear-gradient(135deg, #E5BE48 0%, #D4AF37 100%);
-      box-shadow: 0 6px 18px rgba(212, 175, 55, 0.40);
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
       transform: translateY(-1px);
     }
     .btn-outline {
@@ -646,22 +679,18 @@
       color: #FFFFFF;
     }
     .btn-success:hover {
-      filter: brightness(1.1);
+      filter: brightness(1.08);
       transform: translateY(-1px);
     }
 
-    /* Single-Time Move UP on Click for all interactive keys & buttons */
-    @keyframes btnSingleMoveUp {
-      0% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
-      100% { transform: translateY(0); }
-    }
-    .btn-clicked-animation {
-      animation: btnSingleMoveUp 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) !important;
-      position: relative;
-    }
-    span.btn-clicked-animation, a.btn-clicked-animation, .badge.btn-clicked-animation {
-      display: inline-block !important;
+    /* Accessibility: Respect Reduced Motion Preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
     }
 
     /* Main Workspace Area */
@@ -705,28 +734,29 @@
     }
     .metric-card {
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
     .metric-card:hover {
       border-color: var(--card-hover-border);
-      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45), 0 0 16px rgba(212, 175, 55, 0.12);
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35), 0 0 16px rgba(212, 175, 55, 0.10);
     }
     .metric-title {
-      font-size: 0.72rem;
+      font-size: var(--text-xs);
       text-transform: uppercase;
       letter-spacing: 0.08em;
       color: var(--text-muted);
-      font-weight: 600;
+      font-weight: var(--font-semibold);
+      font-family: var(--font-sans);
     }
     .metric-val {
-      font-size: 1.65rem;
-      font-weight: 700;
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      font-family: var(--font-mono);
+      font-variant-numeric: tabular-nums;
       margin-top: 4px;
       color: var(--text);
       letter-spacing: -0.02em;
@@ -735,21 +765,20 @@
     /* Panels & Tables */
     .panel {
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
       border: 1px solid var(--card-border);
       border-radius: 12px;
       padding: 22px;
       margin-bottom: 22px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
     }
     .panel:hover {
       border-color: var(--card-hover-border);
     }
     .panel-header {
-      font-size: 1.12rem;
-      font-weight: 700;
+      font-size: var(--text-lg);
+      font-weight: var(--font-bold);
+      font-family: var(--font-sans);
       margin-bottom: 16px;
       display: flex;
       justify-content: space-between;
@@ -1058,15 +1087,13 @@
       border: 1px solid rgba(212, 175, 55, 0.22) !important;
     }
     #floatingAiDrawer {
-      background: rgba(14, 17, 26, 0.96) !important;
+      background: #0e111a !important;
       border: 1px solid rgba(212, 175, 55, 0.28) !important;
       color: #F5F5F2 !important;
-      box-shadow: 0 20px 48px rgba(0, 0, 0, 0.65), 0 0 24px rgba(212, 175, 55, 0.14) !important;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 20px rgba(212, 175, 55, 0.12) !important;
     }
     #floatingDrawerHeader {
-      background: rgba(18, 22, 34, 0.98) !important;
+      background: #121622 !important;
       border-bottom: 1px solid rgba(212, 175, 55, 0.20) !important;
     }
     #floatingAiChatHistory {
@@ -1079,8 +1106,8 @@
       position: fixed;
       top: 0; left: 0; width: 100vw; height: 100vh;
       background: rgba(7, 8, 11, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
       z-index: 9999999;
       align-items: center;
       justify-content: center;
@@ -8789,8 +8816,18 @@ result = df.describe()
     let activeModuleId = 'moduleOverview';
 
     // -----------------------------------------------------------------
-    // ENTERPRISE BACKEND, AUTHENTICATION & SECURITY STATE
+    // RENDER LIFECYCLE & DIRTY-CHECKING VERSION CONTROL (ELIMINATE UNNECESSARY RE-RENDERS)
     // -----------------------------------------------------------------
+    let datasetRenderVersion = 1;
+    const moduleRenderedVersions = {};
+
+    function invalidateModuleRenders() {
+      datasetRenderVersion++;
+      if (window.intentPrefetchCache && typeof window.intentPrefetchCache.clear === 'function') {
+        window.intentPrefetchCache.clear();
+      }
+    }
+    window.invalidateModuleRenders = invalidateModuleRenders;
     const isGitHubPages = window.location.hostname.endsWith("github.io");
 
     function getEffectiveApiBaseUrl() {
@@ -11795,6 +11832,101 @@ result = df.describe()
       return validCount > 0 && (numCount / validCount) >= 0.65;
     }
 
+    // =========================================================================
+    // 2. USER INTENT PREFETCH & SPECULATIVE BACKGROUND PRE-COMPUTATION
+    // =========================================================================
+    window.intentPrefetchCache = new Map();
+
+    function prefetchEDAIntent() {
+      if (!currentDataset || !currentDataset.length) return;
+      const key = 'eda_' + datasetRenderVersion;
+      if (window.intentPrefetchCache.has(key)) return;
+      window.intentPrefetchCache.set(key, true);
+
+      try {
+        if (typeof edaMineInterestingRelationships === 'function' && (!window.edaMinedInsights || !window.edaMinedInsights.length)) {
+          edaMineInterestingRelationships();
+        }
+        if (typeof updateEdaExecutiveMetrics === 'function') {
+          updateEdaExecutiveMetrics();
+        }
+      } catch (e) {
+        console.debug("Prefetch EDA error:", e);
+      }
+    }
+
+    function prefetchDashboardIntent() {
+      if (!currentDataset || !currentDataset.length) return;
+      const key = 'dash_' + datasetRenderVersion;
+      if (window.intentPrefetchCache.has(key)) return;
+      window.intentPrefetchCache.set(key, true);
+
+      try {
+        if (typeof updateDashFilterOptions === 'function') {
+          updateDashFilterOptions();
+        }
+      } catch (e) {
+        console.debug("Prefetch Dashboard error:", e);
+      }
+    }
+
+    function prefetchDatabaseIntent() {
+      const key = 'db_status';
+      const cached = window.intentPrefetchCache.get(key);
+      if (cached && (Date.now() - cached.timestamp < 30000)) return;
+
+      const baseUrl = (typeof getEffectiveApiBaseUrl === 'function') ? getEffectiveApiBaseUrl() : 'http://localhost:8000';
+      if (!baseUrl) return;
+
+      fetch(`${baseUrl}/api/db-status`, { method: 'GET', headers: { 'Accept': 'application/json' } })
+        .then(res => res.json())
+        .then(data => {
+          window.intentPrefetchCache.set(key, { timestamp: Date.now(), data });
+        })
+        .catch(() => {});
+    }
+
+    function prefetchMLIntent() {
+      if (!currentDataset || !currentDataset.length) return;
+      const key = 'ml_' + datasetRenderVersion;
+      if (window.intentPrefetchCache.has(key)) return;
+      window.intentPrefetchCache.set(key, true);
+
+      try {
+        const numCols = columns.filter(c => isColNumeric(c));
+        const catCols = columns.filter(c => !isColNumeric(c));
+        window.__prefetchedMLFeatures = { numCols, catCols, total: columns.length };
+      } catch (e) {}
+    }
+
+    function initIntentPrefetching() {
+      const triggerMap = [
+        { sel: '#navBtnEDA, [onclick*="moduleEDA"]', fn: prefetchEDAIntent },
+        { sel: '#navBtnDashboard, #navBtnDashboardBuilder, [onclick*="moduleDashboard"]', fn: prefetchDashboardIntent },
+        { sel: '#navBtnConnectors, #navBtnSql, [onclick*="moduleConnectors"], [onclick*="moduleSql"]', fn: prefetchDatabaseIntent },
+        { sel: '#navBtnML, #navBtnPredictive, [onclick*="moduleML"], [onclick*="modulePredictive"]', fn: prefetchMLIntent }
+      ];
+
+      triggerMap.forEach(({ sel, fn }) => {
+        document.querySelectorAll(sel).forEach(el => {
+          if (el.__intentPrefetchBound) return;
+          el.__intentPrefetchBound = true;
+
+          const runPrefetch = () => {
+            if (window.requestIdleCallback) {
+              window.requestIdleCallback(() => fn(), { timeout: 400 });
+            } else {
+              setTimeout(fn, 50);
+            }
+          };
+
+          el.addEventListener('mouseenter', runPrefetch, { passive: true });
+          el.addEventListener('focusin', runPrefetch, { passive: true });
+        });
+      });
+    }
+    window.initIntentPrefetching = initIntentPrefetching;
+
     function init() {
       try { restoreUserSession(); } catch(e) { console.warn("Restore session init:", e); }
       try { initAuthDatabase(); } catch(e) {}
@@ -11807,6 +11939,7 @@ result = df.describe()
       try { initMLModuleUI(); } catch (e) { console.warn("ML init:", e); }
       try { initSecurityModuleUI(); } catch (e) { console.warn("Security init:", e); }
       try { initSqlModule(); } catch (e) { console.warn("SQL studio init:", e); }
+      try { initIntentPrefetching(); } catch (e) { console.warn("Intent prefetching init:", e); }
     }
 
     // Toggle Sidebar Visibility for Fullscreen Workspace Mode
@@ -11862,6 +11995,23 @@ result = df.describe()
       const targetNavBtn = document.querySelector(`.nav-item[onclick*="'${moduleId}'"]`) ||
                            document.getElementById('navBtn' + moduleId.replace(/^module/, ''));
       if (targetNavBtn) targetNavBtn.classList.add('active');
+      const specificNavBtn = document.getElementById('navBtn' + moduleId.replace(/^module/, ''));
+      if (specificNavBtn) specificNavBtn.classList.add('active');
+
+      // ELIMINATE UNNECESSARY RE-RENDERS:
+      // If module has already been rendered for current dataset version, skip expensive DOM wipes and recalculations
+      const alreadyRendered = (moduleRenderedVersions[moduleId] === datasetRenderVersion);
+      if (alreadyRendered && targetView && targetView.children.length > 0) {
+        requestAnimationFrame(() => {
+          if (window.Chart && typeof window.Chart.instances === 'object') {
+            try {
+              Object.values(window.Chart.instances).forEach(c => { if (c && c.resize) c.resize(); });
+            } catch (e) {}
+          }
+        });
+        return;
+      }
+      moduleRenderedVersions[moduleId] = datasetRenderVersion;
 
       if (moduleId === 'moduleOverview') {
         document.getElementById('navBtnOverview').classList.add('active');
@@ -12757,6 +12907,8 @@ result = df.describe()
     function renderFeSuggestions() {}
     function updateUI() {
       try {
+        if (typeof invalidateModuleRenders === 'function') invalidateModuleRenders();
+        if (typeof moduleRenderedVersions === 'object') moduleRenderedVersions[activeModuleId] = datasetRenderVersion;
         columns = Object.keys(currentDataset[0] || {});
         window.currentDatasetStatsCache = null; // Recompute fresh metadata for new data
         try { refreshKPIs(); } catch (e) { console.warn("KPI error:", e); }
@@ -24775,29 +24927,7 @@ result = df.describe()
       }, 300);
     }
 
-    // =========================================================================
-    document.addEventListener("click", function(e) {
-      const target = e.target;
-      // Do not animate on text input fields, textareas, selects, or dropdown options
-      if (target.matches("input:not([type='button']):not([type='submit']), select, textarea, option")) return;
-      // Do not animate on sidebar items or sidebar buttons to keep them completely steady at their position
-      if (target.closest(".sidebar, .nav-item")) return;
-
-      // Match all buttons, interactive keys, pills, badges, tabs, cards, and clickable controls
-      const btn = target.closest(
-        "button, [role='button'], .btn, .nav-item, .tech-filter-btn, .stats-tab-btn, .ins-tab-btn, " +
-        ".stats-corr-method-btn, .drop-zone, .sidebar-brand, .badge[onclick], [onclick], " +
-        "input[type='button'], input[type='submit'], a[href], .tab-btn"
-      );
-      if (!btn) return;
-
-      btn.classList.remove("btn-clicked-animation");
-      void btn.offsetWidth; // trigger reflow
-      btn.classList.add("btn-clicked-animation");
-      setTimeout(() => {
-        btn.classList.remove("btn-clicked-animation");
-      }, 240);
-    }, false);
+    // Global click listener with forced offsetWidth synchronous reflow removed for 60fps performance
 
   
     // =========================================================================
