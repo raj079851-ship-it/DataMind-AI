@@ -1018,8 +1018,13 @@
       padding: 18px;
       margin-bottom: 16px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
-    }
     canvas { width: 100% !important; height: 260px !important; }
+    .db-widget canvas,
+    .db-chart-canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
 
     /* Bottom-Right Task Execution Monitor */
     #taskExecutionMonitor {
@@ -3056,7 +3061,7 @@
               <span style="font-size:1.5rem;">🎨</span>
               <div>
                 <div style="display:flex; align-items:center; gap:8px;">
-                  <input type="text" id="dbDashboardTitle" value="Executive Strategic Dashboard" onchange="dbUpdateTitle(this.value)" style="font-size:1.15rem; font-weight:700; color:var(--text-primary); background:transparent; border:1px solid transparent; border-bottom:1px dashed var(--card-border); padding:2px 6px; border-radius:4px; max-width:320px;" title="Click to rename dashboard" />
+                  <input type="text" id="dbDashboardTitle" value="Executive Strategic Dashboard" onchange="dbUpdateTitle(this.value)" style="font-size:1.15rem; font-weight:700; color:var(--text-primary); background:transparent; border:1px solid transparent; border-bottom:1px dashed var(--card-border); padding:2px 6px; border-radius:4px; width:380px; max-width:100%; min-width:320px;" title="Click to rename dashboard" />
                   <span class="badge" style="background:#8b5cf6; color:#ffffff; font-weight:700;">Drag &amp; Drop Builder</span>
                 </div>
                 <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">
@@ -3069,22 +3074,22 @@
             <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
               <!-- Add Widget Dropdown -->
                             <!-- Manual Custom Chart Button -->
-              <button class="btn btn-primary" onclick="dbOpenCustomChartModal()" style="background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-color:#2563eb; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+              <button class="btn btn-primary" onclick="dbOpenCustomChartModal()" style="width:auto; background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border-color:#2563eb; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
                 <span>📊 Custom Chart</span>
               </button>
 
               <!-- Manual Custom KPI Button -->
-              <button class="btn btn-primary" onclick="dbOpenCustomKpiModal()" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%); border-color:#059669; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+              <button class="btn btn-primary" onclick="dbOpenCustomKpiModal()" style="width:auto; background:linear-gradient(135deg, #10b981 0%, #059669 100%); border-color:#059669; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
                 <span>🎯 Custom KPI Card</span>
               </button>
 
               <!-- Manual Slicer / Filter Button -->
-              <button class="btn btn-primary" onclick="dbOpenCustomSlicerModal()" style="background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color:#d97706; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+              <button class="btn btn-primary" onclick="dbOpenCustomSlicerModal()" style="width:auto; background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-color:#d97706; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
                 <span>🎛️ Add Slicer / Filter</span>
               </button>
 
               <div style="position:relative; display:inline-block;">
-                <button class="btn btn-primary" onclick="dbToggleAddWidgetMenu()" style="background:linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-color:#8b5cf6; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
+                <button class="btn btn-primary" onclick="dbToggleAddWidgetMenu()" style="width:auto; background:linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); border-color:#8b5cf6; font-size:0.82rem; font-weight:700; padding:7px 14px; display:flex; align-items:center; gap:6px;">
                   <span>➕ Add Widget ▾</span>
                 </button>
                 <div id="dbAddWidgetDropdown" style="display:none; position:absolute; right:0; top:105%; z-index:100; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); min-width:200px; padding:6px 0;">
@@ -3136,33 +3141,28 @@
               </select>
 
               <!-- Save & Duplicate & Share Buttons -->
-              <button class="btn btn-secondary" onclick="dbSaveDashboard()" style="padding:6px 12px; font-size:0.8rem;" title="Save dashboard to local storage">
+              <button class="btn btn-secondary" onclick="dbSaveDashboard()" style="width:auto; padding:6px 12px; font-size:0.8rem;" title="Save dashboard to local storage">
                 <span>💾 Save</span>
               </button>
-              <button class="btn btn-secondary" onclick="dbDuplicateDashboard()" style="padding:6px 12px; font-size:0.8rem;" title="Duplicate entire dashboard">
+              <button class="btn btn-secondary" onclick="dbDuplicateDashboard()" style="width:auto; padding:6px 12px; font-size:0.8rem;" title="Duplicate entire dashboard">
                 <span>📋 Duplicate</span>
               </button>
-              <button class="btn btn-secondary" onclick="dbOpenShareModal()" style="padding:6px 12px; font-size:0.8rem;" title="Share dashboard link / JSON">
+              <button class="btn btn-secondary" onclick="dbOpenShareModal()" style="width:auto; padding:6px 12px; font-size:0.8rem;" title="Share dashboard link / JSON">
                 <span>🔗 Share</span>
               </button>
-
-              <!-- Export Dropdown -->
 
             </div>
           </div>
 
           <!-- Multi-Page Tabs Bar -->
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:8px;">
+          <div id="dbMultiPageTabsBar" style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap; gap:8px;">
             <div id="dbPageTabsContainer" style="display:flex; gap:6px; align-items:center; overflow-x:auto;">
               <!-- Dynamic page tabs rendered here -->
             </div>
             <div style="display:flex; gap:6px; align-items:center;">
-              <button class="btn btn-secondary" onclick="dbAddPage()" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;">
-                <span>➕ Add Page</span>
-              </button>
-              <!-- Export Dropdown adjacent to Add Page -->
+              <!-- Export Dropdown left to Add Page -->
               <div style="position:relative; display:inline-block;">
-                <button class="btn btn-secondary" onclick="dbToggleExportMenu()" style="padding:4px 10px; font-size:0.75rem; border-radius:6px; display:flex; align-items:center; gap:4px;" title="Export Dashboard in Multiple Formats">
+                <button class="btn btn-secondary" onclick="dbToggleExportMenu()" style="width:auto; padding:4px 10px; font-size:0.75rem; border-radius:6px; display:flex; align-items:center; gap:4px;" title="Export Dashboard in Multiple Formats">
                   <span>📥 Export ▾</span>
                 </button>
                 <div id="dbExportDropdown" style="display:none; position:absolute; left:0; top:calc(100% + 4px); z-index:1000; background:var(--card-bg); border:1px solid var(--card-border); border-radius:8px; box-shadow:0 10px 25px rgba(0,0,0,0.5); min-width:170px; padding:6px 0;">
@@ -3180,7 +3180,10 @@
                   </a>
                 </div>
               </div>
-              <button class="btn btn-secondary" onclick="dbResetToStarterLayout()" style="padding:4px 10px; font-size:0.75rem; border-radius:6px;" title="Reset canvas to starter layout">
+              <button class="btn btn-secondary" onclick="dbAddPage()" style="width:auto; padding:4px 10px; font-size:0.75rem; border-radius:6px;">
+                <span>➕ Add Page</span>
+              </button>
+              <button class="btn btn-secondary" onclick="dbResetToStarterLayout()" style="width:auto; padding:4px 10px; font-size:0.75rem; border-radius:6px;" title="Reset canvas to starter layout">
                 <span>🔄 Starter Layout</span>
               </button>
             </div>
@@ -30221,6 +30224,22 @@ result = df.describe()
         }
       } catch (e) { console.warn("Failed to load saved dashboard:", e); }
 
+      // Auto-correct any truncated dashboard titles from prior sessions
+      if (window.dbState.title && (window.dbState.title.includes("dahboa") || window.dbState.title.startsWith("Executive Strategic Dashbo"))) {
+        window.dbState.title = "Executive Strategic Dashboard";
+      }
+
+      // Ensure all chart widgets in restored pages have proper height (not clamped to 180px)
+      if (window.dbState.pages) {
+        window.dbState.pages.forEach(p => {
+          (p.widgets || []).forEach(w => {
+            if (w.type && w.type.startsWith('chart_') && (!w.height || w.height < 260)) {
+              w.height = 290;
+            }
+          });
+        });
+      }
+
       // Update Header Title Input
       const titleInput = document.getElementById('dbDashboardTitle');
       if (titleInput && window.dbState.title) titleInput.value = window.dbState.title;
@@ -30266,6 +30285,7 @@ result = df.describe()
           dim: null,
           agg: "sum",
           span: 3,
+          height: 140,
           icon: "💰"
         },
         // KPI 2
@@ -30277,6 +30297,7 @@ result = df.describe()
           dim: null,
           agg: "mean",
           span: 3,
+          height: 140,
           icon: "📈"
         },
         // Slicer
@@ -30287,7 +30308,8 @@ result = df.describe()
           metric: num1,
           dim: cat1,
           agg: "sum",
-          span: 6
+          span: 6,
+          height: 140
         },
         // Bar Chart
         {
@@ -30297,7 +30319,8 @@ result = df.describe()
           metric: num1,
           dim: cat1,
           agg: "sum",
-          span: 6
+          span: 6,
+          height: 290
         },
         // Donut Chart
         {
@@ -30307,7 +30330,8 @@ result = df.describe()
           metric: num2,
           dim: cat2,
           agg: "sum",
-          span: 6
+          span: 6,
+          height: 290
         },
         // AI Insight Card
         {
@@ -30317,7 +30341,8 @@ result = df.describe()
           metric: num1,
           dim: cat1,
           agg: "sum",
-          span: 4
+          span: 4,
+          height: 290
         },
         // Interactive Table
         {
@@ -30327,7 +30352,8 @@ result = df.describe()
           metric: num1,
           dim: cat1,
           agg: "sum",
-          span: 8
+          span: 8,
+          height: 290
         }
       ];
     }
@@ -30668,32 +30694,49 @@ result = df.describe()
       if (type === 'kpi') {
         newWidget.title = `Total ${defaultMetric}`;
         newWidget.span = 3;
+        newWidget.height = 140;
         newWidget.icon = "🎯";
       } else if (type === 'chart_bar') {
         newWidget.title = `${defaultMetric} by ${defaultDim}`;
         newWidget.span = 6;
+        newWidget.height = 290;
       } else if (type === 'chart_line') {
         newWidget.title = `${defaultMetric} Trend`;
         newWidget.span = 6;
+        newWidget.height = 290;
       } else if (type === 'chart_donut') {
         newWidget.title = `${defaultMetric} Share`;
         newWidget.span = 6;
+        newWidget.height = 290;
       } else if (type === 'chart_area') {
         newWidget.title = `${defaultMetric} Cumulative Area`;
         newWidget.span = 6;
+        newWidget.height = 290;
+      } else if (type === 'chart_hbar') {
+        newWidget.title = `${defaultMetric} Ranking`;
+        newWidget.span = 6;
+        newWidget.height = 290;
+      } else if (type === 'chart_scatter') {
+        newWidget.title = `${defaultMetric} Correlation`;
+        newWidget.span = 6;
+        newWidget.height = 290;
       } else if (type === 'table') {
         newWidget.title = "Detailed Data Table";
         newWidget.span = 8;
+        newWidget.height = 290;
       } else if (type === 'slicer') {
         newWidget.title = `Slicer: ${defaultDim}`;
         newWidget.span = 4;
+        newWidget.height = 140;
       } else if (type === 'text') {
         newWidget.title = "Executive Notes";
         newWidget.text = "Enter executive commentary or analytical takeaways here.";
         newWidget.span = 4;
+        newWidget.height = 180;
       } else if (type === 'ai_insight') {
         newWidget.title = "✨ AI Performance Insight";
         newWidget.span = 4;
+        newWidget.height = 290;
       }
 
       curPage.widgets.push(newWidget);
@@ -30823,11 +30866,13 @@ result = df.describe()
       let html = "";
       curPage.widgets.forEach(w => {
         const span = w.span || 6;
-        const heightStyle = w.height ? `min-height:${w.height}px; height:${w.height}px;` : `min-height:180px;`;
+        const defaultH = w.type.startsWith('chart_') ? 290 : (w.type === 'kpi' ? 140 : (w.type === 'slicer' ? 140 : (w.type === 'table' ? 290 : 200)));
+        const hVal = (w.height && w.height >= 100) ? w.height : defaultH;
+        const heightStyle = `min-height:${hVal}px; height:${hVal}px;`;
         html += `
           <div class="panel db-widget" id="${w.id}" data-id="${w.id}" style="grid-column:span ${span}; margin-bottom:0; position:relative; ${heightStyle} display:flex; flex-direction:column; justify-content:space-between; user-select:none;">
             <!-- Widget Header -->
-            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; cursor:move;">
+            <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; cursor:move; flex-shrink:0;">
               <div class="db-drag-handle" style="display:flex; align-items:center; gap:6px; cursor:move;" title="Drag to reorder">
                 <span style="color:var(--text-muted); font-size:1.1rem; line-height:1;">⠿</span>
                 <span style="font-weight:700; font-size:0.86rem; color:var(--text-primary);">${w.title}</span>
@@ -30848,7 +30893,7 @@ result = df.describe()
             </div>
 
             <!-- Widget Body Container -->
-            <div class="db-widget-body" id="body_${w.id}" style="flex:1; overflow:hidden; display:flex; flex-direction:column; justify-content:center;">
+            <div class="db-widget-body" id="body_${w.id}" style="flex:1; height:calc(100% - 36px); overflow:hidden; display:flex; flex-direction:column; justify-content:space-between;">
               <!-- Dynamic Content rendered below -->
             </div>
 
@@ -30957,8 +31002,8 @@ result = df.describe()
               </select>
             </div>
           </div>
-          <div style="height:${Math.max(140, (w.height || 230) - 50)}px; position:relative; width:100%;">
-            <canvas id="${canvasId}" width="480" height="${Math.max(140, (w.height || 230) - 50)}" style="width:100%; height:100%;"></canvas>
+          <div class="db-chart-container" style="flex:1; width:100%; min-height:200px; height:calc(100% - 36px); position:relative; overflow:hidden;">
+            <canvas id="${canvasId}" class="db-chart-canvas" style="width:100% !important; height:100% !important; display:block;"></canvas>
           </div>
         `;
         setTimeout(() => {
@@ -31210,8 +31255,9 @@ result = df.describe()
       // RETINA / HIGH-DPI SCALING (HD Graphics)
       const dpr = Math.max(2, window.devicePixelRatio || 2);
       const rect = canvas.getBoundingClientRect();
-      const width = rect.width || canvas.parentElement?.clientWidth || 480;
-      const height = rect.height || 180;
+      const parent = canvas.parentElement;
+      const width = parent?.clientWidth || rect.width || canvas.clientWidth || 480;
+      const height = parent?.clientHeight || rect.height || 200;
 
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
@@ -31255,11 +31301,11 @@ result = df.describe()
         return;
       }
 
-      const padLeft = 40;
-      const padBottom = 28;
-      const padTop = 15;
-      const plotW = width - padLeft - 15;
-      const plotH = height - padBottom - padTop;
+      const padLeft = 45;
+      const padBottom = 32;
+      const padTop = 18;
+      const plotW = Math.max(20, width - padLeft - 15);
+      const plotH = Math.max(20, height - padBottom - padTop);
       const maxVal = Math.max(...entries.map(e => e.val), 1);
 
       // Subtle HD gridlines
@@ -31314,7 +31360,7 @@ result = df.describe()
 
           ctx.fillStyle = isSelected ? "#c084fc" : "#94a3b8";
           ctx.font = isSelected ? "bold 9px sans-serif" : "9px sans-serif";
-          ctx.fillText(e.label.slice(0, 7), x + bw / 2, height - 10);
+          ctx.fillText(e.label.slice(0, 8), x + bw / 2, height - padBottom + 16);
         });
         ctx.textAlign = "start";
 
@@ -31422,18 +31468,22 @@ result = df.describe()
           ctx.fillStyle = "#94a3b8";
           ctx.font = "9px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText(pt.label.slice(0, 6), pt.x, height - 10);
+          ctx.fillText(pt.label.slice(0, 8), pt.x, height - padBottom + 16);
         });
         ctx.textAlign = "start";
       } else if (widget.type === 'chart_donut') {
         const total = entries.reduce((a,b)=>a+b.val,0) || 1;
-        const cx = width / 2 - 45;
-        const cy = height / 2;
-        const r = Math.min(cx, cy) - 15;
-        const innerR = r * 0.58;
-        const colors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#8b5cf6", "#14b8a6"];
+        const cx = Math.round(width * 0.35);
+        const cy = Math.round(height * 0.5);
+        const r = Math.max(24, Math.min(cx - 18, cy - 16, 85));
+        const innerR = Math.max(12, Math.round(r * 0.58));
+        const colors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#38bdf8", "#8b5cf6", "#14b8a6", "#e11d48"];
 
         let curAngle = -0.5 * Math.PI;
+        const totalLegendH = entries.length * 18;
+        const startLy = Math.max(12, Math.round((height - totalLegendH) / 2));
+        const legX = Math.max(cx + r + 24, Math.round(width * 0.56));
+
         entries.forEach((e, i) => {
           const sliceAngle = (e.val / total) * 2 * Math.PI;
           const isSelected = window.dbState.crossFilter.col === dim && window.dbState.crossFilter.val === e.label;
@@ -31450,12 +31500,12 @@ result = df.describe()
           ctx.shadowBlur = 0;
 
           // Legend
-          const ly = 18 + i * 18;
+          const ly = startLy + i * 18;
           ctx.fillStyle = color;
-          ctx.fillRect(width - 100, ly, 10, 10);
+          ctx.fillRect(legX, ly, 10, 10);
           ctx.fillStyle = isSelected ? "#ffffff" : "#cbd5e1";
           ctx.font = isSelected ? "bold 9px sans-serif" : "9px sans-serif";
-          ctx.fillText(`${e.label.slice(0, 7)} (${Math.round(e.val/total*100)}%)`, width - 85, ly + 9);
+          ctx.fillText(`${e.label.slice(0, 8)} (${Math.round(e.val/total*100)}%)`, legX + 15, ly + 9);
 
           curAngle += sliceAngle;
         });
