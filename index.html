@@ -1147,31 +1147,13 @@
         </button>
       </div>
 
-      <!-- Top Right Auth Navigation: Login & Registration -->
-      <div id="topAuthActionGroup" style="display:flex;align-items:center;gap:8px;margin-left:4px;">
-        <button id="topHeaderLoginBtn" type="button" class="btn btn-outline" onclick="openAuthModal('user')" style="padding:6px 14px;font-size:0.80rem;font-weight:700;border-radius:8px;border-color:rgba(212,175,55,0.6);color:var(--champagne-gold);background:rgba(212,175,55,0.10);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.25);white-space:nowrap;transition:all 0.2s ease;" title="Sign In to DataMind AI">
-          <span>🔐</span>
-          <span>Login</span>
-        </button>
-        <button id="topHeaderRegisterBtn" type="button" class="btn btn-primary" onclick="openAuthModal('register')" style="padding:6px 14px;font-size:0.80rem;font-weight:700;border-radius:8px;background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#ffffff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(99,102,241,0.4);white-space:nowrap;transition:all 0.2s ease;" title="Register New Account">
-          <span>✨</span>
-          <span>Registration</span>
-        </button>
-      </div>
-
-      <!-- Authenticated User Profile Pill (Active Session) -->
-      <div id="topUserSessionGroup" style="display:none;align-items:center;gap:8px;margin-left:4px;">
-        <div id="topUserContainer" onclick="openAuthModal('user')" style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(15,23,42,0.65);border:1px solid rgba(212,175,55,0.4);border-radius:8px;cursor:pointer;white-space:nowrap;" title="Click to manage account">
-          <span id="topUserIcon" style="font-size:1.05rem;">👤</span>
-          <div style="display:flex;flex-direction:column;line-height:1.2;">
-            <span id="topUserName" style="font-size:0.80rem;font-weight:700;color:var(--champagne-gold);">User</span>
-            <span id="topUserRoleBadge" style="font-size:0.68rem;color:#94a3b8;">Role: Analyst</span>
-          </div>
-          <span id="topUserStatusDot" style="width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
-        </div>
-        <button id="topHeaderSignOutBtn" type="button" class="btn btn-outline" onclick="submitLogoutAuth()" style="padding:6px 11px;font-size:0.75rem;font-weight:700;border-color:rgba(239,68,68,0.45);color:#fca5a5;background:rgba(239,68,68,0.1);border-radius:8px;cursor:pointer;white-space:nowrap;" title="Sign Out">
-          🚪 Logout
-        </button>
+      <!-- Single Logo for Login & Registration -->
+      <div id="topUserContainer" onclick="openAuthModal('user')" style="width:40px; height:40px; min-width:40px; border-radius:50%; border:1.8px solid rgba(212,175,55,0.65); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative; box-shadow:0 0 14px rgba(212,175,55,0.3); background:rgba(15,23,42,0.85); margin-left:6px; flex-shrink:0;" title="DataMind AI • Click to Sign In or Register" onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.5)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 14px rgba(212,175,55,0.3)';">
+        <img id="topUserLogoImg" src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" style="width:34px; height:34px; border-radius:50%; object-fit:cover; display:block;" />
+        <span id="topUserStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#94a3b8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease;" title="Guest • Click to Sign In or Register"></span>
+        <span id="topUserIcon" style="display:none;">👤</span>
+        <span id="topUserName" style="display:none;">Sign In</span>
+        <span id="topUserRoleBadge" style="display:none;">Not Authenticated</span>
       </div>
     </div>
   </header>
@@ -10686,28 +10668,21 @@ result = df.describe()
       const badgeEl = document.getElementById("topUserRoleBadge");
       const secBadgeEl = document.getElementById("secUserBadge");
       const statusDot = document.getElementById("topUserStatusDot");
-      const authGroup = document.getElementById("topAuthActionGroup");
-      const userGroup = document.getElementById("topUserSessionGroup");
 
       const roleIcons = { Admin: "👑", Analyst: "📊", "Data Engineer": "⚙️", Viewer: "👁️" };
 
       if (!currentAuthUser) {
-        if (authGroup) authGroup.style.display = "flex";
-        if (userGroup) userGroup.style.display = "none";
         if (iconEl) iconEl.textContent = "👤";
-        if (topContainer) topContainer.title = "User Account • Click to Sign In";
+        if (topContainer) topContainer.title = "DataMind AI • Click to Sign In or Register";
         if (nameEl) nameEl.textContent = "Sign In";
         if (badgeEl) badgeEl.textContent = "Not Authenticated";
         if (secBadgeEl) secBadgeEl.textContent = "Current User: Unauthenticated (Guest)";
         if (statusDot) {
           statusDot.style.background = "#94a3b8";
-          statusDot.title = "Not Signed In";
+          statusDot.title = "Not Signed In (Guest) • Click to Login / Register";
         }
         return;
       }
-
-      if (authGroup) authGroup.style.display = "none";
-      if (userGroup) userGroup.style.display = "flex";
 
       const icon = roleIcons[currentAuthUser.role] || "👤";
       if (iconEl) iconEl.textContent = icon;
@@ -10717,7 +10692,7 @@ result = df.describe()
       if (secBadgeEl) secBadgeEl.textContent = `Current User: ${currentAuthUser.username || currentAuthUser.email} (${currentAuthUser.role})`;
       if (statusDot) {
         statusDot.style.background = "#10b981";
-        statusDot.title = "Active Session";
+        statusDot.title = `Active Session (${currentAuthUser.role}) • Click to manage account`;
       }
     }
 
