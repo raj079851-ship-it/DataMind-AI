@@ -16,15 +16,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/alasql/4.3.2/alasql.min.js"></script>
-  <!-- Standardized Production Typography (Inter + JetBrains Mono) -->
+  <!-- Standardized Production Typography (Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
       /* Standardized Typography System */
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      --font-mono: "JetBrains Mono", "Fira Code", Consolas, Menlo, Monaco, monospace;
+      --font-mono: ui-monospace, "SF Mono", "Segoe UI Mono", "Liberation Mono", "Courier New", monospace;
       --font: var(--font-sans);
 
       /* Standard Typography Scale */
@@ -139,9 +139,14 @@
       transition: background-color 0.16s ease, color 0.16s ease;
     }
 
-    /* Standard Monospace Elements (Tabular Figures) */
-    code, pre, .code-font, .schema-type, .sql-keyword, .table-mono, input.mono, .stat-value {
+    /* Standard Monospace Elements */
+    code, pre, .code-font, .schema-type, .sql-keyword, input.mono {
       font-family: var(--font-mono) !important;
+    }
+
+    /* Standard Tabular Figures (Clean Hollow Oval Zeros without center point) */
+    .table-mono, .stat-value, .metric-val, table td, table th {
+      font-family: var(--font-sans);
       font-variant-numeric: tabular-nums;
     }
 
@@ -755,7 +760,7 @@
     .metric-val {
       font-size: var(--text-2xl);
       font-weight: var(--font-bold);
-      font-family: var(--font-mono);
+      font-family: var(--font-sans);
       font-variant-numeric: tabular-nums;
       margin-top: 4px;
       color: var(--text);
@@ -888,7 +893,7 @@
        LUXURY SQL STUDIO & CODEMIRROR IDE STYLES
        ========================================================================= */
     .CodeMirror {
-      font-family: "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace !important;
+      font-family: var(--font-mono) !important;
       font-size: 0.88rem !important;
       line-height: 1.55 !important;
       height: 240px !important;
@@ -3610,7 +3615,7 @@
 
             <!-- SQL Editor Container (CodeMirror mounts here) -->
             <div id="sqlEditorWrapper" style="position:relative; margin-top:0;">
-              <textarea id="sqlInput" style="font-family:'JetBrains Mono',Consolas,monospace; font-size:0.88rem; background:#090d16; color:#38bdf8; border:1px solid rgba(212,175,55,0.25); border-radius:0 0 8px 8px; padding:12px; width:100%; height:240px; resize:vertical; box-sizing:border-box;" placeholder="SELECT * FROM dataset LIMIT 10;">SELECT * FROM dataset LIMIT 10;</textarea>
+              <textarea id="sqlInput" style="font-family:var(--font-mono); font-size:0.88rem; background:#090d16; color:#38bdf8; border:1px solid rgba(212,175,55,0.25); border-radius:0 0 8px 8px; padding:12px; width:100%; height:240px; resize:vertical; box-sizing:border-box;" placeholder="SELECT * FROM dataset LIMIT 10;">SELECT * FROM dataset LIMIT 10;</textarea>
             </div>
 
             <!-- Editor Action Bar & Keyboard Shortcut Tips -->
