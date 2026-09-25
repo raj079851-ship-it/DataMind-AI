@@ -2852,94 +2852,166 @@
           </div>
         </div>
 
-        <!-- 6 BI VISUALIZATION TOOLS (2x3 Grid) -->
+        <!-- 8 BI VISUALIZATION TOOLS (2x4 Grid) -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px;">
           
           <!-- Tool 1: Line Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashLineTitle">1. 📈 Line Chart (Sequential Trend)</span>
-              <span class="badge badge-success">Trendline</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashLineTitle" style="font-weight:700;">1. 📈 Line Chart (Sequential Trend)</span>
+                <span class="badge badge-success">Trendline</span>
+              </div>
+              <div id="dashLineDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Tracks sequential progression and cycle trajectory across records with baseline mean and peak markers.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashLineCanvas"></canvas>
+            </div>
+            <div id="dashLineInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>💡 <strong>Trend Analysis:</strong> Sequential progression across records</span>
+              <span id="dashLineBadge" style="color:#818cf8; font-weight:600;">Mean Baseline</span>
             </div>
           </div>
 
           <!-- Tool 2: Horizontal Bar Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashHBarTitle">2. 📊 Bar Chart (Horizontal Ranked)</span>
-              <span class="badge badge-info">Ranked Bars</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashHBarTitle" style="font-weight:700;">2. 📊 Bar Chart (Horizontal Ranked)</span>
+                <span class="badge badge-info">Ranked Bars</span>
+              </div>
+              <div id="dashHBarDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Comparative ranking of cohorts sorted by performance magnitude with cohort share percentages.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashHBarCanvas"></canvas>
+            </div>
+            <div id="dashHBarInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🏆 <strong>Cohort Leader:</strong> Top segment dominance</span>
+              <span id="dashHBarBadge" style="color:#34d399; font-weight:600;">#1 Ranked</span>
             </div>
           </div>
 
           <!-- Tool 3: Vertical Column Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashColTitle">3. 🏛️ Column Chart (Vertical Distribution)</span>
-              <span class="badge badge-info">Columns</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashColTitle" style="font-weight:700;">3. 🏛️ Column Chart (Vertical Distribution)</span>
+                <span class="badge badge-info">Columns</span>
+              </div>
+              <div id="dashColDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Direct side-by-side volume comparison showing categorical distribution against group average.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashColCanvas"></canvas>
+            </div>
+            <div id="dashColInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🏛️ <strong>Distribution Spread:</strong> Categorical volume variance</span>
+              <span id="dashColBadge" style="color:#38bdf8; font-weight:600;">Cohort Spread</span>
             </div>
           </div>
 
           <!-- Tool 4: Donut Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashDonutTitle">4. 🍩 Donut Chart (Segment Share)</span>
-              <span class="badge badge-warning">Proportions</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashDonutTitle" style="font-weight:700;">4. 🍩 Donut Chart (Segment Share)</span>
+                <span class="badge badge-warning">Proportions</span>
+              </div>
+              <div id="dashDonutDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Proportional contribution of each segment relative to the aggregate total volume.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashDonutCanvas"></canvas>
+            </div>
+            <div id="dashDonutInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🍩 <strong>Volume Contribution:</strong> Share distribution across segments</span>
+              <span id="dashDonutBadge" style="color:#f59e0b; font-weight:600;">Share Ratio</span>
             </div>
           </div>
 
           <!-- Tool 5: Pie Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashPieTitle">5. 🥧 Pie Chart (Slice Breakdown)</span>
-              <span class="badge badge-warning">Solid Pie</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashPieTitle" style="font-weight:700;">5. 🥧 Pie Chart (Slice Breakdown)</span>
+                <span class="badge badge-warning">Solid Pie</span>
+              </div>
+              <div id="dashPieDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Detailed percentage slice breakdown illustrating relative cohort weight of the dataset.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashPieCanvas"></canvas>
+            </div>
+            <div id="dashPieInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🥧 <strong>Cohort Weight:</strong> Major vs minor segment proportions</span>
+              <span id="dashPieBadge" style="color:#ec4899; font-weight:600;">100% Total</span>
             </div>
           </div>
 
           <!-- Tool 6: Map Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashMapTitle">6. 🗺️ Map Chart (Geospatial / Regional)</span>
-              <span class="badge badge-info">Spatial Map</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashMapTitle" style="font-weight:700;">6. 🗺️ Map Chart (Geospatial / Regional)</span>
+                <span class="badge badge-info">Spatial Map</span>
+              </div>
+              <div id="dashMapDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                2D spatial coordinates mapping dimension observations against metric intensity clusters.
+              </div>
             </div>
-            <div class="chart-box">
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
               <canvas id="dashMapCanvas"></canvas>
+            </div>
+            <div id="dashMapInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🗺️ <strong>Spatial Density:</strong> Geographic and dimensional cluster distribution</span>
+              <span id="dashMapBadge" style="color:#38bdf8; font-weight:600;">Cluster Center</span>
             </div>
           </div>
 
           <!-- Tool 7: Multi-Axis Radar / Spider Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashRadarTitle">7. 🕸️ Radar Chart: Multi-Dimensional Performance Web</span>
-              <span class="badge badge-success">Spider Matrix</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashRadarTitle" style="font-weight:700;">7. 🕸️ Radar Chart: Multi-Dimensional Performance Web</span>
+                <span class="badge badge-success">Spider Matrix</span>
+              </div>
+              <div id="dashRadarDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Normalized multi-spoke spider polygon comparing relative cohort strength from 0% (center) to 100% (outer ring).
+              </div>
             </div>
-            <div class="chart-box" style="position:relative; height:240px;">
-              <canvas id="dashRadarCanvas" style="width:100%; height:100%;"></canvas>
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
+              <canvas id="dashRadarCanvas"></canvas>
+            </div>
+            <div id="dashRadarInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🕸️ <strong>Spider Balance:</strong> Multi-axis cohort strength and outlier detection</span>
+              <span id="dashRadarBadge" style="color:#a78bfa; font-weight:600;">Spoke Profile</span>
             </div>
           </div>
 
           <!-- Tool 8: Conversion Funnel / Waterfall Flow Chart -->
           <div class="panel">
-            <div class="panel-header">
-              <span id="dashFunnelTitle">8. 🌪️ Funnel Flow: Stage Volume &amp; Conversion Pipeline</span>
-              <span class="badge badge-warning">Pipeline Funnel</span>
+            <div class="panel-header" style="flex-direction:column; align-items:flex-start; gap:4px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                <span id="dashFunnelTitle" style="font-weight:700;">8. 🌪️ Funnel Flow: Stage Volume &amp; Conversion Pipeline</span>
+                <span class="badge badge-warning">Pipeline Funnel</span>
+              </div>
+              <div id="dashFunnelDesc" style="font-size:0.75rem; color:var(--text-muted); font-weight:400; line-height:1.4;">
+                Pipeline attrition visualization tracking step-by-step retention rates and volume loss across successive cohorts.
+              </div>
             </div>
-            <div class="chart-box" style="position:relative; height:240px;">
-              <canvas id="dashFunnelCanvas" style="width:100%; height:100%;"></canvas>
+            <div class="chart-box" style="position:relative; overflow:hidden; box-sizing:border-box;">
+              <canvas id="dashFunnelCanvas"></canvas>
+            </div>
+            <div id="dashFunnelInsight" style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:6px; padding:6px 12px; margin-top:-8px; margin-bottom:6px; font-size:0.75rem; color:var(--text-muted);">
+              <span>🌪️ <strong>Pipeline Velocity:</strong> Drop-off and retention across successive cohorts</span>
+              <span id="dashFunnelBadge" style="color:#fbbf24; font-weight:600;">Net Retention</span>
             </div>
           </div>
 
@@ -18187,30 +18259,87 @@ result = df.describe()
       const topSeg = aggregated[0] ? `${aggregated[0].segment} (${aggregated[0].score})` : "N/A";
       document.getElementById("dashKpiTop").textContent = topSeg;
 
-      // Update Chart Titles
-      document.getElementById("dashLineTitle").textContent = `1. 📈 Line Chart: ${metricCol} Trend`;
-      document.getElementById("dashHBarTitle").textContent = `2. 📊 Bar Chart: ${metricCol} by ${dimCol} (Ranked)`;
-      document.getElementById("dashColTitle").textContent = `3. 🏛️ Column Chart: ${metricCol} (${aggFunc.toUpperCase()})`;
-      document.getElementById("dashDonutTitle").textContent = `4. 🍩 Donut Chart: ${dimCol} Share`;
-      document.getElementById("dashPieTitle").textContent = `5. 🥧 Pie Chart: Segment Proportions`;
-      const mapTitle = document.getElementById("dashMapTitle");
-      if (mapTitle) mapTitle.textContent = `6. 🗺️ Map Chart: Regional / Spatial Mapping`;
-      const radarTitle = document.getElementById("dashRadarTitle");
-      if (radarTitle) radarTitle.textContent = `7. 🕸️ Radar Chart: Multi-Dimensional Performance Web`;
-      const funnelTitle = document.getElementById("dashFunnelTitle");
-      if (funnelTitle) funnelTitle.textContent = `8. 🌪️ Funnel Flow: Stage Volume & Conversion Pipeline`;
-
+      // Calculate context metrics for rich chart annotations
+      const topPct = aggregated[0] ? Math.round((aggregated[0].score / (totalSum || 1)) * 100) : 0;
+      const top3Pct = Math.round((aggregated.slice(0, 3).reduce((a, b) => a + b.score, 0) / (totalSum || 1)) * 100);
+      const bottomSeg = aggregated[aggregated.length - 1];
+      const rangeSpread = (maxVal - minVal).toFixed(1);
       const topData = aggregated.slice(0, topLimit);
+      const finalRetPct = topData.length > 1 && topData[0].score > 0 ? Math.round((topData[topData.length - 1].score / topData[0].score) * 100) : 100;
 
-      // Render All 8 Charts
-      renderDashLineChart(metricVals.slice(0, 40));
-      renderDashHBarChart(topData);
-      renderDashColChart(topData);
-      renderDashDonutChart(topData.slice(0, 6));
-      renderDashPieChart(topData.slice(0, 6));
-      renderDashMapChart(filtered, metricCol, dimCol);
+      // 1. Line Chart Details
+      const lineT = document.getElementById("dashLineTitle");
+      if (lineT) lineT.textContent = `1. 📈 Trendline: ${metricCol} Sequential Variation`;
+      const lineD = document.getElementById("dashLineDesc");
+      if (lineD) lineD.textContent = `Sequential progression of ${metricCol} across ${metricVals.length} observations. Identifies trajectory, cyclical shifts, and peaks.`;
+      const lineI = document.getElementById("dashLineInsight");
+      if (lineI) lineI.innerHTML = `<span>💡 <strong>Trajectory:</strong> Baseline mean is <strong>${avgVal.toFixed(1)}</strong> (Peak: <strong>${maxVal.toFixed(1)}</strong>, Min: <strong>${minVal.toFixed(1)}</strong>)</span><span style="color:#818cf8; font-weight:600;">Span: ${rangeSpread}</span>`;
+
+      // 2. Bar Chart Details
+      const hbarT = document.getElementById("dashHBarTitle");
+      if (hbarT) hbarT.textContent = `2. 📊 Ranked Cohorts: ${metricCol} by ${dimCol}`;
+      const hbarD = document.getElementById("dashHBarDesc");
+      if (hbarD) hbarD.textContent = `Comparative ranking of top ${topData.length} ${dimCol} segments by ${aggFunc.toUpperCase()} of ${metricCol}.`;
+      const hbarI = document.getElementById("dashHBarInsight");
+      if (hbarI) hbarI.innerHTML = `<span>🏆 <strong>Cohort Leader:</strong> <strong>${aggregated[0]?.segment}</strong> leads with <strong>${aggregated[0]?.score}</strong> (${topPct}% share)</span><span style="color:#34d399; font-weight:600;">#1 of ${aggregated.length}</span>`;
+
+      // 3. Column Chart Details
+      const colT = document.getElementById("dashColTitle");
+      if (colT) colT.textContent = `3. 🏛️ Column Distribution: ${metricCol} (${aggFunc.toUpperCase()})`;
+      const colD = document.getElementById("dashColDesc");
+      if (colD) colD.textContent = `Direct vertical magnitude comparison across ${dimCol} segments against cohort average (${avgVal.toFixed(1)}).`;
+      const colI = document.getElementById("dashColInsight");
+      if (colI) colI.innerHTML = `<span>🏛️ <strong>Distribution Variance:</strong> Cohort average is <strong>${avgVal.toFixed(1)}</strong> across ${topData.length} visible segments</span><span style="color:#38bdf8; font-weight:600;">Spread: ${rangeSpread}</span>`;
+
+      // 4. Donut Chart Details
+      const donT = document.getElementById("dashDonutTitle");
+      if (donT) donT.textContent = `4. 🍩 Market Share: ${dimCol} Contribution`;
+      const donD = document.getElementById("dashDonutDesc");
+      if (donD) donD.textContent = `Proportional percentage contribution of top segments toward aggregate volume (${totalSum > 1000 ? (totalSum/1000).toFixed(1)+'k' : totalSum.toFixed(0)}).`;
+      const donI = document.getElementById("dashDonutInsight");
+      if (donI) donI.innerHTML = `<span>🍩 <strong>Concentration:</strong> Top 3 cohorts account for <strong>${top3Pct}%</strong> of total volume</span><span style="color:#f59e0b; font-weight:600;">Top: ${topPct}%</span>`;
+
+      // 5. Pie Chart Details
+      const pieT = document.getElementById("dashPieTitle");
+      if (pieT) pieT.textContent = `5. 🥧 Relative Split: ${dimCol} Proportions`;
+      const pieD = document.getElementById("dashPieDesc");
+      if (pieD) pieD.textContent = `Slice distribution illustrating the relative weight of each ${dimCol} cohort within 100% total.`;
+      const pieI = document.getElementById("dashPieInsight");
+      if (pieI) pieI.innerHTML = `<span>🥧 <strong>Cohort Weight:</strong> Top slice <strong>${aggregated[0]?.segment}</strong> accounts for ${topPct}% of the whole</span><span style="color:#ec4899; font-weight:600;">${aggregated.length} Segments</span>`;
+
+      // 6. Map Chart Details
+      const mapT = document.getElementById("dashMapTitle");
+      if (mapT) mapT.textContent = `6. 🗺️ Spatial & Density Clustering: ${dimCol} vs ${metricCol}`;
+      const mapD = document.getElementById("dashMapDesc");
+      if (mapD) mapD.textContent = `2D density scatter plotting ${dimCol} observations against ${metricCol} intensity.`;
+      const mapI = document.getElementById("dashMapInsight");
+      if (mapI) mapI.innerHTML = `<span>🗺️ <strong>Density Mapping:</strong> Peak cluster center at <strong>${maxVal.toFixed(1)}</strong> with highest observation frequency</span><span style="color:#38bdf8; font-weight:600;">${filtered.length} Points</span>`;
+
+      // 7. Radar Chart Details
+      const radT = document.getElementById("dashRadarTitle");
+      if (radT) radT.textContent = `7. 🕸️ Multi-Axis Radar: ${dimCol} Performance Web`;
+      const radD = document.getElementById("dashRadarDesc");
+      if (radD) radD.textContent = `Normalized spider web cross-evaluating relative performance across top segments (0% center to 100% outer rim).`;
+      const radI = document.getElementById("dashRadarInsight");
+      if (radI) radI.innerHTML = `<span>🕸️ <strong>Spider Balance:</strong> Outermost vertex is <strong>${aggregated[0]?.segment}</strong> (100% relative strength, score ${aggregated[0]?.score})</span><span style="color:#a78bfa; font-weight:600;">${Math.min(6, topData.length)} Axes</span>`;
+
+      // 8. Funnel Chart Details
+      const funT = document.getElementById("dashFunnelTitle");
+      if (funT) funT.textContent = `8. 🌪️ Pipeline Funnel: ${dimCol} Conversion & Drop-Off`;
+      const funD = document.getElementById("dashFunnelDesc");
+      if (funD) funD.textContent = `Step-by-step cohort attrition tracking stage volume and retention percentage from base to final stage.`;
+      const funI = document.getElementById("dashFunnelInsight");
+      if (funI) funI.innerHTML = `<span>🌪️ <strong>Pipeline Velocity:</strong> Base cohort starts at 100%. Final stage retains <strong>${finalRetPct}%</strong> of base volume</span><span style="color:#fbbf24; font-weight:600;">${Math.min(5, topData.length)} Stages</span>`;
+
+      // Render All 8 Charts with enriched details & accurate dimensions
+      renderDashLineChart(metricVals.slice(0, 45), metricCol, avgVal, minVal, maxVal);
+      renderDashHBarChart(topData, metricCol, dimCol, totalSum, avgVal);
+      renderDashColChart(topData, metricCol, dimCol, aggFunc, avgVal);
+      renderDashDonutChart(topData.slice(0, 6), metricCol, dimCol, totalSum);
+      renderDashPieChart(topData.slice(0, 6), metricCol, dimCol, totalSum);
+      renderDashMapChart(filtered, metricCol, dimCol, maxVal);
       renderDashRadarChart(topData.slice(0, 6), metricCol, dimCol);
-      renderDashFunnelChart(topData.slice(0, 6), metricCol, dimCol);
+      renderDashFunnelChart(topData.slice(0, 5), metricCol, dimCol);
 
       // Render Leaderboard
       renderDashboardLeaderboard(aggregated, metricCol);
@@ -18219,12 +18348,12 @@ result = df.describe()
     const PALETTE = ["#6366f1", "#10b981", "#38bdf8", "#f59e0b", "#ec4899", "#8b5cf6", "#14b8a6", "#f97316"];
 
     // 1. Line Chart
-    function renderDashLineChart(values) {
+    function renderDashLineChart(values, metricCol, avgVal, minVal, maxVal) {
       const canvas = document.getElementById("dashLineCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18233,35 +18362,85 @@ result = df.describe()
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
-      if (values.length < 2) { ctx.restore(); return; }
+      if (!values || values.length < 2) { ctx.restore(); return; }
 
       const max = Math.max(...values, 1);
       const min = Math.min(...values, 0);
-      const padL = 35, padR = 20, padT = 20, padB = 30;
+      const padL = 45, padR = 25, padT = 28, padB = 34;
       const plotW = width - padL - padR;
       const plotH = height - padT - padB;
       const stepX = plotW / (values.length - 1);
 
-      // Subtle horizontal gridlines
-      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      // Y-Axis Ticks & Gridlines
       ctx.lineWidth = 1;
       for (let g = 0; g <= 4; g++) {
-        const gy = Math.round(padT + (g / 4) * plotH) + 0.5;
+        const ratio = g / 4;
+        const gy = Math.round(padT + ratio * plotH) + 0.5;
+        const tickVal = max - ratio * (max - min);
+        
+        ctx.strokeStyle = "rgba(255,255,255,0.06)";
         ctx.beginPath();
         ctx.moveTo(padL, gy);
         ctx.lineTo(width - padR, gy);
         ctx.stroke();
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "9px Inter, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(tickVal >= 1000 ? (tickVal/1000).toFixed(1)+'k' : tickVal.toFixed(0), padL - 8, gy + 3);
+      }
+
+      // X-Axis Baseline & Label
+      ctx.strokeStyle = "rgba(255,255,255,0.14)";
+      ctx.beginPath();
+      ctx.moveTo(padL, height - padB);
+      ctx.lineTo(width - padR, height - padB);
+      ctx.stroke();
+
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "500 9.5px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`Observation Sequence (1 → ${values.length})`, padL + plotW / 2, height - 10);
+
+      // Y-Axis Title
+      ctx.save();
+      ctx.translate(14, padT + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "500 9.5px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(metricCol || "Metric Value", 0, 0);
+      ctx.restore();
+
+      // Mean Baseline Reference Line
+      if (typeof avgVal === "number" && avgVal >= min && avgVal <= max) {
+        const meanY = height - padB - ((avgVal - min) / (max - min || 1)) * plotH;
+        ctx.save();
+        ctx.setLineDash([4, 4]);
+        ctx.strokeStyle = "rgba(251, 191, 36, 0.75)";
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(padL, meanY);
+        ctx.lineTo(width - padR, meanY);
+        ctx.stroke();
+        ctx.fillStyle = "#fbbf24";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`── Mean: ${avgVal.toFixed(1)}`, padL + 6, meanY - 4);
+        ctx.restore();
       }
 
       // Smooth Bezier Curve Path
       const pts = values.map((v, i) => ({
         x: padL + i * stepX,
-        y: height - padB - ((v - min) / (max - min || 1)) * (plotH - 10)
+        y: height - padB - ((v - min) / (max - min || 1)) * plotH,
+        val: v,
+        idx: i
       }));
 
       // Gradient area fill
       const grad = ctx.createLinearGradient(0, padT, 0, height - padB);
-      grad.addColorStop(0, "rgba(99, 102, 241, 0.4)");
+      grad.addColorStop(0, "rgba(99, 102, 241, 0.38)");
       grad.addColorStop(1, "rgba(99, 102, 241, 0.0)");
 
       ctx.beginPath();
@@ -18289,32 +18468,51 @@ result = df.describe()
       ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
       ctx.strokeStyle = "#818cf8";
       ctx.lineWidth = 2.5;
-      ctx.shadowColor = "rgba(129, 140, 248, 0.5)";
-      ctx.shadowBlur = 8;
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
-      // Data points
-      pts.forEach((p, idx) => {
-        if (values.length <= 25 || idx % Math.ceil(values.length / 15) === 0) {
-          ctx.fillStyle = "#ffffff";
-          ctx.strokeStyle = "#4f46e5";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.stroke();
-        }
+      // Peak & Valley Markers
+      let peakPt = pts[0], valleyPt = pts[0];
+      pts.forEach(p => {
+        if (p.val > peakPt.val) peakPt = p;
+        if (p.val < valleyPt.val) valleyPt = p;
       });
+
+      // Draw Peak Badge
+      ctx.fillStyle = "#10b981";
+      ctx.beginPath();
+      ctx.arc(peakPt.x, peakPt.y, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = "#34d399";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`▲ Peak ${peakPt.val.toFixed(1)}`, peakPt.x, Math.max(padT - 6, peakPt.y - 8));
+
+      // Draw Valley Badge
+      ctx.fillStyle = "#ef4444";
+      ctx.beginPath();
+      ctx.arc(valleyPt.x, valleyPt.y, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.fillStyle = "#f87171";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`▼ Min ${valleyPt.val.toFixed(1)}`, valleyPt.x, Math.min(height - padB + 14, valleyPt.y + 14));
+
       ctx.restore();
     }
 
-    function renderDashHBarChart(data) {
+    // 2. Horizontal Bar Chart
+    function renderDashHBarChart(data, metricCol, dimCol, totalSum, avgVal) {
       const canvas = document.getElementById("dashHBarCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18323,16 +18521,24 @@ result = df.describe()
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
-      if (!data.length) { ctx.restore(); return; }
+      if (!data || !data.length) { ctx.restore(); return; }
 
       const maxVal = Math.max(...data.map(d => d.score), 1);
-      const padL = 75, padR = 40, padT = 15, padB = 20;
+      const padL = 95, padR = 85, padT = 16, padB = 24;
       const plotW = width - padL - padR;
       const rowH = Math.min(26, (height - padT - padB) / data.length);
+      const totalScoreSum = totalSum || data.reduce((a, b) => a + b.score, 0) || 1;
 
       data.forEach((d, i) => {
         const y = padT + i * rowH;
         const bw = Math.max(6, (d.score / maxVal) * plotW);
+        const pct = Math.round((d.score / totalScoreSum) * 100);
+
+        // Rank Badge (#1, #2, ...)
+        ctx.fillStyle = i === 0 ? "#fbbf24" : (i === 1 ? "#94a3b8" : (i === 2 ? "#d97706" : "#64748b"));
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`#${i+1}`, 14, y + rowH / 2 + 3);
 
         // Background track rail
         ctx.fillStyle = "rgba(255,255,255,0.03)";
@@ -18341,42 +18547,59 @@ result = df.describe()
         else ctx.rect(padL, y + 2, plotW, rowH - 6);
         ctx.fill();
 
-        // HD Gradient Bar with rounded cap
+        // HD Gradient Bar
         const grad = ctx.createLinearGradient(padL, 0, padL + bw, 0);
         grad.addColorStop(0, "#10b981");
         grad.addColorStop(1, "#059669");
         ctx.fillStyle = grad;
-        ctx.shadowColor = "rgba(16, 185, 129, 0.3)";
-        ctx.shadowBlur = 4;
         ctx.beginPath();
         if (ctx.roundRect) ctx.roundRect(padL, y + 2, bw, rowH - 6, 4);
         else ctx.rect(padL, y + 2, bw, rowH - 6);
         ctx.fill();
-        ctx.shadowBlur = 0;
 
-        // Label
+        // Dimension label
         ctx.fillStyle = "#cbd5e1";
-        ctx.font = "500 10px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.font = "500 10px Inter, sans-serif";
         ctx.textAlign = "right";
-        const cleanName = String(d.segment).length > 11 ? String(d.segment).substring(0, 10) + "…" : d.segment;
-        ctx.fillText(cleanName, padL - 6, y + rowH / 2 + 3);
+        const cleanName = String(d.segment).length > 13 ? String(d.segment).substring(0, 12) + "…" : d.segment;
+        ctx.fillText(cleanName, padL - 8, y + rowH / 2 + 3);
 
-        // Value text
+        // Value & Share Percentage
         ctx.fillStyle = "#34d399";
-        ctx.font = "bold 9.5px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.font = "bold 9.5px Inter, sans-serif";
         ctx.textAlign = "left";
         const valStr = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(1);
-        ctx.fillText(valStr, padL + bw + 4, y + rowH / 2 + 3);
+        ctx.fillText(`${valStr} (${pct}%)`, padL + bw + 6, y + rowH / 2 + 3);
       });
+
+      // Benchmark Average Reference line
+      if (typeof avgVal === "number" && avgVal <= maxVal) {
+        const avgX = padL + (avgVal / maxVal) * plotW;
+        ctx.save();
+        ctx.setLineDash([3, 3]);
+        ctx.strokeStyle = "rgba(251, 191, 36, 0.6)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(avgX, padT - 4);
+        ctx.lineTo(avgX, height - padB + 2);
+        ctx.stroke();
+        ctx.fillStyle = "#fbbf24";
+        ctx.font = "bold 8.5px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Avg", avgX, height - padB + 14);
+        ctx.restore();
+      }
+
       ctx.restore();
     }
 
-    function renderDashColChart(data) {
+    // 3. Vertical Column Chart
+    function renderDashColChart(data, metricCol, dimCol, aggFunc, avgVal) {
       const canvas = document.getElementById("dashColCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18385,59 +18608,81 @@ result = df.describe()
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
-      if (!data.length) { ctx.restore(); return; }
+      if (!data || !data.length) { ctx.restore(); return; }
 
       const maxVal = Math.max(...data.map(d => d.score), 1);
-      const padL = 35, padR = 15, padT = 20, padB = 30;
+      const padL = 45, padR = 20, padT = 26, padB = 40;
       const plotW = width - padL - padR;
       const plotH = height - padT - padB;
       const colW = plotW / data.length;
 
-      // Subtle horizontal gridlines
-      ctx.strokeStyle = "rgba(255,255,255,0.06)";
+      // Y-Axis Horizontal Gridlines & Values
       ctx.lineWidth = 1;
       for (let g = 0; g <= 4; g++) {
-        const gy = Math.round(padT + (g / 4) * plotH) + 0.5;
+        const ratio = g / 4;
+        const gy = Math.round(padT + ratio * plotH) + 0.5;
+        const tickVal = maxVal - ratio * maxVal;
+
+        ctx.strokeStyle = "rgba(255,255,255,0.06)";
         ctx.beginPath();
         ctx.moveTo(padL, gy);
         ctx.lineTo(width - padR, gy);
         ctx.stroke();
+
+        ctx.fillStyle = "#64748b";
+        ctx.font = "9px Inter, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(tickVal >= 1000 ? (tickVal/1000).toFixed(1)+'k' : tickVal.toFixed(0), padL - 8, gy + 3);
       }
 
+      // X-Axis Baseline
+      ctx.strokeStyle = "rgba(255,255,255,0.14)";
+      ctx.beginPath();
+      ctx.moveTo(padL, height - padB);
+      ctx.lineTo(width - padR, height - padB);
+      ctx.stroke();
+
+      // Columns
       data.forEach((d, i) => {
-        const h = Math.max(6, (d.score / maxVal) * (plotH - 12));
-        const x = padL + i * colW + 4;
+        const h = Math.max(6, (d.score / maxVal) * (plotH - 8));
+        const x = padL + i * colW + 6;
         const y = height - padB - h;
-        const bw = Math.max(4, colW - 8);
+        const bw = Math.max(6, colW - 12);
 
         const grad = ctx.createLinearGradient(0, y, 0, height - padB);
         grad.addColorStop(0, "#38bdf8");
         grad.addColorStop(1, "#0284c7");
         ctx.fillStyle = grad;
-        ctx.shadowColor = "rgba(56, 189, 248, 0.35)";
-        ctx.shadowBlur = 6;
         ctx.beginPath();
         if (ctx.roundRect) ctx.roundRect(x, y, bw, h, [4, 4, 0, 0]);
         else ctx.rect(x, y, bw, h);
         ctx.fill();
-        ctx.shadowBlur = 0;
 
-        // Label
-        ctx.fillStyle = "#94a3b8";
-        ctx.font = "9px -apple-system, BlinkMacSystemFont, sans-serif";
+        // Exact Value on Top
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "bold 9px Inter, sans-serif";
         ctx.textAlign = "center";
-        const shortName = String(d.segment).substring(0, 5);
-        ctx.fillText(shortName, x + bw / 2, height - 10);
+        const valStr = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(1);
+        ctx.fillText(valStr, x + bw / 2, y - 5);
+
+        // Segment Name Below
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "500 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        const shortName = String(d.segment).length > 7 ? String(d.segment).substring(0, 6) + "…" : d.segment;
+        ctx.fillText(shortName, x + bw / 2, height - padB + 14);
       });
+
       ctx.restore();
     }
 
-    function renderDashDonutChart(data) {
+    // 4. Donut Chart
+    function renderDashDonutChart(data, metricCol, dimCol, totalSum) {
       const canvas = document.getElementById("dashDonutCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18446,12 +18691,12 @@ result = df.describe()
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
-      if (!data.length) { ctx.restore(); return; }
+      if (!data || !data.length) { ctx.restore(); return; }
 
-      const total = data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
-      const cx = width * 0.4;
+      const total = totalSum || data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
+      const cx = width * 0.38;
       const cy = height * 0.5;
-      const r = Math.min(width * 0.35, height * 0.42);
+      const r = Math.min(width * 0.32, height * 0.40);
       const innerR = r * 0.62;
 
       let startAngle = -Math.PI / 2;
@@ -18470,39 +18715,49 @@ result = df.describe()
         startAngle = endAngle;
       });
 
-      // Center HD text
+      // Center High-Resolution KPI Ring Callout
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 13px -apple-system, BlinkMacSystemFont, sans-serif";
+      ctx.font = "bold 14px Inter, sans-serif";
       ctx.textAlign = "center";
       const totalTxt = total >= 1e6 ? (total/1e6).toFixed(1)+"M" : (total>=1e3 ? (total/1e3).toFixed(1)+"k" : total.toFixed(0));
-      ctx.fillText(totalTxt, cx, cy + 2);
+      ctx.fillText(totalTxt, cx, cy - 2);
       ctx.fillStyle = "#94a3b8";
-      ctx.font = "9px sans-serif";
-      ctx.fillText("Total", cx, cy + 14);
+      ctx.font = "500 8.5px Inter, sans-serif";
+      ctx.fillText("Total Volume", cx, cy + 12);
+      if (data[0]) {
+        const topRatio = Math.round((data[0].score / total) * 100);
+        ctx.fillStyle = "#10b981";
+        ctx.font = "bold 8.5px Inter, sans-serif";
+        ctx.fillText(`Top: ${topRatio}%`, cx, cy + 24);
+      }
 
-      // Legend on the right
-      const legX = width * 0.72;
-      data.slice(0, 5).forEach((d, i) => {
-        const ly = 40 + i * 26;
+      // Rich Legend on the right
+      const legX = width * 0.68;
+      data.slice(0, 6).forEach((d, i) => {
+        const ly = 32 + i * 28;
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
-        ctx.arc(legX, ly, 4, 0, Math.PI * 2);
+        ctx.arc(legX, ly, 4.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+
+        ctx.fillStyle = "#f1f5f9";
+        ctx.font = "600 10px Inter, sans-serif";
         ctx.textAlign = "left";
+        const cleanName = String(d.segment).length > 10 ? String(d.segment).substring(0, 9) + "…" : d.segment;
         const pct = Math.round((d.score / total) * 100);
-        ctx.fillText(`${String(d.segment).substring(0, 9)} (${pct}%)`, legX + 8, ly + 3);
+        const scoreTxt = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(0);
+        ctx.fillText(`${cleanName}: ${scoreTxt} (${pct}%)`, legX + 10, ly + 3);
       });
       ctx.restore();
     }
 
-    function renderDashPieChart(data) {
+    // 5. Pie Chart
+    function renderDashPieChart(data, metricCol, dimCol, totalSum) {
       const canvas = document.getElementById("dashPieCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18511,12 +18766,12 @@ result = df.describe()
       ctx.save();
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
-      if (!data.length) { ctx.restore(); return; }
+      if (!data || !data.length) { ctx.restore(); return; }
 
-      const total = data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
-      const cx = width * 0.4;
+      const total = totalSum || data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
+      const cx = width * 0.38;
       const cy = height * 0.5;
-      const r = Math.min(width * 0.35, height * 0.42);
+      const r = Math.min(width * 0.32, height * 0.40);
 
       let startAngle = -Math.PI / 2;
       data.forEach((d, i) => {
@@ -18531,32 +18786,48 @@ result = df.describe()
         ctx.strokeStyle = "#0f172a";
         ctx.lineWidth = 1.5;
         ctx.stroke();
+
+        // Slice Percentage Callout inside or alongside slice
+        if (slice > 0.45) {
+          const midAngle = startAngle + slice / 2;
+          const textR = r * 0.68;
+          const tx = cx + Math.cos(midAngle) * textR;
+          const ty = cy + Math.sin(midAngle) * textR;
+          const pct = Math.round((d.score / total) * 100);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "bold 9px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(`${pct}%`, tx, ty + 3);
+        }
         startAngle = endAngle;
       });
 
-      // Legend
-      const legX = width * 0.72;
-      data.slice(0, 5).forEach((d, i) => {
-        const ly = 40 + i * 26;
+      // Legend on the right
+      const legX = width * 0.68;
+      data.slice(0, 6).forEach((d, i) => {
+        const ly = 32 + i * 28;
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
-        ctx.arc(legX, ly, 4, 0, Math.PI * 2);
+        ctx.arc(legX, ly, 4.5, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "10px -apple-system, BlinkMacSystemFont, sans-serif";
+
+        ctx.fillStyle = "#f1f5f9";
+        ctx.font = "600 10px Inter, sans-serif";
         ctx.textAlign = "left";
+        const cleanName = String(d.segment).length > 10 ? String(d.segment).substring(0, 9) + "…" : d.segment;
         const pct = Math.round((d.score / total) * 100);
-        ctx.fillText(`${String(d.segment).substring(0, 9)} (${pct}%)`, legX + 8, ly + 3);
+        ctx.fillText(`${cleanName}: ${pct}%`, legX + 10, ly + 3);
       });
       ctx.restore();
     }
 
-    function renderDashMapChart(data, metricCol, dimCol) {
+    // 6. Regional / Density Map Chart
+    function renderDashMapChart(data, metricCol, dimCol, maxVal) {
       const canvas = document.getElementById("dashMapCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 220;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18566,36 +18837,64 @@ result = df.describe()
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      // Coordinate grid lines
-      ctx.strokeStyle = "rgba(255,255,255,0.05)";
+      const padL = 40, padR = 25, padT = 24, padB = 30;
+      const plotW = width - padL - padR;
+      const plotH = height - padT - padB;
+
+      // Coordinate Gridlines
+      ctx.strokeStyle = "rgba(255,255,255,0.06)";
       ctx.lineWidth = 1;
-      for (let x = 20; x < width; x += 30) {
-        ctx.beginPath(); ctx.moveTo(x, 15); ctx.lineTo(x, height - 15); ctx.stroke();
-      }
-      for (let y = 15; y < height; y += 30) {
-        ctx.beginPath(); ctx.moveTo(15, y); ctx.lineTo(width - 15, y); ctx.stroke();
+      for (let g = 0; g <= 4; g++) {
+        const gy = padT + (g / 4) * plotH;
+        ctx.beginPath(); ctx.moveTo(padL, gy); ctx.lineTo(width - padR, gy); ctx.stroke();
+        const gx = padL + (g / 4) * plotW;
+        ctx.beginPath(); ctx.moveTo(gx, padT); ctx.lineTo(gx, height - padB); ctx.stroke();
       }
 
-      // Geo points
-      const maxVal = safeMax(data.slice(0, 1000).map(r => typeof r[metricCol] === "number" ? r[metricCol] : 0), 1);
+      // X and Y Axis titles
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "500 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`Dimension Cohorts (${dimCol || 'Segments'})`, padL + plotW / 2, height - 8);
+
+      ctx.save();
+      ctx.translate(14, padT + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText(`${metricCol || 'Intensity'}`, 0, 0);
+      ctx.restore();
+
+      // Density Legend in top right
+      ctx.fillStyle = "#64748b";
+      ctx.font = "8.5px Inter, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText("Density: 🔵 Low ➔ 🟣 Med ➔ 🟡 Peak", width - padR, padT - 8);
+
+      // Geo points & density halos
+      const peakScore = typeof maxVal === "number" && maxVal > 0 ? maxVal : 1;
       const sample = data.slice(0, 45);
+      let highestPt = null;
 
       sample.forEach((r, idx) => {
         const hash1 = ((idx * 7919 + 104729) % 1000) / 1000;
         const hash2 = ((idx * 3571 + 65537) % 1000) / 1000;
-        const px = 30 + hash1 * (width - 60);
-        const py = 25 + hash2 * (height - 50);
+        const px = padL + hash1 * plotW;
+        const py = padT + (1 - hash2) * plotH;
         const val = typeof r[metricCol] === "number" ? r[metricCol] : 0;
-        const ratio = Math.max(0.1, val / maxVal);
+        const ratio = Math.max(0.12, Math.min(1.0, val / peakScore));
         const radius = 3 + ratio * 8;
 
-        // Pulsing glow
-        ctx.fillStyle = "rgba(99, 102, 241, 0.25)";
+        if (!highestPt || val > highestPt.val) {
+          highestPt = { x: px, y: py, val: val };
+        }
+
+        // Density Halo
+        ctx.fillStyle = ratio > 0.7 ? "rgba(251, 191, 36, 0.25)" : (ratio > 0.4 ? "rgba(168, 85, 247, 0.22)" : "rgba(59, 130, 246, 0.18)");
         ctx.beginPath();
         ctx.arc(px, py, radius * 1.8, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.fillStyle = "rgba(56, 189, 248, 0.85)";
+        // Core Dot
+        ctx.fillStyle = ratio > 0.7 ? "#fbbf24" : (ratio > 0.4 ? "#c084fc" : "#38bdf8");
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -18604,22 +18903,24 @@ result = df.describe()
         ctx.stroke();
       });
 
-      ctx.fillStyle = "#94a3b8";
-      ctx.font = "9.5px -apple-system, BlinkMacSystemFont, sans-serif";
-      ctx.textAlign = "right";
-      ctx.fillText("Regional Cluster Density Map", width - 15, height - 10);
+      // Annotate Peak Cluster Point
+      if (highestPt) {
+        ctx.fillStyle = "#fbbf24";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`📍 Peak (${highestPt.val.toFixed(1)})`, highestPt.x, Math.max(padT + 12, highestPt.y - 12));
+      }
+
       ctx.restore();
     }
 
-    // -------------------------------------------------------------------------
-    // NEW UNIQUE CHART 7: MULTI-AXIS RADAR / SPIDER WEB CHART
-    // -------------------------------------------------------------------------
+    // 7. Multi-Axis Radar / Spider Chart (FIXED ALIGNMENT & SIZING)
     function renderDashRadarChart(data, metricCol, dimCol) {
       const canvas = document.getElementById("dashRadarCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 240;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18631,7 +18932,7 @@ result = df.describe()
 
       if (!data || data.length < 3) {
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "11px sans-serif";
+        ctx.font = "11px Inter, sans-serif";
         ctx.textAlign = "center";
         ctx.fillText("Need at least 3 segments for Radar Chart", width / 2, height / 2);
         ctx.restore();
@@ -18640,14 +18941,15 @@ result = df.describe()
 
       const cx = width / 2;
       const cy = height / 2;
-      const R = Math.min(width, height) / 2 - 38;
+      // Buffer of 46px prevents labels and points from ever touching or exceeding box boundaries
+      const R = Math.min(width, height) / 2 - 46;
       const N = data.length;
       const maxVal = Math.max(...data.map(d => d.score), 1);
 
       // Concentric polygon web rings (25%, 50%, 75%, 100%)
       const rings = [0.25, 0.5, 0.75, 1.0];
       rings.forEach((ring, rIdx) => {
-        ctx.strokeStyle = rIdx === rings.length - 1 ? "rgba(255,255,255,0.18)" : "rgba(255,255,255,0.06)";
+        ctx.strokeStyle = rIdx === rings.length - 1 ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.08)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         for (let i = 0; i < N; i++) {
@@ -18659,6 +18961,12 @@ result = df.describe()
         }
         ctx.closePath();
         ctx.stroke();
+
+        // Ring Percentage Label on Vertical Axis
+        ctx.fillStyle = "#64748b";
+        ctx.font = "8px Inter, sans-serif";
+        ctx.textAlign = "right";
+        ctx.fillText(`${Math.round(ring * 100)}%`, cx - 4, cy - R * ring + 3);
       });
 
       // Axis spokes & labels
@@ -18666,30 +18974,33 @@ result = df.describe()
         const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
         const ax = cx + R * Math.cos(angle);
         const ay = cy + R * Math.sin(angle);
-        ctx.strokeStyle = "rgba(255,255,255,0.1)";
+        ctx.strokeStyle = "rgba(255,255,255,0.12)";
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.lineTo(ax, ay);
         ctx.stroke();
 
-        // Label
-        const lx = cx + (R + 18) * Math.cos(angle);
-        const ly = cy + (R + 18) * Math.sin(angle);
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "bold 9px -apple-system, BlinkMacSystemFont, sans-serif";
+        // Full legible Segment Name & Score on Spoke
+        const lx = cx + (R + 15) * Math.cos(angle);
+        const ly = cy + (R + 15) * Math.sin(angle);
+        ctx.fillStyle = i === 0 ? "#fbbf24" : "#e2e8f0";
+        ctx.font = "bold 9px Inter, sans-serif";
         ctx.textAlign = Math.abs(Math.cos(angle)) < 0.2 ? "center" : (Math.cos(angle) > 0 ? "left" : "right");
-        const cleanName = String(d.segment).substring(0, 8);
-        ctx.fillText(cleanName, lx, ly + 3);
+        const cleanName = String(d.segment).length > 9 ? String(d.segment).substring(0, 8) + "…" : d.segment;
+        const valStr = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(1);
+        ctx.fillText(`${cleanName}: ${valStr}`, lx, ly + 3);
       });
 
       // Polygon Area Fill
       const pts = data.map((d, i) => {
         const angle = -Math.PI / 2 + (i * 2 * Math.PI) / N;
-        const r = Math.max(0.12, (d.score / maxVal)) * R;
+        const r = Math.max(0.14, (d.score / maxVal)) * R;
         return {
           x: cx + r * Math.cos(angle),
-          y: cy + r * Math.sin(angle)
+          y: cy + r * Math.sin(angle),
+          score: d.score,
+          isLeader: i === 0
         };
       });
 
@@ -18705,21 +19016,18 @@ result = df.describe()
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // Stroke with glow
+      // Stroke
       ctx.strokeStyle = "#a78bfa";
       ctx.lineWidth = 2.5;
-      ctx.shadowColor = "rgba(167, 139, 250, 0.55)";
-      ctx.shadowBlur = 8;
       ctx.stroke();
-      ctx.shadowBlur = 0;
 
-      // Glowing vertices
+      // Vertices
       pts.forEach((p, i) => {
-        ctx.fillStyle = "#ffffff";
-        ctx.strokeStyle = "#8b5cf6";
+        ctx.fillStyle = p.isLeader ? "#fbbf24" : "#ffffff";
+        ctx.strokeStyle = p.isLeader ? "#d97706" : "#8b5cf6";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.arc(p.x, p.y, p.isLeader ? 5.5 : 4, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
       });
@@ -18727,15 +19035,13 @@ result = df.describe()
       ctx.restore();
     }
 
-    // -------------------------------------------------------------------------
-    // NEW UNIQUE CHART 8: CONVERSION FUNNEL & FLOW WATERFALL
-    // -------------------------------------------------------------------------
+    // 8. Conversion Funnel Chart (FIXED ALIGNMENT & SIZING)
     function renderDashFunnelChart(data, metricCol, dimCol) {
       const canvas = document.getElementById("dashFunnelCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
-      const width = canvas.parentElement.clientWidth || 380;
-      const height = 240;
+      const width = canvas.clientWidth || canvas.parentElement.clientWidth || 380;
+      const height = canvas.clientHeight || 260;
       if (canvas.width !== Math.round(width * dpr) || canvas.height !== Math.round(height * dpr)) {
         canvas.width = Math.round(width * dpr);
         canvas.height = Math.round(height * dpr);
@@ -18749,10 +19055,11 @@ result = df.describe()
 
       const stages = data.slice(0, 5);
       const N = stages.length;
-      const padTop = 15;
-      const padBottom = 20;
+      // Generous bottom padding (30px) ensures bottom trapezoid NEVER extends beyond box boundary
+      const padTop = 18;
+      const padBottom = 30;
       const padL = 20;
-      const padR = 85;
+      const padR = 105;
       const funnelW = width - padL - padR;
       const stageH = (height - padTop - padBottom) / N;
       const cx = padL + funnelW / 2;
@@ -18767,8 +19074,8 @@ result = df.describe()
       ];
 
       stages.forEach((st, i) => {
-        const topRatio = i === 0 ? 0.95 : Math.max(0.2, stages[i-1].score / maxVal);
-        const botRatio = Math.max(0.18, st.score / maxVal);
+        const topRatio = i === 0 ? 0.95 : Math.max(0.22, stages[i-1].score / maxVal);
+        const botRatio = Math.max(0.20, st.score / maxVal);
         const topW = funnelW * topRatio;
         const botW = funnelW * botRatio;
 
@@ -18793,33 +19100,40 @@ result = df.describe()
         ctx.lineTo(x3, y2);
         ctx.lineTo(x4, y2);
         ctx.closePath();
-        ctx.shadowColor = "rgba(0,0,0,0.3)";
-        ctx.shadowBlur = 4;
         ctx.fill();
-        ctx.shadowBlur = 0;
 
         // Stage Name & Value inside trapezoid
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 10px -apple-system, BlinkMacSystemFont, sans-serif";
+        ctx.font = "bold 10px Inter, sans-serif";
         ctx.textAlign = "center";
         const valTxt = st.score >= 1000 ? (st.score/1000).toFixed(1)+"k" : st.score.toFixed(1);
-        ctx.fillText(`${st.segment}: ${valTxt}`, cx, (y1 + y2) / 2 + 3);
+        ctx.fillText(`Stage ${i+1}: ${st.segment} (${valTxt})`, cx, (y1 + y2) / 2 + 3);
 
-        // Drop-off percentage badge on the right
+        // Retention & Conversion Rate on Right
         if (i > 0) {
           const prev = stages[i-1].score || 1;
           const retPct = Math.round((st.score / prev) * 100);
+          const dropPct = 100 - retPct;
           ctx.fillStyle = retPct >= 70 ? "#34d399" : (retPct >= 40 ? "#fbbf24" : "#f87171");
-          ctx.font = "bold 9px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.font = "bold 9px Inter, sans-serif";
           ctx.textAlign = "left";
-          ctx.fillText(`↓ ${retPct}% conv`, padL + funnelW + 8, (y1 + y2) / 2 + 3);
+          ctx.fillText(`↓ ${retPct}% conv (-${dropPct}%)`, padL + funnelW + 8, (y1 + y2) / 2 + 3);
         } else {
           ctx.fillStyle = "#94a3b8";
-          ctx.font = "9px -apple-system, BlinkMacSystemFont, sans-serif";
+          ctx.font = "bold 9px Inter, sans-serif";
           ctx.textAlign = "left";
-          ctx.fillText("100% (Base)", padL + funnelW + 8, (y1 + y2) / 2 + 3);
+          ctx.fillText("100% Base Stage", padL + funnelW + 8, (y1 + y2) / 2 + 3);
         }
       });
+
+      // Bottom Net Funnel Summary
+      if (stages.length > 1) {
+        const netRetention = Math.round((stages[stages.length - 1].score / (stages[0].score || 1)) * 100);
+        ctx.fillStyle = "#64748b";
+        ctx.font = "500 8.5px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`Overall Funnel Retention: 100% ➔ ${netRetention}%`, cx, height - 8);
+      }
 
       ctx.restore();
     }
