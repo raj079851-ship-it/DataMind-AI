@@ -1147,11 +1147,13 @@
         </button>
       </div>
 
-      <!-- Single Logo for Login & Registration -->
-      <div id="topUserContainer" onclick="openAuthModal('user')" style="width:40px; height:40px; min-width:40px; border-radius:50%; border:1.8px solid rgba(212,175,55,0.65); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative; box-shadow:0 0 14px rgba(212,175,55,0.3); background:rgba(15,23,42,0.85); margin-left:6px; flex-shrink:0;" title="DataMind AI • Click to Sign In or Register" onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.5)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 14px rgba(212,175,55,0.3)';">
-        <img id="topUserLogoImg" src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" style="width:34px; height:34px; border-radius:50%; object-fit:cover; display:block;" />
+      <!-- Simple Login Logo Button -->
+      <div id="topUserContainer" onclick="openAuthModal('user')" style="width:40px; height:40px; min-width:40px; border-radius:50%; border:1.8px solid rgba(212,175,55,0.65); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative; box-shadow:0 0 14px rgba(212,175,55,0.3); background:rgba(15,23,42,0.85); margin-left:6px; flex-shrink:0;" title="Login / Account • Click to Sign In or Register" onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.5)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 14px rgba(212,175,55,0.3)';">
+        <svg id="topUserLoginLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--champagne-gold, #d4af37); display:block;" aria-hidden="true">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3.6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 12.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+        </svg>
+        <span id="topUserIcon" style="display:none; font-size:1.15rem; line-height:1;">👤</span>
         <span id="topUserStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#94a3b8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease;" title="Guest • Click to Sign In or Register"></span>
-        <span id="topUserIcon" style="display:none;">👤</span>
         <span id="topUserName" style="display:none;">Sign In</span>
         <span id="topUserRoleBadge" style="display:none;">Not Authenticated</span>
       </div>
@@ -10664,6 +10666,7 @@ result = df.describe()
     function applyUserSessionUI() {
       const topContainer = document.getElementById("topUserContainer");
       const iconEl = document.getElementById("topUserIcon");
+      const logoSvg = document.getElementById("topUserLoginLogoSvg");
       const nameEl = document.getElementById("topUserName");
       const badgeEl = document.getElementById("topUserRoleBadge");
       const secBadgeEl = document.getElementById("secUserBadge");
@@ -10672,8 +10675,9 @@ result = df.describe()
       const roleIcons = { Admin: "👑", Analyst: "📊", "Data Engineer": "⚙️", Viewer: "👁️" };
 
       if (!currentAuthUser) {
-        if (iconEl) iconEl.textContent = "👤";
-        if (topContainer) topContainer.title = "DataMind AI • Click to Sign In or Register";
+        if (logoSvg) logoSvg.style.display = "block";
+        if (iconEl) iconEl.style.display = "none";
+        if (topContainer) topContainer.title = "Login / Account • Click to Sign In or Register";
         if (nameEl) nameEl.textContent = "Sign In";
         if (badgeEl) badgeEl.textContent = "Not Authenticated";
         if (secBadgeEl) secBadgeEl.textContent = "Current User: Unauthenticated (Guest)";
@@ -10685,7 +10689,11 @@ result = df.describe()
       }
 
       const icon = roleIcons[currentAuthUser.role] || "👤";
-      if (iconEl) iconEl.textContent = icon;
+      if (logoSvg) logoSvg.style.display = "none";
+      if (iconEl) {
+        iconEl.textContent = icon;
+        iconEl.style.display = "block";
+      }
       if (topContainer) topContainer.title = `Signed in as ${currentAuthUser.full_name || currentAuthUser.username} (${currentAuthUser.role}) • Click to manage account`;
       if (nameEl) nameEl.textContent = `${currentAuthUser.full_name || currentAuthUser.username}`;
       if (badgeEl) badgeEl.textContent = `Role: ${currentAuthUser.role} • PBKDF2`;
