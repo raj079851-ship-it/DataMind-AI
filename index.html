@@ -18335,8 +18335,8 @@ result = df.describe()
       renderDashLineChart(metricVals.slice(0, 45), metricCol, avgVal, minVal, maxVal);
       renderDashHBarChart(topData, metricCol, dimCol, totalSum, avgVal);
       renderDashColChart(topData, metricCol, dimCol, aggFunc, avgVal);
-      renderDashDonutChart(topData.slice(0, 6), metricCol, dimCol, totalSum);
-      renderDashPieChart(topData.slice(0, 6), metricCol, dimCol, totalSum);
+      renderDashDonutChart(topData.slice(0, 6), metricCol, dimCol);
+      renderDashPieChart(topData.slice(0, 6), metricCol, dimCol);
       renderDashMapChart(filtered, metricCol, dimCol, maxVal);
       renderDashRadarChart(topData.slice(0, 6), metricCol, dimCol);
       renderDashFunnelChart(topData.slice(0, 5), metricCol, dimCol);
@@ -18506,7 +18506,7 @@ result = df.describe()
       ctx.restore();
     }
 
-    // 2. Horizontal Bar Chart
+    // 2. Horizontal Bar Chart (FIXED: Isolated coordinate zones prevent #1, #2 from submerging into data labels)
     function renderDashHBarChart(data, metricCol, dimCol, totalSum, avgVal) {
       const canvas = document.getElementById("dashHBarCanvas");
       if (!canvas) return;
@@ -18523,31 +18523,50 @@ result = df.describe()
       ctx.clearRect(0, 0, width, height);
       if (!data || !data.length) { ctx.restore(); return; }
 
-      const maxVal = Math.max(...data.map(d => d.score), 1);
-      const padL = 95, padR = 85, padT = 16, padB = 24;
-      const plotW = width - padL - padR;
+      const maxVal = Math.max(...data.map(d => Math.abs(Number(d.score) || 0)), 1);
+      // Strictly separated coordinate corridors:
+      // Corridor 1 [Rank]: x = 12 to 34 (Left-aligned)
+      // Corridor 2 [Label]: x = 40 to 134 (Left-aligned, bounded width, never submerges with rank)
+      // Corridor 3 [Track & Bar]: x = 142 to (width - 76)
+      // Corridor 4 [Value Badge]: x = padL + bw + 6
+      const padL = 142;
+      const padR = 76;
+      const padT = 16;
+      const padB = 24;
+      const plotW = Math.max(30, width - padL - padR);
       const rowH = Math.min(26, (height - padT - padB) / data.length);
-      const totalScoreSum = totalSum || data.reduce((a, b) => a + b.score, 0) || 1;
+      const visibleTotal = data.reduce((a, b) => a + Math.max(0, Math.abs(Number(b.score) || 0)), 0) || 1;
 
       data.forEach((d, i) => {
         const y = padT + i * rowH;
-        const bw = Math.max(6, (d.score / maxVal) * plotW);
-        const pct = Math.round((d.score / totalScoreSum) * 100);
+        const val = Math.abs(Number(d.score) || 0);
+        const bw = Math.max(6, (val / maxVal) * plotW);
+        const pct = Math.round((val / visibleTotal) * 100);
 
-        // Rank Badge (#1, #2, ...)
+        // 1. Rank Badge (#1, #2, ...) in its own protected zone [12px, 34px]
         ctx.fillStyle = i === 0 ? "#fbbf24" : (i === 1 ? "#94a3b8" : (i === 2 ? "#d97706" : "#64748b"));
         ctx.font = "bold 9px Inter, sans-serif";
         ctx.textAlign = "left";
-        ctx.fillText(`#${i+1}`, 14, y + rowH / 2 + 3);
+        ctx.fillText(`#${i+1}`, 12, y + rowH / 2 + 3);
 
-        // Background track rail
+        // 2. Category Dimension Label in its own protected zone [40px, 134px]
+        ctx.fillStyle = "#cbd5e1";
+        ctx.font = "500 10px Inter, sans-serif";
+        ctx.textAlign = "left";
+        let cleanName = String(d.segment);
+        while (ctx.measureText(cleanName).width > 94 && cleanName.length > 3) {
+          cleanName = cleanName.substring(0, cleanName.length - 2) + "…";
+        }
+        ctx.fillText(cleanName, 40, y + rowH / 2 + 3);
+
+        // 3. Background Track Rail
         ctx.fillStyle = "rgba(255,255,255,0.03)";
         ctx.beginPath();
         if (ctx.roundRect) ctx.roundRect(padL, y + 2, plotW, rowH - 6, 4);
         else ctx.rect(padL, y + 2, plotW, rowH - 6);
         ctx.fill();
 
-        // HD Gradient Bar
+        // 4. HD Gradient Bar
         const grad = ctx.createLinearGradient(padL, 0, padL + bw, 0);
         grad.addColorStop(0, "#10b981");
         grad.addColorStop(1, "#059669");
@@ -18557,23 +18576,16 @@ result = df.describe()
         else ctx.rect(padL, y + 2, bw, rowH - 6);
         ctx.fill();
 
-        // Dimension label
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "500 10px Inter, sans-serif";
-        ctx.textAlign = "right";
-        const cleanName = String(d.segment).length > 13 ? String(d.segment).substring(0, 12) + "…" : d.segment;
-        ctx.fillText(cleanName, padL - 8, y + rowH / 2 + 3);
-
-        // Value & Share Percentage
+        // 5. Value & Share Percentage
         ctx.fillStyle = "#34d399";
         ctx.font = "bold 9.5px Inter, sans-serif";
         ctx.textAlign = "left";
-        const valStr = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(1);
+        const valStr = val >= 1000 ? (val/1000).toFixed(1)+"k" : val.toFixed(1);
         ctx.fillText(`${valStr} (${pct}%)`, padL + bw + 6, y + rowH / 2 + 3);
       });
 
       // Benchmark Average Reference line
-      if (typeof avgVal === "number" && avgVal <= maxVal) {
+      if (typeof avgVal === "number" && avgVal <= maxVal && avgVal > 0) {
         const avgX = padL + (avgVal / maxVal) * plotW;
         ctx.save();
         ctx.setLineDash([3, 3]);
@@ -18676,8 +18688,8 @@ result = df.describe()
       ctx.restore();
     }
 
-    // 4. Donut Chart
-    function renderDashDonutChart(data, metricCol, dimCol, totalSum) {
+    // 4. Donut Chart (ALWAYS VISIBLE & FULLY FORMED 360 RING)
+    function renderDashDonutChart(data, metricCol, dimCol) {
       const canvas = document.getElementById("dashDonutCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
@@ -18693,22 +18705,44 @@ result = df.describe()
       ctx.clearRect(0, 0, width, height);
       if (!data || !data.length) { ctx.restore(); return; }
 
-      const total = totalSum || data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
-      const cx = width * 0.38;
-      const cy = height * 0.5;
-      const r = Math.min(width * 0.32, height * 0.40);
-      const innerR = r * 0.62;
+      const sliceData = data.slice(0, 6);
+      const values = sliceData.map(d => Math.abs(Number(d.score) || 0));
+      const sliceTotal = values.reduce((sum, v) => sum + v, 0);
+
+      const cx = Math.round(width * 0.36);
+      const cy = Math.round(height * 0.5);
+      const r = Math.min(width * 0.30, height * 0.40);
+      const innerR = r * 0.60;
+
+      // Handle case where all scores are 0 or empty
+      if (sliceTotal <= 0) {
+        ctx.strokeStyle = "rgba(255,255,255,0.08)";
+        ctx.lineWidth = 12;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r - 6, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = "#64748b";
+        ctx.font = "500 11px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Neutral (0.0)", cx, cy + 3);
+        ctx.restore();
+        return;
+      }
 
       let startAngle = -Math.PI / 2;
-      data.forEach((d, i) => {
-        const slice = (Math.max(0, d.score) / total) * (Math.PI * 2);
+      sliceData.forEach((d, i) => {
+        const val = values[i];
+        const fraction = val / sliceTotal;
+        const slice = fraction * (Math.PI * 2);
         const endAngle = startAngle + slice;
+
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
         ctx.arc(cx, cy, r, startAngle, endAngle);
         ctx.arc(cx, cy, innerR, endAngle, startAngle, true);
         ctx.closePath();
         ctx.fill();
+
         ctx.strokeStyle = "#0f172a";
         ctx.lineWidth = 2;
         ctx.stroke();
@@ -18717,24 +18751,27 @@ result = df.describe()
 
       // Center High-Resolution KPI Ring Callout
       ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 14px Inter, sans-serif";
+      ctx.font = "bold 13px Inter, sans-serif";
       ctx.textAlign = "center";
-      const totalTxt = total >= 1e6 ? (total/1e6).toFixed(1)+"M" : (total>=1e3 ? (total/1e3).toFixed(1)+"k" : total.toFixed(0));
+      const totalTxt = sliceTotal >= 1e6 ? (sliceTotal/1e6).toFixed(1)+"M" : (sliceTotal>=1e3 ? (sliceTotal/1e3).toFixed(1)+"k" : (sliceTotal % 1 === 0 ? sliceTotal.toFixed(0) : sliceTotal.toFixed(1)));
       ctx.fillText(totalTxt, cx, cy - 2);
       ctx.fillStyle = "#94a3b8";
       ctx.font = "500 8.5px Inter, sans-serif";
-      ctx.fillText("Total Volume", cx, cy + 12);
-      if (data[0]) {
-        const topRatio = Math.round((data[0].score / total) * 100);
-        ctx.fillStyle = "#10b981";
-        ctx.font = "bold 8.5px Inter, sans-serif";
-        ctx.fillText(`Top: ${topRatio}%`, cx, cy + 24);
-      }
+      ctx.fillText("Visible Volume", cx, cy + 11);
+      const topRatio = Math.round((values[0] / sliceTotal) * 100);
+      ctx.fillStyle = "#10b981";
+      ctx.font = "bold 8.5px Inter, sans-serif";
+      ctx.fillText(`Top: ${topRatio}%`, cx, cy + 22);
 
       // Rich Legend on the right
-      const legX = width * 0.68;
-      data.slice(0, 6).forEach((d, i) => {
-        const ly = 32 + i * 28;
+      const legX = Math.round(width * 0.65);
+      const startY = Math.max(16, (height - sliceData.length * 28) / 2 + 10);
+      sliceData.forEach((d, i) => {
+        const ly = startY + i * 28;
+        const val = values[i];
+        const pct = Math.round((val / sliceTotal) * 100);
+        const scoreTxt = val >= 1000 ? (val/1000).toFixed(1)+"k" : (val % 1 === 0 ? val.toFixed(0) : val.toFixed(1));
+
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
         ctx.arc(legX, ly, 4.5, 0, Math.PI * 2);
@@ -18744,15 +18781,18 @@ result = df.describe()
         ctx.font = "600 10px Inter, sans-serif";
         ctx.textAlign = "left";
         const cleanName = String(d.segment).length > 10 ? String(d.segment).substring(0, 9) + "…" : d.segment;
-        const pct = Math.round((d.score / total) * 100);
-        const scoreTxt = d.score >= 1000 ? (d.score/1000).toFixed(1)+"k" : d.score.toFixed(0);
-        ctx.fillText(`${cleanName}: ${scoreTxt} (${pct}%)`, legX + 10, ly + 3);
+        ctx.fillText(cleanName, legX + 10, ly + 2);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "500 8.5px Inter, sans-serif";
+        ctx.fillText(`${scoreTxt} (${pct}%)`, legX + 10, ly + 13);
       });
+
       ctx.restore();
     }
 
-    // 5. Pie Chart
-    function renderDashPieChart(data, metricCol, dimCol, totalSum) {
+    // 5. Pie Chart (ALWAYS VISIBLE & FULLY FORMED 360 CIRCLE)
+    function renderDashPieChart(data, metricCol, dimCol) {
       const canvas = document.getElementById("dashPieCanvas");
       if (!canvas) return;
       const dpr = Math.max(2, window.devicePixelRatio || 2);
@@ -18768,44 +18808,70 @@ result = df.describe()
       ctx.clearRect(0, 0, width, height);
       if (!data || !data.length) { ctx.restore(); return; }
 
-      const total = totalSum || data.reduce((a, b) => a + Math.max(0, b.score), 0) || 1;
-      const cx = width * 0.38;
-      const cy = height * 0.5;
-      const r = Math.min(width * 0.32, height * 0.40);
+      const sliceData = data.slice(0, 6);
+      const values = sliceData.map(d => Math.abs(Number(d.score) || 0));
+      const sliceTotal = values.reduce((sum, v) => sum + v, 0);
+
+      const cx = Math.round(width * 0.36);
+      const cy = Math.round(height * 0.5);
+      const r = Math.min(width * 0.30, height * 0.40);
+
+      // Handle zero case
+      if (sliceTotal <= 0) {
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#64748b";
+        ctx.font = "500 11px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("Neutral (0.0)", cx, cy + 3);
+        ctx.restore();
+        return;
+      }
 
       let startAngle = -Math.PI / 2;
-      data.forEach((d, i) => {
-        const slice = (Math.max(0, d.score) / total) * (Math.PI * 2);
+      sliceData.forEach((d, i) => {
+        const val = values[i];
+        const fraction = val / sliceTotal;
+        const slice = fraction * (Math.PI * 2);
         const endAngle = startAngle + slice;
+
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
         ctx.moveTo(cx, cy);
         ctx.arc(cx, cy, r, startAngle, endAngle);
         ctx.closePath();
         ctx.fill();
+
         ctx.strokeStyle = "#0f172a";
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Slice Percentage Callout inside or alongside slice
-        if (slice > 0.45) {
+        // Direct Slice Percentage inside slice for prominent segments (>= 10% share)
+        if (fraction >= 0.10) {
           const midAngle = startAngle + slice / 2;
-          const textR = r * 0.68;
+          const textR = r * 0.65;
           const tx = cx + Math.cos(midAngle) * textR;
           const ty = cy + Math.sin(midAngle) * textR;
-          const pct = Math.round((d.score / total) * 100);
+          const pct = Math.round(fraction * 100);
           ctx.fillStyle = "#ffffff";
-          ctx.font = "bold 9px Inter, sans-serif";
+          ctx.font = "bold 9.5px Inter, sans-serif";
           ctx.textAlign = "center";
           ctx.fillText(`${pct}%`, tx, ty + 3);
         }
         startAngle = endAngle;
       });
 
-      // Legend on the right
-      const legX = width * 0.68;
-      data.slice(0, 6).forEach((d, i) => {
-        const ly = 32 + i * 28;
+      // Rich Legend on the right
+      const legX = Math.round(width * 0.65);
+      const startY = Math.max(16, (height - sliceData.length * 28) / 2 + 10);
+      sliceData.forEach((d, i) => {
+        const ly = startY + i * 28;
+        const val = values[i];
+        const pct = Math.round((val / sliceTotal) * 100);
+        const scoreTxt = val >= 1000 ? (val/1000).toFixed(1)+"k" : (val % 1 === 0 ? val.toFixed(0) : val.toFixed(1));
+
         ctx.fillStyle = PALETTE[i % PALETTE.length];
         ctx.beginPath();
         ctx.arc(legX, ly, 4.5, 0, Math.PI * 2);
@@ -18815,9 +18881,13 @@ result = df.describe()
         ctx.font = "600 10px Inter, sans-serif";
         ctx.textAlign = "left";
         const cleanName = String(d.segment).length > 10 ? String(d.segment).substring(0, 9) + "…" : d.segment;
-        const pct = Math.round((d.score / total) * 100);
-        ctx.fillText(`${cleanName}: ${pct}%`, legX + 10, ly + 3);
+        ctx.fillText(cleanName, legX + 10, ly + 2);
+
+        ctx.fillStyle = "#94a3b8";
+        ctx.font = "500 8.5px Inter, sans-serif";
+        ctx.fillText(`${scoreTxt} (${pct}%)`, legX + 10, ly + 13);
       });
+
       ctx.restore();
     }
 
