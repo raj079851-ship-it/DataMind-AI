@@ -1147,7 +1147,32 @@
         </button>
       </div>
 
+      <!-- Top Right Auth Navigation: Login & Registration -->
+      <div id="topAuthActionGroup" style="display:flex;align-items:center;gap:8px;margin-left:4px;">
+        <button id="topHeaderLoginBtn" type="button" class="btn btn-outline" onclick="openAuthModal('user')" style="padding:6px 14px;font-size:0.80rem;font-weight:700;border-radius:8px;border-color:rgba(212,175,55,0.6);color:var(--champagne-gold);background:rgba(212,175,55,0.10);cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(0,0,0,0.25);white-space:nowrap;transition:all 0.2s ease;" title="Sign In to DataMind AI">
+          <span>🔐</span>
+          <span>Login</span>
+        </button>
+        <button id="topHeaderRegisterBtn" type="button" class="btn btn-primary" onclick="openAuthModal('register')" style="padding:6px 14px;font-size:0.80rem;font-weight:700;border-radius:8px;background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#ffffff;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 2px 10px rgba(99,102,241,0.4);white-space:nowrap;transition:all 0.2s ease;" title="Register New Account">
+          <span>✨</span>
+          <span>Registration</span>
+        </button>
+      </div>
 
+      <!-- Authenticated User Profile Pill (Active Session) -->
+      <div id="topUserSessionGroup" style="display:none;align-items:center;gap:8px;margin-left:4px;">
+        <div id="topUserContainer" onclick="openAuthModal('user')" style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:rgba(15,23,42,0.65);border:1px solid rgba(212,175,55,0.4);border-radius:8px;cursor:pointer;white-space:nowrap;" title="Click to manage account">
+          <span id="topUserIcon" style="font-size:1.05rem;">👤</span>
+          <div style="display:flex;flex-direction:column;line-height:1.2;">
+            <span id="topUserName" style="font-size:0.80rem;font-weight:700;color:var(--champagne-gold);">User</span>
+            <span id="topUserRoleBadge" style="font-size:0.68rem;color:#94a3b8;">Role: Analyst</span>
+          </div>
+          <span id="topUserStatusDot" style="width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
+        </div>
+        <button id="topHeaderSignOutBtn" type="button" class="btn btn-outline" onclick="submitLogoutAuth()" style="padding:6px 11px;font-size:0.75rem;font-weight:700;border-color:rgba(239,68,68,0.45);color:#fca5a5;background:rgba(239,68,68,0.1);border-radius:8px;cursor:pointer;white-space:nowrap;" title="Sign Out">
+          🚪 Logout
+        </button>
+      </div>
     </div>
   </header>
 
@@ -10661,10 +10686,14 @@ result = df.describe()
       const badgeEl = document.getElementById("topUserRoleBadge");
       const secBadgeEl = document.getElementById("secUserBadge");
       const statusDot = document.getElementById("topUserStatusDot");
+      const authGroup = document.getElementById("topAuthActionGroup");
+      const userGroup = document.getElementById("topUserSessionGroup");
 
       const roleIcons = { Admin: "👑", Analyst: "📊", "Data Engineer": "⚙️", Viewer: "👁️" };
 
       if (!currentAuthUser) {
+        if (authGroup) authGroup.style.display = "flex";
+        if (userGroup) userGroup.style.display = "none";
         if (iconEl) iconEl.textContent = "👤";
         if (topContainer) topContainer.title = "User Account • Click to Sign In";
         if (nameEl) nameEl.textContent = "Sign In";
@@ -10676,6 +10705,9 @@ result = df.describe()
         }
         return;
       }
+
+      if (authGroup) authGroup.style.display = "none";
+      if (userGroup) userGroup.style.display = "flex";
 
       const icon = roleIcons[currentAuthUser.role] || "👤";
       if (iconEl) iconEl.textContent = icon;
