@@ -1021,6 +1021,21 @@
     }
     canvas { width: 100% !important; height: 260px !important; }
 
+    /* Razor-sharp High-DPI EDA Visualization Canvases */
+    #moduleEDA canvas,
+    .eda-chart-canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+    #moduleEDA .chart-box {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
     /* Bottom-Right Task Execution Monitor */
     #taskExecutionMonitor {
       position: fixed;
@@ -2522,8 +2537,8 @@
                 <span>📈 Distribution Histogram &amp; KDE Density</span>
                 <span class="badge badge-secondary" id="edaDistSubtitle">Normal Curve Overlay</span>
               </div>
-              <div class="chart-box" style="height:280px; position:relative;">
-                <canvas id="histCanvas" width="600" height="280"></canvas>
+              <div class="chart-box eda-chart-container" style="height:300px; min-height:280px; position:relative;">
+                <canvas id="histCanvas" class="eda-chart-canvas"></canvas>
               </div>
             </div>
             <div class="panel">
@@ -2531,8 +2546,8 @@
                 <span>📊 Frequency Breakdown &amp; Pareto</span>
                 <span class="badge badge-secondary" id="edaFreqSubtitle">Top Values</span>
               </div>
-              <div class="chart-box" style="height:280px; position:relative;">
-                <canvas id="barCanvas" width="600" height="280"></canvas>
+              <div class="chart-box eda-chart-container" style="height:300px; min-height:280px; position:relative;">
+                <canvas id="barCanvas" class="eda-chart-canvas"></canvas>
               </div>
             </div>
           </div>
@@ -2599,8 +2614,8 @@
                 <span id="edaBiChartTitle">Interactive Bivariate Scatter &amp; Trendline</span>
                 <span class="badge badge-secondary" id="edaBiChartSub">OLS Regression</span>
               </div>
-              <div class="chart-box" style="height:320px; position:relative;">
-                <canvas id="edaBiCanvas" width="650" height="320"></canvas>
+              <div class="chart-box eda-chart-container" style="height:340px; min-height:320px; position:relative;">
+                <canvas id="edaBiCanvas" class="eda-chart-canvas"></canvas>
               </div>
             </div>
 
@@ -2668,8 +2683,8 @@
               <span>🔲 Pair Plots Matrix (Scatter &amp; Univariate Distributions)</span>
               <span class="badge badge-secondary" id="edaPairPlotBadge">Top 4 Numerical Features</span>
             </div>
-            <div class="chart-box" style="height:360px; position:relative; overflow:hidden; background:rgba(15,23,42,0.4); border-radius:8px;">
-              <canvas id="edaPairCanvas" width="900" height="360"></canvas>
+            <div class="chart-box eda-chart-container" style="height:360px; min-height:340px; position:relative; overflow:hidden; background:rgba(15,23,42,0.4); border-radius:8px;">
+              <canvas id="edaPairCanvas" class="eda-chart-canvas"></canvas>
             </div>
           </div>
 
@@ -2689,8 +2704,8 @@
                   </select>
                 </div>
               </div>
-              <div class="chart-box" style="height:280px; position:relative;">
-                <canvas id="edaClusterCanvas" width="550" height="280"></canvas>
+              <div class="chart-box eda-chart-container" style="height:300px; min-height:280px; position:relative;">
+                <canvas id="edaClusterCanvas" class="eda-chart-canvas"></canvas>
               </div>
               <div id="edaClusterProfileTable" style="margin-top:10px; font-size:0.78rem;"></div>
             </div>
@@ -2701,8 +2716,8 @@
                 <span>🧬 PCA 2D Dimensionality Reduction</span>
                 <span class="badge badge-info" id="edaPcaVarianceBadge">PC1: --% | PC2: --%</span>
               </div>
-              <div class="chart-box" style="height:280px; position:relative;">
-                <canvas id="edaPcaCanvas" width="550" height="280"></canvas>
+              <div class="chart-box eda-chart-container" style="height:300px; min-height:280px; position:relative;">
+                <canvas id="edaPcaCanvas" class="eda-chart-canvas"></canvas>
               </div>
               <div id="edaPcaLoadingsText" style="margin-top:10px; font-size:0.76rem; color:var(--text-muted);"></div>
             </div>
@@ -15056,12 +15071,14 @@ result = df.describe()
         }
       });
 
-      // Lazy render current view
-      if (tabName === 'univariate') renderEdaUnivariate();
-      else if (tabName === 'bivariate') renderEdaBivariate();
-      else if (tabName === 'multivariate') renderEdaMultivariate();
-      else if (tabName === 'summary') renderEdaSummaryTable();
-      else if (tabName === 'ai') renderEdaAiRelationships();
+      // Lazy render current view with requestAnimationFrame to ensure container dimensions are computed
+      requestAnimationFrame(() => {
+        if (tabName === 'univariate') renderEdaUnivariate();
+        else if (tabName === 'bivariate') renderEdaBivariate();
+        else if (tabName === 'multivariate') renderEdaMultivariate();
+        else if (tabName === 'summary') renderEdaSummaryTable();
+        else if (tabName === 'ai') renderEdaAiRelationships();
+      });
     }
 
     // -------------------------------------------------------------------------
@@ -15583,11 +15600,44 @@ result = df.describe()
       }
     }
 
-    function drawEdaHistogramKde(canvasId, vals, binCount = 10, mean, std) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
+    // -------------------------------------------------------------------------
+    // HIGH-DPI RETINA CANVAS HELPER FOR SHARP RENDERING
+    // -------------------------------------------------------------------------
+    function edaSetupCanvasHD(canvasIdOrEl, defaultW = 600, defaultH = 300) {
+      const canvas = typeof canvasIdOrEl === 'string' ? document.getElementById(canvasIdOrEl) : canvasIdOrEl;
+      if (!canvas) return null;
       const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!ctx) return null;
+      
+      const dpr = Math.max(2, window.devicePixelRatio || 2);
+      const parent = canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : canvas.getBoundingClientRect();
+      const w = Math.max(300, Math.round(rect.width || canvas.clientWidth || defaultW));
+      const h = Math.max(200, Math.round(rect.height || canvas.clientHeight || defaultH));
+      
+      const pixelW = Math.round(w * dpr);
+      const pixelH = Math.round(h * dpr);
+      if (canvas.width !== pixelW || canvas.height !== pixelH) {
+        canvas.width = pixelW;
+        canvas.height = pixelH;
+      }
+      canvas.style.width = w + 'px';
+      canvas.style.height = h + 'px';
+      
+      if (ctx.resetTransform) {
+        ctx.resetTransform();
+      } else {
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, w, h);
+      return { ctx, width: w, height: h, dpr };
+    }
+
+    function drawEdaHistogramKde(canvasId, vals, binCount = 10, mean, std) {
+      const hd = edaSetupCanvasHD(canvasId, 600, 300);
+      if (!hd || !vals || !vals.length) return;
+      const { ctx, width, height } = hd;
 
       const min = vals[0];
       const max = vals[vals.length - 1];
@@ -15601,193 +15651,495 @@ result = df.describe()
       });
 
       const maxBin = Math.max(...bins, 1);
-      const padLeft = 40;
-      const padBottom = 30;
-      const padTop = 20;
-      const plotW = canvas.width - padLeft - 20;
-      const plotH = canvas.height - padBottom - padTop;
+      const modeIdx = bins.indexOf(maxBin);
+      const median = edaCalcMedian(vals);
+
+      const padLeft = 46;
+      const padBottom = 38;
+      const padTop = 32;
+      const padRight = 24;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padBottom - padTop;
       const barW = plotW / binCount;
 
-      // Draw Axes
-      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      // 1. Subtle Horizontal Grid lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
       ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padLeft, padTop);
-      ctx.lineTo(padLeft, canvas.height - padBottom);
-      ctx.lineTo(canvas.width - 20, canvas.height - padBottom);
-      ctx.stroke();
+      const gridSteps = 4;
+      for (let g = 0; g <= gridSteps; g++) {
+        const gy = height - padBottom - (g / gridSteps) * plotH;
+        const gVal = Math.round((g / gridSteps) * maxBin);
+        ctx.beginPath();
+        ctx.moveTo(padLeft, gy);
+        ctx.lineTo(width - padRight, gy);
+        ctx.stroke();
 
-      // Draw Bars
+        ctx.fillStyle = "rgba(148, 163, 184, 0.75)";
+        ctx.font = "10px Inter, -apple-system, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillText(gVal.toString(), padLeft - 6, gy);
+      }
+
+      // 2. Shaded ±1σ Standard Deviation Band
+      if (std > 0) {
+        const sigmaLeftVal = Math.max(min, mean - std);
+        const sigmaRightVal = Math.min(max, mean + std);
+        const sX1 = padLeft + ((sigmaLeftVal - min) / span) * plotW;
+        const sX2 = padLeft + ((sigmaRightVal - min) / span) * plotW;
+        const sW = Math.max(2, sX2 - sX1);
+
+        ctx.fillStyle = "rgba(56, 189, 248, 0.09)";
+        ctx.fillRect(sX1, padTop, sW, plotH);
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.35)";
+        ctx.setLineDash([3, 3]);
+        ctx.strokeRect(sX1, padTop, sW, plotH);
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "rgba(56, 189, 248, 0.9)";
+        ctx.font = "9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("±1σ Core Range (68.2%)", sX1 + sW / 2, padTop - 18);
+      }
+
+      // 3. Crisp Bars with dynamic gradient & peak highlight
       bins.forEach((cnt, i) => {
-        const h = (cnt / maxBin) * (plotH - 10);
+        const h = (cnt / maxBin) * (plotH - 8);
         const x = padLeft + i * barW;
-        const y = canvas.height - padBottom - h;
+        const y = height - padBottom - h;
+        const isPeak = (i === modeIdx && cnt > 0);
 
-        ctx.fillStyle = "rgba(212, 175, 55, 0.75)";
-        ctx.fillRect(x + 2, y, barW - 4, h);
-        ctx.strokeStyle = "#D4AF37";
-        ctx.strokeRect(x + 2, y, barW - 4, h);
+        const grad = ctx.createLinearGradient(0, y, 0, height - padBottom);
+        if (isPeak) {
+          grad.addColorStop(0, "rgba(245, 158, 11, 0.95)");
+          grad.addColorStop(1, "rgba(217, 119, 6, 0.7)");
+        } else {
+          grad.addColorStop(0, "rgba(212, 175, 55, 0.85)");
+          grad.addColorStop(1, "rgba(161, 98, 7, 0.55)");
+        }
 
-        // Value text
-        ctx.fillStyle = "#cbd5e1";
-        ctx.font = "10px sans-serif";
-        ctx.fillText(cnt, x + barW / 2 - 4, y - 4);
+        ctx.fillStyle = grad;
+        const barPad = Math.max(1, Math.min(3, barW * 0.08));
+        const renderW = barW - barPad * 2;
+        ctx.fillRect(x + barPad, y, renderW, h);
 
-        // Bin X-tick
-        if (i % 2 === 0 || binCount <= 8) {
-          const tickVal = (min + i * binWidth).toFixed(1);
+        ctx.strokeStyle = isPeak ? "#fbbf24" : "rgba(253, 230, 138, 0.5)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + barPad, y, renderW, h);
+
+        // Value & Percentage Labels
+        if (cnt > 0) {
+          const pct = ((cnt / vals.length) * 100).toFixed(0);
+          ctx.fillStyle = isPeak ? "#fef08a" : "#f1f5f9";
+          ctx.font = isPeak ? "bold 10px Inter, sans-serif" : "9px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(cnt >= 1000 ? (cnt / 1000).toFixed(1) + 'k' : cnt, x + barW / 2, y - 6);
+          if (barW > 28 && h > 24) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.font = "8px Inter, sans-serif";
+            ctx.fillText(`${pct}%`, x + barW / 2, y + 12);
+          }
+        }
+
+        // X-tick label
+        if (i % Math.max(1, Math.ceil(binCount / 8)) === 0 || i === binCount - 1) {
+          const tickVal = min + i * binWidth;
           ctx.fillStyle = "#94a3b8";
-          ctx.font = "9px sans-serif";
-          ctx.fillText(tickVal, x + 2, canvas.height - 10);
+          ctx.font = "9px Inter, sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText(Math.abs(tickVal) >= 1000 ? tickVal.toFixed(0) : tickVal.toFixed(1), x + barPad, height - padBottom + 14);
         }
       });
 
-      // Draw KDE Density Curve
+      // 4. KDE Density Curve with filled area gradient
       if (std > 0) {
-        ctx.strokeStyle = "#C5A059";
-        ctx.lineWidth = 2.5;
+        const steps = 80;
+        const peakDensity = 1 / (std * Math.sqrt(2 * Math.PI));
+        ctx.save();
         ctx.beginPath();
-        const steps = 60;
+        ctx.moveTo(padLeft, height - padBottom);
         for (let s = 0; s <= steps; s++) {
           const curXVal = min + (s / steps) * span;
-          // Gaussian density
           const z = (curXVal - mean) / std;
           const density = (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
-          // Scale density to canvas plot height
-          const peakDensity = 1 / (std * Math.sqrt(2 * Math.PI));
-          const y = canvas.height - padBottom - (density / (peakDensity || 1)) * (plotH - 15);
+          const y = height - padBottom - (density / (peakDensity || 1)) * (plotH - 12);
+          const x = padLeft + (s / steps) * plotW;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(padLeft + plotW, height - padBottom);
+        ctx.closePath();
+        const kdeFill = ctx.createLinearGradient(0, padTop, 0, height - padBottom);
+        kdeFill.addColorStop(0, "rgba(99, 102, 241, 0.22)");
+        kdeFill.addColorStop(1, "rgba(99, 102, 241, 0.01)");
+        ctx.fillStyle = kdeFill;
+        ctx.fill();
+
+        ctx.beginPath();
+        for (let s = 0; s <= steps; s++) {
+          const curXVal = min + (s / steps) * span;
+          const z = (curXVal - mean) / std;
+          const density = (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
+          const y = height - padBottom - (density / (peakDensity || 1)) * (plotH - 12);
           const x = padLeft + (s / steps) * plotW;
           if (s === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
+        ctx.strokeStyle = "#818cf8";
+        ctx.lineWidth = 2.5;
         ctx.stroke();
+        ctx.restore();
       }
+
+      // 5. Mean & Median Vertical Reference Lines with Pill Tags
+      const meanX = padLeft + ((mean - min) / span) * plotW;
+      if (meanX >= padLeft && meanX <= width - padRight) {
+        ctx.strokeStyle = "#10b981";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(meanX, padTop);
+        ctx.lineTo(meanX, height - padBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#10b981";
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(meanX - 26, padTop - 14, 52, 14, 3) : ctx.rect(meanX - 26, padTop - 14, 52, 14);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`μ ${mean.toFixed(1)}`, meanX, padTop - 4);
+      }
+
+      const medX = padLeft + ((median - min) / span) * plotW;
+      if (medX >= padLeft && medX <= width - padRight && Math.abs(medX - meanX) > 12) {
+        ctx.strokeStyle = "#06b6d4";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(medX, padTop);
+        ctx.lineTo(medX, height - padBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#06b6d4";
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(medX - 26, padTop - 28, 52, 14, 3) : ctx.rect(medX - 26, padTop - 28, 52, 14);
+        ctx.fill();
+        ctx.fillStyle = "#0f172a";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`M ${median.toFixed(1)}`, medX, padTop - 18);
+      }
+
+      // 6. Peak Mode Pill Badge
+      const modeVal = min + (modeIdx + 0.5) * binWidth;
+      const badgeW = 124;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.4)";
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(width - padRight - badgeW, padTop - 16, badgeW, 16, 4) : ctx.rect(width - padRight - badgeW, padTop - 16, badgeW, 16);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`★ Peak Mode: ~${modeVal.toFixed(1)}`, width - padRight - badgeW / 2, padTop - 4);
     }
 
     function drawEdaQuartiles(canvasId, vals, iqrObj) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 600, 300);
+      if (!hd || !vals || !vals.length) return;
+      const { ctx, width, height } = hd;
 
-      const padLeft = 40;
-      const padBottom = 30;
-      const plotW = canvas.width - padLeft - 20;
-      const plotH = canvas.height - padBottom - 40;
+      const padLeft = 48;
+      const padRight = 24;
+      const padBottom = 35;
+      const padTop = 30;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padBottom - padTop;
 
-      // Draw 5 percentiles (Min, Q1, Median, Q3, Max)
-      const pcts = [
-        { label: "Min", val: iqrObj.min, color: "#64748b" },
-        { label: "Q1 (25%)", val: iqrObj.q1, color: "#38bdf8" },
-        { label: "Median", val: edaCalcMedian(vals), color: "#818cf8" },
-        { label: "Q3 (75%)", val: iqrObj.q3, color: "#a855f7" },
-        { label: "Max", val: iqrObj.max, color: "#ec4899" }
-      ];
-
-      const barW = plotW / pcts.length;
-      const maxVal = Math.max(...vals);
-      const minVal = Math.min(...vals);
+      const median = edaCalcMedian(vals);
+      const minVal = vals[0];
+      const maxVal = vals[vals.length - 1];
       const span = maxVal - minVal || 1;
 
-      pcts.forEach((p, i) => {
-        const norm = (p.val - minVal) / span;
-        const h = Math.max(8, norm * (plotH - 20));
-        const x = padLeft + i * barW;
-        const y = canvas.height - padBottom - h;
+      const pcts = [
+        { label: "Min (0%)", val: iqrObj.min, color: "#64748b", grad: ["#64748b", "#475569"] },
+        { label: "Q1 (25%)", val: iqrObj.q1, color: "#38bdf8", grad: ["#38bdf8", "#0284c7"] },
+        { label: "Median (50%)", val: median, color: "#818cf8", grad: ["#818cf8", "#4f46e5"] },
+        { label: "Q3 (75%)", val: iqrObj.q3, color: "#a855f7", grad: ["#a855f7", "#7c3aed"] },
+        { label: "Max (100%)", val: iqrObj.max, color: "#ec4899", grad: ["#ec4899", "#be185d"] }
+      ];
 
-        ctx.fillStyle = p.color;
-        ctx.fillRect(x + 10, y, barW - 20, h);
+      // Top Section: Horizontal Box-and-Whisker anatomy (height ~80px)
+      const boxAreaH = 80;
+      const boxMidY = padTop + 36;
+      const q1X = padLeft + ((iqrObj.q1 - minVal) / span) * plotW;
+      const q3X = padLeft + ((iqrObj.q3 - minVal) / span) * plotW;
+      const medX = padLeft + ((median - minVal) / span) * plotW;
+      const minX = padLeft + ((iqrObj.min - minVal) / span) * plotW;
+      const maxX = padLeft + ((iqrObj.max - minVal) / span) * plotW;
+
+      // Whisker Line
+      ctx.strokeStyle = "rgba(148, 163, 184, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(minX, boxMidY);
+      ctx.lineTo(q1X, boxMidY);
+      ctx.moveTo(q3X, boxMidY);
+      ctx.lineTo(maxX, boxMidY);
+      ctx.stroke();
+
+      // Whisker End Caps
+      ctx.beginPath();
+      ctx.moveTo(minX, boxMidY - 10);
+      ctx.lineTo(minX, boxMidY + 10);
+      ctx.moveTo(maxX, boxMidY - 10);
+      ctx.lineTo(maxX, boxMidY + 10);
+      ctx.stroke();
+
+      // IQR Core Box
+      const boxH = 34;
+      const boxY = boxMidY - boxH / 2;
+      const boxW = Math.max(4, q3X - q1X);
+      const boxGrad = ctx.createLinearGradient(0, boxY, 0, boxY + boxH);
+      boxGrad.addColorStop(0, "rgba(99, 102, 241, 0.4)");
+      boxGrad.addColorStop(1, "rgba(168, 85, 247, 0.3)");
+      ctx.fillStyle = boxGrad;
+      ctx.fillRect(q1X, boxY, boxW, boxH);
+      ctx.strokeStyle = "#818cf8";
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(q1X, boxY, boxW, boxH);
+
+      // Median Line in Box
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(medX, boxY);
+      ctx.lineTo(medX, boxY + boxH);
+      ctx.stroke();
+
+      // IQR Bracket & Label
+      const iqrVal = (iqrObj.q3 - iqrObj.q1);
+      ctx.fillStyle = "#cbd5e1";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`IQR = ${iqrVal.toFixed(2)} (Core 50% Distribution)`, q1X + boxW / 2, boxY - 6);
+
+      // Lower Section: 5 Percentile Benchmark Pillars
+      const pillarAreaY = padTop + boxAreaH + 10;
+      const pillarAreaH = height - padBottom - pillarAreaY;
+      const barW = plotW / pcts.length;
+
+      pcts.forEach((p, i) => {
+        const norm = span > 0 ? (p.val - minVal) / span : 0.5;
+        const h = Math.max(12, norm * (pillarAreaH - 30));
+        const x = padLeft + i * barW;
+        const y = height - padBottom - h;
+
+        const grad = ctx.createLinearGradient(0, y, 0, height - padBottom);
+        grad.addColorStop(0, p.grad[0]);
+        grad.addColorStop(1, p.grad[1]);
+        ctx.fillStyle = grad;
+
+        const pW = barW - 16;
+        ctx.fillRect(x + 8, y, pW, h);
+        ctx.strokeStyle = p.color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 8, y, pW, h);
 
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillText(Number(p.val).toFixed(1), x + 12, y - 8);
+        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(Number(p.val).toFixed(1), x + barW / 2, y - 6);
 
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "10px sans-serif";
-        ctx.fillText(p.label, x + 10, canvas.height - 10);
+        ctx.font = "9px Inter, sans-serif";
+        ctx.fillText(p.label, x + barW / 2, height - padBottom + 14);
       });
+
+      // Outlier Fences Callout
+      const lowFence = iqrObj.q1 - 1.5 * iqrVal;
+      const highFence = iqrObj.q3 + 1.5 * iqrVal;
+      ctx.fillStyle = "rgba(244, 63, 94, 0.85)";
+      ctx.font = "9px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`Fences: [${lowFence.toFixed(1)}, ${highFence.toFixed(1)}]`, padLeft, padTop - 12);
     }
 
     function drawEdaBarChart(canvasId, entries, totalCount) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 600, 300);
+      if (!hd || !entries || !entries.length) return;
+      const { ctx, width, height } = hd;
 
-      const maxVal = Math.max(...entries.map(e => e[1]), 1);
-      const barH = (canvas.height - 40) / entries.length;
+      const topEntries = entries.slice(0, 8);
+      const maxVal = Math.max(...topEntries.map(e => e[1]), 1);
+      const padLeft = 110;
+      const padRight = 80;
+      const padTop = 32;
+      const padBottom = 20;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+      const barH = plotH / topEntries.length;
 
-      entries.forEach(([label, cnt], i) => {
-        const w = (cnt / maxVal) * (canvas.width - 150);
-        const y = 20 + i * barH;
+      // Average frequency benchmark
+      const avgCnt = entries.reduce((s, e) => s + e[1], 0) / (entries.length || 1);
+      const avgX = padLeft + (avgCnt / maxVal) * plotW;
 
-        ctx.fillStyle = "#D4AF37";
-        ctx.fillRect(100, y + 2, w, barH - 6);
+      topEntries.forEach(([label, cnt], i) => {
+        const w = (cnt / maxVal) * plotW;
+        const y = padTop + i * barH + 4;
+        const actualH = barH - 8;
+        const pct = Math.round((cnt / (totalCount || 1)) * 100);
+
+        const medal = i === 0 ? "🥇" : (i === 1 ? "🥈" : (i === 2 ? "🥉" : `#${i + 1}`));
+
+        const grad = ctx.createLinearGradient(padLeft, 0, padLeft + w, 0);
+        if (i === 0) {
+          grad.addColorStop(0, "rgba(245, 158, 11, 0.95)");
+          grad.addColorStop(1, "rgba(217, 119, 6, 0.75)");
+        } else {
+          grad.addColorStop(0, "rgba(212, 175, 55, 0.85)");
+          grad.addColorStop(1, "rgba(161, 98, 7, 0.6)");
+        }
+        ctx.fillStyle = grad;
+        ctx.fillRect(padLeft, y, w, actualH);
+        ctx.strokeStyle = i === 0 ? "#fbbf24" : "rgba(253, 230, 138, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(padLeft, y, w, actualH);
 
         ctx.fillStyle = "#cbd5e1";
-        ctx.font = "10px sans-serif";
-        ctx.fillText(label.slice(0, 12), 10, y + barH / 2 + 2);
+        ctx.font = "10px Inter, sans-serif";
+        ctx.textAlign = "right";
+        ctx.textBaseline = "middle";
+        const cleanLabel = String(label).slice(0, 14);
+        ctx.fillText(`${medal} ${cleanLabel}`, padLeft - 8, y + actualH / 2);
 
-        const pct = Math.round((cnt / (totalCount || 1)) * 100);
-        ctx.fillStyle = "#94a3b8";
-        ctx.fillText(`${cnt} (${pct}%)`, 105 + w, y + barH / 2 + 2);
+        ctx.fillStyle = i === 0 ? "#fef08a" : "#f1f5f9";
+        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText(`${cnt.toLocaleString()} (${pct}%)`, padLeft + w + 6, y + actualH / 2);
       });
+
+      // Average Benchmark Line
+      if (avgX >= padLeft && avgX <= width - padRight) {
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 3]);
+        ctx.beginPath();
+        ctx.moveTo(avgX, padTop);
+        ctx.lineTo(avgX, height - padBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.font = "9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`Avg: ${Math.round(avgCnt)}`, avgX, padTop - 6);
+      }
     }
 
     function drawEdaParetoChart(canvasId, entries, totalCount) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 600, 300);
+      if (!hd || !entries || !entries.length) return;
+      const { ctx, width, height } = hd;
 
       const topEntries = entries.slice(0, 8);
       const maxCnt = topEntries[0] ? topEntries[0][1] : 1;
-      const w = (canvas.width - 80) / topEntries.length;
+      const padLeft = 48;
+      const padRight = 48;
+      const padTop = 32;
+      const padBottom = 38;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padTop - padBottom;
+      const w = plotW / topEntries.length;
+
       let cumSum = 0;
       const cumPcts = [];
-
       topEntries.forEach(([label, cnt]) => {
         cumSum += cnt;
         cumPcts.push((cumSum / (totalCount || 1)) * 100);
       });
 
+      // Frequency Bars
       topEntries.forEach(([label, cnt], i) => {
-        const h = (cnt / maxCnt) * (canvas.height - 80);
-        const x = 40 + i * w;
-        const y = canvas.height - 40 - h;
+        const h = (cnt / maxCnt) * (plotH - 12);
+        const x = padLeft + i * w;
+        const y = height - padBottom - h;
 
-        ctx.fillStyle = "#06b6d4";
+        const grad = ctx.createLinearGradient(0, y, 0, height - padBottom);
+        grad.addColorStop(0, "rgba(6, 182, 212, 0.85)");
+        grad.addColorStop(1, "rgba(14, 116, 144, 0.5)");
+        ctx.fillStyle = grad;
         ctx.fillRect(x + 4, y, w - 8, h);
+        ctx.strokeStyle = "#22d3ee";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x + 4, y, w - 8, h);
+
+        ctx.fillStyle = "#f1f5f9";
+        ctx.font = "9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(cnt >= 1000 ? (cnt/1000).toFixed(1)+'k' : cnt, x + w / 2, y - 4);
 
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "9px sans-serif";
-        ctx.fillText(label.slice(0, 7), x + 4, canvas.height - 20);
+        ctx.fillText(String(label).slice(0, 7), x + w / 2, height - padBottom + 14);
       });
 
-      // Cumulative line
+      // Right-side 0-100% ticks
+      ctx.fillStyle = "rgba(245, 158, 11, 0.75)";
+      ctx.font = "9px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("100%", width - padRight + 4, padTop + 8);
+      ctx.fillText("80%", width - padRight + 4, height - padBottom - 0.8 * plotH);
+      ctx.fillText("0%", width - padRight + 4, height - padBottom);
+
+      // 80% Pareto Threshold Guide
+      const y80 = height - padBottom - 0.8 * plotH;
+      ctx.strokeStyle = "rgba(239, 68, 68, 0.75)";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(padLeft, y80);
+      ctx.lineTo(width - padRight, y80);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = "#ef4444";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText("80% Pareto Cutoff", padLeft + 6, y80 - 4);
+
+      // Amber Cumulative Curve
       ctx.strokeStyle = "#f59e0b";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
       ctx.beginPath();
       cumPcts.forEach((pct, i) => {
-        const x = 40 + i * w + w / 2;
-        const y = canvas.height - 40 - (pct / 100) * (canvas.height - 80);
+        const x = padLeft + i * w + w / 2;
+        const y = height - padBottom - (pct / 100) * plotH;
         if (i === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
       ctx.stroke();
 
-      // 80% threshold guideline
-      const y80 = canvas.height - 40 - 0.8 * (canvas.height - 80);
-      ctx.strokeStyle = "rgba(239, 68, 68, 0.6)";
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(40, y80);
-      ctx.lineTo(canvas.width - 20, y80);
-      ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = "#ef4444";
-      ctx.font = "9px sans-serif";
-      ctx.fillText("80% Pareto Line", canvas.width - 90, y80 - 4);
+      // Nodes on curve
+      cumPcts.forEach((pct, i) => {
+        const x = padLeft + i * w + w / 2;
+        const y = height - padBottom - (pct / 100) * plotH;
+        ctx.fillStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.fillStyle = "#fde68a";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(`${Math.round(pct)}%`, x, y - 8);
+      });
     }
 
     // -------------------------------------------------------------------------
@@ -15802,7 +16154,6 @@ result = df.describe()
       const isXNum = isColNumeric(colX);
       const isYNum = isColNumeric(colY);
 
-      // Determine effective mode
       let effectiveMode = mode;
       if (mode === 'auto') {
         if (isXNum && isYNum) effectiveMode = 'num_vs_num';
@@ -15811,7 +16162,6 @@ result = df.describe()
         else effectiveMode = 'cat_vs_num';
       }
 
-      // Update badge
       const badge = document.getElementById('edaBiTypeBadge');
       if (badge) {
         badge.textContent = effectiveMode === 'num_vs_num' ? 'Numerical vs Numerical (OLS)' :
@@ -15838,13 +16188,9 @@ result = df.describe()
         document.getElementById('edaBiR2').textContent = (ols.r2 * 100).toFixed(1) + "%";
         document.getElementById('edaBiOlsEq').textContent = `y = ${ols.slope.toFixed(2)}x ${ols.intercept >= 0 ? '+' : ''}${ols.intercept.toFixed(2)}`;
 
-        // Draw Scatter & Trendline
         drawEdaScatterPlot('edaBiCanvas', pairs, ols, colX, colY);
-
-        // Hide or repurpose group table for quantile correlation bins
         renderEdaBinnedBreakdown(arrX, arrY, colX, colY);
 
-        // Update Narrative
         const isPos = r > 0;
         document.getElementById('edaBiNarrativeTitle').textContent = `Linear Regression Fit: ${colX} vs ${colY}`;
         document.getElementById('edaBiNarrativeText').innerHTML = `
@@ -15852,7 +16198,6 @@ result = df.describe()
           (r = <strong>${r.toFixed(3)}</strong>, R² = <strong>${(ols.r2 * 100).toFixed(1)}%</strong>). For every 1-unit increase in ${colX}, ${colY} shifts by approximately <strong>${ols.slope.toFixed(3)}</strong> units.
         `;
       } else {
-        // Category vs Numerical Group comparisons
         const groups = {};
         biSample.forEach(r => {
           const k = String(r[colX] || "Unassigned").trim();
@@ -15879,11 +16224,9 @@ result = df.describe()
           };
         }).sort((a, b) => b.mean - a.mean);
 
-        // Overall benchmark
         const allVals = biSample.map(r => parseFloat(r[colY])).filter(v => !isNaN(v));
         const overallMean = edaCalcMean(allVals);
 
-        // Metrics strip
         const topG = groupStats[0] || { group: "N/A", mean: 0 };
         const botG = groupStats[groupStats.length - 1] || { group: "N/A", mean: 0 };
         const spreadPct = botG.mean > 0 ? Math.round(((topG.mean - botG.mean) / botG.mean) * 100) : 0;
@@ -15895,13 +16238,9 @@ result = df.describe()
         document.getElementById('edaBiR2').textContent = overallMean.toFixed(1);
         document.getElementById('edaBiOlsEq').textContent = `Overall Benchmark Mean`;
 
-        // Render Group Comparison Bar Chart
         drawEdaGroupComparisonChart('edaBiCanvas', groupStats.slice(0, 8), overallMean, colX, colY);
-
-        // Render Group Table
         renderEdaGroupTable(groupStats, overallMean);
 
-        // Narrative
         const secG = groupStats[1] || botG;
         const diffVsSec = secG.mean > 0 ? Math.round(((topG.mean - secG.mean) / secG.mean) * 1000) / 10 : 0;
         document.getElementById('edaBiNarrativeTitle').textContent = `Group Disparity Finding (${colX} on ${colY}):`;
@@ -15913,16 +16252,16 @@ result = df.describe()
     }
 
     function drawEdaScatterPlot(canvasId, pairs, ols, colX, colY) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 600, 340);
+      if (!hd || !pairs || !pairs.length) return;
+      const { ctx, width, height } = hd;
 
-      const padLeft = 45;
-      const padBottom = 35;
-      const padTop = 20;
-      const plotW = canvas.width - padLeft - 20;
-      const plotH = canvas.height - padBottom - padTop;
+      const padLeft = 52;
+      const padBottom = 40;
+      const padTop = 32;
+      const padRight = 24;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padBottom - padTop;
 
       const xs = pairs.map(p => p[0]);
       const ys = pairs.map(p => p[1]);
@@ -15933,94 +16272,205 @@ result = df.describe()
       const spanX = maxX - minX || 1;
       const spanY = maxY - minY || 1;
 
-      // Axes
-      ctx.strokeStyle = "rgba(255,255,255,0.15)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(padLeft, padTop);
-      ctx.lineTo(padLeft, canvas.height - padBottom);
-      ctx.lineTo(canvas.width - 20, canvas.height - padBottom);
-      ctx.stroke();
+      const meanX = edaCalcMean(xs);
+      const meanY = edaCalcMean(ys);
 
-      // Points
-      pairs.forEach(([xVal, yVal]) => {
+      // Grid Lines
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.lineWidth = 1;
+      for (let g = 0; g <= 4; g++) {
+        const gy = height - padBottom - (g / 4) * plotH;
+        ctx.beginPath();
+        ctx.moveTo(padLeft, gy);
+        ctx.lineTo(width - padRight, gy);
+        ctx.stroke();
+
+        const gx = padLeft + (g / 4) * plotW;
+        ctx.beginPath();
+        ctx.moveTo(gx, padTop);
+        ctx.lineTo(gx, height - padBottom);
+        ctx.stroke();
+      }
+
+      // Regression Corridor (Confidence Ribbon)
+      const xLeft = padLeft;
+      const xRight = padLeft + plotW;
+      const yFitLeft = height - padBottom - (((ols.slope * minX + ols.intercept) - minY) / spanY) * plotH;
+      const yFitRight = height - padBottom - (((ols.slope * maxX + ols.intercept) - minY) / spanY) * plotH;
+      const ribbonSpread = Math.max(6, plotH * 0.06);
+
+      ctx.fillStyle = "rgba(245, 158, 11, 0.08)";
+      ctx.beginPath();
+      ctx.moveTo(xLeft, yFitLeft - ribbonSpread);
+      ctx.lineTo(xRight, yFitRight - ribbonSpread);
+      ctx.lineTo(xRight, yFitRight + ribbonSpread);
+      ctx.lineTo(xLeft, yFitLeft + ribbonSpread);
+      ctx.closePath();
+      ctx.fill();
+
+      // Scatter Points
+      const sampleToDraw = pairs.length > 800 ? pairs.slice(0, 800) : pairs;
+      sampleToDraw.forEach(([xVal, yVal]) => {
         const cx = padLeft + ((xVal - minX) / spanX) * plotW;
-        const cy = canvas.height - padBottom - ((yVal - minY) / spanY) * plotH;
+        const cy = height - padBottom - ((yVal - minY) / spanY) * plotH;
         ctx.fillStyle = "rgba(129, 140, 248, 0.75)";
         ctx.beginPath();
         ctx.arc(cx, cy, 3.5, 0, 2 * Math.PI);
         ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.lineWidth = 0.5;
+        ctx.stroke();
       });
 
-      // OLS Regression Trendline
-      const yFitMin = ols.slope * minX + ols.intercept;
-      const yFitMax = ols.slope * maxX + ols.intercept;
-      const lineX1 = padLeft;
-      const lineY1 = canvas.height - padBottom - ((yFitMin - minY) / spanY) * plotH;
-      const lineX2 = padLeft + plotW;
-      const lineY2 = canvas.height - padBottom - ((yFitMax - minY) / spanY) * plotH;
+      // Centroid Marker ⊕ Center (X̄, Ȳ)
+      const centX = padLeft + ((meanX - minX) / spanX) * plotW;
+      const centY = height - padBottom - ((meanY - minY) / spanY) * plotH;
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(padLeft, centY);
+      ctx.lineTo(width - padRight, centY);
+      ctx.moveTo(centX, padTop);
+      ctx.lineTo(centX, height - padBottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
+      ctx.fillStyle = "#38bdf8";
+      ctx.beginPath();
+      ctx.arc(centX, centY, 5, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`⊕ Centroid (${meanX.toFixed(1)}, ${meanY.toFixed(1)})`, centX + 8, centY - 4);
+
+      // OLS Regression Trendline
       ctx.strokeStyle = "#f59e0b";
       ctx.lineWidth = 2.5;
       ctx.beginPath();
-      ctx.moveTo(lineX1, lineY1);
-      ctx.lineTo(lineX2, lineY2);
+      ctx.moveTo(xLeft, yFitLeft);
+      ctx.lineTo(xRight, yFitRight);
       ctx.stroke();
 
-      // Axis labels
+      // Axes Ticks & Labels
       ctx.fillStyle = "#94a3b8";
-      ctx.font = "10px sans-serif";
-      ctx.fillText(minX.toFixed(1), padLeft, canvas.height - 12);
-      ctx.fillText(maxX.toFixed(1), canvas.width - 45, canvas.height - 12);
-      ctx.fillText(minY.toFixed(1), 10, canvas.height - padBottom);
-      ctx.fillText(maxY.toFixed(1), 10, padTop + 10);
+      ctx.font = "9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(minX.toFixed(1), padLeft, height - padBottom + 14);
+      ctx.fillText(maxX.toFixed(1), width - padRight, height - padBottom + 14);
+      ctx.fillText(colX, padLeft + plotW / 2, height - 6);
+
+      ctx.textAlign = "right";
+      ctx.fillText(minY.toFixed(1), padLeft - 6, height - padBottom);
+      ctx.fillText(maxY.toFixed(1), padLeft - 6, padTop + 8);
+
+      // Fit Pill HUD in Top-Right
+      const fitBadgeText = `OLS: y = ${ols.slope.toFixed(2)}x ${ols.intercept >= 0 ? '+' : ''}${ols.intercept.toFixed(2)} | R² = ${(ols.r2 * 100).toFixed(1)}%`;
+      const badgeW = 230;
+      ctx.fillStyle = "rgba(15, 23, 42, 0.85)";
+      ctx.strokeStyle = "rgba(245, 158, 11, 0.5)";
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(width - padRight - badgeW, padTop - 18, badgeW, 18, 4) : ctx.rect(width - padRight - badgeW, padTop - 18, badgeW, 18);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(fitBadgeText, width - padRight - badgeW / 2, padTop - 5);
     }
 
     function drawEdaGroupComparisonChart(canvasId, groupStats, overallMean, colX, colY) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 600, 340);
+      if (!hd || !groupStats || !groupStats.length) return;
+      const { ctx, width, height } = hd;
 
-      const padLeft = 45;
-      const padBottom = 35;
-      const plotW = canvas.width - padLeft - 20;
-      const plotH = canvas.height - padBottom - 20;
+      const padLeft = 52;
+      const padBottom = 42;
+      const padTop = 32;
+      const padRight = 24;
+      const plotW = width - padLeft - padRight;
+      const plotH = height - padBottom - padTop;
 
-      const maxMean = Math.max(...groupStats.map(g => g.mean), overallMean, 1);
+      const maxMean = Math.max(...groupStats.map(g => g.mean + (g.std || 0)), overallMean * 1.1, 1);
       const barW = plotW / groupStats.length;
 
-      // Group Bars
       groupStats.forEach((g, i) => {
-        const h = (g.mean / maxMean) * (plotH - 20);
+        const h = (g.mean / maxMean) * (plotH - 15);
         const x = padLeft + i * barW;
-        const y = canvas.height - padBottom - h;
+        const y = height - padBottom - h;
+        const isAbove = g.mean >= overallMean;
 
-        ctx.fillStyle = g.mean >= overallMean ? "rgba(16, 185, 129, 0.8)" : "rgba(244, 63, 94, 0.75)";
-        ctx.fillRect(x + 6, y, barW - 12, h);
+        const grad = ctx.createLinearGradient(0, y, 0, height - padBottom);
+        if (isAbove) {
+          grad.addColorStop(0, "rgba(16, 185, 129, 0.9)");
+          grad.addColorStop(1, "rgba(5, 150, 105, 0.6)");
+        } else {
+          grad.addColorStop(0, "rgba(244, 63, 94, 0.85)");
+          grad.addColorStop(1, "rgba(190, 18, 60, 0.55)");
+        }
+        ctx.fillStyle = grad;
 
+        const bW = Math.max(16, barW - 16);
+        const bX = x + (barW - bW) / 2;
+        ctx.fillRect(bX, y, bW, h);
+        ctx.strokeStyle = isAbove ? "#34d399" : "#fb7185";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(bX, y, bW, h);
+
+        // Standard Deviation Error Whisker (±1σ)
+        if (g.std > 0) {
+          const whiskerTopY = height - padBottom - (Math.min(maxMean, g.mean + g.std) / maxMean) * (plotH - 15);
+          const whiskerBotY = height - padBottom - (Math.max(0, g.mean - g.std) / maxMean) * (plotH - 15);
+          const whiskerX = bX + bW / 2;
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.7)";
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(whiskerX, whiskerTopY);
+          ctx.lineTo(whiskerX, whiskerBotY);
+          ctx.moveTo(whiskerX - 4, whiskerTopY);
+          ctx.lineTo(whiskerX + 4, whiskerTopY);
+          ctx.moveTo(whiskerX - 4, whiskerBotY);
+          ctx.lineTo(whiskerX + 4, whiskerBotY);
+          ctx.stroke();
+        }
+
+        const deltaPct = overallMean > 0 ? Math.round(((g.mean - overallMean) / overallMean) * 100) : 0;
         ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 10px sans-serif";
-        ctx.fillText(g.mean.toFixed(1), x + 8, y - 5);
+        ctx.font = "bold 10px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText(g.mean.toFixed(1), bX + bW / 2, y - 8);
+
+        ctx.fillStyle = isAbove ? "#a7f3d0" : "#fecdd3";
+        ctx.font = "bold 8px Inter, sans-serif";
+        ctx.fillText(`${deltaPct >= 0 ? '+' : ''}${deltaPct}%`, bX + bW / 2, y - 18);
 
         ctx.fillStyle = "#94a3b8";
-        ctx.font = "9px sans-serif";
-        ctx.fillText(g.group.slice(0, 8), x + 6, canvas.height - 12);
+        ctx.font = "9px Inter, sans-serif";
+        ctx.fillText(String(g.group).slice(0, 8), bX + bW / 2, height - padBottom + 14);
       });
 
       // Overall Mean Benchmark Dashed Line
-      const yBench = canvas.height - padBottom - (overallMean / maxMean) * (plotH - 20);
+      const yBench = height - padBottom - (overallMean / maxMean) * (plotH - 15);
       ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = 2;
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(padLeft, yBench);
-      ctx.lineTo(canvas.width - 20, yBench);
+      ctx.lineTo(width - padRight, yBench);
       ctx.stroke();
       ctx.setLineDash([]);
+
       ctx.fillStyle = "#38bdf8";
-      ctx.font = "9px sans-serif";
-      ctx.fillText(`Mean Benchmark (${overallMean.toFixed(1)})`, padLeft + 6, yBench - 4);
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "left";
+      ctx.fillText(`Overall Avg Benchmark: ${overallMean.toFixed(1)}`, padLeft + 6, yBench - 5);
     }
 
     function renderEdaGroupTable(groupStats, overallMean) {
@@ -16064,7 +16514,6 @@ result = df.describe()
     function renderEdaBinnedBreakdown(arrX, arrY, colX, colY) {
       const container = document.getElementById('edaBiGroupTableContainer');
       if (!container) return;
-      // 4 Quantile Bins for colX
       const pairs = arrX.map((x, i) => ({ x, y: arrY[i] })).sort((a, b) => a.x - b.x);
       const binSize = Math.ceil(pairs.length / 4);
       const bins = [
@@ -16111,19 +16560,10 @@ result = df.describe()
       const numCols = columns.filter(c => isColNumeric(c));
       const activeSample = (currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset;
 
-      // 1. Correlation Matrix Heatmap
       renderEdaCorrelationHeatmap(numCols, activeSample);
-
-      // 2. Top Correlated Pairs Ranking
       renderEdaTopPairsRanking(numCols, activeSample);
-
-      // 3. Pair Plots Matrix Preview
       drawEdaPairPlotsMatrix('edaPairCanvas', numCols.slice(0, 4), activeSample);
-
-      // 4. k-Means Clustering
       renderEdaKMeansClustering(numCols, activeSample);
-
-      // 5. PCA Dimensionality Reduction
       renderEdaPcaDecomposition(numCols, activeSample);
     }
 
@@ -16137,7 +16577,7 @@ result = df.describe()
       }
 
       const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
-      const activeCols = numCols.slice(0, 8); // Top 8 features
+      const activeCols = numCols.slice(0, 8);
       let html = `<table><thead><tr><th>Feature</th>` + activeCols.map(c => `<th>${c}</th>`).join('') + `</tr></thead><tbody>`;
 
       activeCols.forEach(rCol => {
@@ -16152,7 +16592,6 @@ result = df.describe()
             const rVal = edaCalcPearson(arrR, arrC);
             const rFixed = rVal.toFixed(2);
             
-            // Heatmap color interpolation
             let bg = "transparent";
             let color = "inherit";
             if (rVal > 0) {
@@ -16239,52 +16678,58 @@ result = df.describe()
     }
 
     function drawEdaPairPlotsMatrix(canvasId, targetCols, datasetToUse) {
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD(canvasId, 900, 360);
+      if (!hd || !targetCols || targetCols.length < 2) return;
+      const { ctx, width, height } = hd;
 
-      if (targetCols.length < 2) return;
       const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const k = targetCols.length;
       const pad = 8;
-      const cellW = (canvas.width - (k + 1) * pad) / k;
-      const cellH = (canvas.height - (k + 1) * pad) / k;
+      const cellW = (width - (k + 1) * pad) / k;
+      const cellH = (height - (k + 1) * pad) / k;
 
       for (let r = 0; r < k; r++) {
         for (let c = 0; c < k; c++) {
           const x0 = pad + c * (cellW + pad);
           const y0 = pad + r * (cellH + pad);
 
-          // Cell Border
-          ctx.strokeStyle = "rgba(255,255,255,0.08)";
+          ctx.fillStyle = "rgba(15, 23, 42, 0.4)";
+          ctx.fillRect(x0, y0, cellW, cellH);
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.lineWidth = 1;
           ctx.strokeRect(x0, y0, cellW, cellH);
 
           if (r === c) {
-            // Diagonal: Univariate Histogram
             const col = targetCols[r];
             const vals = dataToUse.map(row => parseFloat(row[col])).filter(v => !isNaN(v)).sort((a,b)=>a-b);
             if (vals.length) {
-              const bins = new Array(6).fill(0);
+              const binCnt = 8;
+              const bins = new Array(binCnt).fill(0);
               const min = vals[0], max = vals[vals.length - 1];
               const span = max - min || 1;
               vals.forEach(v => {
-                const idx = Math.min(5, Math.floor(((v - min) / span) * 6));
+                const idx = Math.min(binCnt - 1, Math.floor(((v - min) / span) * binCnt));
                 bins[idx]++;
               });
               const maxB = Math.max(...bins, 1);
-              const bW = cellW / 6;
+              const bW = cellW / binCnt;
               bins.forEach((cnt, bi) => {
-                const bH = (cnt / maxB) * (cellH - 18);
-                ctx.fillStyle = "rgba(99, 102, 241, 0.6)";
+                const bH = (cnt / maxB) * (cellH - 24);
+                const bGrad = ctx.createLinearGradient(0, y0 + cellH - bH - 2, 0, y0 + cellH);
+                bGrad.addColorStop(0, "rgba(99, 102, 241, 0.85)");
+                bGrad.addColorStop(1, "rgba(79, 70, 229, 0.5)");
+                ctx.fillStyle = bGrad;
                 ctx.fillRect(x0 + bi * bW + 1, y0 + cellH - bH - 2, bW - 2, bH);
               });
-              ctx.fillStyle = "#cbd5e1";
-              ctx.font = "bold 9px sans-serif";
-              ctx.fillText(col.slice(0, 10), x0 + 4, y0 + 12);
+
+              ctx.fillStyle = "rgba(15, 23, 42, 0.7)";
+              ctx.fillRect(x0 + 4, y0 + 4, cellW - 8, 16);
+              ctx.fillStyle = "#818cf8";
+              ctx.font = "bold 9px Inter, sans-serif";
+              ctx.textAlign = "left";
+              ctx.fillText(col.slice(0, 12), x0 + 8, y0 + 16);
             }
           } else {
-            // Off-Diagonal: Bivariate Scatter
             const colX = targetCols[c];
             const colY = targetCols[r];
             const pairs = dataToUse.map(row => [parseFloat(row[colX]), parseFloat(row[colY])])
@@ -16296,13 +16741,31 @@ result = df.describe()
               const minY = safeMin(ys), maxY = safeMax(ys);
               const spanX = maxX - minX || 1;
               const spanY = maxY - minY || 1;
+              const rVal = edaCalcPearson(xs, ys);
 
-              pairs.slice(0, 50).forEach(([px, py]) => {
-                const dotX = x0 + 4 + ((px - minX) / spanX) * (cellW - 8);
-                const dotY = y0 + cellH - 4 - ((py - minY) / spanY) * (cellH - 8);
-                ctx.fillStyle = "rgba(56, 189, 248, 0.7)";
-                ctx.fillRect(dotX - 1, dotY - 1, 2.5, 2.5);
+              pairs.slice(0, 80).forEach(([px, py]) => {
+                const dotX = x0 + 6 + ((px - minX) / spanX) * (cellW - 12);
+                const dotY = y0 + cellH - 6 - ((py - minY) / spanY) * (cellH - 12);
+                ctx.fillStyle = "rgba(56, 189, 248, 0.75)";
+                ctx.beginPath();
+                ctx.arc(dotX, dotY, 2, 0, 2 * Math.PI);
+                ctx.fill();
               });
+
+              const ols = edaCalcOLS(xs, ys);
+              const yFit1 = y0 + cellH - 6 - (((ols.slope * minX + ols.intercept) - minY) / spanY) * (cellH - 12);
+              const yFit2 = y0 + cellH - 6 - (((ols.slope * maxX + ols.intercept) - minY) / spanY) * (cellH - 12);
+              ctx.strokeStyle = "rgba(245, 158, 11, 0.7)";
+              ctx.lineWidth = 1.2;
+              ctx.beginPath();
+              ctx.moveTo(x0 + 6, yFit1);
+              ctx.lineTo(x0 + cellW - 6, yFit2);
+              ctx.stroke();
+
+              ctx.fillStyle = rVal >= 0 ? "rgba(16, 185, 129, 0.85)" : "rgba(244, 63, 94, 0.85)";
+              ctx.font = "bold 8px Inter, sans-serif";
+              ctx.textAlign = "right";
+              ctx.fillText(`r=${rVal.toFixed(2)}`, x0 + cellW - 6, y0 + 14);
             }
           }
         }
@@ -16310,10 +16773,9 @@ result = df.describe()
     }
 
     function renderEdaKMeansClustering(numCols, datasetToUse) {
-      const canvas = document.getElementById('edaClusterCanvas');
-      if (!canvas || numCols.length < 2) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD('edaClusterCanvas', 550, 300);
+      if (!hd || numCols.length < 2) return;
+      const { ctx, width, height } = hd;
 
       const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const k = parseInt(document.getElementById('edaKMeansK')?.value || '3', 10);
@@ -16325,8 +16787,6 @@ result = df.describe()
       if (data2D.length < k) return;
 
       const { assignments, centroids } = edaCalcKMeans(data2D, k);
-
-      // Plot points with cluster colors
       const clusterColors = ["#6366f1", "#10b981", "#f59e0b", "#ec4899", "#06b6d4"];
       const xs = data2D.map(p => p[0]);
       const ys = data2D.map(p => p[1]);
@@ -16335,34 +16795,64 @@ result = df.describe()
       const spanX = maxX - minX || 1;
       const spanY = maxY - minY || 1;
 
-      const pad = 30;
-      const plotW = canvas.width - 2 * pad;
-      const plotH = canvas.height - 2 * pad;
+      const pad = 36;
+      const plotW = width - 2 * pad;
+      const plotH = height - 2 * pad;
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.06)";
+      ctx.lineWidth = 1;
+      for (let g = 0; g <= 4; g++) {
+        ctx.beginPath();
+        ctx.moveTo(pad, pad + (g / 4) * plotH);
+        ctx.lineTo(width - pad, pad + (g / 4) * plotH);
+        ctx.moveTo(pad + (g / 4) * plotW, pad);
+        ctx.lineTo(pad + (g / 4) * plotW, height - pad);
+        ctx.stroke();
+      }
 
       data2D.forEach((p, i) => {
         const c = assignments[i] % clusterColors.length;
         const cx = pad + ((p[0] - minX) / spanX) * plotW;
-        const cy = canvas.height - pad - ((p[1] - minY) / spanY) * plotH;
+        const cy = height - pad - ((p[1] - minY) / spanY) * plotH;
         ctx.fillStyle = clusterColors[c];
         ctx.beginPath();
         ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
         ctx.fill();
       });
 
-      // Plot Centroids
       centroids.forEach((cent, cIdx) => {
         const cx = pad + ((cent[0] - minX) / spanX) * plotW;
-        const cy = canvas.height - pad - ((cent[1] - minY) / spanY) * plotH;
+        const cy = height - pad - ((cent[1] - minY) / spanY) * plotH;
+        const col = clusterColors[cIdx % clusterColors.length];
+
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(cx, cy, 32, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 8, 0, 2 * Math.PI);
+        ctx.fill();
         ctx.strokeStyle = "#ffffff";
         ctx.lineWidth = 2;
-        ctx.fillStyle = clusterColors[cIdx % clusterColors.length];
-        ctx.beginPath();
-        ctx.arc(cx, cy, 7, 0, 2 * Math.PI);
-        ctx.fill();
         ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 9px Inter, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText((cIdx + 1).toString(), cx, cy);
       });
 
-      // Cluster Profile Table
+      ctx.fillStyle = "#94a3b8";
+      ctx.font = "9px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`${colX} (X-Axis)`, pad + plotW / 2, height - 10);
+
       const counts = new Array(k).fill(0);
       assignments.forEach(c => counts[c]++);
       let profHtml = `<div style="display:flex; gap:8px; flex-wrap:wrap;">`;
@@ -16381,10 +16871,9 @@ result = df.describe()
     }
 
     function renderEdaPcaDecomposition(numCols, datasetToUse) {
-      const canvas = document.getElementById('edaPcaCanvas');
-      if (!canvas || numCols.length < 2) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const hd = edaSetupCanvasHD('edaPcaCanvas', 550, 300);
+      if (!hd || numCols.length < 2) return;
+      const { ctx, width, height } = hd;
 
       const dataToUse = datasetToUse || ((currentDataset.length > 5000) ? getRepresentativeSample(currentDataset, 5000) : currentDataset);
       const targetCols = numCols.slice(0, 6);
@@ -16395,11 +16884,9 @@ result = df.describe()
 
       const { coords, expVar1, expVar2 } = edaCalcPCA2D(multiData);
 
-      // Badge
       const badge = document.getElementById('edaPcaVarianceBadge');
       if (badge) badge.textContent = `PC1: ${expVar1}% | PC2: ${expVar2}% (Total: ${expVar1 + expVar2}%)`;
 
-      // Draw PCA projection scatter
       const xs = coords.map(p => p[0]);
       const ys = coords.map(p => p[1]);
       const minX = safeMin(xs), maxX = safeMax(xs);
@@ -16407,27 +16894,56 @@ result = df.describe()
       const spanX = maxX - minX || 1;
       const spanY = maxY - minY || 1;
 
-      const pad = 30;
-      const plotW = canvas.width - 2 * pad;
-      const plotH = canvas.height - 2 * pad;
+      const pad = 36;
+      const plotW = width - 2 * pad;
+      const plotH = height - 2 * pad;
 
-      // Zero-axes lines
-      ctx.strokeStyle = "rgba(255,255,255,0.1)";
+      const zeroX = pad + ((0 - minX) / spanX) * plotW;
+      const zeroY = height - pad - ((0 - minY) / spanY) * plotH;
+
+      ctx.strokeStyle = "rgba(255,255,255,0.15)";
+      ctx.lineWidth = 1.5;
       ctx.beginPath();
-      ctx.moveTo(pad, canvas.height / 2);
-      ctx.lineTo(canvas.width - pad, canvas.height / 2);
-      ctx.moveTo(canvas.width / 2, pad);
-      ctx.lineTo(canvas.width / 2, canvas.height - pad);
+      ctx.moveTo(pad, Math.max(pad, Math.min(height - pad, zeroY)));
+      ctx.lineTo(width - pad, Math.max(pad, Math.min(height - pad, zeroY)));
+      ctx.moveTo(Math.max(pad, Math.min(width - pad, zeroX)), pad);
+      ctx.lineTo(Math.max(pad, Math.min(width - pad, zeroX)), height - pad);
       ctx.stroke();
+
+      const meanPcaX = edaCalcMean(xs);
+      const meanPcaY = edaCalcMean(ys);
+      const stdPcaX = edaCalcStd(xs, meanPcaX);
+      const stdPcaY = edaCalcStd(ys, meanPcaY);
+      const ellipCx = pad + ((meanPcaX - minX) / spanX) * plotW;
+      const ellipCy = height - pad - ((meanPcaY - minY) / spanY) * plotH;
+      const ellipRx = (stdPcaX / spanX) * plotW * 1.96;
+      const ellipRy = (stdPcaY / spanY) * plotH * 1.96;
+
+      if (ellipRx > 0 && ellipRy > 0) {
+        ctx.strokeStyle = "rgba(168, 85, 247, 0.35)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.ellipse ? ctx.ellipse(ellipCx, ellipCy, Math.min(plotW / 2, ellipRx), Math.min(plotH / 2, ellipRy), 0, 0, 2 * Math.PI) : ctx.arc(ellipCx, ellipCy, ellipRx, 0, 2 * Math.PI);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
 
       coords.forEach(p => {
         const cx = pad + ((p[0] - minX) / spanX) * plotW;
-        const cy = canvas.height - pad - ((p[1] - minY) / spanY) * plotH;
+        const cy = height - pad - ((p[1] - minY) / spanY) * plotH;
         ctx.fillStyle = "rgba(168, 85, 247, 0.8)";
         ctx.beginPath();
         ctx.arc(cx, cy, 3, 0, 2 * Math.PI);
         ctx.fill();
       });
+
+      ctx.fillStyle = "#a855f7";
+      ctx.font = "bold 9px Inter, sans-serif";
+      ctx.textAlign = "right";
+      ctx.fillText(`PC1 (${expVar1}% Var) →`, width - pad, height - 10);
+      ctx.textAlign = "left";
+      ctx.fillText(`↑ PC2 (${expVar2}% Var)`, pad, pad - 8);
 
       const textEl = document.getElementById('edaPcaLoadingsText');
       if (textEl) {
