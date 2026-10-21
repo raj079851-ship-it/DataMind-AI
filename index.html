@@ -7891,7 +7891,7 @@ result = df.describe()
                   <span class="badge badge-success" id="vizChartTypeBadge">Chart</span>
                 </div>
                 <div style="padding:12px 16px;">
-                  <div id="vizChartContainer" style="min-height:360px;display:flex;align-items:center;justify-content:center;background:rgba(15,23,42,0.4);border-radius:8px;">
+                  <div id="vizChartContainer" style="min-height:420px; width:100%; display:flex; align-items:center; justify-content:center; background:rgba(15,23,42,0.6); border-radius:10px; border:1px solid rgba(255,255,255,0.06); padding:4px;">
                     <span style="color:var(--text-muted);font-size:0.9rem;">Chart will appear here after recommendation</span>
                   </div>
                   <div style="margin-top:8px;font-size:0.8rem;color:var(--text-muted);" id="vizChartCaption"></div>
@@ -28810,49 +28810,114 @@ result = df.describe()
       if (inp) inp.value = text;
     }
 
+    // ================================================================
+    // HIGH-DPI RETINA ENGINE & COLLISION-FREE RENDERING (MODULE 10)
+    // ================================================================
+
+    // High-DPI Canvas Buffer Scaler for Module 10
+    function aiChartSetupCanvasHD(canvasIdOrEl, defaultW = 760, defaultH = 420) {
+      const canvas = typeof canvasIdOrEl === 'string' ? document.getElementById(canvasIdOrEl) : canvasIdOrEl;
+      if (!canvas) return null;
+
+      const dpr = Math.max(2, window.devicePixelRatio || 2);
+      const parent = canvas.parentElement;
+      const rect = parent ? parent.getBoundingClientRect() : null;
+      let w = rect && rect.width > 100 ? Math.floor(rect.width) : defaultW;
+      let h = defaultH;
+
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      canvas.style.width = '100%';
+      canvas.style.maxWidth = '100%';
+      canvas.style.height = h + 'px';
+      canvas.style.display = 'block';
+      canvas.style.borderRadius = '8px';
+      canvas.style.imageRendering = '-webkit-optimize-contrast';
+
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+
+      return { ctx, W: w, H: h, dpr };
+    }
+
+    // Number formatting helper
+    function aiChartFormatNum(v) {
+      if (v === null || v === undefined || isNaN(v)) return '';
+      const abs = Math.abs(v);
+      if (abs >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+      if (abs >= 1e3) return (v / 1e3).toFixed(1) + 'k';
+      if (abs >= 100) return Math.round(v).toLocaleString();
+      if (abs >= 1) return Number.isInteger(v) ? String(v) : v.toFixed(1);
+      return v.toFixed(2);
+    }
+
     // Rich Canvas 2D Chart Renderer for Offline & Online Charts
     function drawAIChartOnCanvas(canvasId, chartType, data, colX, colY, title, options = {}) {
       const canvas = typeof canvasId === 'string' ? document.getElementById(canvasId) : canvasId;
       if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height;
+
+      const isMini = canvas.id && canvas.id.startsWith('vizColCanvas_');
+      const defaultW = isMini ? 400 : 760;
+      const defaultH = isMini ? 250 : 420;
+
+      const setup = aiChartSetupCanvasHD(canvas, defaultW, defaultH);
+      if (!setup) return;
+      const { ctx, W, H } = setup;
+
       ctx.clearRect(0, 0, W, H);
 
-      // Background styling
+      // Deep luxury background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
       bgGrad.addColorStop(0, '#0c0f18');
-      bgGrad.addColorStop(1, '#121520');
+      bgGrad.addColorStop(1, '#131724');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
-      const padL = 60, padR = 30, padT = 42, padB = 46;
-      const plotW = W - padL - padR;
-      const plotH = H - padT - padB;
+      // Inner subtle border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
 
-      // Title
+      // Dedicated collision-free margin zones
+      const padL = isMini ? 52 : 68;
+      const padR = isMini ? 24 : 36;
+      const padT = isMini ? 44 : 56;
+      const padB = isMini ? 48 : 64;
+      const plotW = Math.max(50, W - padL - padR);
+      const plotH = Math.max(50, H - padT - padB);
+
+      // Header zone: Title & badges
+      const cleanTitle = title || 'AI Recommended Visualization';
       ctx.fillStyle = '#f8fafc';
-      ctx.font = 'bold 13px system-ui, sans-serif';
+      ctx.font = 'bold ' + (isMini ? '12px' : '14px') + ' system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'left';
-      ctx.fillText(title || 'AI Recommended Visualization', padL, 24);
+      ctx.textBaseline = 'middle';
+      const maxTitleW = plotW - (isMini ? 80 : 200);
+      const displayTitle = ctx.measureText(cleanTitle).width > maxTitleW
+        ? cleanTitle.slice(0, Math.floor(maxTitleW / 8)) + '…'
+        : cleanTitle;
+      ctx.fillText(displayTitle, padL, isMini ? 20 : 26);
 
       if (!data || !data.length) {
         ctx.fillStyle = '#94a3b8';
         ctx.font = '12px system-ui, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('No dataset loaded to plot. Load a dataset above.', W / 2, H / 2);
+        ctx.textBaseline = 'middle';
+        ctx.fillText('No dataset loaded. Upload or select a dataset to visualize.', W / 2, H / 2);
         return;
       }
 
-      // Infer columns if missing
+      // Infer features if missing
       const keys = Object.keys(data[0]);
       const numCols = keys.filter(k => data.some(r => !isNaN(parseFloat(r[k])) && r[k] !== null && r[k] !== ''));
       const catCols = keys.filter(k => !numCols.includes(k));
 
-      if (!colX || !keys.includes(colX)) colX = numCols[0] || keys[0];
-      if (!colY || !keys.includes(colY)) colY = numCols[1] || numCols[0] || keys[1] || keys[0];
+      if (!colX || !keys.includes(colX)) colX = (chartType && (chartType.includes('scatter') || chartType.includes('corr'))) ? (numCols[0] || keys[0]) : (catCols[0] || keys[0]);
+      if (!colY || !keys.includes(colY)) colY = numCols.find(c => c !== colX) || numCols[0] || keys[1] || keys[0];
 
-      // Gridlines & Axes
-      ctx.strokeStyle = 'rgba(165, 169, 181, 0.12)';
+      // Subtle horizontal gridlines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
       ctx.lineWidth = 1;
       for (let g = 0; g <= 4; g++) {
         const gy = padT + (plotH / 4) * g;
@@ -28864,7 +28929,9 @@ result = df.describe()
 
       const type = (chartType || 'bar').toLowerCase();
 
-      // ========================== SCATTER PLOT ==========================
+      // =========================================================================
+      // 1. SCATTER PLOT & BIVARIATE OLS REGRESSION
+      // =========================================================================
       if (type.includes('scatter') || type.includes('relationship') || type.includes('correlation')) {
         let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
         const validPts = [];
@@ -28879,67 +28946,172 @@ result = df.describe()
         });
 
         if (!validPts.length) return;
-        const rangeX = maxX - minX || 1;
-        const rangeY = maxY - minY || 1;
 
-        // Draw points with batched path
-        ctx.fillStyle = 'rgba(212, 175, 55, 0.85)';
-        ctx.beginPath();
-        validPts.forEach(pt => {
-          const cx = padL + ((pt.x - minX) / rangeX) * plotW;
-          const cy = padT + plotH - (((pt.y - minY) / rangeY) * plotH);
-          ctx.moveTo(cx + 4, cy);
-          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+        // Add 8% buffer to plot boundaries
+        const spanX = maxX - minX || 1;
+        const spanY = maxY - minY || 1;
+        const scaleMinX = minX - spanX * 0.05;
+        const scaleMaxX = maxX + spanX * 0.05;
+        const scaleMinY = minY - spanY * 0.05;
+        const scaleMaxY = maxY + spanY * 0.08;
+        const rangeX = scaleMaxX - scaleMinX;
+        const rangeY = scaleMaxY - scaleMinY;
+
+        // Calculate True Ordinary Least Squares (OLS) Regression Line & Pearson r
+        let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0, sumYY = 0;
+        const n = validPts.length;
+        validPts.forEach(p => {
+          sumX += p.x; sumY += p.y;
+          sumXY += p.x * p.y; sumXX += p.x * p.x; sumYY += p.y * p.y;
         });
-        ctx.fill();
+        const meanX = sumX / n;
+        const meanY = sumY / n;
+        const varX = sumXX - n * meanX * meanX;
+        const covXY = sumXY - n * meanX * meanY;
+        const slope = varX !== 0 ? covXY / varX : 0;
+        const intercept = meanY - slope * meanX;
+        const rDenom = Math.sqrt((sumXX - n * meanX * meanX) * (sumYY - n * meanY * meanY));
+        const pearsonR = rDenom !== 0 ? covXY / rDenom : 0;
+        const r2 = Math.round(pearsonR * pearsonR * 1000) / 10;
 
-        // Regression / trendline
-        if (validPts.length > 2) {
+        // Top Header Stats Pill
+        if (!isMini) {
+          const rBadge = `OLS Fit: R² = ${r2}% | r = ${pearsonR >= 0 ? '+' : ''}${pearsonR.toFixed(2)}`;
+          ctx.font = '600 11px system-ui, sans-serif';
+          const badgeW = ctx.measureText(rBadge).width + 16;
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
+          ctx.beginPath();
+          ctx.roundRect(padL + plotW - badgeW, 14, badgeW, 22, [6]);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+          ctx.stroke();
+          ctx.fillStyle = '#38bdf8';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(rBadge, padL + plotW - badgeW / 2, 25);
+        }
+
+        // Draw Confidence Corridor
+        if (n > 5 && Math.abs(slope) > 1e-6) {
+          const yLeft = slope * minX + intercept;
+          const yRight = slope * maxX + intercept;
+          const cx1 = padL + ((minX - scaleMinX) / rangeX) * plotW;
+          const cy1 = padT + plotH - (((yLeft - scaleMinY) / rangeY) * plotH);
+          const cx2 = padL + ((maxX - scaleMinX) / rangeX) * plotW;
+          const cy2 = padT + plotH - (((yRight - scaleMinY) / rangeY) * plotH);
+          const corridorOffset = plotH * 0.08;
+
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+          ctx.beginPath();
+          ctx.moveTo(cx1, cy1 - corridorOffset);
+          ctx.lineTo(cx2, cy2 - corridorOffset);
+          ctx.lineTo(cx2, cy2 + corridorOffset);
+          ctx.lineTo(cx1, cy1 + corridorOffset);
+          ctx.closePath();
+          ctx.fill();
+
+          // OLS Regression Trendline
           ctx.strokeStyle = '#f59e0b';
           ctx.lineWidth = 2;
           ctx.setLineDash([5, 4]);
           ctx.beginPath();
-          const startY = padT + plotH - (((validPts[0].y - minY) / rangeY) * plotH);
-          const endY = padT + plotH - (((validPts[validPts.length - 1].y - minY) / rangeY) * plotH);
-          ctx.moveTo(padL, startY);
-          ctx.lineTo(padL + plotW, endY);
+          ctx.moveTo(cx1, cy1);
+          ctx.lineTo(cx2, cy2);
           ctx.stroke();
           ctx.setLineDash([]);
         }
 
-        // Axis labels
+        // Draw Scatter Points (anti-aliased glowing dots with zero blur)
+        const ptRadius = n > 300 ? 3 : (n > 100 ? 3.5 : 4.5);
+        validPts.forEach(pt => {
+          const cx = padL + ((pt.x - scaleMinX) / rangeX) * plotW;
+          const cy = padT + plotH - (((pt.y - scaleMinY) / rangeY) * plotH);
+
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.65)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, ptRadius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        });
+
+        // Centroid Crosshair
+        const centX = padL + ((meanX - scaleMinX) / rangeX) * plotW;
+        const centY = padT + plotH - (((meanY - scaleMinY) / rangeY) * plotH);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centX, centY, 6, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 5-Point Y-Axis Ticks
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '11px sans-serif';
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+          const val = scaleMinY + (rangeY / 4) * i;
+          const yPos = padT + plotH - (plotH / 4) * i;
+          ctx.fillText(aiChartFormatNum(val), padL - 8, yPos);
+        }
+
+        // 5-Point X-Axis Ticks
         ctx.textAlign = 'center';
-        ctx.fillText(`${colX} (X)`, padL + plotW / 2, H - 12);
+        ctx.textBaseline = 'top';
+        for (let i = 0; i <= 4; i++) {
+          const val = scaleMinX + (rangeX / 4) * i;
+          const xPos = padL + (plotW / 4) * i;
+          ctx.fillText(aiChartFormatNum(val), xPos, padT + plotH + 8);
+        }
+
+        // Isolated Axis Titles
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '500 11px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${colX} (X-Axis)`, padL + plotW / 2, H - (isMini ? 8 : 12));
+
         ctx.save();
-        ctx.translate(16, padT + plotH / 2);
+        ctx.translate(isMini ? 12 : 16, padT + plotH / 2);
         ctx.rotate(-Math.PI / 2);
-        ctx.fillText(`${colY} (Y)`, 0, 0);
+        ctx.fillText(`${colY} (Y-Axis)`, 0, 0);
         ctx.restore();
 
-        // Min/Max Ticks
-        ctx.font = '10px sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText(minY.toFixed(1), padL - 8, padT + plotH);
-        ctx.fillText(maxY.toFixed(1), padL - 8, padT + 8);
-        ctx.textAlign = 'left';
-        ctx.fillText(minX.toFixed(1), padL, padT + plotH + 16);
-        ctx.textAlign = 'right';
-        ctx.fillText(maxX.toFixed(1), padL + plotW, padT + plotH + 16);
-
-      // ========================== LINE / TREND CHART ==========================
-      } else if (type.includes('line') || type.includes('trend') || type.includes('time')) {
-        const series = data.map(r => parseFloat(r[colY]) || 0).slice(0, 60);
-        const minVal = Math.min(...series);
-        const maxVal = Math.max(...series);
-        const range = maxVal - minVal || 1;
+      // =========================================================================
+      // 2. TIME-SERIES / SEQUENTIAL LINE & TREND CHART
+      // =========================================================================
+      } else if (type.includes('line') || type.includes('trend') || type.includes('time') || type.includes('series')) {
+        const series = data.map(r => parseFloat(r[colY]) || 0).slice(0, 100);
+        if (!series.length) return;
+        const rawMin = Math.min(...series);
+        const rawMax = Math.max(...series);
+        const span = rawMax - rawMin || 1;
+        const minVal = rawMin - span * 0.05;
+        const maxVal = rawMax + span * 0.15;
+        const range = maxVal - minVal;
         const stepX = plotW / Math.max(series.length - 1, 1);
 
-        // Gradient area
+        // Header statistics
+        if (!isMini) {
+          const statsBadge = `Peak: ${aiChartFormatNum(rawMax)} | Min: ${aiChartFormatNum(rawMin)} | μ: ${aiChartFormatNum(series.reduce((a,b)=>a+b,0)/series.length)}`;
+          ctx.font = '600 11px system-ui, sans-serif';
+          const bW = ctx.measureText(statsBadge).width + 16;
+          ctx.fillStyle = 'rgba(212, 175, 55, 0.12)';
+          ctx.beginPath();
+          ctx.roundRect(padL + plotW - bW, 14, bW, 22, [6]);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(212, 175, 55, 0.3)';
+          ctx.stroke();
+          ctx.fillStyle = '#D4AF37';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(statsBadge, padL + plotW - bW / 2, 25);
+        }
+
+        // Shaded Gradient Path
         const areaGrad = ctx.createLinearGradient(0, padT, 0, padT + plotH);
-        areaGrad.addColorStop(0, 'rgba(212, 175, 55, 0.35)');
-        areaGrad.addColorStop(1, 'rgba(212, 175, 55, 0.0)');
+        areaGrad.addColorStop(0, 'rgba(56, 189, 248, 0.35)');
+        areaGrad.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
         ctx.fillStyle = areaGrad;
         ctx.beginPath();
         ctx.moveTo(padL, padT + plotH);
@@ -28952,8 +29124,8 @@ result = df.describe()
         ctx.closePath();
         ctx.fill();
 
-        // Stroke line
-        ctx.strokeStyle = '#D4AF37';
+        // High-DPI Stroke Line
+        ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 2.5;
         ctx.beginPath();
         series.forEach((val, i) => {
@@ -28963,59 +29135,327 @@ result = df.describe()
         });
         ctx.stroke();
 
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${colY} Trend Line`, padL + plotW / 2, H - 12);
-
-      // ========================== BAR CHART / DISTRIBUTION ==========================
-      } else {
-        // Group by colX and aggregate colY or count
-        const catMap = {};
-        data.forEach(r => {
-          const k = String(r[colX] !== undefined ? r[colX] : 'Item').trim().slice(0, 15);
-          const v = parseFloat(r[colY]) || 1;
-          catMap[k] = (catMap[k] || 0) + v;
+        // Peak / Trough Callouts
+        let peakIdx = 0, troughIdx = 0;
+        series.forEach((v, idx) => {
+          if (v > series[peakIdx]) peakIdx = idx;
+          if (v < series[troughIdx]) troughIdx = idx;
         });
 
-        const sortedCats = Object.entries(catMap).slice(0, 10);
-        const maxVal = Math.max(...sortedCats.map(c => c[1]), 1);
-        const barW = Math.max(12, (plotW / (sortedCats.length || 1)) - 10);
+        const drawCallout = (idx, label, color) => {
+          const cx = padL + idx * stepX;
+          const cy = padT + plotH - ((series[idx] - minVal) / range) * plotH;
+          ctx.fillStyle = color;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
 
-        sortedCats.forEach(([cat, val], i) => {
-          const bx = padL + i * (plotW / sortedCats.length) + 5;
-          const bh = (val / maxVal) * plotH;
+          const pillText = `${label}: ${aiChartFormatNum(series[idx])}`;
+          ctx.font = 'bold 9px system-ui, sans-serif';
+          const pW = ctx.measureText(pillText).width + 10;
+          const pY = Math.max(padT + 12, cy - 14);
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+          ctx.beginPath();
+          ctx.roundRect(cx - pW / 2, pY - 8, pW, 16, [4]);
+          ctx.fill();
+          ctx.strokeStyle = color;
+          ctx.stroke();
+          ctx.fillStyle = color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(pillText, cx, pY);
+        };
+
+        drawCallout(peakIdx, '▲ Peak', '#10b981');
+        if (peakIdx !== troughIdx) drawCallout(troughIdx, '▼ Low', '#ef4444');
+
+        // Y-Axis Ticks
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+          const val = minVal + (range / 4) * i;
+          const yPos = padT + plotH - (plotH / 4) * i;
+          ctx.fillText(aiChartFormatNum(val), padL - 8, yPos);
+        }
+
+        // X-Axis Milestone Ticks
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const milestones = [0, Math.floor(series.length * 0.25), Math.floor(series.length * 0.5), Math.floor(series.length * 0.75), series.length - 1];
+        milestones.forEach(mIdx => {
+          const cx = padL + mIdx * stepX;
+          const label = data[mIdx] && data[mIdx][colX] ? String(data[mIdx][colX]).slice(0, 8) : `#${mIdx + 1}`;
+          ctx.fillText(label, cx, padT + plotH + 8);
+        });
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '500 11px system-ui, sans-serif';
+        ctx.fillText(`Trajectory of ${colY} over ${series.length} observations`, padL + plotW / 2, H - (isMini ? 8 : 12));
+
+      // =========================================================================
+      // 3. NUMERICAL DISTRIBUTION & HISTOGRAM
+      // =========================================================================
+      } else if (type.includes('hist') || type.includes('distribution')) {
+        const rawVals = data.map(r => parseFloat(r[colX])).filter(v => !isNaN(v));
+        if (!rawVals.length) return;
+        const minV = Math.min(...rawVals);
+        const maxV = Math.max(...rawVals);
+        const span = maxV - minV || 1;
+        const binCount = isMini ? 6 : 10;
+        const binWidth = span / binCount;
+        const bins = new Array(binCount).fill(0);
+
+        rawVals.forEach(v => {
+          const idx = Math.min(Math.floor((v - minV) / binWidth), binCount - 1);
+          bins[idx]++;
+        });
+
+        const maxFreq = Math.max(...bins, 1);
+        const plotMaxFreq = maxFreq * 1.18; // 18% headroom
+        const barSlotW = plotW / binCount;
+        const barW = Math.max(8, barSlotW - 6);
+
+        // Header statistics
+        const meanV = rawVals.reduce((a,b)=>a+b,0) / rawVals.length;
+        const sortedV = rawVals.slice().sort((a,b)=>a-b);
+        const medianV = sortedV[Math.floor(sortedV.length / 2)];
+
+        if (!isMini) {
+          const distBadge = `μ = ${aiChartFormatNum(meanV)} | M = ${aiChartFormatNum(medianV)} | N = ${rawVals.length.toLocaleString()}`;
+          ctx.font = '600 11px system-ui, sans-serif';
+          const bW = ctx.measureText(distBadge).width + 16;
+          ctx.fillStyle = 'rgba(99, 102, 241, 0.14)';
+          ctx.beginPath();
+          ctx.roundRect(padL + plotW - bW, 14, bW, 22, [6]);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
+          ctx.stroke();
+          ctx.fillStyle = '#a5b4fc';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(distBadge, padL + plotW - bW / 2, 25);
+        }
+
+        // Draw Bins
+        bins.forEach((cnt, i) => {
+          const bx = padL + i * barSlotW + 3;
+          const bh = (cnt / plotMaxFreq) * plotH;
           const by = padT + plotH - bh;
 
-          // Bar gradient
           const barGrad = ctx.createLinearGradient(0, by, 0, by + bh);
-          barGrad.addColorStop(0, '#D4AF37');
-          barGrad.addColorStop(1, '#C5A059');
+          barGrad.addColorStop(0, '#6366f1');
+          barGrad.addColorStop(1, '#4338ca');
           ctx.fillStyle = barGrad;
           ctx.beginPath();
           ctx.roundRect(bx, by, barW, bh, [4, 4, 0, 0]);
           ctx.fill();
+          ctx.strokeStyle = '#818cf8';
+          ctx.lineWidth = 1;
+          ctx.stroke();
 
-          // Bar top value
-          ctx.fillStyle = '#f8fafc';
-          ctx.font = '10px sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText(val > 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val), bx + barW / 2, by - 6);
+          // Bar Count Micro-Pill
+          if (cnt > 0) {
+            ctx.font = 'bold 10px system-ui, sans-serif';
+            ctx.fillStyle = '#f8fafc';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(cnt, bx + barW / 2, Math.max(padT + 12, by - 4));
+          }
 
-          // X Category label
+          // X-Axis Interval Label
+          ctx.font = '9px system-ui, sans-serif';
           ctx.fillStyle = '#94a3b8';
-          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'top';
+          const binStart = minV + i * binWidth;
+          ctx.fillText(aiChartFormatNum(binStart), bx + barW / 2, padT + plotH + 8);
+        });
+
+        // Staggered Mean & Median Reference Lines
+        const drawRefLine = (val, label, color, yOffset) => {
+          const cx = padL + ((val - minV) / span) * plotW;
+          if (cx < padL || cx > padL + plotW) return;
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([4, 3]);
+          ctx.beginPath();
+          ctx.moveTo(cx, padT);
+          ctx.lineTo(cx, padT + plotH);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.font = 'bold 9px system-ui, sans-serif';
+          const pText = `${label}: ${aiChartFormatNum(val)}`;
+          const pW = ctx.measureText(pText).width + 10;
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+          ctx.beginPath();
+          ctx.roundRect(cx - pW / 2, padT + yOffset, pW, 16, [4]);
+          ctx.fill();
+          ctx.strokeStyle = color;
+          ctx.stroke();
+          ctx.fillStyle = color;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(pText, cx, padT + yOffset + 8);
+        };
+
+        const isClose = Math.abs(meanV - medianV) / span < 0.12;
+        drawRefLine(meanV, 'μ Mean', '#10b981', 12);
+        drawRefLine(medianV, 'M Median', '#38bdf8', isClose ? 32 : 12);
+
+        ctx.fillStyle = '#cbd5e1';
+        ctx.font = '500 11px system-ui, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`Distribution Spectrum: ${colX} (Bins: ${binCount})`, padL + plotW / 2, H - (isMini ? 8 : 12));
+
+      // =========================================================================
+      // 4. CATEGORICAL BAR CHART & SEGMENT COMPARISONS (DEFAULT)
+      // =========================================================================
+      } else {
+        const catMap = {};
+        let totalSum = 0;
+        data.forEach(r => {
+          const rawK = r[colX];
+          const k = (rawK !== undefined && rawK !== null && rawK !== '') ? String(rawK).trim() : 'Unknown';
+          const v = parseFloat(r[colY]) || 1;
+          catMap[k] = (catMap[k] || 0) + v;
+          totalSum += v;
+        });
+
+        // Top categories sorted by value descending
+        const maxDisplayCats = isMini ? 6 : 9;
+        const allEntries = Object.entries(catMap).sort((a, b) => b[1] - a[1]);
+        const sortedCats = allEntries.slice(0, maxDisplayCats);
+        
+        // Group remainder into "Other" if many categories exist
+        if (allEntries.length > maxDisplayCats) {
+          const otherSum = allEntries.slice(maxDisplayCats).reduce((s, c) => s + c[1], 0);
+          sortedCats.push(['Other', otherSum]);
+        }
+
+        const maxVal = Math.max(...sortedCats.map(c => c[1]), 1);
+        const plotMaxVal = maxVal * 1.18; // 18% headroom prevents bar top value collisions
+        const avgVal = totalSum / (allEntries.length || 1);
+        const slotW = plotW / (sortedCats.length || 1);
+        const barW = Math.max(12, Math.min(isMini ? 32 : 56, slotW - (isMini ? 8 : 16)));
+
+        // Header Summary Badge
+        if (!isMini && sortedCats.length > 0) {
+          const topShare = Math.round((sortedCats[0][1] / (totalSum || 1)) * 100);
+          const topBadge = `★ Top: ${sortedCats[0][0].slice(0, 12)} (${topShare}% share | Total: ${aiChartFormatNum(totalSum)})`;
+          ctx.font = '600 11px system-ui, sans-serif';
+          const bW = ctx.measureText(topBadge).width + 16;
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.12)';
+          ctx.beginPath();
+          ctx.roundRect(padL + plotW - bW, 14, bW, 22, [6]);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(56, 189, 248, 0.3)';
+          ctx.stroke();
+          ctx.fillStyle = '#38bdf8';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(topBadge, padL + plotW - bW / 2, 25);
+        }
+
+        // Benchmark Average Line
+        if (avgVal > 0 && avgVal < plotMaxVal) {
+          const avgY = padT + plotH - (avgVal / plotMaxVal) * plotH;
+          ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(padL, avgY);
+          ctx.lineTo(padL + plotW, avgY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          if (!isMini) {
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = 'bold 9px system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(`Avg: ${aiChartFormatNum(avgVal)}`, padL + 6, avgY - 2);
+          }
+        }
+
+        // Draw Bars
+        sortedCats.forEach(([cat, val], i) => {
+          const centerX = padL + i * slotW + slotW / 2;
+          const bx = centerX - barW / 2;
+          const bh = Math.max(4, (val / plotMaxVal) * plotH);
+          const by = padT + plotH - bh;
+
+          const isTop = (i === 0 && cat !== 'Other');
+          const barGrad = ctx.createLinearGradient(0, by, 0, by + bh);
+          if (isTop) {
+            barGrad.addColorStop(0, '#38bdf8');
+            barGrad.addColorStop(1, '#2563eb');
+          } else {
+            barGrad.addColorStop(0, '#818cf8');
+            barGrad.addColorStop(1, '#4f46e5');
+          }
+          ctx.fillStyle = barGrad;
+          ctx.beginPath();
+          ctx.roundRect(bx, by, barW, bh, [5, 5, 0, 0]);
+          ctx.fill();
+          ctx.strokeStyle = isTop ? '#60a5fa' : 'rgba(165, 180, 252, 0.6)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Bar Top Metric Capsule (Clamped to prevent header collisions)
+          const valText = aiChartFormatNum(val);
+          ctx.font = 'bold ' + (isMini ? '9px' : '10px') + ' system-ui, sans-serif';
+          const textW = ctx.measureText(valText).width + 8;
+          const pillY = Math.max(padT + 12, by - 8);
+
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+          ctx.beginPath();
+          ctx.roundRect(centerX - textW / 2, pillY - 7, textW, 14, [4]);
+          ctx.fill();
+          ctx.fillStyle = isTop ? '#38bdf8' : '#f8fafc';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(valText, centerX, pillY);
+
+          // Clean Rotated X-Axis Category Label
+          const maxCatChars = isMini ? 8 : 12;
+          const truncatedCat = cat.length > maxCatChars ? cat.slice(0, maxCatChars - 1) + '…' : cat;
+          ctx.fillStyle = '#cbd5e1';
+          ctx.font = '500 ' + (isMini ? '9px' : '10px') + ' system-ui, sans-serif';
           ctx.save();
-          ctx.translate(bx + barW / 2, padT + plotH + 14);
-          ctx.rotate(-0.35);
-          ctx.fillText(cat, 0, 0);
+          ctx.translate(centerX, padT + plotH + 8);
+          const rotateAngle = sortedCats.length > (isMini ? 4 : 5) ? -0.42 : 0;
+          ctx.rotate(rotateAngle);
+          ctx.textAlign = rotateAngle === 0 ? 'center' : 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(truncatedCat, 0, 0);
           ctx.restore();
         });
 
+        // 5-Point Y-Axis Ticks
         ctx.fillStyle = '#94a3b8';
-        ctx.font = '11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`${colX} vs ${colY}`, padL + plotW / 2, H - 8);
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 4; i++) {
+          const val = (plotMaxVal / 4) * i;
+          const yPos = padT + plotH - (plotH / 4) * i;
+          ctx.fillText(aiChartFormatNum(val), padL - 8, yPos);
+        }
+
+        // Bottom Axis Subtitle (Only on full-size charts to prevent crowding mini-cards)
+        if (!isMini) {
+          ctx.fillStyle = '#cbd5e1';
+          ctx.font = '500 11px system-ui, sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(`${colX} (Dimension) vs ${colY} (Metric Aggregation)`, padL + plotW / 2, H - 8);
+        }
       }
     }
 
@@ -29064,7 +29504,7 @@ result = df.describe()
         });
         const res = await resp.json();
         if (!resp.ok) throw new Error(res.message || 'Error');
-        renderChartCollection(res.collection || [], res.summary || `Generated ${(res.collection||[]).length} charts`);
+        renderChartCollection(res.collection || res.charts || [], res.summary || `Generated ${(res.collection||res.charts||[]).length} charts`);
         if (badge) { badge.textContent = 'Done'; badge.className = 'badge badge-success'; }
       } catch (err) {
         console.warn('Best-collection API offline, generating local suite:', err);
@@ -29083,10 +29523,10 @@ result = df.describe()
       document.getElementById('vizChartTypeBadge').textContent = res.chart_type_label || res.chart_type || 'Chart';
       document.getElementById('vizRationale').textContent = res.rationale || '—';
       document.getElementById('vizChartTypeDetail').textContent = res.chart_type_label || res.chart_type || '—';
-      document.getElementById('vizFeaturesUsed').textContent = (res.relevant_columns || res.matched_columns || []).join(', ') || '—';
+      document.getElementById('vizFeaturesUsed').textContent = (res.relevant_columns || res.matched_columns || []).join(', ') || [res.col_x, res.col_y].filter(Boolean).join(', ') || '—';
       document.getElementById('vizIntent').textContent = res.intent || 'Exploratory Analysis';
       document.getElementById('vizExplanation').innerHTML = res.explanation || 'Optimal visualization generated based on variable metadata and statistical distributions.';
-      document.getElementById('vizChartCaption').textContent = `X: ${res.col_x||'—'} | Y: ${res.col_y||'—'}`;
+      document.getElementById('vizChartCaption').textContent = `X Axis: ${res.col_x || '—'} | Y Axis: ${res.col_y || '—'}`;
 
       const patEl = document.getElementById('vizPatternsList');
       const pats = res.patterns || [];
@@ -29094,15 +29534,17 @@ result = df.describe()
         ? pats.map(p => `<div style="margin-bottom:6px;font-size:0.85rem;color:var(--text-muted);">• ${p}</div>`).join('')
         : '<span style="color:var(--text-muted);font-size:0.86rem;">No outlier skew or non-linear patterns detected.</span>';
 
-      // RENDER REAL CANVAS VISUALIZATION
+      // RENDER RETINA HIGH-DPI CANVAS VISUALIZATION
       const container = document.getElementById('vizChartContainer');
-      container.innerHTML = '<canvas id="vizMainCanvas" width="580" height="340" style="width:100%;max-width:580px;height:auto;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);"></canvas>';
-      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset.length) ? currentDataset : (rawDataset || []);
-      drawAIChartOnCanvas('vizMainCanvas', res.chart_type || 'bar', dataToUse, res.col_x, res.col_y, title);
+      container.innerHTML = '<canvas id="vizMainCanvas" style="width:100%;height:420px;display:block;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.35);"></canvas>';
+      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) ? currentDataset : (rawDataset || []);
+      setTimeout(() => {
+        drawAIChartOnCanvas('vizMainCanvas', res.chart_type || 'bar', dataToUse, res.col_x, res.col_y, title);
+      }, 20);
     }
 
     function renderChartFallback(query) {
-      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset.length) ? currentDataset : (rawDataset || []);
+      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) ? currentDataset : (rawDataset || []);
       if (!dataToUse || dataToUse.length === 0) {
         document.getElementById('vizEmptyState').style.display = 'block';
         return;
@@ -29141,14 +29583,16 @@ result = df.describe()
       document.getElementById('vizChartTypeDetail').textContent = chartType.toUpperCase();
       document.getElementById('vizFeaturesUsed').textContent = [colX, colY].filter(Boolean).join(', ') || '—';
       document.getElementById('vizIntent').textContent = 'Pattern & Distribution Exploration';
-      document.getElementById('vizExplanation').textContent = `Rendered high-performance Canvas visualization on ${dataToUse.length.toLocaleString()} records across features '${colX}' and '${colY}'.`;
+      document.getElementById('vizExplanation').textContent = `Rendered high-performance Retina Canvas visualization on ${dataToUse.length.toLocaleString()} records across features '${colX}' and '${colY}'.`;
       document.getElementById('vizChartCaption').textContent = `X Axis: ${colX} | Y Axis: ${colY}`;
       document.getElementById('vizPatternsList').innerHTML = `<div style="color:#38bdf8;font-size:0.86rem;">• Plotted ${Math.min(dataToUse.length, 1000).toLocaleString()} data elements in 2D coordinate space.</div>`;
 
-      // RENDER ACTUAL CANVAS CHART
+      // RENDER RETINA HIGH-DPI CANVAS VISUALIZATION
       const container = document.getElementById('vizChartContainer');
-      container.innerHTML = '<canvas id="vizMainCanvas" width="580" height="340" style="width:100%;max-width:580px;height:auto;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);"></canvas>';
-      drawAIChartOnCanvas('vizMainCanvas', chartType, dataToUse, colX, colY, title);
+      container.innerHTML = '<canvas id="vizMainCanvas" style="width:100%;height:420px;display:block;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.35);"></canvas>';
+      setTimeout(() => {
+        drawAIChartOnCanvas('vizMainCanvas', chartType, dataToUse, colX, colY, title);
+      }, 20);
     }
 
     function renderChartCollection(collection, summary) {
@@ -29159,28 +29603,30 @@ result = df.describe()
 
       const grid = document.getElementById('vizCollectionGrid');
       grid.innerHTML = collection.map((item, i) => `
-        <div class="panel">
-          <div class="panel-header" style="justify-content:space-between;">
-            <span>${item.title || 'Chart ' + (i+1)}</span>
-            <span class="badge badge-info">${item.chart_type_label || item.chart_type || 'Chart'}</span>
+        <div class="panel" style="background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.25);">
+          <div class="panel-header" style="justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.02);">
+            <span style="font-weight:700;font-size:0.88rem;">${item.title || 'Chart ' + (i+1)}</span>
+            <span class="badge badge-info" style="font-size:0.72rem;">${item.chart_type_label || item.chart_type || 'Chart'}</span>
           </div>
-          <div style="padding:12px 16px;">
-            <canvas id="vizColCanvas_${i}" width="340" height="190" style="width:100%;height:auto;border-radius:6px;margin-bottom:10px;"></canvas>
+          <div style="padding:10px 14px;">
+            <div style="width:100%;height:250px;background:rgba(15,23,42,0.4);border-radius:8px;overflow:hidden;margin-bottom:10px;">
+              <canvas id="vizColCanvas_${i}" style="width:100%;height:250px;display:block;"></canvas>
+            </div>
             <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.5;">${item.rationale || ''}</div>
           </div>
         </div>
       `).join('');
 
-      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset.length) ? currentDataset : (rawDataset || []);
+      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) ? currentDataset : (rawDataset || []);
       collection.forEach((item, i) => {
         setTimeout(() => {
           drawAIChartOnCanvas(`vizColCanvas_${i}`, item.chart_type || 'bar', dataToUse, item.col_x, item.col_y, item.title);
-        }, 20);
+        }, 30 * (i + 1));
       });
     }
 
     function generateClientChartCollection() {
-      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset.length) ? currentDataset : (rawDataset || []);
+      const dataToUse = (typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) ? currentDataset : (rawDataset || []);
       if (!dataToUse || !dataToUse.length) return;
       const keys = Object.keys(dataToUse[0]);
       const numCols = keys.filter(k => dataToUse.some(r => !isNaN(parseFloat(r[k])) && r[k] !== null && r[k] !== ''));

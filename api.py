@@ -958,7 +958,10 @@ def recommend_chart(req: ChartRecommendationRequest):
             serialized_collection.append({
                 "title": item.get("title", "Untitled Visualization"),
                 "chart_type": item.get("chart_type", "custom"),
+                "chart_type_label": item.get("chart_type_label", "Chart"),
                 "columns": item.get("columns", []),
+                "col_x": item.get("col_x"),
+                "col_y": item.get("col_y"),
                 "rationale": item.get("rationale", ""),
                 "explanation": item.get("explanation", ""),
                 "patterns": item.get("patterns", []),
@@ -969,7 +972,8 @@ def recommend_chart(req: ChartRecommendationRequest):
             "mode": "collection",
             "query": req.query,
             "summary": res.get("summary", ""),
-            "charts": serialized_collection
+            "charts": serialized_collection,
+            "collection": serialized_collection
         }
 
     return {
@@ -977,9 +981,13 @@ def recommend_chart(req: ChartRecommendationRequest):
         "mode": "single",
         "query": req.query,
         "matched_columns": res.get("matched_columns", []),
+        "relevant_columns": res.get("relevant_columns", res.get("matched_columns", [])),
         "intent": res.get("intent", "general"),
         "chart_type": res.get("chart_type", "custom"),
+        "chart_type_label": res.get("chart_type_label", "Chart"),
         "title": res.get("title", "AI Recommended Visualization"),
+        "col_x": res.get("col_x"),
+        "col_y": res.get("col_y"),
         "rationale": res.get("rationale", ""),
         "explanation": res.get("explanation", ""),
         "patterns": res.get("patterns", []),
@@ -988,6 +996,7 @@ def recommend_chart(req: ChartRecommendationRequest):
 
 
 @app.get("/charts/best-collection", tags=["AI Visualization"])
+@app.post("/charts/best-collection", tags=["AI Visualization"])
 def get_best_charts_collection(max_charts: int = 5):
     """
     Synthesizes a curated collection of high-impact visualizations for the active dataset.
@@ -999,7 +1008,10 @@ def get_best_charts_collection(max_charts: int = 5):
         serialized.append({
             "title": item.get("title", "Untitled Visualization"),
             "chart_type": item.get("chart_type", "custom"),
+            "chart_type_label": item.get("chart_type_label", "Chart"),
             "columns": item.get("columns", []),
+            "col_x": item.get("col_x"),
+            "col_y": item.get("col_y"),
             "rationale": item.get("rationale", ""),
             "explanation": item.get("explanation", ""),
             "patterns": item.get("patterns", []),
@@ -1008,7 +1020,8 @@ def get_best_charts_collection(max_charts: int = 5):
     return {
         "status": "success",
         "total_charts": len(serialized),
-        "charts": serialized
+        "charts": serialized,
+        "collection": serialized
     }
 
 
