@@ -5287,36 +5287,60 @@ result = df.describe()
 
             <!-- Pivot -->
             <div class="panel" style="margin-bottom:0;">
-              <div class="panel-header" style="margin-bottom:12px;"><span>🔄 Pivot Table</span></div>
-              <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <div class="panel-header" style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+                <span>🔄 Pivot Table</span>
+                <span class="badge badge-info" style="font-size:0.7rem;">High-Speed O(N) Engine</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
                   <div>
-                    <label style="font-size:0.74rem; color:var(--text-muted); display:block; margin-bottom:3px;">Index (Rows):</label>
-                    <select id="pivotIndex" class="proc-all-col-sel" style="width:100%; padding:6px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option>Select</option></select>
+                    <label style="font-size:0.74rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Index (Rows):</label>
+                    <select id="pivotIndex" class="proc-all-col-sel" style="width:100%; padding:7px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option value="">Select Row Field</option></select>
                   </div>
                   <div>
-                    <label style="font-size:0.74rem; color:var(--text-muted); display:block; margin-bottom:3px;">Columns:</label>
-                    <select id="pivotColumns" class="proc-all-col-sel" style="width:100%; padding:6px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option>Select</option></select>
+                    <label style="font-size:0.74rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Columns (Pivot Dimension):</label>
+                    <select id="pivotColumns" class="proc-all-col-sel" style="width:100%; padding:7px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option value="">Select Column Field</option></select>
                   </div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:10px;">
                   <div>
-                    <label style="font-size:0.74rem; color:var(--text-muted); display:block; margin-bottom:3px;">Values:</label>
-                    <select id="pivotValues" class="proc-num-col-sel" style="width:100%; padding:6px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option>Select</option></select>
+                    <label style="font-size:0.74rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Values (Metric):</label>
+                    <select id="pivotValues" class="proc-num-col-sel" style="width:100%; padding:7px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);"><option value="">Select Metric Field</option></select>
                   </div>
                   <div>
-                    <label style="font-size:0.74rem; color:var(--text-muted); display:block; margin-bottom:3px;">Aggregation:</label>
-                    <select id="pivotAggfunc" style="width:100%; padding:6px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);">
+                    <label style="font-size:0.74rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Aggregation:</label>
+                    <select id="pivotAggfunc" style="width:100%; padding:7px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);">
                       <option value="sum">Sum</option>
-                      <option value="mean">Mean</option>
-                      <option value="count">Count</option>
+                      <option value="mean">Mean (Average)</option>
+                      <option value="median">Median</option>
+                      <option value="count">Count (Frequency)</option>
+                      <option value="distinct_count">Distinct Count</option>
                       <option value="max">Max</option>
                       <option value="min">Min</option>
+                      <option value="std">Std Dev</option>
                     </select>
                   </div>
                 </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; align-items:center;">
+                  <div>
+                    <label style="font-size:0.74rem; font-weight:600; color:var(--text-muted); display:block; margin-bottom:4px;">Empty Cell Display:</label>
+                    <select id="pivotFillNa" style="width:100%; padding:7px 10px; font-size:0.8rem; border-radius:6px; background:var(--card-bg); color:var(--text-primary); border:1px solid var(--card-border);">
+                      <option value="0">0 (Zero)</option>
+                      <option value="dash">- (Dash)</option>
+                      <option value="blank">Blank / Empty</option>
+                    </select>
+                  </div>
+                  <div style="padding-top:16px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--text-secondary); cursor:pointer; user-select:none;">
+                      <input type="checkbox" id="pivotIncludeTotals" checked style="accent-color:var(--primary); width:15px; height:15px;">
+                      <span>Include Row &amp; Column Totals</span>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <button class="btn btn-primary" onclick="applyPivot()" style="width:100%; font-weight:700;">🔄 Generate Pivot Table</button>
+              <button id="btnApplyPivot" class="btn btn-primary" onclick="applyPivot()" style="width:100%; font-weight:700; padding:9px 16px; font-size:0.88rem; display:flex; align-items:center; justify-content:center; gap:8px;">
+                <span>🔄 Generate Pivot Table</span>
+              </button>
             </div>
 
             <!-- Unpivot / Melt -->
@@ -5335,10 +5359,28 @@ result = df.describe()
           </div>
 
           <!-- Pivot Result -->
-          <div id="pivotResultContainer" style="display:none;">
-            <div class="panel">
-              <div class="panel-header" style="margin-bottom:8px;"><span>📋 Pivot Result Preview</span><button onclick="ingestPivotResult()" class="btn btn-primary" style="width:auto; padding:4px 12px; font-size:0.78rem;">🚀 Ingest</button></div>
-              <div class="table-container" id="pivotResultTable" style="max-height:260px;"></div>
+          <div id="pivotResultContainer" style="display:none; margin-top:16px;">
+            <div class="panel" style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+              <div class="panel-header" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-weight:700; font-size:0.95rem;">📋 Pivot Table Result</span>
+                  <span id="pivotMetaDuration" class="badge badge-success" style="font-size:0.72rem; padding:3px 8px;">⚡ 0.0 ms</span>
+                </div>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button onclick="copyPivotTable()" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.78rem;" title="Copy to clipboard as TSV">📋 Copy</button>
+                  <button onclick="exportPivotCSV()" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.78rem;" title="Download as CSV">💾 CSV</button>
+                  <button onclick="ingestPivotResult('pipeline')" class="btn btn-outline" style="width:auto; padding:5px 12px; font-size:0.78rem; border-color:var(--primary); color:var(--primary);" title="Keep working on this pivoted table in this Processing tab">📥 Load into Pipeline</button>
+                  <button onclick="ingestPivotResult('main')" class="btn btn-primary" style="width:auto; padding:5px 14px; font-size:0.78rem; font-weight:700;" title="Set as main platform dataset and navigate to Overview">🚀 Ingest to Workspace</button>
+                </div>
+              </div>
+
+              <!-- Metadata Summary Bar -->
+              <div id="pivotMetaBar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px; font-size:0.75rem;"></div>
+
+              <!-- High Cardinality Warning Banner -->
+              <div id="pivotColumnWarning" style="display:none; margin-bottom:10px; padding:8px 12px; background:rgba(245,158,11,0.12); border-left:4px solid #f59e0b; border-radius:6px; font-size:0.78rem; color:#fbbf24;"></div>
+
+              <div class="table-container" id="pivotResultTable" style="max-height:380px; overflow:auto; border-radius:8px; border:1px solid var(--card-border);"></div>
             </div>
           </div>
         </div>
@@ -24787,6 +24829,20 @@ result = df.describe()
           `<span onclick="insertColChip('${c}')" style="cursor:pointer; font-size:0.72rem; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.3); border-radius:4px; padding:2px 6px; font-family:monospace; color:#c7d2fe;">${c}</span>`
         ).join('');
       }
+
+      // Smart distinct default selections for Pivot dropdowns
+      const pIdx = document.getElementById('pivotIndex');
+      const pCols = document.getElementById('pivotColumns');
+      const pVal = document.getElementById('pivotValues');
+      if (pIdx && pCols && allCols.length >= 2) {
+        if (!pIdx.value || pIdx.value === pCols.value) {
+          pIdx.value = allCols[0];
+          pCols.value = allCols[1];
+        }
+      }
+      if (pVal && numCols.length > 0 && !pVal.value) {
+        pVal.value = numCols[0];
+      }
     }
 
     function insertColChip(colName) {
@@ -25161,54 +25217,469 @@ result = df.describe()
     }
 
     function applyPivot() {
-      if (!procDataset) { notifyTaskFailed('Pivot', 'No dataset loaded.'); return; }
-      notifyTaskStart('Generating Pivot Table...');
-      const indexCol = document.getElementById('pivotIndex').value;
-      const colsCol = document.getElementById('pivotColumns').value;
-      const valCol = document.getElementById('pivotValues').value;
-      const aggfunc = document.getElementById('pivotAggfunc').value;
-
-      const uniqueIdxVals = [...new Set(procDataset.map(r => r[indexCol]))];
-      const uniqueColVals = [...new Set(procDataset.map(r => r[colsCol]))];
-
-      const result = uniqueIdxVals.map(idxVal => {
-        const row = { [indexCol]: idxVal };
-        uniqueColVals.forEach(colVal => {
-          const matching = procDataset.filter(r => r[indexCol] === idxVal && r[colsCol] === colVal);
-          const vals = matching.map(r => parseFloat(r[valCol])).filter(v => !isNaN(v));
-          let agg = 0;
-          if (aggfunc === 'sum') agg = vals.reduce((a,b)=>a+b,0);
-          else if (aggfunc === 'mean') agg = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
-          else if (aggfunc === 'count') agg = matching.length;
-          else if (aggfunc === 'max') agg = vals.length ? Math.max(...vals) : 0;
-          else if (aggfunc === 'min') agg = vals.length ? Math.min(...vals) : 0;
-          row[String(colVal)] = Math.round(agg * 100) / 100;
-        });
-        return row;
-      });
-
-      window._pivotResult = result;
-      const container = document.getElementById('pivotResultTable');
-      const resContainer = document.getElementById('pivotResultContainer');
-      if (container && result.length) {
-        resContainer.style.display = 'block';
-        const cols = Object.keys(result[0]);
-        let tableHtml = '<table><thead><tr>' + cols.map(c=>`<th>${c}</th>`).join('') + '</tr></thead><tbody>';
-        result.slice(0, 30).forEach(row => tableHtml += '<tr>' + cols.map(c=>`<td>${row[c] !== undefined ? row[c] : ''}</td>`).join('') + '</tr>');
-        tableHtml += '</tbody></table>';
-        container.innerHTML = tableHtml;
+      // 1. Dataset availability fallback
+      if (!procDataset || !procDataset.length) {
+        if (typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) {
+          procDataset = typeof snapshotDataset === 'function' ? snapshotDataset(currentDataset) : currentDataset.slice();
+          updateProcBadges();
+          populateProcSelectors();
+        } else {
+          notifyTaskFailed('Pivot Table', 'No dataset loaded in workspace.');
+          return;
+        }
       }
 
-      notifyTaskSuccess('Pivot', `Pivoted ${procDataset.length} rows into ${result.length} × ${uniqueColVals.length + 1} table.`);
+      const pIdxEl = document.getElementById('pivotIndex');
+      const pColsEl = document.getElementById('pivotColumns');
+      const pValEl = document.getElementById('pivotValues');
+      const pAggEl = document.getElementById('pivotAggfunc');
+      const pFillEl = document.getElementById('pivotFillNa');
+      const pTotEl = document.getElementById('pivotIncludeTotals');
+      const btn = document.getElementById('btnApplyPivot');
+
+      const indexCol = pIdxEl ? pIdxEl.value : '';
+      const colsCol = pColsEl ? pColsEl.value : '';
+      const valCol = pValEl ? pValEl.value : '';
+      const aggfunc = pAggEl ? pAggEl.value : 'sum';
+      const fillNa = pFillEl ? pFillEl.value : '0';
+      const includeTotals = pTotEl ? pTotEl.checked : true;
+
+      // 2. Comprehensive Input Validation
+      if (!indexCol || indexCol === 'Select' || indexCol === '') {
+        notifyTaskFailed('Pivot Table', 'Please select a valid Index (Row) dimension.');
+        if (pIdxEl) pIdxEl.focus();
+        return;
+      }
+      if (!colsCol || colsCol === 'Select' || colsCol === '') {
+        notifyTaskFailed('Pivot Table', 'Please select a valid Columns dimension.');
+        if (pColsEl) pColsEl.focus();
+        return;
+      }
+      if (indexCol === colsCol) {
+        notifyTaskFailed('Pivot Table', `Index (Row) and Columns cannot be the same field ("${indexCol}"). Please select different dimensions.`);
+        return;
+      }
+      if (aggfunc !== 'count' && (!valCol || valCol === 'Select' || valCol === '')) {
+        notifyTaskFailed('Pivot Table', `Please select a numerical Values column to calculate ${aggfunc.toUpperCase()}.`);
+        if (pValEl) pValEl.focus();
+        return;
+      }
+
+      // 3. UI responsiveness: show spinner and yield execution to unblock browser render
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span><i class="fa fa-spinner fa-spin"></i> Pivoting...</span>';
+      }
+      notifyTaskStart('Generating Pivot Table...');
+
+      setTimeout(() => {
+        try {
+          const t0 = performance.now();
+          const dataset = procDataset;
+          const N = dataset.length;
+
+          const isCount = aggfunc === 'count';
+          const isDistinct = aggfunc === 'distinct_count';
+          const isMedian = aggfunc === 'median';
+          const isStd = aggfunc === 'std';
+          const needVals = isMedian || isStd;
+
+          // Single-pass O(N) Hash Map Grid
+          const indexOrder = [];
+          const indexSeen = new Set();
+          const colCounts = new Map();
+          const grid = new Map(); // idxKey -> Map(colKey -> { sum: 0, count: 0, min: null, max: null, vals: []/null, set: Set/null })
+
+          for (let i = 0; i < N; i++) {
+            const row = dataset[i];
+            const rawIdx = row[indexCol];
+            const rawCol = row[colsCol];
+
+            const idxKey = (rawIdx !== null && rawIdx !== undefined && rawIdx !== '') ? String(rawIdx) : '(Blank)';
+            const colKey = (rawCol !== null && rawCol !== undefined && rawCol !== '') ? String(rawCol) : '(Blank)';
+
+            if (!indexSeen.has(idxKey)) {
+              indexSeen.add(idxKey);
+              indexOrder.push(idxKey);
+            }
+            colCounts.set(colKey, (colCounts.get(colKey) || 0) + 1);
+
+            let colMap = grid.get(idxKey);
+            if (!colMap) {
+              colMap = new Map();
+              grid.set(idxKey, colMap);
+            }
+
+            let cell = colMap.get(colKey);
+            if (!cell) {
+              cell = {
+                sum: 0,
+                count: 0,
+                min: null,
+                max: null,
+                vals: needVals ? [] : null,
+                set: isDistinct ? new Set() : null
+              };
+              colMap.set(colKey, cell);
+            }
+
+            if (isCount) {
+              cell.count++;
+            } else {
+              const rawV = row[valCol];
+              const num = typeof rawV === 'number' ? rawV : parseFloat(rawV);
+              if (!isNaN(num)) {
+                cell.count++;
+                cell.sum += num;
+                if (cell.min === null || num < cell.min) cell.min = num;
+                if (cell.max === null || num > cell.max) cell.max = num;
+                if (needVals) cell.vals.push(num);
+              }
+              if (isDistinct && rawV !== undefined && rawV !== null && rawV !== '') {
+                cell.set.add(rawV);
+              }
+            }
+          }
+
+          // Safety guard against high-cardinality column dimensions
+          const MAX_COLUMNS = 75;
+          let allColKeys = Array.from(colCounts.keys());
+          let warningMsg = null;
+          if (allColKeys.length > MAX_COLUMNS) {
+            warningMsg = `Column dimension "${colsCol}" has ${allColKeys.length} unique values. Automatically displayed top ${MAX_COLUMNS} most frequent columns to maintain maximum performance.`;
+            allColKeys.sort((a, b) => colCounts.get(b) - colCounts.get(a));
+            allColKeys = allColKeys.slice(0, MAX_COLUMNS);
+          }
+          // Sort columns cleanly (natural alphanumeric)
+          allColKeys.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+          // Sort index rows cleanly
+          indexOrder.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+
+          // Aggregation resolver helper
+          function resolveCell(c) {
+            if (!c || c.count === 0) return null;
+            if (aggfunc === 'sum') return Math.round(c.sum * 100) / 100;
+            if (aggfunc === 'mean') return Math.round((c.sum / c.count) * 100) / 100;
+            if (aggfunc === 'count') return c.count;
+            if (aggfunc === 'distinct_count') return c.set ? c.set.size : 0;
+            if (aggfunc === 'max') return c.max !== null ? Math.round(c.max * 100) / 100 : null;
+            if (aggfunc === 'min') return c.min !== null ? Math.round(c.min * 100) / 100 : null;
+            if (aggfunc === 'median') {
+              if (!c.vals || !c.vals.length) return null;
+              c.vals.sort((x, y) => x - y);
+              const m = Math.floor(c.vals.length / 2);
+              const med = (c.vals.length % 2 !== 0) ? c.vals[m] : (c.vals[m - 1] + c.vals[m]) / 2;
+              return Math.round(med * 100) / 100;
+            }
+            if (aggfunc === 'std') {
+              if (!c.vals || c.vals.length < 2) return 0;
+              const avg = c.sum / c.count;
+              const variance = c.vals.reduce((s, v) => s + Math.pow(v - avg, 2), 0) / (c.vals.length - 1);
+              return Math.round(Math.sqrt(variance) * 100) / 100;
+            }
+            return Math.round(c.sum * 100) / 100;
+          }
+
+          // Build pivoted rows
+          const result = [];
+          const colTotals = new Map();
+          if (includeTotals) {
+            allColKeys.forEach(k => colTotals.set(k, { sum: 0, count: 0, min: null, max: null, vals: needVals ? [] : null }));
+          }
+
+          for (let i = 0; i < indexOrder.length; i++) {
+            const idxKey = indexOrder[i];
+            const colMap = grid.get(idxKey) || new Map();
+            const rowObj = { [indexCol]: idxKey };
+
+            let rowSum = 0;
+            let rowCount = 0;
+            let rowVals = [];
+
+            for (let j = 0; j < allColKeys.length; j++) {
+              const colKey = allColKeys[j];
+              const cell = colMap.get(colKey);
+              const val = resolveCell(cell);
+
+              let dispVal;
+              if (val === null || val === undefined) {
+                dispVal = (fillNa === '0') ? 0 : (fillNa === 'dash' ? '-' : '');
+              } else {
+                dispVal = val;
+              }
+              rowObj[colKey] = dispVal;
+
+              if (includeTotals && cell && cell.count > 0) {
+                const ct = colTotals.get(colKey);
+                ct.count += cell.count;
+                ct.sum += cell.sum;
+                if (cell.min !== null && (ct.min === null || cell.min < ct.min)) ct.min = cell.min;
+                if (cell.max !== null && (ct.max === null || cell.max > ct.max)) ct.max = cell.max;
+                if (needVals && cell.vals) ct.vals.push(...cell.vals);
+
+                if (typeof val === 'number') {
+                  rowSum += val;
+                  rowCount++;
+                  rowVals.push(val);
+                }
+              }
+            }
+
+            if (includeTotals) {
+              let rowTotal = 0;
+              if (aggfunc === 'sum' || aggfunc === 'count' || aggfunc === 'distinct_count') rowTotal = Math.round(rowSum * 100) / 100;
+              else if (aggfunc === 'mean') rowTotal = rowCount ? Math.round((rowSum / rowCount) * 100) / 100 : 0;
+              else if (aggfunc === 'max') rowTotal = rowVals.length ? Math.round(Math.max(...rowVals) * 100) / 100 : 0;
+              else if (aggfunc === 'min') rowTotal = rowVals.length ? Math.round(Math.min(...rowVals) * 100) / 100 : 0;
+              else rowTotal = Math.round(rowSum * 100) / 100;
+              rowObj['Total'] = rowTotal;
+            }
+
+            result.push(rowObj);
+          }
+
+          // Grand Total row
+          let grandTotalRow = null;
+          if (includeTotals && result.length > 0) {
+            grandTotalRow = { [indexCol]: 'Grand Total' };
+            let grandSum = 0;
+            let grandCount = 0;
+            let grandVals = [];
+
+            for (let j = 0; j < allColKeys.length; j++) {
+              const colKey = allColKeys[j];
+              const ct = colTotals.get(colKey);
+              const val = resolveCell(ct);
+              grandTotalRow[colKey] = (val !== null && val !== undefined) ? val : (fillNa === '0' ? 0 : '-');
+              if (typeof val === 'number') {
+                grandSum += val;
+                grandCount++;
+                grandVals.push(val);
+              }
+            }
+
+            let finalGrandTotal = 0;
+            if (aggfunc === 'sum' || aggfunc === 'count' || aggfunc === 'distinct_count') finalGrandTotal = Math.round(grandSum * 100) / 100;
+            else if (aggfunc === 'mean') finalGrandTotal = grandCount ? Math.round((grandSum / grandCount) * 100) / 100 : 0;
+            else if (aggfunc === 'max') finalGrandTotal = grandVals.length ? Math.max(...grandVals) : 0;
+            else if (aggfunc === 'min') finalGrandTotal = grandVals.length ? Math.min(...grandVals) : 0;
+            else finalGrandTotal = Math.round(grandSum * 100) / 100;
+            grandTotalRow['Total'] = finalGrandTotal;
+          }
+
+          const t1 = performance.now();
+          const durationMs = Math.max(0.1, Math.round((t1 - t0) * 10) / 10);
+
+          // Store for ingestion, export, and copy
+          window._pivotResult = result;
+          window._pivotGrandTotal = grandTotalRow;
+          window._pivotColumns = allColKeys;
+          window._pivotMeta = {
+            indexCol,
+            colsCol,
+            valCol,
+            aggfunc,
+            fillNa,
+            includeTotals,
+            rowCount: result.length,
+            colCount: allColKeys.length + (includeTotals ? 2 : 1),
+            durationMs
+          };
+
+          // Update Result UI Containers
+          const resContainer = document.getElementById('pivotResultContainer');
+          const tableContainer = document.getElementById('pivotResultTable');
+          const durBadge = document.getElementById('pivotMetaDuration');
+          const metaBar = document.getElementById('pivotMetaBar');
+          const warnBox = document.getElementById('pivotColumnWarning');
+
+          if (resContainer) resContainer.style.display = 'block';
+          if (durBadge) durBadge.textContent = `⚡ ${durationMs} ms (O(N) single-pass)`;
+
+          if (warnBox) {
+            if (warningMsg) {
+              warnBox.textContent = '⚠️ ' + warningMsg;
+              warnBox.style.display = 'block';
+            } else {
+              warnBox.style.display = 'none';
+            }
+          }
+
+          if (metaBar) {
+            metaBar.innerHTML = `
+              <span class="badge badge-info" style="font-size:0.75rem;"><i class="fa fa-arrows-alt"></i> ${result.length.toLocaleString()} Rows × ${allColKeys.length + (includeTotals ? 2 : 1)} Cols</span>
+              <span class="badge badge-primary" style="font-size:0.75rem;"><i class="fa fa-calculator"></i> ${aggfunc.toUpperCase()} of "${aggfunc === 'count' ? 'Rows' : valCol}"</span>
+              <span class="badge badge-neutral" style="font-size:0.75rem;">Row: <strong>${indexCol}</strong></span>
+              <span class="badge badge-neutral" style="font-size:0.75rem;">Col: <strong>${colsCol}</strong></span>
+              ${includeTotals ? '<span class="badge badge-success" style="font-size:0.75rem;">✓ Subtotals & Grand Totals</span>' : ''}
+            `;
+          }
+
+          // Build High-Performance Styled Table HTML
+          const tableCols = [indexCol, ...allColKeys];
+          if (includeTotals) tableCols.push('Total');
+
+          let tableHtml = '<table class="table data-table" style="width:100%; border-collapse:separate; border-spacing:0; font-size:0.8rem; text-align:left;">';
+          
+          // Sticky Table Header
+          tableHtml += '<thead><tr style="background:var(--card-header-bg, #1e2230); position:sticky; top:0; z-index:4;">';
+          tableCols.forEach((c, cIdx) => {
+            const isFirst = (cIdx === 0);
+            const isTot = (c === 'Total');
+            const stickyStyle = isFirst ? 'position:sticky; left:0; z-index:5; background:var(--card-header-bg, #1e2230); border-right:2px solid var(--card-border);' : '';
+            const totStyle = isTot ? 'background:rgba(99,102,241,0.18); color:var(--primary); font-weight:700; border-left:2px solid var(--card-border);' : '';
+            tableHtml += `<th style="padding:8px 12px; white-space:nowrap; border-bottom:2px solid var(--card-border); font-size:0.78rem; text-align:${isFirst ? 'left' : 'right'}; ${stickyStyle} ${totStyle}">${c}</th>`;
+          });
+          tableHtml += '</tr></thead><tbody>';
+
+          // Data Rows (display up to 100 for instant snappy rendering)
+          const MAX_RENDER_ROWS = 100;
+          const displaySlice = result.slice(0, MAX_RENDER_ROWS);
+
+          displaySlice.forEach((row, rIdx) => {
+            const bg = (rIdx % 2 === 0) ? 'transparent' : 'rgba(255,255,255,0.015)';
+            tableHtml += `<tr style="background:${bg}; transition:background 0.1s;" onmouseover="this.style.background='rgba(99,102,241,0.08)'" onmouseout="this.style.background='${bg}'">`;
+            tableCols.forEach((c, cIdx) => {
+              const isFirst = (cIdx === 0);
+              const isTot = (c === 'Total');
+              const cellVal = row[c] !== undefined ? row[c] : '';
+              const stickyStyle = isFirst ? 'position:sticky; left:0; z-index:2; background:var(--card-bg, #161922); font-weight:600; border-right:2px solid var(--card-border);' : '';
+              const totStyle = isTot ? 'background:rgba(99,102,241,0.08); font-weight:700; color:var(--primary); border-left:2px solid var(--card-border);' : '';
+              
+              let formattedVal = cellVal;
+              if (typeof cellVal === 'number') {
+                formattedVal = cellVal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+              }
+
+              tableHtml += `<td style="padding:6px 12px; white-space:nowrap; border-bottom:1px solid rgba(255,255,255,0.05); font-variant-numeric:tabular-nums; text-align:${isFirst ? 'left' : 'right'}; ${stickyStyle} ${totStyle}">${formattedVal}</td>`;
+            });
+            tableHtml += '</tr>';
+          });
+
+          // Grand Total Row
+          if (grandTotalRow) {
+            tableHtml += '<tr style="background:rgba(99,102,241,0.14); font-weight:800; border-top:2px solid var(--primary); position:sticky; bottom:0; z-index:3;">';
+            tableCols.forEach((c, cIdx) => {
+              const isFirst = (cIdx === 0);
+              const isTot = (c === 'Total');
+              const cellVal = grandTotalRow[c] !== undefined ? grandTotalRow[c] : '';
+              const stickyStyle = isFirst ? 'position:sticky; left:0; z-index:5; background:rgba(30,34,50,0.98); border-right:2px solid var(--primary);' : '';
+              const totStyle = isTot ? 'background:rgba(99,102,241,0.25); color:#a5b4fc; border-left:2px solid var(--primary);' : '';
+              
+              let formattedVal = cellVal;
+              if (typeof cellVal === 'number') {
+                formattedVal = cellVal.toLocaleString(undefined, { maximumFractionDigits: 2 });
+              }
+              tableHtml += `<td style="padding:8px 12px; white-space:nowrap; border-top:2px solid var(--primary); border-bottom:2px solid var(--primary); font-variant-numeric:tabular-nums; text-align:${isFirst ? 'left' : 'right'}; ${stickyStyle} ${totStyle}">${formattedVal}</td>`;
+            });
+            tableHtml += '</tr>';
+          }
+
+          tableHtml += '</tbody></table>';
+
+          if (result.length > MAX_RENDER_ROWS) {
+            tableHtml += `<div style="padding:8px 12px; font-size:0.75rem; color:var(--text-muted); background:var(--card-header-bg, #1e2230); text-align:center; border-top:1px solid var(--card-border);">Showing first ${MAX_RENDER_ROWS} of ${result.length.toLocaleString()} rows. Full dataset will be preserved when ingested or exported.</div>`;
+          }
+
+          if (tableContainer) {
+            tableContainer.innerHTML = tableHtml;
+          }
+
+          notifyTaskSuccess('Pivot Generated', `Pivoted ${N.toLocaleString()} rows into ${result.length} × ${allColKeys.length + (includeTotals ? 2 : 1)} table in ${durationMs}ms with zero lag.`);
+        } catch (err) {
+          console.error("Pivot generation error:", err);
+          notifyTaskFailed('Pivot Table', `Error generating pivot: ${err.message}`);
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔄 Generate Pivot Table</span>';
+          }
+        }
+      }, 20);
     }
 
-    function ingestPivotResult() {
-      if (window._pivotResult) {
-        procDataset = window._pivotResult;
+    function ingestPivotResult(mode = 'main') {
+      if (!window._pivotResult || !window._pivotResult.length) {
+        notifyTaskFailed('Ingest Pivot', 'No pivot table generated yet.');
+        return;
+      }
+
+      // Clone clean data without display artifacts
+      const pivotedData = window._pivotResult.map(r => ({ ...r }));
+      const count = pivotedData.length;
+
+      if (mode === 'pipeline') {
+        saveProcStep(`Pivot Table (${window._pivotMeta.aggfunc} of ${window._pivotMeta.valCol} by ${window._pivotMeta.indexCol} × ${window._pivotMeta.colsCol})`);
+        procDataset = pivotedData;
+        updateProcBadges();
+        populateProcSelectors();
+        renderProcPreview();
+        notifyTaskSuccess('Piped to Processing', `${count} pivoted rows loaded into processing pipeline.`);
+      } else {
+        saveProcStep(`Ingested Pivot result (${count} rows)`);
+        procDataset = pivotedData;
         setDataset(procDataset);
-        notifyTaskSuccess('Ingest Pivot', `${procDataset.length} pivoted rows loaded into workspace.`);
+        notifyTaskSuccess('Ingest Pivot', `${count} pivoted rows set as workspace dataset.`);
         switchModule('moduleOverview');
       }
+    }
+
+    function copyPivotTable() {
+      if (!window._pivotResult || !window._pivotResult.length) {
+        notifyTaskFailed('Copy Pivot', 'No pivot table generated yet.');
+        return;
+      }
+      const cols = [window._pivotMeta.indexCol, ...window._pivotColumns];
+      if (window._pivotMeta.includeTotals) cols.push('Total');
+
+      let tsv = cols.join('\t') + '\n';
+      window._pivotResult.forEach(row => {
+        tsv += cols.map(c => row[c] !== undefined ? row[c] : '').join('\t') + '\n';
+      });
+      if (window._pivotGrandTotal) {
+        tsv += cols.map(c => window._pivotGrandTotal[c] !== undefined ? window._pivotGrandTotal[c] : '').join('\t') + '\n';
+      }
+
+      navigator.clipboard.writeText(tsv).then(() => {
+        notifyTaskSuccess('Copied to Clipboard', 'Pivot table copied in TSV format (paste directly into Excel/Sheets).');
+      }).catch(err => {
+        notifyTaskFailed('Copy Pivot', 'Failed to copy to clipboard.');
+      });
+    }
+
+    function exportPivotCSV() {
+      if (!window._pivotResult || !window._pivotResult.length) {
+        notifyTaskFailed('Export CSV', 'No pivot table generated yet.');
+        return;
+      }
+      const cols = [window._pivotMeta.indexCol, ...window._pivotColumns];
+      if (window._pivotMeta.includeTotals) cols.push('Total');
+
+      let csv = cols.map(c => `"${String(c).replace(/"/g, '""')}"`).join(',') + '\r\n';
+      window._pivotResult.forEach(row => {
+        csv += cols.map(c => {
+          const v = row[c] !== undefined ? row[c] : '';
+          return `"${String(v).replace(/"/g, '""')}"`;
+        }).join(',') + '\r\n';
+      });
+      if (window._pivotGrandTotal) {
+        csv += cols.map(c => {
+          const v = window._pivotGrandTotal[c] !== undefined ? window._pivotGrandTotal[c] : '';
+          return `"${String(v).replace(/"/g, '""')}"`;
+        }).join(',') + '\r\n';
+      }
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pivot_table_${window._pivotMeta.indexCol}_x_${window._pivotMeta.colsCol}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      notifyTaskSuccess('Export CSV', 'Pivot table exported to CSV successfully.');
     }
 
     function applyMelt() {
@@ -25456,6 +25927,11 @@ result = df.describe()
     }
 
     function switchProcTab(tab) {
+      if (!procDataset && typeof currentDataset !== 'undefined' && currentDataset && currentDataset.length) {
+        procDataset = typeof snapshotDataset === 'function' ? snapshotDataset(currentDataset) : currentDataset.slice();
+        updateProcBadges();
+      }
+      populateProcSelectors();
       document.querySelectorAll('.proc-tab-btn').forEach(b => b.className = 'btn btn-outline proc-tab-btn');
       document.querySelectorAll('.proc-tab-content').forEach(c => c.style.display = 'none');
       const tabMap = { filter: 1, calc: 2, group: 3, reshape: 4, join: 5, transform: 6 };
