@@ -246,59 +246,41 @@
       transform: scale(1.04);
     }
 
-    /* Luxury Brightness Adjuster: Day Light & Night Light */
-    .brightness-adjuster {
-      display: inline-flex;
+    /* Simple Day / Night Theme Toggle Logo */
+    .theme-toggle-logo-btn {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      border: 1.8px solid rgba(212, 175, 55, 0.65);
+      display: flex;
       align-items: center;
-      background: rgba(14, 18, 28, 0.85);
-      border: 1.5px solid rgba(212, 175, 55, 0.35);
-      border-radius: 24px;
-      padding: 2px 3px;
-      gap: 2px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      user-select: none;
-      flex-shrink: 0;
-    }
-    .brightness-theme-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: 18px;
+      justify-content: center;
       cursor: pointer;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      white-space: nowrap;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.28);
+      background: rgba(15, 23, 42, 0.85);
+      flex-shrink: 0;
       user-select: none;
     }
-    .brightness-theme-btn:hover {
-      color: var(--champagne-gold);
-      background: rgba(212, 175, 55, 0.12);
+    .theme-toggle-logo-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.55);
+      border-color: var(--champagne-gold, #D4AF37);
     }
-    .brightness-theme-btn.active {
-      color: #07080B;
-      background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 100%);
-      border-color: rgba(212, 175, 55, 0.6);
-      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.35);
+    .theme-toggle-logo-btn:hover #themeToggleLogoSvg {
+      transform: rotate(15deg);
     }
-    body.day-theme .brightness-adjuster,
-    body.light-theme .brightness-adjuster {
-      background: #E2E8F0;
-      border-color: rgba(212, 175, 55, 0.50);
+    body.day-theme .theme-toggle-logo-btn,
+    body.light-theme .theme-toggle-logo-btn {
+      background: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      border-color: rgba(212, 175, 55, 0.65);
     }
-    body.day-theme .brightness-theme-btn,
-    body.light-theme .brightness-theme-btn {
-      color: #475569;
-    }
-    body.day-theme .brightness-theme-btn.active,
-    body.light-theme .brightness-theme-btn.active {
-      color: #07080B;
-      background: linear-gradient(135deg, #F3E5AB 0%, #D4AF37 100%);
-      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+    body.day-theme #themeToggleStatusDot,
+    body.light-theme #themeToggleStatusDot {
+      border-color: #FFFFFF !important;
     }
 
     /* Day Light Luxury Theme */
@@ -1182,16 +1164,20 @@
         <span>Download Active CSV</span>
       </button>
 
-      <!-- Luxury Brightness Adjuster: Two Themes (Day Light & Night Light) -->
-      <div id="brightnessAdjuster" class="brightness-adjuster" title="Brightness Adjuster: Day Light &amp; Night Light">
-        <button id="themeDayBtn" type="button" class="brightness-theme-btn" onclick="applyTheme('day')" title="Day Light Theme" aria-label="Day Light Theme">
-          <span style="font-size:0.92rem; line-height:1;">☀️</span>
-          <span class="theme-label">Day</span>
-        </button>
-        <button id="themeNightBtn" type="button" class="brightness-theme-btn active" onclick="applyTheme('night')" title="Night Light Theme" aria-label="Night Light Theme">
-          <span style="font-size:0.92rem; line-height:1;">🌙</span>
-          <span class="theme-label">Night</span>
-        </button>
+      <!-- Simple Day / Night Theme Toggle Logo Button -->
+      <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
+        <svg id="themeToggleLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
+          <!-- Sun Rays (Day Side) -->
+          <path d="M12 2.5V4.5M6.34 6.34L4.58 4.58M4.5 12H2M6.34 17.66L4.58 19.42M12 19.5V21.5" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
+          <!-- Sun Body (Day Side) -->
+          <path d="M12 7A5 5 0 0 0 12 17V7Z" fill="#F59E0B"/>
+          <!-- Moon Crescent (Night Side) -->
+          <path d="M12 7A5 5 0 0 1 12 17Q15 12 12 7Z" fill="#38BDF8"/>
+          <!-- Night Celestial Stars -->
+          <circle cx="18.5" cy="6.5" r="1.1" fill="#E0F2FE"/>
+          <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
+        </svg>
+        <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
       </div>
 
       <!-- Simple Login Logo Button -->
@@ -21544,6 +21530,8 @@ result = df.describe()
     function applyTheme(theme) {
       const dayBtn = document.getElementById("themeDayBtn");
       const nightBtn = document.getElementById("themeNightBtn");
+      const toggleBtn = document.getElementById("themeToggleBtn");
+      const toggleDot = document.getElementById("themeToggleStatusDot");
       const isDay = (theme === "day" || theme === "light");
 
       if (isDay) {
@@ -21552,9 +21540,17 @@ result = df.describe()
         document.body.classList.add("light-theme");
         if (dayBtn) dayBtn.classList.add("active");
         if (nightBtn) nightBtn.classList.remove("active");
+        if (toggleBtn) {
+          toggleBtn.setAttribute("title", "Day / Night: Currently ☀️ Day Light (Click to switch to 🌙 Night)");
+          toggleBtn.setAttribute("aria-label", "Switch to Night Mode");
+        }
+        if (toggleDot) {
+          toggleDot.style.background = "#F59E0B";
+          toggleDot.setAttribute("title", "Currently ☀️ Day Light Mode");
+        }
         localStorage.setItem("datamind_theme", "day");
         if (typeof notifyTaskSuccess === "function") {
-          notifyTaskSuccess("Brightness Adjuster", "Switched to ☀️ Day Light Theme.");
+          notifyTaskSuccess("Theme Adjuster", "Switched to ☀️ Day Light Theme.");
         }
       } else {
         document.body.classList.remove("day-theme");
@@ -21562,9 +21558,17 @@ result = df.describe()
         document.body.classList.add("midnight-theme");
         if (nightBtn) nightBtn.classList.add("active");
         if (dayBtn) dayBtn.classList.remove("active");
+        if (toggleBtn) {
+          toggleBtn.setAttribute("title", "Day / Night: Currently 🌙 Night Light (Click to switch to ☀️ Day)");
+          toggleBtn.setAttribute("aria-label", "Switch to Day Mode");
+        }
+        if (toggleDot) {
+          toggleDot.style.background = "#38BDF8";
+          toggleDot.setAttribute("title", "Currently 🌙 Night Light Mode");
+        }
         localStorage.setItem("datamind_theme", "night");
         if (typeof notifyTaskSuccess === "function") {
-          notifyTaskSuccess("Brightness Adjuster", "Switched to 🌙 Night Light Theme.");
+          notifyTaskSuccess("Theme Adjuster", "Switched to 🌙 Night Light Theme.");
         }
       }
 
