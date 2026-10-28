@@ -1475,5 +1475,140 @@
     "status": "Production",
     "author": "DataMind AutoML",
     "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
+  },
+  "mod_1790362100_gradient_b": {
+    "id": "mod_1790362100_gradient_b",
+    "name": "AutoML Champion: Gradient Boosting Regressor",
+    "version": "1.0.0",
+    "dataset": "Active Dataset",
+    "target": "Sales",
+    "features": [
+      "Postal_Code",
+      "Order_ID_freq_enc",
+      "Order_Date_freq_enc",
+      "Ship_Date_freq_enc",
+      "Ship_Mode_Same Day",
+      "Ship_Mode_Second Class",
+      "Ship_Mode_Standard Class",
+      "Customer_ID_freq_enc",
+      "Customer_Name_freq_enc",
+      "Segment_Corporate",
+      "Segment_Home Office",
+      "City_freq_enc",
+      "State_freq_enc",
+      "Region_East",
+      "Region_South",
+      "Region_West",
+      "Product_ID_freq_enc",
+      "Category_Office Supplies",
+      "Category_Technology",
+      "Sub_Category_freq_enc",
+      "Product_Name_freq_enc",
+      "Postal_Code_div_Order_ID_freq_enc"
+    ],
+    "algorithm": "Gradient Boosting Regressor",
+    "hyperparameters": {
+      "max_iter": 80,
+      "learning_rate": 0.1
+    },
+    "metrics": {
+      "Training Time (s)": 0.698,
+      "MAE": 254.1983,
+      "MSE": 178363.6385,
+      "RMSE": 422.3312,
+      "R\u00b2": 0.3029,
+      "MAPE": 1037.07
+    },
+    "training_date": "2026-09-26 00:18:20",
+    "status": "Production",
+    "author": "DataMind AutoML",
+    "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
+  },
+  "mod_1790362933_extra_tree": {
+    "id": "mod_1790362933_extra_tree",
+    "name": "AutoML Champion: Extra Trees",
+    "version": "1.0.0",
+    "dataset": "Active Dataset",
+    "target": "linkid",
+    "features": [
+      "date_2021-08-20",
+      "date_2021-08-21",
+      "date_2021-08-22",
+      "date_2021-08-23",
+      "date_2021-08-24",
+      "date_2021-08-25",
+      "country_freq_enc",
+      "city_freq_enc",
+      "artist_freq_enc",
+      "album_freq_enc",
+      "track_freq_enc",
+      "isrc_freq_enc",
+      "city_freq_enc_log1p",
+      "artist_freq_enc_log1p",
+      "album_freq_enc_log1p",
+      "track_freq_enc_log1p",
+      "isrc_freq_enc_log1p",
+      "date_2021-08-20_div_date_2021-08-21"
+    ],
+    "algorithm": "Extra Trees",
+    "hyperparameters": {
+      "n_estimators": 100
+    },
+    "metrics": {
+      "Training Time (s)": 0.517,
+      "Accuracy": 0.605,
+      "Precision": 0.5969,
+      "Recall": 0.605,
+      "F1": 0.5959,
+      "AUC": 0.605
+    },
+    "training_date": "2026-09-26 00:32:13",
+    "status": "Production",
+    "author": "DataMind AutoML",
+    "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
+  },
+  "mod_1793189830_support_ve": {
+    "id": "mod_1793189830_support_ve",
+    "name": "AutoML Champion: Support Vector Machine (SVC)",
+    "version": "1.0.0",
+    "dataset": "Active Dataset",
+    "target": "Left_Company",
+    "features": [
+      "Age",
+      "Years_Experience",
+      "Salary",
+      "Gender_Male",
+      "Gender_Non-Binary",
+      "Department_Finance",
+      "Department_HR",
+      "Department_IT",
+      "Department_Marketing",
+      "Department_Operations",
+      "Department_Sales",
+      "Job_Level_Junior",
+      "Job_Level_Lead",
+      "Job_Level_Mid",
+      "Job_Level_Senior",
+      "Performance_Rating_Needs Improvement",
+      "Performance_Rating_Outstanding",
+      "Performance_Rating_Satisfactory",
+      "Age_div_Years_Experience"
+    ],
+    "algorithm": "Support Vector Machine (SVC)",
+    "hyperparameters": {
+      "C": 1.0
+    },
+    "metrics": {
+      "Training Time (s)": 0.049,
+      "Accuracy": 0.85,
+      "Precision": 0.7225,
+      "Recall": 0.85,
+      "F1": 0.7811,
+      "AUC": 0.7059
+    },
+    "training_date": "2026-10-28 17:47:10",
+    "status": "Production",
+    "author": "DataMind AutoML",
+    "notes": "Automatically generated and validated by DataMind AI AutoML Pipeline."
   }
 }

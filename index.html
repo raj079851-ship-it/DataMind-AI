@@ -19,7 +19,7 @@
   <!-- Standardized Production Typography (Inter) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script>
     (function() {
       try {
@@ -37,7 +37,7 @@
   <style>
     :root {
       /* Standardized Typography System */
-      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-sans: "Inter", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: ui-monospace, "SF Mono", "Segoe UI Mono", "Liberation Mono", "Courier New", monospace;
       --font: var(--font-sans);
 
@@ -69,8 +69,8 @@
       --champagne-gold: #D4AF37;
       --gold-muted: #C5A059;
       --gold-glow: rgba(212, 175, 55, 0.28);
-      --soft-white: #F5F5F2;
-      --text-secondary: #A5A9B5;
+      --soft-white: #F8FAFC;
+      --text-secondary: #CBD5E1;
       --border-gold-subtle: rgba(212, 175, 55, 0.18);
       --border-gold-hover: rgba(212, 175, 55, 0.45);
       --glass-bg: rgba(16, 18, 26, 0.90);
@@ -87,8 +87,8 @@
       --header-border: rgba(212, 175, 55, 0.20);
       --primary: #D4AF37;
       --primary-hover: #E5BE48;
-      --text: #F5F5F2;
-      --text-muted: #A5A9B5;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
@@ -114,8 +114,8 @@
       --header-border: rgba(197, 160, 89, 0.18);
       --primary: #C5A059;
       --primary-hover: #D4AF37;
-      --text: #F5F5F2;
-      --text-muted: #8E929E;
+      --text: #F8FAFC;
+      --text-muted: #94A3B8;
       --table-bg: #06080e;
       --table-header: #0a0c14;
       --table-border: rgba(197, 160, 89, 0.14);
@@ -125,13 +125,23 @@
       background-image: var(--bg-ambient);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
+      text-rendering: geometricPrecision;
+    }
     html, body {
       height: 100%;
       max-height: 100vh;
       margin: 0;
       padding: 0;
       overflow: hidden;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
+      text-rendering: geometricPrecision;
     }
     body {
       background-color: var(--bg);
@@ -143,14 +153,27 @@
       font-family: var(--font-sans);
       font-size: var(--text-base);
       line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
+      text-rendering: geometricPrecision;
       height: 100vh;
       display: flex;
       flex-direction: column;
       transition: background-color 0.16s ease, color 0.16s ease;
+    }
+
+    button, input, select, textarea, table, th, td {
+      font-family: inherit;
+      -webkit-font-smoothing: subpixel-antialiased;
+      -moz-osx-font-smoothing: auto;
+      text-rendering: geometricPrecision;
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      *, html, body, button, input, select, textarea, table, th, td {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
     }
 
     /* Standard Monospace Elements */
@@ -12849,18 +12872,18 @@ result = df.describe()
         if (badge) badge.textContent = "0 Rows";
         if (container) {
           container.innerHTML = `
-            <div style="text-align:center;padding:46px 20px;background:rgba(15,23,42,0.4);border:1px dashed rgba(99,102,241,0.35);border-radius:12px;margin:8px 0;">
+            <div style="text-align:center;padding:46px 20px;background:var(--card-bg);border:1px dashed var(--card-border);border-radius:12px;margin:8px 0;">
               <div style="font-size:3rem;margin-bottom:12px;">📂</div>
-              <h3 style="color:#f8fafc;margin-bottom:6px;font-size:1.2rem;font-weight:700;">No Dataset Uploaded Yet</h3>
-              <p style="color:#94a3b8;font-size:0.88rem;max-width:480px;margin:0 auto 18px auto;line-height:1.6;">
+              <h3 style="color:var(--text);margin-bottom:6px;font-size:1.2rem;font-weight:700;">No Dataset Uploaded Yet</h3>
+              <p style="color:var(--text-muted);font-size:0.88rem;max-width:480px;margin:0 auto 18px auto;line-height:1.6;">
                 Please upload your CSV file to begin data cleaning, feature engineering, exploratory analysis, and BI dashboards.
               </p>
               <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
                 <button class="btn btn-primary" style="width:auto;padding:8px 22px;font-size:0.84rem;" onclick="document.getElementById('csvInput').click()">
                   📁 Upload Your CSV Dataset
                 </button>
-                <button class="btn btn-outline" style="width:auto;padding:8px 18px;font-size:0.84rem;border-color:rgba(99,102,241,0.5);color:#818cf8;font-weight:700;" onclick="loadKaggleHR2MDataset()">
-                  ⚡ Ingest Kaggle HR (2M Rows)
+                <button class="btn btn-outline" style="width:auto;padding:8px 18px;font-size:0.84rem;" onclick="loadSampleChurn()">
+                  📊 Explore Demo Dataset
                 </button>
               </div>
             </div>
