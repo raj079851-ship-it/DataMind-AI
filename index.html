@@ -245,6 +245,16 @@
       text-shadow: 0 0 8px rgba(37, 99, 235, 0.40);
       transition: color 0.16s ease, text-shadow 0.16s ease;
     }
+    .brand-logo-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.55), 0 0 8px rgba(14, 144, 238, 0.40);
+      border: 1.5px solid rgba(37, 99, 235, 0.65);
+      flex-shrink: 0;
+      transition: border-color 0.16s ease, box-shadow 0.16s ease;
+    }
     .brand-subtitle {
       font-size: 0.74rem;
       font-weight: 700;
@@ -483,6 +493,11 @@
     body.light-theme .brand-mind {
       color: #1E3A8A !important;
       text-shadow: none !important;
+    }
+    body.day-theme .brand-logo-img,
+    body.light-theme .brand-logo-img {
+      box-shadow: 0 0 16px rgba(30, 58, 138, 0.35), 0 0 6px rgba(37, 99, 235, 0.30) !important;
+      border: 1.5px solid rgba(30, 58, 138, 0.55) !important;
     }
     body.day-theme .brand-subtitle,
     body.light-theme .brand-subtitle {
@@ -1867,7 +1882,7 @@
   <!-- Top Header -->
   <header class="header">
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
-      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
+      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" />
       <div>
         <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
         <div class="brand-subtitle">Analyze • Predict • Empower</div>
