@@ -20,6 +20,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem("datamind_theme") || localStorage.getItem("autodata_theme") || "night";
+        if (saved === "day" || saved === "light") {
+          document.documentElement.classList.add("day-theme", "light-theme");
+          document.documentElement.setAttribute("data-theme", "light");
+        } else {
+          document.documentElement.classList.add("midnight-theme");
+          document.documentElement.setAttribute("data-theme", "dark");
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       /* Standardized Typography System */
@@ -283,70 +297,535 @@
       border-color: #FFFFFF !important;
     }
 
-    /* Day Light Luxury Theme */
-    body.day-theme,
-    body.light-theme {
-      --bg: #F8FAFC;
-      --bg-ambient: radial-gradient(circle at 50% 20%, #FFFFFF 0%, #F1F5F9 55%, #E2E8F0 100%);
-      --card-bg: rgba(255, 255, 255, 0.94);
-      --card-border: rgba(212, 175, 55, 0.30);
-      --card-hover-border: rgba(212, 175, 55, 0.65);
+        /* =========================================================================
+       DAYLIGHT ENTERPRISE LIGHT THEME (Strict High-Contrast Palette)
+       Rolls-Royce Night Mode is preserved untouched when day-theme is inactive
+       ========================================================================= */
+    html.day-theme, html.light-theme, [data-theme="light"],
+    body.day-theme, body.light-theme {
+      --bg: #F5F7FA;
+      --bg-ambient: #F5F7FA;
+      --card-bg: #FFFFFF;
+      --card-border: #D1D5DB;
+      --card-hover-border: #9CA3AF;
       --sidebar-bg: #FFFFFF;
       --header-bg: #FFFFFF;
-      --header-border: rgba(212, 175, 55, 0.28);
-      --primary: #B89628;
-      --primary-hover: #99781B;
-      --text: #0F172A;
-      --text-muted: #64748B;
+      --header-border: #D1D5DB;
+      --primary: #162C4F;
+      --primary-hover: #1E3A66;
+      --text: #111827;
+      --text-secondary: #374151;
+      --text-muted: #4B5563;
       --table-bg: #FFFFFF;
-      --table-header: #F1F5F9;
-      --table-border: rgba(212, 175, 55, 0.22);
+      --table-header: #F9FAFB;
+      --table-border: #D1D5DB;
       --input-bg: #FFFFFF;
-      --input-border: rgba(212, 175, 55, 0.38);
-      background-color: var(--bg);
-      background-image: var(--bg-ambient);
-      color: var(--text);
+      --input-border: #D1D5DB;
+      --success: #065F46;
+      --warning: #92400E;
+      --danger: #991B1B;
+      --info: #1D4ED8;
+      background-color: #F5F7FA !important;
+      background-image: none !important;
+      color: #111827 !important;
+    }
+
+    /* Universal Typography & Headings in Day Mode */
+    body.day-theme h1, body.day-theme h2, body.day-theme h3, body.day-theme h4, body.day-theme h5, body.day-theme h6,
+    body.light-theme h1, body.light-theme h2, body.light-theme h3, body.light-theme h4, body.light-theme h5, body.light-theme h6 {
+      color: #111827 !important;
+    }
+    body.day-theme p, body.light-theme p {
+      color: #374151;
+    }
+    body.day-theme small, body.day-theme .text-muted, body.day-theme .metric-title,
+    body.light-theme small, body.light-theme .text-muted, body.light-theme .metric-title {
+      color: #4B5563 !important;
+    }
+    body.day-theme a, body.light-theme a,
+    body.day-theme .text-link, body.light-theme .text-link {
+      color: #1D4ED8 !important;
+    }
+    body.day-theme a:hover, body.light-theme a:hover {
+      color: #1E40AF !important;
+    }
+
+    /* Top Navigation Header & Brand */
+    body.day-theme .header,
+    body.light-theme .header {
+      background: #FFFFFF !important;
+      border-bottom: 1px solid #D1D5DB !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.day-theme .brand-title,
+    body.light-theme .brand-title {
+      color: #111827 !important;
+    }
+    body.day-theme .brand-subtitle,
+    body.light-theme .brand-subtitle {
+      color: #4B5563 !important;
+    }
+    body.day-theme #activeDatasetTag,
+    body.light-theme #activeDatasetTag {
+      background: #E9EEF5 !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+    }
+    body.day-theme #topUserContainer,
+    body.light-theme #topUserContainer {
+      background: #FFFFFF !important;
+      border-color: #D1D5DB !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06) !important;
+    }
+    body.day-theme #topUserLoginLogoSvg,
+    body.light-theme #topUserLoginLogoSvg {
+      color: #162C4F !important;
+    }
+    body.day-theme #topUserStatusDot,
+    body.light-theme #topUserStatusDot {
+      border-color: #FFFFFF !important;
+    }
+
+    /* Left Sidebar Column */
+    body.day-theme .sidebar,
+    body.light-theme .sidebar {
+      background: #FFFFFF !important;
+      border-right: 1px solid #D1D5DB !important;
+    }
+    body.day-theme .sidebar-pinned-header,
+    body.light-theme .sidebar-pinned-header {
+      background: #FFFFFF !important;
+      border-bottom: 1.5px solid #D1D5DB !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+    }
+    body.day-theme .sidebar-title,
+    body.light-theme .sidebar-title {
+      color: #4B5563 !important;
+      border-bottom-color: #E5E7EB !important;
+    }
+    body.day-theme .nav-group-header,
+    body.light-theme .nav-group-header {
+      color: #4B5563 !important;
+      border-bottom-color: #E5E7EB !important;
+    }
+    body.day-theme .nav-group-header span.category-title,
+    body.light-theme .nav-group-header span.category-title {
+      color: #4B5563 !important;
+    }
+    body.day-theme .nav-item,
+    body.light-theme .nav-item {
+      background: #FFFFFF !important;
+      border: 1px solid #E5E7EB !important;
+      border-left: 3.5px solid transparent !important;
+      color: #111827 !important;
+    }
+    body.day-theme .nav-item:hover,
+    body.light-theme .nav-item:hover {
+      background: #E9EEF5 !important;
+      border-color: #D1D5DB !important;
+      color: #111827 !important;
+    }
+    body.day-theme .nav-item.active,
+    body.light-theme .nav-item.active {
+      background: #E9EEF5 !important;
+      border-color: #D1D5DB !important;
+      border-left: 3.5px solid #162C4F !important;
+      color: #162C4F !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
+      font-weight: 700 !important;
+    }
+    body.day-theme .drop-zone,
+    body.light-theme .drop-zone {
+      background: #FFFFFF !important;
+      border: 2px dashed #D1D5DB !important;
+      color: #374151 !important;
+    }
+    body.day-theme .drop-zone:hover,
+    body.light-theme .drop-zone:hover {
+      border-color: #162C4F !important;
+      background: #F9FAFB !important;
+    }
+    body.day-theme .insert-col-box,
+    body.light-theme .insert-col-box {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+    }
+
+    /* Cards, Panels, KPI Tiles, Banners & Containers */
+    body.day-theme .card, body.day-theme .panel, body.day-theme .metric-card,
+    body.day-theme .chart-box, body.day-theme .feature-box, body.day-theme .step-card,
+    body.light-theme .card, body.light-theme .panel, body.light-theme .metric-card,
+    body.light-theme .chart-box, body.light-theme .feature-box, body.light-theme .step-card {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.day-theme .metric-card:hover, body.day-theme .panel:hover, body.day-theme .card:hover,
+    body.light-theme .metric-card:hover, body.light-theme .panel:hover, body.light-theme .card:hover {
+      border-color: #9CA3AF !important;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    }
+    body.day-theme .metric-title,
+    body.light-theme .metric-title {
+      color: #4B5563 !important;
+      font-weight: 600 !important;
+    }
+    body.day-theme .metric-val,
+    body.light-theme .metric-val {
+      color: #111827 !important;
+    }
+    body.day-theme .panel-header,
+    body.light-theme .panel-header {
+      color: #111827 !important;
     }
     body.day-theme .banner-box,
     body.light-theme .banner-box {
       background: #FFFFFF !important;
-      border-color: rgba(212, 175, 55, 0.30) !important;
+      border: 1px solid #D1D5DB !important;
+      border-left: 4px solid #162C4F !important;
+      color: #111827 !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
-    body.day-theme .nav-item,
-    body.light-theme .nav-item {
-      background: rgba(241, 245, 249, 0.85);
-      border-color: rgba(0, 0, 0, 0.08);
-      color: #1E293B;
+    body.day-theme #insertColGeneratorBox,
+    body.light-theme #insertColGeneratorBox {
+      border: 1.5px solid #D1D5DB !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
     }
-    body.day-theme .nav-item:hover,
-    body.light-theme .nav-item:hover {
-      background: rgba(212, 175, 55, 0.14);
-      color: #0F172A;
+
+    /* Buttons: Primary, Outline, Secondary, Success, Danger */
+    body.day-theme .btn-primary,
+    body.light-theme .btn-primary {
+      background: #162C4F !important;
+      color: #FFFFFF !important;
+      border: 1px solid #162C4F !important;
+      box-shadow: 0 2px 4px rgba(22, 44, 79, 0.15) !important;
     }
-    body.day-theme .nav-item.active,
-    body.light-theme .nav-item.active {
-      background: linear-gradient(90deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.08) 100%);
-      color: #0F172A;
-      border-left-color: var(--champagne-gold);
+    body.day-theme .btn-primary:hover,
+    body.light-theme .btn-primary:hover {
+      background: #1E3A66 !important;
+      border-color: #1E3A66 !important;
+      box-shadow: 0 4px 8px rgba(22, 44, 79, 0.25) !important;
+      color: #FFFFFF !important;
     }
-    body.day-theme .metric-card,
-    body.light-theme .metric-card {
+    body.day-theme .btn-outline, body.day-theme .btn-secondary,
+    body.light-theme .btn-outline, body.light-theme .btn-secondary {
       background: #FFFFFF !important;
-      border-color: rgba(212, 175, 55, 0.25) !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
     }
-    body.day-theme .metric-title,
-    body.light-theme .metric-title {
-      color: #64748B !important;
+    body.day-theme .btn-outline:hover, body.day-theme .btn-secondary:hover,
+    body.light-theme .btn-outline:hover, body.light-theme .btn-secondary:hover {
+      background: #E9EEF5 !important;
+      border-color: #9CA3AF !important;
+      color: #111827 !important;
     }
-    body.day-theme .metric-val,
-    body.light-theme .metric-val {
-      color: #0F172A !important;
+    body.day-theme .btn-success,
+    body.light-theme .btn-success {
+      background: #047857 !important;
+      color: #FFFFFF !important;
+      border: 1px solid #047857 !important;
     }
-    body.day-theme .chart-box,
-    body.light-theme .chart-box {
+    body.day-theme .btn-success:hover,
+    body.light-theme .btn-success:hover {
+      background: #065F46 !important;
+      color: #FFFFFF !important;
+    }
+    body.day-theme .btn-danger,
+    body.light-theme .btn-danger {
+      background: #B91C1C !important;
+      color: #FFFFFF !important;
+      border: 1px solid #B91C1C !important;
+    }
+    body.day-theme .btn-danger:hover,
+    body.light-theme .btn-danger:hover {
+      background: #991B1B !important;
+      color: #FFFFFF !important;
+    }
+
+    /* Forms, Inputs, Dropdowns, Textareas */
+    body.day-theme input[type="text"], body.day-theme input[type="number"],
+    body.day-theme input[type="password"], body.day-theme input[type="search"],
+    body.day-theme input[type="file"], body.day-theme select, body.day-theme textarea,
+    body.day-theme .form-control,
+    body.light-theme input[type="text"], body.light-theme input[type="number"],
+    body.light-theme input[type="password"], body.light-theme input[type="search"],
+    body.light-theme input[type="file"], body.light-theme select, body.light-theme textarea,
+    body.light-theme .form-control {
       background: #FFFFFF !important;
-      border-color: rgba(212, 175, 55, 0.22) !important;
+      color: #111827 !important;
+      border: 1px solid #D1D5DB !important;
     }
+    body.day-theme input::placeholder, body.day-theme textarea::placeholder,
+    body.light-theme input::placeholder, body.light-theme textarea::placeholder {
+      color: #6B7280 !important;
+    }
+    body.day-theme input:focus, body.day-theme select:focus, body.day-theme textarea:focus,
+    body.light-theme input:focus, body.light-theme select:focus, body.light-theme textarea:focus {
+      border-color: #162C4F !important;
+      box-shadow: 0 0 0 2px rgba(22, 44, 79, 0.15) !important;
+      outline: none !important;
+    }
+    body.day-theme select option,
+    body.light-theme select option {
+      background: #FFFFFF !important;
+      color: #111827 !important;
+    }
+
+    /* Data Tables & Previews */
+    body.day-theme .table-container,
+    body.light-theme .table-container {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.day-theme table,
+    body.light-theme table {
+      background: #FFFFFF !important;
+      color: #374151 !important;
+    }
+    body.day-theme th,
+    body.light-theme th {
+      background: #F9FAFB !important;
+      color: #111827 !important;
+      border-bottom: 2px solid #D1D5DB !important;
+      font-weight: 600 !important;
+    }
+    body.day-theme td,
+    body.light-theme td {
+      background: #FFFFFF !important;
+      color: #374151 !important;
+      border-bottom: 1px solid #E5E7EB !important;
+    }
+    body.day-theme tr:hover td,
+    body.light-theme tr:hover td {
+      background: #F3F4F6 !important;
+    }
+
+    /* Indicators & Badges */
+    body.day-theme .badge-success,
+    body.light-theme .badge-success {
+      background: #D1FAE5 !important;
+      color: #065F46 !important;
+      border: 1px solid #A7F3D0 !important;
+    }
+    body.day-theme .badge-warning,
+    body.light-theme .badge-warning {
+      background: #FEF3C7 !important;
+      color: #92400E !important;
+      border: 1px solid #FDE68A !important;
+    }
+    body.day-theme .badge-danger,
+    body.light-theme .badge-danger {
+      background: #FEE2E2 !important;
+      color: #991B1B !important;
+      border: 1px solid #FECACA !important;
+    }
+    body.day-theme .badge-info,
+    body.light-theme .badge-info {
+      background: #DBEAFE !important;
+      color: #1D4ED8 !important;
+      border: 1px solid #BFDBFE !important;
+    }
+    body.day-theme .badge-primary,
+    body.light-theme .badge-primary {
+      background: #E0E7FF !important;
+      color: #3730A3 !important;
+      border: 1px solid #C7D2FE !important;
+    }
+    body.day-theme .badge-secondary,
+    body.light-theme .badge-secondary {
+      background: #F3F4F6 !important;
+      color: #4B5563 !important;
+      border: 1px solid #D1D5DB !important;
+    }
+
+    /* Task Execution Monitor & Toasts */
+    body.day-theme #taskExecutionMonitor,
+    body.light-theme #taskExecutionMonitor {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    }
+    body.day-theme #taskExecutionMonitor.state-running,
+    body.light-theme #taskExecutionMonitor.state-running {
+      background: #FFFFFF !important;
+      border: 1px solid #162C4F !important;
+      color: #111827 !important;
+      box-shadow: 0 8px 24px rgba(22, 44, 79, 0.15) !important;
+    }
+    body.day-theme #taskExecutionMonitor.state-success,
+    body.light-theme #taskExecutionMonitor.state-success {
+      background: #D1FAE5 !important;
+      border: 1px solid #A7F3D0 !important;
+      color: #065F46 !important;
+      box-shadow: 0 8px 24px rgba(6, 95, 70, 0.15) !important;
+    }
+    body.day-theme #taskExecutionMonitor.state-failed,
+    body.light-theme #taskExecutionMonitor.state-failed {
+      background: #FEE2E2 !important;
+      border: 1px solid #FECACA !important;
+      color: #991B1B !important;
+      box-shadow: 0 8px 24px rgba(153, 27, 27, 0.15) !important;
+    }
+
+    /* Modals, Dialogs & Auth Gate */
+    body.day-theme .auth-modal-backdrop,
+    body.light-theme .auth-modal-backdrop {
+      background: rgba(17, 24, 39, 0.45) !important;
+    }
+    body.day-theme .auth-modal-card, body.day-theme .modal-content,
+    body.light-theme .auth-modal-card, body.light-theme .modal-content {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+    }
+    body.day-theme .sec-tab-btn,
+    body.light-theme .sec-tab-btn {
+      color: #4B5563 !important;
+    }
+    body.day-theme .sec-tab-btn.active,
+    body.light-theme .sec-tab-btn.active {
+      color: #162C4F !important;
+      border-bottom: 2px solid #162C4F !important;
+      font-weight: 700 !important;
+    }
+
+    /* AI Chat & Drawers */
+    body.day-theme #floatingAiDrawer,
+    body.light-theme #floatingAiDrawer {
+      background: #FFFFFF !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+    }
+    body.day-theme #floatingDrawerHeader,
+    body.light-theme #floatingDrawerHeader {
+      background: #F9FAFB !important;
+      border-bottom: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+    }
+    body.day-theme #floatingAiChatHistory,
+    body.light-theme #floatingAiChatHistory {
+      background: #F3F4F6 !important;
+      border: 1px solid #D1D5DB !important;
+      color: #111827 !important;
+    }
+
+    /* CodeMirror & Console Editors (SQL / Python Analytics) */
+    body.day-theme .CodeMirror,
+    body.light-theme .CodeMirror {
+      background: #F9FAFB !important;
+      color: #111827 !important;
+      border: 1px solid #D1D5DB !important;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.day-theme .CodeMirror-focused,
+    body.light-theme .CodeMirror-focused {
+      border-color: #162C4F !important;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05), 0 0 0 2px rgba(22, 44, 79, 0.15) !important;
+    }
+    body.day-theme .CodeMirror-gutters,
+    body.light-theme .CodeMirror-gutters {
+      background: #F3F4F6 !important;
+      border-right: 1px solid #D1D5DB !important;
+    }
+    body.day-theme .CodeMirror-linenumber,
+    body.light-theme .CodeMirror-linenumber {
+      color: #6B7280 !important;
+    }
+    body.day-theme .CodeMirror-cursor,
+    body.light-theme .CodeMirror-cursor {
+      border-left: 2px solid #162C4F !important;
+    }
+    body.day-theme .cm-keyword, body.light-theme .cm-keyword { color: #1D4ED8 !important; font-weight: 700 !important; }
+    body.day-theme .cm-builtin, body.light-theme .cm-builtin { color: #047857 !important; font-weight: 600 !important; }
+    body.day-theme .cm-string, body.light-theme .cm-string { color: #B45309 !important; }
+    body.day-theme .cm-number, body.light-theme .cm-number { color: #7C3AED !important; }
+    body.day-theme .cm-comment, body.light-theme .cm-comment { color: #6B7280 !important; font-style: italic !important; }
+    body.day-theme .sql-tabs-bar,
+    body.light-theme .sql-tabs-bar {
+      background: #F3F4F6 !important;
+      border: 1px solid #D1D5DB !important;
+      border-bottom: none !important;
+    }
+    body.day-theme .sql-tab,
+    body.light-theme .sql-tab {
+      background: #E5E7EB !important;
+      color: #4B5563 !important;
+      border: 1px solid #D1D5DB !important;
+    }
+    body.day-theme .sql-tab:hover,
+    body.light-theme .sql-tab:hover {
+      background: #E9EEF5 !important;
+      color: #111827 !important;
+    }
+    body.day-theme .sql-tab.active,
+    body.light-theme .sql-tab.active {
+      background: #FFFFFF !important;
+      color: #162C4F !important;
+      border: 1px solid #D1D5DB !important;
+      border-bottom-color: #FFFFFF !important;
+      font-weight: 700 !important;
+    }
+    body.day-theme #pythonConsoleOutput, body.day-theme #sqlConsoleOutput,
+    body.day-theme #modulePyConsoleOutput, body.day-theme textarea.code-font,
+    body.day-theme .sql-editor-container,
+    body.light-theme #pythonConsoleOutput, body.light-theme #sqlConsoleOutput,
+    body.light-theme #modulePyConsoleOutput, body.light-theme textarea.code-font,
+    body.light-theme .sql-editor-container {
+      background: #F9FAFB !important;
+      color: #111827 !important;
+      border: 1px solid #D1D5DB !important;
+    }
+
+    /* Universal Override for Inline Dark Background Styles in Day Mode */
+    body.day-theme [style*="background: #0"], body.day-theme [style*="background:#0"],
+    body.day-theme [style*="background: #1"], body.day-theme [style*="background:#1"],
+    body.day-theme [style*="background: rgba(1"], body.day-theme [style*="background:rgba(1"],
+    body.day-theme [style*="background: rgba(0"], body.day-theme [style*="background:rgba(0"],
+    body.day-theme [style*="background: rgba(2"], body.day-theme [style*="background:rgba(2"],
+    body.light-theme [style*="background: #0"], body.light-theme [style*="background:#0"],
+    body.light-theme [style*="background: #1"], body.light-theme [style*="background:#1"],
+    body.light-theme [style*="background: rgba(1"], body.light-theme [style*="background:rgba(1"],
+    body.light-theme [style*="background: rgba(0"], body.light-theme [style*="background:rgba(0"],
+    body.light-theme [style*="background: rgba(2"], body.light-theme [style*="background:rgba(2"] {
+      background: #FFFFFF !important;
+      border-color: #D1D5DB !important;
+      color: #111827 !important;
+    }
+
+    /* Universal Override for Inline Light Text Colors in Day Mode */
+    body.day-theme [style*="color: #fff"], body.day-theme [style*="color: #FFF"],
+    body.day-theme [style*="color:#fff"], body.day-theme [style*="color:#FFF"],
+    body.day-theme [style*="color: #f8fafc"], body.day-theme [style*="color: #F5F5F2"],
+    body.day-theme [style*="color: #f1f5f9"], body.day-theme [style*="color: #e2e8f0"],
+    body.day-theme [style*="color: #cbd5e1"], body.day-theme [style*="color: white"],
+    body.day-theme [style*="color:white"],
+    body.light-theme [style*="color: #fff"], body.light-theme [style*="color: #FFF"],
+    body.light-theme [style*="color:#fff"], body.light-theme [style*="color:#FFF"],
+    body.light-theme [style*="color: #f8fafc"], body.light-theme [style*="color: #F5F5F2"],
+    body.light-theme [style*="color: #f1f5f9"], body.light-theme [style*="color: #e2e8f0"],
+    body.light-theme [style*="color: #cbd5e1"], body.light-theme [style*="color: white"],
+    body.light-theme [style*="color:white"] {
+      color: #111827 !important;
+    }
+
+    /* Preserve Button & Alert Text Colors */
+    body.day-theme .btn-primary, body.day-theme .btn-primary *,
+    body.day-theme .btn-success, body.day-theme .btn-success *,
+    body.day-theme .btn-danger, body.day-theme .btn-danger *,
+    body.light-theme .btn-primary, body.light-theme .btn-primary *,
+    body.light-theme .btn-success, body.light-theme .btn-success *,
+    body.light-theme .btn-danger, body.light-theme .btn-danger * {
+      color: #FFFFFF !important;
+    }
+    body.day-theme .badge-success, body.light-theme .badge-success { color: #065F46 !important; }
+    body.day-theme .badge-warning, body.light-theme .badge-warning { color: #92400E !important; }
+    body.day-theme .badge-danger, body.light-theme .badge-danger { color: #991B1B !important; }
+    body.day-theme .badge-info, body.light-theme .badge-info { color: #1D4ED8 !important; }
+
     .app-wrapper.sidebar-hidden {
       grid-template-columns: 1fr !important;
     }
@@ -1178,17 +1657,6 @@
           <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
         </svg>
         <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
-      </div>
-
-      <!-- Simple Login Logo Button -->
-      <div id="topUserContainer" onclick="openAuthModal('user')" style="width:40px; height:40px; min-width:40px; border-radius:50%; border:1.8px solid rgba(212,175,55,0.65); display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.2s ease, box-shadow 0.2s ease; position:relative; box-shadow:0 0 14px rgba(212,175,55,0.3); background:rgba(15,23,42,0.85); margin-left:6px; flex-shrink:0;" title="Login / Account • Click to Sign In or Register" onmouseover="this.style.transform='scale(1.08)';this.style.boxShadow='0 0 20px rgba(212,175,55,0.5)';" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 0 14px rgba(212,175,55,0.3)';">
-        <svg id="topUserLoginLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" style="color:var(--champagne-gold, #d4af37); display:block;" aria-hidden="true">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3.6c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 12.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
-        </svg>
-        <span id="topUserIcon" style="display:none; font-size:1.15rem; line-height:1;">👤</span>
-        <span id="topUserStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#94a3b8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease;" title="Guest • Click to Sign In or Register"></span>
-        <span id="topUserName" style="display:none;">Sign In</span>
-        <span id="topUserRoleBadge" style="display:none;">Not Authenticated</span>
       </div>
     </div>
   </header>
@@ -21535,9 +22003,12 @@ result = df.describe()
       const isDay = (theme === "day" || theme === "light");
 
       if (isDay) {
+        document.documentElement.classList.remove("midnight-theme");
+        document.documentElement.classList.add("day-theme", "light-theme");
+        document.documentElement.setAttribute("data-theme", "light");
         document.body.classList.remove("midnight-theme");
-        document.body.classList.add("day-theme");
-        document.body.classList.add("light-theme");
+        document.body.classList.add("day-theme", "light-theme");
+        document.body.setAttribute("data-theme", "light");
         if (dayBtn) dayBtn.classList.add("active");
         if (nightBtn) nightBtn.classList.remove("active");
         if (toggleBtn) {
@@ -21553,9 +22024,12 @@ result = df.describe()
           notifyTaskSuccess("Theme Adjuster", "Switched to ☀️ Day Light Theme.");
         }
       } else {
-        document.body.classList.remove("day-theme");
-        document.body.classList.remove("light-theme");
+        document.documentElement.classList.remove("day-theme", "light-theme");
+        document.documentElement.classList.add("midnight-theme");
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.body.classList.remove("day-theme", "light-theme");
         document.body.classList.add("midnight-theme");
+        document.body.setAttribute("data-theme", "dark");
         if (nightBtn) nightBtn.classList.add("active");
         if (dayBtn) dayBtn.classList.remove("active");
         if (toggleBtn) {
@@ -21575,6 +22049,20 @@ result = df.describe()
       // Sync settings dropdown if open
       const cfgTheme = document.getElementById("cfgThemeMode");
       if (cfgTheme) cfgTheme.value = isDay ? "light" : "dark";
+
+      // Trigger re-rendering of active charts
+      try {
+        if (typeof drawAIChartOnCanvas === "function" && document.getElementById("vizResultPanel")?.style.display !== "none") {
+          const mainC = document.getElementById("vizMainCanvas");
+          if (mainC && window.lastRecommendedChartParams && typeof currentDataset !== "undefined") {
+            drawAIChartOnCanvas(mainC, window.lastRecommendedChartParams.chartType, currentDataset, window.lastRecommendedChartParams.colX, window.lastRecommendedChartParams.colY, window.lastRecommendedChartParams.title);
+          }
+        }
+        const activeMod = document.querySelector(".module-view.active");
+        if (activeMod && activeMod.id === "moduleEDA" && typeof renderEDA === "function") {
+          renderEDA();
+        }
+      } catch (e) {}
 
       // Trigger resize for charts so theme re-renders cleanly
       setTimeout(() => {
@@ -28871,15 +29359,23 @@ result = df.describe()
 
       ctx.clearRect(0, 0, W, H);
 
-      // Deep luxury background gradient
+      window.lastRecommendedChartParams = { chartType, colX, colY, title };
+      const isDay = document.body.classList.contains("day-theme") || document.body.classList.contains("light-theme");
+
+      // Adaptive background gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-      bgGrad.addColorStop(0, '#0c0f18');
-      bgGrad.addColorStop(1, '#131724');
+      if (isDay) {
+        bgGrad.addColorStop(0, '#FFFFFF');
+        bgGrad.addColorStop(1, '#F8FAFC');
+      } else {
+        bgGrad.addColorStop(0, '#0c0f18');
+        bgGrad.addColorStop(1, '#131724');
+      }
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, W, H);
 
       // Inner subtle border
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.strokeStyle = isDay ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1;
       ctx.strokeRect(0.5, 0.5, W - 1, H - 1);
 
@@ -28893,7 +29389,7 @@ result = df.describe()
 
       // Header zone: Title & badges
       const cleanTitle = title || 'AI Recommended Visualization';
-      ctx.fillStyle = '#f8fafc';
+      ctx.fillStyle = isDay ? '#111827' : '#f8fafc';
       ctx.font = 'bold ' + (isMini ? '12px' : '14px') + ' system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
@@ -28921,7 +29417,7 @@ result = df.describe()
       if (!colY || !keys.includes(colY)) colY = numCols.find(c => c !== colX) || numCols[0] || keys[1] || keys[0];
 
       // Subtle horizontal gridlines
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.strokeStyle = isDay ? 'rgba(0, 0, 0, 0.07)' : 'rgba(255, 255, 255, 0.06)';
       ctx.lineWidth = 1;
       for (let g = 0; g <= 4; g++) {
         const gy = padT + (plotH / 4) * g;
