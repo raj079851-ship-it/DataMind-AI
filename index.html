@@ -1279,6 +1279,50 @@
       100% { transform: translateX(120%) rotate(25deg); }
     }
 
+    /* When dataset is uploaded/loaded: stop all animations in the upload box */
+    .drop-zone.dataset-loaded {
+      animation: none !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 10px rgba(212, 175, 55, 0.10) !important;
+      transform: none !important;
+    }
+    .drop-zone.dataset-loaded .drop-icon-anim {
+      animation: none !important;
+      transform: none !important;
+      filter: none !important;
+    }
+    .drop-zone.dataset-loaded::before {
+      animation: none !important;
+      display: none !important;
+    }
+    .drop-zone.dataset-loaded:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 16px rgba(212, 175, 55, 0.25) !important;
+    }
+
+    /* Day Mode for loaded dataset */
+    body.day-theme .drop-zone.dataset-loaded,
+    body.light-theme .drop-zone.dataset-loaded {
+      animation: none !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06), 0 0 10px rgba(22, 44, 79, 0.08) !important;
+      transform: none !important;
+    }
+    body.day-theme .drop-zone.dataset-loaded .drop-icon-anim,
+    body.light-theme .drop-zone.dataset-loaded .drop-icon-anim {
+      animation: none !important;
+      transform: none !important;
+      filter: none !important;
+    }
+    body.day-theme .drop-zone.dataset-loaded::before,
+    body.light-theme .drop-zone.dataset-loaded::before {
+      animation: none !important;
+      display: none !important;
+    }
+    body.day-theme .drop-zone.dataset-loaded:hover,
+    body.light-theme .drop-zone.dataset-loaded:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10), 0 0 14px rgba(22, 44, 79, 0.15) !important;
+    }
+
     /* Standard Production Buttons & Inputs */
     .btn {
       display: inline-flex;
@@ -2208,10 +2252,10 @@
           </button>
         </div>
 
-        <div class="drop-zone" onclick="document.getElementById('csvInput').click()" title="Click or Drag &amp; Drop to Ingest Dataset File">
-          <div class="drop-icon-anim" style="font-size:28px;margin-bottom:6px;">📂</div>
-          <div style="font-weight:700;font-size:0.88rem;letter-spacing:-0.01em;">Upload Dataset File</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">CSV, XLSX, JSON, TSV, TXT</div>
+        <div class="drop-zone" id="sidebarDropZone" onclick="document.getElementById('csvInput').click()" title="Click or Drag &amp; Drop to Ingest Dataset File">
+          <div class="drop-icon-anim" id="dropZoneIcon" style="font-size:28px;margin-bottom:6px;">📂</div>
+          <div id="dropZoneTitle" style="font-weight:700;font-size:0.88rem;letter-spacing:-0.01em;word-break:break-word;">Upload Dataset File</div>
+          <div id="dropZoneSubtitle" style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">CSV, XLSX, JSON, TSV, TXT</div>
           <input type="file" id="csvInput" accept=".csv,.xlsx,.xls,.json,.tsv,.txt" style="display:none;" onchange="handleFileUpload(event)" />
         </div>
 
@@ -11429,6 +11473,8 @@ result = df.describe()
       // Reset active dataset tag in top navigation
       const tag = document.getElementById("activeDatasetTag");
       if (tag) tag.textContent = "Dataset: None (Upload CSV)";
+      window.activeDatasetName = null;
+      if (typeof updateDropZoneDisplay === "function") updateDropZoneDisplay();
 
       // Reset UI modules and tables
       try {
@@ -12035,6 +12081,7 @@ result = df.describe()
 
     function loadSampleChurn() {
       notifyTaskStart("Load Telecom Churn Dataset");
+      window.activeDatasetName = "Telecom Customer Churn";
       rawCSVText = "";
       const churnData = [
         {"CustomerID":"CUST-1001","Contract":"Month-to-month","TenureMonths":2,"MonthlyCharges":70.35,"TotalCharges":140.7,"Churn":"Yes"},
@@ -12056,6 +12103,7 @@ result = df.describe()
 
     function loadSampleHousing() {
       notifyTaskStart("Load Real Estate Housing Dataset");
+      window.activeDatasetName = "Real Estate Housing";
       rawCSVText = "";
       const houseData = [
         {"PropID":"P-201","Neighborhood":"Downtown","SqftLiving":1800,"Bedrooms":3,"Bathrooms":2.0,"SalePrice":450000},
@@ -12076,6 +12124,7 @@ result = df.describe()
 
     function loadSampleSales() {
       notifyTaskStart("Load E-Commerce Sales Dataset");
+      window.activeDatasetName = "E-Commerce Sales";
       rawCSVText = "";
       const salesData = [
         {"OrderID":"ORD-901","Category":"Electronics","SubCategory":"Laptops","Sales":1299.99,"Quantity":1,"Discount":0.05,"Profit":245.50,"Item":"MacBook Pro"},
@@ -12197,6 +12246,54 @@ result = df.describe()
       }
     }
 
+    function updateDropZoneDisplay(datasetName) {
+      const dz = document.getElementById("sidebarDropZone") || document.querySelector(".drop-zone");
+      const title = document.getElementById("dropZoneTitle");
+      const subtitle = document.getElementById("dropZoneSubtitle");
+      const icon = document.getElementById("dropZoneIcon");
+
+      if (datasetName) {
+        window.activeDatasetName = datasetName;
+      }
+
+      if (currentDataset && currentDataset.length > 0) {
+        const name = window.activeDatasetName ||
+                     (document.getElementById("activeDatasetTag") ? document.getElementById("activeDatasetTag").textContent.replace(/^Dataset:\s*/i, '').trim() : "") ||
+                     "Active Dataset";
+        
+        if (dz) {
+          dz.classList.add("dataset-loaded");
+          dz.title = `Current Dataset: ${name} (${currentDataset.length.toLocaleString()} rows × ${columns ? columns.length : 0} columns). Click to upload or replace file.`;
+        }
+        if (title) {
+          title.textContent = name;
+          title.title = name;
+        }
+        if (subtitle) {
+          subtitle.textContent = `${currentDataset.length.toLocaleString()} rows • ${columns ? columns.length : 0} cols (Click to replace)`;
+        }
+        if (icon) {
+          icon.textContent = "📊";
+        }
+      } else {
+        if (dz) {
+          dz.classList.remove("dataset-loaded");
+          dz.title = "Click or Drag & Drop to Ingest Dataset File";
+        }
+        if (title) {
+          title.textContent = "Upload Dataset File";
+          title.title = "";
+        }
+        if (subtitle) {
+          subtitle.textContent = "CSV, XLSX, JSON, TSV, TXT";
+        }
+        if (icon) {
+          icon.textContent = "📂";
+        }
+      }
+    }
+    window.updateDropZoneDisplay = updateDropZoneDisplay;
+
     function setDataset(data) {
       if (!data || !Array.isArray(data) || data.length === 0) {
         rawDataset = [];
@@ -12207,6 +12304,8 @@ result = df.describe()
         window.currentDatasetStatsCache = null;
         window.isBigDataset = false;
         window.actualTotalRows = 0;
+        window.activeDatasetName = null;
+        updateDropZoneDisplay();
         updateUI();
         return;
       }
@@ -12220,6 +12319,7 @@ result = df.describe()
       columns = [...rawColumns];
       window.currentDatasetStatsCache = null;
       cleaningLogList = [];
+      updateDropZoneDisplay();
       try {
         updateUI();
       } catch (err) {
@@ -12260,9 +12360,11 @@ result = df.describe()
       if (!file) return;
 
       const fileName = file.name || "uploaded_data";
+      window.activeDatasetName = fileName;
       const ext = (fileName.split('.').pop() || '').toLowerCase();
       notifyTaskStart(`Ingest ${ext.toUpperCase()}: ${fileName}`);
       document.getElementById("activeDatasetTag").textContent = `Dataset: ${fileName}`;
+      updateDropZoneDisplay(fileName);
 
       // 1. EXCEL SPREADSHEETS (.xlsx, .xls)
       if (ext === "xlsx" || ext === "xls") {
