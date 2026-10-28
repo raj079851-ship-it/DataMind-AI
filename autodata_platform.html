@@ -199,7 +199,7 @@
       opacity: 0.90;
     }
 
-    /* Top Header with Frosted Glass */
+    /* Top Header with Frosted Glass & Twinkling Stars */
     .header {
       background: rgba(11, 14, 22, 0.75);
       backdrop-filter: blur(12px);
@@ -219,6 +219,100 @@
       width: 100%;
       box-sizing: border-box;
       transition: background-color 0.16s ease, border-color 0.16s ease;
+      overflow: hidden;
+    }
+
+    /* Twinkling Small Stars Layer in Header */
+    .header-stars-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .header > *:not(.header-stars-layer) {
+      position: relative;
+      z-index: 2;
+    }
+    .header-star {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      will-change: transform, opacity;
+    }
+    /* Micro Dot Stars */
+    .header-star.star-dot {
+      animation: headerDotTwinkle ease-in-out infinite alternate;
+    }
+    .header-star.star-dot[data-color="0"] {
+      background: #D4AF37;
+      box-shadow: 0 0 5px #D4AF37, 0 0 8px rgba(212, 175, 55, 0.65);
+    }
+    .header-star.star-dot[data-color="1"] {
+      background: #FFFFFF;
+      box-shadow: 0 0 6px #FFFFFF, 0 0 10px rgba(255, 255, 255, 0.85);
+    }
+    .header-star.star-dot[data-color="2"] {
+      background: #38BDF8;
+      box-shadow: 0 0 5px #38BDF8, 0 0 8px rgba(56, 189, 248, 0.65);
+    }
+    /* 4-Point Diamond Sparkle Cross Stars */
+    .header-star.star-cross {
+      animation: headerCrossTwinkle ease-in-out infinite;
+      background: none !important;
+      box-shadow: none !important;
+    }
+    .header-star.star-cross svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    @keyframes headerDotTwinkle {
+      0% {
+        opacity: 0.15;
+        transform: scale(0.65);
+      }
+      50% {
+        opacity: 0.65;
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1.4);
+      }
+    }
+    @keyframes headerCrossTwinkle {
+      0%, 100% {
+        opacity: 0.18;
+        transform: scale(0.6) rotate(0deg);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.3) rotate(45deg);
+        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 7px rgba(212, 175, 55, 0.9));
+      }
+    }
+    /* Day Theme Adaptability for Header Stars */
+    body.day-theme .header-star.star-dot[data-color="0"],
+    body.light-theme .header-star.star-dot[data-color="0"] {
+      background: #F59E0B;
+      box-shadow: 0 0 4px #F59E0B;
+    }
+    body.day-theme .header-star.star-dot[data-color="1"],
+    body.light-theme .header-star.star-dot[data-color="1"] {
+      background: #2563EB;
+      box-shadow: 0 0 4px #2563EB;
+    }
+    body.day-theme .header-star.star-dot[data-color="2"],
+    body.light-theme .header-star.star-dot[data-color="2"] {
+      background: #0284C7;
+      box-shadow: 0 0 4px #0284C7;
+    }
+    body.day-theme .header-star.star-cross,
+    body.light-theme .header-star.star-cross {
+      filter: drop-shadow(0 0 3px #2563EB) !important;
     }
     .brand {
       display: flex;
@@ -1871,6 +1965,8 @@
 
   <!-- Top Header -->
   <header class="header">
+    <!-- Continuously Twinkling Small Celestial Stars -->
+    <div id="headerStarsLayer" class="header-stars-layer"></div>
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
       <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
       <div>
@@ -33996,10 +34092,52 @@ LIMIT 10;</pre>
       render();
     }
 
+    // =========================================================================
+    // CONTINUOUSLY TWINKLING SMALL STARS IN HEADER
+    // =========================================================================
+    function initHeaderTwinklingStars() {
+      const layer = document.getElementById('headerStarsLayer');
+      if (!layer) return;
+      layer.innerHTML = '';
+
+      const crossSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 0L13.8 8.2L22 10.0L15.6 14.8L17.8 23L12 18.2L6.2 23L8.4 14.8L2 10.0L10.2 8.2L12 0Z" fill="url(#starGoldGrad)"/><defs><radialGradient id="starGoldGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#D4AF37"/><stop offset="100%" stop-color="rgba(212, 175, 55, 0.2)"/></radialGradient></defs></svg>';
+      const count = 55;
+
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement('div');
+        const isCross = (i % 6 === 0);
+        star.className = isCross ? 'header-star star-cross' : 'header-star star-dot';
+        const size = isCross ? (Math.floor(Math.random() * 4) + 7) : (Math.random() * 1.8 + 1.2);
+        const left = (Math.random() * 97 + 1.5).toFixed(2);
+        const top = (Math.random() * 82 + 8).toFixed(2);
+        const dur = (Math.random() * 2.4 + 1.6).toFixed(2);
+        const delay = (Math.random() * -6.0).toFixed(2);
+        const col = i % 3; // 0: Gold, 1: Diamond White, 2: Cyan
+
+        star.style.left = left + '%';
+        star.style.top = top + '%';
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.animationDuration = dur + 's';
+        star.style.animationDelay = delay + 's';
+        star.setAttribute('data-color', col);
+
+        if (isCross) {
+          star.innerHTML = crossSvg;
+        }
+
+        layer.appendChild(star);
+      }
+    }
+
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initGlobal3DBackground);
+      document.addEventListener('DOMContentLoaded', function() {
+        initGlobal3DBackground();
+        initHeaderTwinklingStars();
+      });
     } else {
       initGlobal3DBackground();
+      initHeaderTwinklingStars();
     }
 
   </script>
