@@ -259,74 +259,91 @@
     }
 
     /* Sidebar Logo Icon Toggle Button (Icon Only, No Plain Text) */
-    /* Header Undo & Redo Controls */
-    .header-undo-redo-group {
+    /* Refined Segmented Undo & Redo Header Component */
+    .header-undo-redo-cluster {
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      background: rgba(15, 23, 42, 0.60);
-      padding: 3px 6px;
+      height: 36px;
+      background: rgba(18, 22, 34, 0.85);
+      border: 1.5px solid rgba(212, 175, 55, 0.35);
       border-radius: 8px;
-      border: 1px solid rgba(212, 175, 55, 0.25);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      overflow: hidden;
       flex-shrink: 0;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .header-undo-redo-cluster:hover {
+      border-color: rgba(212, 175, 55, 0.60);
+      box-shadow: 0 3px 12px rgba(212, 175, 55, 0.20);
     }
     .header-ctrl-btn {
-      background: rgba(212, 175, 55, 0.08);
-      border: 1px solid rgba(212, 175, 55, 0.35);
-      color: var(--champagne-gold, #D4AF37);
-      height: 28px;
-      padding: 0 10px;
-      border-radius: 6px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
+      height: 100%;
+      padding: 0 13px;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      transition: all 0.15s ease;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: var(--champagne-gold, #D4AF37);
+      font-size: 0.80rem;
+      font-weight: 600;
+      cursor: pointer;
       user-select: none;
-      font-family: inherit;
+      transition: all 0.15s ease;
+      opacity: 0.65;
     }
-    .header-ctrl-btn:hover:not(:disabled) {
-      background: rgba(212, 175, 55, 0.22);
-      border-color: var(--champagne-gold, #D4AF37);
+    .header-ctrl-btn.has-history {
+      opacity: 1;
+      font-weight: 700;
       color: #FFFFFF;
-      box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
-      transform: translateY(-1px);
     }
-    .header-ctrl-btn:disabled {
-      opacity: 0.35;
-      cursor: not-allowed;
-      border-color: rgba(212, 175, 55, 0.15);
-      transform: none;
+    .header-ctrl-btn:hover {
+      background: rgba(212, 175, 55, 0.20);
+      color: #FFFFFF;
+      opacity: 1;
+    }
+    .header-ctrl-btn:active {
+      transform: scale(0.96);
+    }
+    .header-ctrl-divider {
+      width: 1px;
+      height: 18px;
+      background: rgba(212, 175, 55, 0.30);
+      flex-shrink: 0;
     }
 
     /* Day Theme styles for Header Undo & Redo */
-    body.day-theme .header-undo-redo-group,
-    body.light-theme .header-undo-redo-group {
-      background: #F3F4F6 !important;
-      border-color: #D1D5DB !important;
+    body.day-theme .header-undo-redo-cluster,
+    body.light-theme .header-undo-redo-cluster {
+      background: #FFFFFF !important;
+      border: 1.5px solid #D1D5DB !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+    }
+    body.day-theme .header-undo-redo-cluster:hover,
+    body.light-theme .header-undo-redo-cluster:hover {
+      border-color: #9CA3AF !important;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12) !important;
     }
     body.day-theme .header-ctrl-btn,
     body.light-theme .header-ctrl-btn {
-      background: #FFFFFF !important;
-      border-color: #D1D5DB !important;
+      color: #374151 !important;
+      opacity: 0.70;
+    }
+    body.day-theme .header-ctrl-btn.has-history,
+    body.light-theme .header-ctrl-btn.has-history {
       color: #162C4F !important;
+      font-weight: 700;
+      opacity: 1;
     }
-    body.day-theme .header-ctrl-btn:hover:not(:disabled),
-    body.light-theme .header-ctrl-btn:hover:not(:disabled) {
+    body.day-theme .header-ctrl-btn:hover,
+    body.light-theme .header-ctrl-btn:hover {
       background: #E9EEF5 !important;
-      border-color: #9CA3AF !important;
       color: #111827 !important;
+      opacity: 1;
     }
-    body.day-theme .header-ctrl-btn:disabled,
-    body.light-theme .header-ctrl-btn:disabled {
-      opacity: 0.45 !important;
-      background: #F9FAFB !important;
-      border-color: #E5E7EB !important;
-      color: #9CA3AF !important;
-      cursor: not-allowed !important;
-      transform: none !important;
+    body.day-theme .header-ctrl-divider,
+    body.light-theme .header-ctrl-divider {
+      background: #D1D5DB !important;
     }
 
     /* Sidebar Logo Icon Toggle Button (Icon Only, No Plain Text) */
@@ -1732,22 +1749,24 @@
         <span>Show Sidebar</span>
       </button>
 
-      <!-- Undo & Redo Controls in Top Header -->
-      <div class="header-undo-redo-group" id="headerUndoRedoGroup" title="History Navigation">
+      <!-- Seamless Segmented Undo & Redo Controls in Top Header -->
+      <div class="header-undo-redo-cluster" id="headerUndoRedoCluster" role="toolbar" aria-label="Undo and Redo actions">
         <!-- Undo Button -->
-        <button id="headerUndoBtn" class="header-ctrl-btn" onclick="undoCleaningStep()" title="Undo Last Transformation / Ingestion (Ctrl+Z)" aria-label="Undo" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
-            <path d="M3 7v6h6"></path>
-            <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+        <button id="headerUndoBtn" class="header-ctrl-btn" onclick="handleUniversalUndo()" title="Undo (Ctrl+Z) - No actions to undo" aria-label="Undo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;">
+            <path d="M9 14L4 9l5-5"/>
+            <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
           </svg>
           <span>Undo</span>
         </button>
 
+        <span class="header-ctrl-divider" aria-hidden="true"></span>
+
         <!-- Redo Button -->
-        <button id="headerRedoBtn" class="header-ctrl-btn" onclick="redoCleaningStep()" title="Redo Last Transformation / Ingestion (Ctrl+Y)" aria-label="Redo" disabled>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
-            <path d="M21 7v6h-6"></path>
-            <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
+        <button id="headerRedoBtn" class="header-ctrl-btn" onclick="handleUniversalRedo()" title="Redo (Ctrl+Y) - No actions to redo" aria-label="Redo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;">
+            <path d="M15 14l5-5-5-5"/>
+            <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/>
           </svg>
           <span>Redo</span>
         </button>
@@ -13330,11 +13349,14 @@ result = df.describe()
     function updateUndoRedoButtons() {
       const undoBtn = document.getElementById('cleanUndoBtn');
       const redoBtn = document.getElementById('cleanRedoBtn');
-      const hasUndo = (window.cleaningHistoryStack || []).length > 0;
-      const hasRedo = (window.cleaningRedoStack || []).length > 0;
+      const cleanUndoCount = (window.cleaningHistoryStack || []).length;
+      const cleanRedoCount = (window.cleaningRedoStack || []).length;
+      const procUndoCount = (typeof procHistory !== 'undefined' && Array.isArray(procHistory)) ? procHistory.length : 0;
+      const hasUndo = cleanUndoCount > 0 || procUndoCount > 0;
+      const hasRedo = cleanRedoCount > 0;
 
-      if (undoBtn) undoBtn.disabled = !hasUndo;
-      if (redoBtn) redoBtn.disabled = !hasRedo;
+      if (undoBtn) undoBtn.disabled = cleanUndoCount === 0;
+      if (redoBtn) redoBtn.disabled = cleanRedoCount === 0;
 
       const sbUndoBtn = document.getElementById('sidebarUndoBtn');
       const sbRedoBtn = document.getElementById('sidebarRedoBtn');
@@ -13343,11 +13365,51 @@ result = df.describe()
 
       const hUndoBtn = document.getElementById('headerUndoBtn');
       const hRedoBtn = document.getElementById('headerRedoBtn');
-      if (hUndoBtn) hUndoBtn.disabled = !hasUndo;
-      if (hRedoBtn) hRedoBtn.disabled = !hasRedo;
+      if (hUndoBtn) {
+        hUndoBtn.classList.toggle('has-history', hasUndo);
+        hUndoBtn.title = hasUndo
+          ? `Undo Last Action (${cleanUndoCount || procUndoCount} available - Ctrl+Z)`
+          : "Undo (Ctrl+Z) - No actions to undo";
+      }
+      if (hRedoBtn) {
+        hRedoBtn.classList.toggle('has-history', hasRedo);
+        hRedoBtn.title = hasRedo
+          ? `Redo Action (${cleanRedoCount} available - Ctrl+Y)`
+          : "Redo (Ctrl+Y) - No actions to redo";
+      }
 
       const logBadge = document.getElementById('cleaningLogBadge');
       if (logBadge) logBadge.textContent = `${window.cleaningPipelineSteps.length} actions`;
+    }
+
+    function handleUniversalUndo() {
+      if (typeof activeModuleId !== 'undefined' && activeModuleId === 'moduleProcessing' && typeof procHistory !== 'undefined' && procHistory.length > 0) {
+        if (typeof undoProcStep === 'function') {
+          undoProcStep();
+          updateUndoRedoButtons();
+          return;
+        }
+      }
+      if (window.cleaningHistoryStack && window.cleaningHistoryStack.length > 0) {
+        undoCleaningStep();
+        return;
+      }
+      if (typeof procHistory !== 'undefined' && procHistory.length > 0) {
+        if (typeof undoProcStep === 'function') {
+          undoProcStep();
+          updateUndoRedoButtons();
+          return;
+        }
+      }
+      showToast("No actions to undo yet. Make an edit or transformation first.", "info");
+    }
+
+    function handleUniversalRedo() {
+      if (window.cleaningRedoStack && window.cleaningRedoStack.length > 0) {
+        redoCleaningStep();
+        return;
+      }
+      showToast("No actions to redo.", "info");
     }
 
     function undoCleaningStep() {
@@ -31573,10 +31635,12 @@ LIMIT 10;</pre>
         }
       } else if (!isInput && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
         e.preventDefault();
-        if (typeof undoCleaningStep === 'function') undoCleaningStep();
+        if (typeof handleUniversalUndo === 'function') handleUniversalUndo();
+        else if (typeof undoCleaningStep === 'function') undoCleaningStep();
       } else if (!isInput && (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') || ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'z'))) {
         e.preventDefault();
-        if (typeof redoCleaningStep === 'function') redoCleaningStep();
+        if (typeof handleUniversalRedo === 'function') handleUniversalRedo();
+        else if (typeof redoCleaningStep === 'function') redoCleaningStep();
       }
     });
 
