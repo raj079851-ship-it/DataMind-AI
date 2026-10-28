@@ -187,23 +187,9 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Whole-Body 3D Perspective Canvas */
-    #global3dCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 0;
-      opacity: 0.90;
-    }
-
-    /* Top Header with Frosted Glass & Twinkling Stars */
+    /* Top Header */
     .header {
-      background: rgba(11, 14, 22, 0.75);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--header-bg);
       padding: 10px 24px;
       border-bottom: 1px solid var(--header-border);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
@@ -219,100 +205,6 @@
       width: 100%;
       box-sizing: border-box;
       transition: background-color 0.16s ease, border-color 0.16s ease;
-      overflow: hidden;
-    }
-
-    /* Twinkling Small Stars Layer in Header */
-    .header-stars-layer {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-    .header > *:not(.header-stars-layer) {
-      position: relative;
-      z-index: 2;
-    }
-    .header-star {
-      position: absolute;
-      pointer-events: none;
-      border-radius: 50%;
-      will-change: transform, opacity;
-    }
-    /* Micro Dot Stars */
-    .header-star.star-dot {
-      animation: headerDotTwinkle ease-in-out infinite alternate;
-    }
-    .header-star.star-dot[data-color="0"] {
-      background: #D4AF37;
-      box-shadow: 0 0 5px #D4AF37, 0 0 8px rgba(212, 175, 55, 0.65);
-    }
-    .header-star.star-dot[data-color="1"] {
-      background: #FFFFFF;
-      box-shadow: 0 0 6px #FFFFFF, 0 0 10px rgba(255, 255, 255, 0.85);
-    }
-    .header-star.star-dot[data-color="2"] {
-      background: #38BDF8;
-      box-shadow: 0 0 5px #38BDF8, 0 0 8px rgba(56, 189, 248, 0.65);
-    }
-    /* 4-Point Diamond Sparkle Cross Stars */
-    .header-star.star-cross {
-      animation: headerCrossTwinkle ease-in-out infinite;
-      background: none !important;
-      box-shadow: none !important;
-    }
-    .header-star.star-cross svg {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-    @keyframes headerDotTwinkle {
-      0% {
-        opacity: 0.15;
-        transform: scale(0.65);
-      }
-      50% {
-        opacity: 0.65;
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1.4);
-      }
-    }
-    @keyframes headerCrossTwinkle {
-      0%, 100% {
-        opacity: 0.18;
-        transform: scale(0.6) rotate(0deg);
-      }
-      50% {
-        opacity: 1;
-        transform: scale(1.3) rotate(45deg);
-        filter: drop-shadow(0 0 4px #ffffff) drop-shadow(0 0 7px rgba(212, 175, 55, 0.9));
-      }
-    }
-    /* Day Theme Adaptability for Header Stars */
-    body.day-theme .header-star.star-dot[data-color="0"],
-    body.light-theme .header-star.star-dot[data-color="0"] {
-      background: #F59E0B;
-      box-shadow: 0 0 4px #F59E0B;
-    }
-    body.day-theme .header-star.star-dot[data-color="1"],
-    body.light-theme .header-star.star-dot[data-color="1"] {
-      background: #2563EB;
-      box-shadow: 0 0 4px #2563EB;
-    }
-    body.day-theme .header-star.star-dot[data-color="2"],
-    body.light-theme .header-star.star-dot[data-color="2"] {
-      background: #0284C7;
-      box-shadow: 0 0 4px #0284C7;
-    }
-    body.day-theme .header-star.star-cross,
-    body.light-theme .header-star.star-cross {
-      filter: drop-shadow(0 0 3px #2563EB) !important;
     }
     .brand {
       display: flex;
@@ -571,11 +463,8 @@
 
     /* Top Navigation Header & Brand */
     body.day-theme .header,
-    body.day-theme .header,
     body.light-theme .header {
-      background: rgba(255, 255, 255, 0.85) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      background: #FFFFFF !important;
       border-bottom: 1px solid #D1D5DB !important;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
@@ -610,11 +499,8 @@
 
     /* Left Sidebar Column */
     body.day-theme .sidebar,
-    body.day-theme .sidebar,
     body.light-theme .sidebar {
-      background: rgba(255, 255, 255, 0.88) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      background: #FFFFFF !important;
       border-right: 1px solid #D1D5DB !important;
     }
     body.day-theme .sidebar-pinned-header,
@@ -1090,7 +976,6 @@
       max-width: 100vw;
       box-sizing: border-box;
       position: relative;
-      z-index: 1;
     }
     @media (max-width: 1200px) {
       .app-wrapper {
@@ -1132,9 +1017,7 @@
       min-width: 340px;
       max-width: 340px;
       flex-shrink: 0;
-      background: rgba(9, 11, 17, 0.78);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: var(--sidebar-bg);
       border-right: 1px solid var(--card-border);
       padding: 0 18px 24px 18px;
       display: flex;
@@ -1960,13 +1843,9 @@
   </style>
 </head>
 <body>
-  <!-- Whole-Body 3D Cosmic Neural Matrix Background Canvas -->
-  <canvas id="global3dCanvas"></canvas>
 
   <!-- Top Header -->
   <header class="header">
-    <!-- Continuously Twinkling Small Celestial Stars -->
-    <div id="headerStarsLayer" class="header-stars-layer"></div>
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
       <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
       <div>
@@ -33872,272 +33751,6 @@ LIMIT 10;</pre>
         dbRenderWidgets();
         showToast(`Updated chart to: ${widget.title}`, "info");
       }
-    }
-
-    // =========================================================================
-// =========================================================================
-    // 3D HOLOGRAPHIC NEURAL MATRIX WHOLE-BODY BACKGROUND ANIMATION
-    // =========================================================================
-    function initGlobal3DBackground() {
-      let canvas = document.getElementById('global3dCanvas');
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      let width = 0, height = 0, dpr = 1;
-
-      function resize() {
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-      resize();
-      window.addEventListener('resize', resize);
-
-      // 88 Floating Neural Constellation Nodes across the entire 3D volume
-      const NUM_NODES = 88;
-      const nodes = [];
-      for (let i = 0; i < NUM_NODES; i++) {
-        nodes.push({
-          x: (Math.random() - 0.5) * 1600,
-          y: (Math.random() - 0.5) * 1000,
-          z: Math.random() * 800 - 400,
-          vx: (Math.random() - 0.5) * 0.45,
-          vy: (Math.random() - 0.5) * 0.35,
-          vz: (Math.random() - 0.5) * 0.55,
-          type: (i % 4 === 0) ? 1 : 0 // 1: secondary accent, 0: primary
-        });
-      }
-
-      // Concentric 3D Perspective Orbital Rings
-      const rings = [
-        { radius: 340, rotX: 0.55, rotY: 0.2, speedY: 0.003 },
-        { radius: 540, rotX: -0.45, rotY: -0.15, speedY: -0.002 },
-        { radius: 740, rotX: 0.70, rotY: 0.4, speedY: 0.0018 }
-      ];
-
-      let mouseX = 0, mouseY = 0;
-      let targetMouseX = 0, targetMouseY = 0;
-
-      window.addEventListener('mousemove', (e) => {
-        const mx = e.clientX / (window.innerWidth || 1) - 0.5;
-        const my = e.clientY / (window.innerHeight || 1) - 0.5;
-        targetMouseX = mx * 0.55;
-        targetMouseY = my * 0.45;
-      });
-
-      window.addEventListener('mouseleave', () => {
-        targetMouseX = 0;
-        targetMouseY = 0;
-      });
-
-      let baseAngleY = 0;
-
-      function render() {
-        ctx.clearRect(0, 0, width, height);
-
-        const isDay = document.documentElement.classList.contains('day-theme') || 
-                      document.body.classList.contains('day-theme') ||
-                      document.body.classList.contains('light-theme');
-
-        // Rolls-Royce Champagne Gold & Electric Cyan vs Daylight Royal Sapphire & Deep Navy
-        const colorPrimary = isDay ? '37, 99, 235' : '212, 175, 55';
-        const colorSecondary = isDay ? '22, 44, 79' : '56, 189, 248';
-
-        baseAngleY += 0.002;
-        mouseX += (targetMouseX - mouseX) * 0.04;
-        mouseY += (targetMouseY - mouseY) * 0.04;
-
-        const curAngleY = baseAngleY + mouseX;
-        const curAngleX = Math.sin(baseAngleY * 0.6) * 0.15 + mouseY;
-
-        const fov = 450;
-        const cx = width / 2;
-        const cy = height / 2;
-
-        // 1. Draw 3D Orbiting Rings across the body
-        for (let r = 0; r < rings.length; r++) {
-          const ring = rings[r];
-          ring.rotY += ring.speedY;
-          ctx.beginPath();
-          const segments = 64;
-          let first = true;
-          for (let s = 0; s <= segments; s++) {
-            const theta = (s / segments) * Math.PI * 2;
-            const rx = Math.cos(theta) * ring.radius;
-            const ry = Math.sin(theta) * (ring.radius * 0.32);
-            const rz = Math.sin(theta) * (ring.radius * 0.5);
-
-            const cosY = Math.cos(ring.rotY + curAngleY * 0.5);
-            const sinY = Math.sin(ring.rotY + curAngleY * 0.5);
-            const x1 = rx * cosY - rz * sinY;
-            const z1 = rz * cosY + rx * sinY;
-
-            const cosX = Math.cos(ring.rotX + curAngleX);
-            const sinX = Math.sin(ring.rotX + curAngleX);
-            const y2 = ry * cosX - z1 * sinX;
-            const z2 = z1 * cosX + ry * sinX;
-
-            const scale = fov / (fov + z2 + 420);
-            const px = x1 * scale + cx;
-            const py = y2 * scale + cy;
-
-            if (first) {
-              ctx.moveTo(px, py);
-              first = false;
-            } else {
-              ctx.lineTo(px, py);
-            }
-          }
-          ctx.closePath();
-          ctx.strokeStyle = r === 0 
-            ? `rgba(${colorPrimary}, ${isDay ? 0.22 : 0.18})` 
-            : `rgba(${colorSecondary}, ${isDay ? 0.16 : 0.12})`;
-          ctx.lineWidth = 1.0;
-          ctx.setLineDash([8, 10]);
-          ctx.stroke();
-          ctx.setLineDash([]);
-        }
-
-        // 2. Project Nodes with 3D Matrix Rotation
-        const projected = [];
-        for (let i = 0; i < nodes.length; i++) {
-          const n = nodes[i];
-          n.x += n.vx;
-          n.y += n.vy;
-          n.z += n.vz;
-
-          if (n.x < -900) n.x = 900;
-          if (n.x > 900) n.x = -900;
-          if (n.y < -550) n.y = 550;
-          if (n.y > 550) n.y = -550;
-          if (n.z < -400) n.z = 400;
-          if (n.z > 400) n.z = -400;
-
-          // Rotate Y
-          const cosY = Math.cos(curAngleY);
-          const sinY = Math.sin(curAngleY);
-          const x1 = n.x * cosY - n.z * sinY;
-          const z1 = n.z * cosY + n.x * sinY;
-
-          // Rotate X
-          const cosX = Math.cos(curAngleX);
-          const sinX = Math.sin(curAngleX);
-          const y2 = n.y * cosX - z1 * sinX;
-          const z2 = z1 * cosX + n.y * sinX;
-
-          const scale = fov / (fov + z2 + 400);
-          const px = x1 * scale + cx;
-          const py = y2 * scale + cy;
-
-          projected.push({
-            x: px,
-            y: py,
-            z: z2,
-            scale: scale,
-            alpha: Math.min(1, Math.max(0.12, (z2 + 400) / 800)),
-            type: n.type
-          });
-        }
-
-        // 3. Draw 3D Dynamic Filaments / Connection Lines
-        for (let i = 0; i < projected.length; i++) {
-          for (let j = i + 1; j < projected.length; j++) {
-            const p1 = projected[i];
-            const p2 = projected[j];
-            const dx = p1.x - p2.x;
-            const dy = p1.y - p2.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 135) {
-              const lineAlpha = (1 - dist / 135) * 0.26 * Math.min(p1.alpha, p2.alpha);
-              ctx.strokeStyle = `rgba(${colorPrimary}, ${lineAlpha})`;
-              ctx.lineWidth = (p1.scale + p2.scale) * 0.6;
-              ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.stroke();
-            }
-          }
-        }
-
-        // 4. Draw 3D Depth Nodes & Sparkling Cores
-        for (let i = 0; i < projected.length; i++) {
-          const p = projected[i];
-          const radius = Math.max(1.2, p.scale * 3.6);
-          const col = p.type === 1 ? colorSecondary : colorPrimary;
-
-          // Outer Glow
-          ctx.fillStyle = `rgba(${col}, ${p.alpha * 0.75})`;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Core Sparkle
-          if (p.scale > 0.58) {
-            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.95})`;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, radius * 0.44, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-
-        requestAnimationFrame(render);
-      }
-
-      render();
-    }
-
-    // =========================================================================
-    // CONTINUOUSLY TWINKLING SMALL STARS IN HEADER
-    // =========================================================================
-    function initHeaderTwinklingStars() {
-      const layer = document.getElementById('headerStarsLayer');
-      if (!layer) return;
-      layer.innerHTML = '';
-
-      const crossSvg = '<svg viewBox="0 0 24 24" fill="none"><path d="M12 0L13.8 8.2L22 10.0L15.6 14.8L17.8 23L12 18.2L6.2 23L8.4 14.8L2 10.0L10.2 8.2L12 0Z" fill="url(#starGoldGrad)"/><defs><radialGradient id="starGoldGrad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="45%" stop-color="#D4AF37"/><stop offset="100%" stop-color="rgba(212, 175, 55, 0.2)"/></radialGradient></defs></svg>';
-      const count = 55;
-
-      for (let i = 0; i < count; i++) {
-        const star = document.createElement('div');
-        const isCross = (i % 6 === 0);
-        star.className = isCross ? 'header-star star-cross' : 'header-star star-dot';
-        const size = isCross ? (Math.floor(Math.random() * 4) + 7) : (Math.random() * 1.8 + 1.2);
-        const left = (Math.random() * 97 + 1.5).toFixed(2);
-        const top = (Math.random() * 82 + 8).toFixed(2);
-        const dur = (Math.random() * 2.4 + 1.6).toFixed(2);
-        const delay = (Math.random() * -6.0).toFixed(2);
-        const col = i % 3; // 0: Gold, 1: Diamond White, 2: Cyan
-
-        star.style.left = left + '%';
-        star.style.top = top + '%';
-        star.style.width = size + 'px';
-        star.style.height = size + 'px';
-        star.style.animationDuration = dur + 's';
-        star.style.animationDelay = delay + 's';
-        star.setAttribute('data-color', col);
-
-        if (isCross) {
-          star.innerHTML = crossSvg;
-        }
-
-        layer.appendChild(star);
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        initGlobal3DBackground();
-        initHeaderTwinklingStars();
-      });
-    } else {
-      initGlobal3DBackground();
-      initHeaderTwinklingStars();
     }
 
   </script>
