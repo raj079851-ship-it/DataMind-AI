@@ -34,14 +34,14 @@
       } catch (e) {}
     })();
   </script>
-  <style>
+    <style>
     :root {
-      /* Standardized Typography System */
+      /* Standardized Modern SaaS Design System */
       --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: ui-monospace, "SF Mono", "Segoe UI Mono", "Liberation Mono", "Courier New", monospace;
       --font: var(--font-sans);
 
-      /* Standard Typography Scale */
+      /* Typography Scale */
       --text-2xs: 0.6875rem; /* 11px */
       --text-xs: 0.75rem;    /* 12px */
       --text-sm: 0.8125rem;  /* 13px */
@@ -51,81 +51,145 @@
       --text-xl: 1.25rem;    /* 20px */
       --text-2xl: 1.5rem;    /* 24px */
 
-      /* Standard Font Weights */
+      /* Font Weights */
       --font-regular: 400;
       --font-medium: 500;
       --font-semibold: 600;
       --font-bold: 700;
 
-      /* High-Performance Hardware-Accelerated Transitions */
+      /* Hardware-Accelerated Transitions */
       --transition-fast: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.12s ease;
       --transition-base: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 
-      /* Luxury Rolls-Royce Inspired Core Palette */
-      --obsidian-black: #07080B;
-      --velvet-black: #020306;
-      --royal-slate: #121520;
-      --secondary-slate: #151928;
-      --champagne-gold: #D4AF37;
-      --gold-muted: #C5A059;
-      --gold-glow: rgba(212, 175, 55, 0.28);
-      --soft-white: #F5F5F2;
-      --text-secondary: #A5A9B5;
-      --border-gold-subtle: rgba(212, 175, 55, 0.18);
-      --border-gold-hover: rgba(212, 175, 55, 0.45);
-      --glass-bg: rgba(16, 18, 26, 0.90);
-      --glass-blur: none;
+      /* Radii & Geometry */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.35);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.45);
 
-      /* Semantic Theme Variables: Daylight Studio Mode (Default) */
-      --bg: #07080B;
-      --bg-ambient: radial-gradient(circle at 50% 28%, #151928 0%, #07080B 65%, #020306 100%);
-      --card-bg: rgba(16, 18, 26, 0.94);
-      --card-border: rgba(212, 175, 55, 0.18);
-      --card-hover-border: rgba(212, 175, 55, 0.45);
-      --sidebar-bg: #090b11;
-      --header-bg: #0b0e16;
-      --header-border: rgba(212, 175, 55, 0.20);
-      --primary: #D4AF37;
-      --primary-hover: #E5BE48;
-      --text: #F5F5F2;
-      --text-muted: #A5A9B5;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --danger: #ef4444;
-      --info: #38bdf8;
-      --table-bg: #0e111a;
-      --table-header: #131722;
-      --table-border: rgba(212, 175, 55, 0.15);
-      --input-bg: rgba(15, 18, 28, 0.85);
-      --input-border: rgba(212, 175, 55, 0.22);
+      /* =========================================================================
+         DARK MODE (DEFAULT PREMIUM ENTERPRISE PALETTE)
+         ========================================================================= */
+      --bg: #080D16;
+      --bg-ambient: #080D16;
+      --surface: #111827;
+      --surface-elevated: #182235;
+      --card-bg: #111827;
+      --card-border: #273449;
+      --card-hover-border: #2563EB;
+      --sidebar-bg: #0D131F;
+      --header-bg: #0B111D;
+      --header-border: #1E293B;
+
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --accent-ai: #8B5CF6;
+      --accent-ai-hover: #7C3AED;
+
+      --text: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+
+      --borders: #273449;
+      --border-subtle: #1E293B;
+      --border-focus: #3B82F6;
+
+      --input-bg: #0F172A;
+      --input-border: #273449;
+      --input-text: #F8FAFC;
+
+      --table-bg: #111827;
+      --table-header: #151F32;
+      --table-border: #1E293B;
+      --table-hover: #172338;
+
+      --success: #10B981;
+      --warning: #F59E0B;
+      --danger: #EF4444;
+      --info: #38BDF8;
+
+      /* Restrained Accent Highlights */
+      --champagne-gold: #F59E0B;
+      --gold-muted: #94A3B8;
     }
 
     /* =========================================================================
-       MIDNIGHT VELVET LUXURY THEME
+       MIDNIGHT THEME ALIAS
        ========================================================================= */
     body.midnight-theme {
-      --bg: #020306;
-      --bg-ambient: radial-gradient(circle at 50% 22%, #0b0e17 0%, #040508 65%, #020306 100%);
-      --card-bg: rgba(9, 11, 16, 0.88);
-      --card-border: rgba(197, 160, 89, 0.16);
-      --card-hover-border: rgba(212, 175, 55, 0.40);
-      --sidebar-bg: rgba(5, 6, 9, 0.98);
-      --header-bg: rgba(7, 8, 12, 0.95);
-      --header-border: rgba(197, 160, 89, 0.18);
-      --primary: #C5A059;
-      --primary-hover: #D4AF37;
-      --text: #F5F5F2;
-      --text-muted: #8E929E;
-      --table-bg: #06080e;
-      --table-header: #0a0c14;
-      --table-border: rgba(197, 160, 89, 0.14);
-      --input-bg: rgba(8, 10, 15, 0.90);
-      --input-border: rgba(197, 160, 89, 0.20);
-      background-color: var(--bg);
-      background-image: var(--bg-ambient);
+      --bg: #080D16;
+      --surface: #111827;
+      --surface-elevated: #182235;
+      --card-bg: #111827;
+      --card-border: #273449;
+      --sidebar-bg: #0D131F;
+      --header-bg: #0B111D;
+      --header-border: #1E293B;
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --accent-ai: #8B5CF6;
+      --text: #F8FAFC;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --borders: #273449;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    /* =========================================================================
+       LIGHT MODE (PREMIUM ENTERPRISE PALETTE)
+       ========================================================================= */
+    html.day-theme, html.light-theme, [data-theme="light"],
+    body.day-theme, body.light-theme {
+      --bg: #F4F7FB;
+      --bg-ambient: #F4F7FB;
+      --surface: #FFFFFF;
+      --surface-elevated: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --card-border: #E2E8F0;
+      --card-hover-border: #93C5FD;
+      --sidebar-bg: #FFFFFF;
+      --header-bg: #FFFFFF;
+      --header-border: #E2E8F0;
+
+      --primary: #2563EB;
+      --primary-hover: #1D4ED8;
+      --accent-ai: #7C3AED;
+      --accent-ai-hover: #6D28D9;
+
+      --text: #111827;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+
+      --borders: #E2E8F0;
+      --border-subtle: #F1F5F9;
+      --border-focus: #2563EB;
+
+      --input-bg: #FFFFFF;
+      --input-border: #CBD5E1;
+      --input-text: #111827;
+
+      --table-bg: #FFFFFF;
+      --table-header: #F8FAFC;
+      --table-border: #E2E8F0;
+      --table-hover: #F1F5F9;
+
+      --success: #059669;
+      --warning: #D97706;
+      --danger: #DC2626;
+      --info: #2563EB;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.08);
+
+      background-color: #F4F7FB !important;
+      background-image: none !important;
+      color: #111827 !important;
+    }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
       height: 100%;
       max-height: 100vh;
@@ -1616,47 +1680,741 @@
       from { opacity: 0; transform: translateY(4px); }
       to { opacity: 1; transform: translateY(0); }
     }
+  
+    /* Universal Theme-Responsive Elements */
+    .brand-title {
+      color: var(--text) !important;
+    }
+    .brand-tagline {
+      color: var(--text-muted) !important;
+    }
+    .panel, .card, .chart-box, .feature-box, .step-card {
+      background: var(--card-bg) !important;
+      border: 1px solid var(--borders) !important;
+      box-shadow: var(--shadow-sm) !important;
+      color: var(--text) !important;
+      border-radius: var(--radius-md) !important;
+    }
+    .panel:hover, .card:hover {
+      border-color: var(--card-hover-border) !important;
+    }
+    .panel-header {
+      color: var(--text) !important;
+      border-bottom-color: var(--border-subtle) !important;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-sans) !important;
+      border-radius: var(--radius-sm) !important;
+      transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .btn-primary {
+      background: var(--primary) !important;
+      border: 1px solid var(--primary) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3) !important;
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover) !important;
+      border-color: var(--primary-hover) !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4) !important;
+    }
+    .btn-outline, .btn-secondary {
+      background: var(--surface-elevated) !important;
+      border: 1px solid var(--borders) !important;
+      color: var(--text) !important;
+    }
+    .btn-outline:hover, .btn-secondary:hover {
+      background: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: #FFFFFF !important;
+    }
+    body.day-theme .btn-outline, body.day-theme .btn-secondary {
+      background: #FFFFFF !important;
+      border-color: #CBD5E1 !important;
+      color: #1E293B !important;
+    }
+    body.day-theme .btn-outline:hover, body.day-theme .btn-secondary:hover {
+      background: #2563EB !important;
+      border-color: #2563EB !important;
+      color: #FFFFFF !important;
+    }
+    .btn-ai {
+      background: var(--accent-ai) !important;
+      border: 1px solid var(--accent-ai) !important;
+      color: #FFFFFF !important;
+    }
+    .btn-ai:hover {
+      background: var(--accent-ai-hover) !important;
+      border-color: var(--accent-ai-hover) !important;
+    }
+
+    /* Badges */
+    .badge {
+      font-size: 0.72rem !important;
+      font-weight: 600 !important;
+      padding: 3px 8px !important;
+      border-radius: 9999px !important;
+    }
+    .badge-primary {
+      background: rgba(37, 99, 235, 0.15) !important;
+      color: #60A5FA !important;
+      border: 1px solid rgba(37, 99, 235, 0.3) !important;
+    }
+    body.day-theme .badge-primary {
+      background: #EFF6FF !important;
+      color: #1D4ED8 !important;
+      border-color: #BFDBFE !important;
+    }
+    .badge-info {
+      background: rgba(56, 189, 248, 0.15) !important;
+      color: #38BDF8 !important;
+      border: 1px solid rgba(56, 189, 248, 0.3) !important;
+    }
+    body.day-theme .badge-info {
+      background: #F0F9FF !important;
+      color: #0284C7 !important;
+      border-color: #BAE6FD !important;
+    }
+    .badge-ai {
+      background: rgba(139, 92, 246, 0.15) !important;
+      color: #A78BFA !important;
+      border: 1px solid rgba(139, 92, 246, 0.3) !important;
+    }
+    body.day-theme .badge-ai {
+      background: #F5F3FF !important;
+      color: #7C3AED !important;
+      border-color: #DDD6FE !important;
+    }
+
+    /* Table System */
+    .table-container {
+      background: var(--table-bg) !important;
+      border: 1px solid var(--borders) !important;
+      border-radius: var(--radius-md) !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+    table th {
+      background: var(--table-header) !important;
+      color: var(--text-secondary) !important;
+      border-bottom: 2px solid var(--borders) !important;
+      font-size: 0.78rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+    }
+    table td {
+      border-bottom: 1px solid var(--border-subtle) !important;
+      color: var(--text) !important;
+    }
+    table tr:hover {
+      background: var(--table-hover) !important;
+    }
+
+    /* Form Controls & Inputs */
+    input[type="text"], input[type="number"], input[type="password"], input[type="search"], select, textarea {
+      background: var(--input-bg) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--borders) !important;
+      border-radius: var(--radius-sm) !important;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--border-focus) !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25) !important;
+      outline: none !important;
+    }
+    ::placeholder {
+      color: var(--text-muted) !important;
+      opacity: 0.8 !important;
+    }
+
+    /* Header & Action Controls */
+    .header {
+      background: var(--header-bg) !important;
+      border-bottom: 1px solid var(--header-border) !important;
+      height: 64px !important;
+      padding: 0 20px !important;
+    }
+    .brand-logo-img {
+      width: 36px !important;
+      height: 36px !important;
+      border-radius: 8px !important;
+      border: 1px solid var(--borders) !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .header-dataset-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      background: var(--surface-elevated);
+      border: 1px solid var(--borders);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text);
+      max-width: 280px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .dataset-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+    .header-btn {
+      width: auto !important;
+      margin: 0 !important;
+      padding: 6px 12px !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      border-radius: 6px !important;
+      white-space: nowrap !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      height: 32px !important;
+    }
+    .header-dropdown {
+      position: relative;
+    }
+    .header-dropdown-menu {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--borders);
+      border-radius: 10px;
+      padding: 6px;
+      min-width: 250px;
+      box-shadow: var(--shadow-lg);
+      z-index: 2000;
+    }
+    .header-dropdown-menu .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text);
+      transition: background 0.15s ease;
+      font-size: 0.82rem;
+    }
+    .header-dropdown-menu .dropdown-item:hover {
+      background: var(--surface-elevated);
+      color: var(--primary);
+    }
+    body.day-theme .header-dropdown-menu .dropdown-item:hover {
+      background: #F1F5F9;
+      color: #2563EB;
+    }
+    .dropdown-icon {
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .dropdown-title {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+    .dropdown-sub {
+      font-size: 0.70rem;
+      color: var(--text-muted);
+    }
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 6px;
+      cursor: pointer;
+      border-radius: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Pinned Sidebar & Collapsible Categories */
+    .sidebar {
+      width: 280px !important;
+      min-width: 280px !important;
+      max-width: 280px !important;
+      background: var(--sidebar-bg) !important;
+      border-right: 1px solid var(--borders) !important;
+      padding: 0 10px 24px 10px !important;
+    }
+    .sidebar-pinned-header {
+      background: var(--sidebar-bg) !important;
+      border-bottom: 1px solid var(--borders) !important;
+      margin: 0 -10px 0 -10px !important;
+      padding: 10px 12px !important;
+      box-shadow: var(--shadow-sm) !important;
+    }
+    .sidebar-ctrl-btn, .sidebar-hide-btn {
+      background: var(--surface-elevated) !important;
+      border: 1px solid var(--borders) !important;
+      color: var(--text-secondary) !important;
+      border-radius: 6px !important;
+    }
+    .sidebar-ctrl-btn:hover:not(:disabled), .sidebar-hide-btn:hover {
+      background: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: #FFFFFF !important;
+    }
+    .nav-category-group {
+      margin-bottom: 6px;
+    }
+    .nav-group-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      transition: background 0.15s ease, color 0.15s ease;
+      font-family: inherit;
+      user-select: none;
+    }
+    .nav-group-header:hover {
+      background: var(--surface-elevated);
+      color: var(--text);
+    }
+    .category-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .category-chevron {
+      font-size: 0.75rem;
+      transition: transform 0.2s ease;
+      opacity: 0.6;
+    }
+    .nav-category-group.is-collapsed .category-chevron {
+      transform: rotate(-90deg);
+    }
+    .nav-group-items {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-top: 2px;
+    }
+    .nav-category-group.is-collapsed .nav-group-items {
+      display: none;
+    }
+    .nav-item {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      width: 100% !important;
+      padding: 7px 10px !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      border-left: 3px solid transparent !important;
+      border-radius: 6px !important;
+      color: var(--text-secondary) !important;
+      font-size: 0.83rem !important;
+      font-weight: 500 !important;
+      cursor: pointer !important;
+      transition: all 0.12s ease !important;
+      text-align: left !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+    .nav-item:hover {
+      background: var(--surface-elevated) !important;
+      color: var(--text) !important;
+      border-color: var(--borders) !important;
+    }
+    body.day-theme .nav-item:hover {
+      background: #F1F5F9 !important;
+      color: #111827 !important;
+      border-color: #E2E8F0 !important;
+    }
+    .nav-item.active {
+      background: rgba(37, 99, 235, 0.12) !important;
+      border-color: rgba(37, 99, 235, 0.25) !important;
+      border-left: 3px solid var(--primary) !important;
+      color: #60A5FA !important;
+      font-weight: 700 !important;
+    }
+    body.day-theme .nav-item.active {
+      background: #EFF6FF !important;
+      border-color: #BFDBFE !important;
+      border-left: 3px solid #2563EB !important;
+      color: #1D4ED8 !important;
+    }
+
+    /* Modern KPI Metric Cards */
+    .metrics-grid {
+      display: grid !important;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)) !important;
+      gap: 14px !important;
+      margin-bottom: 24px !important;
+    }
+    .metric-card {
+      background: var(--card-bg) !important;
+      border: 1px solid var(--borders) !important;
+      border-radius: var(--radius-md) !important;
+      padding: 16px 18px !important;
+      box-shadow: var(--shadow-sm) !important;
+      transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: space-between !important;
+      min-height: 104px !important;
+    }
+    .metric-card:hover {
+      border-color: var(--card-hover-border) !important;
+      box-shadow: var(--shadow-md) !important;
+      transform: translateY(-2px) !important;
+    }
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .metric-title {
+      font-size: 0.72rem !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.06em !important;
+      color: var(--text-secondary) !important;
+      font-weight: 600 !important;
+    }
+    .metric-icon {
+      font-size: 1.05rem;
+      opacity: 0.85;
+    }
+    .metric-val {
+      font-size: 1.65rem !important;
+      font-weight: 800 !important;
+      color: var(--text) !important;
+      letter-spacing: -0.02em !important;
+      font-variant-numeric: tabular-nums !important;
+      line-height: 1.2 !important;
+    }
+    .metric-subtext {
+      font-size: 0.71rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Landing Page Hero Card */
+    .landing-hero-card {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(139, 92, 246, 0.04) 50%, rgba(17, 24, 39, 0.6) 100%);
+      border: 1px solid var(--borders);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease;
+    }
+    body.day-theme .landing-hero-card {
+      background: linear-gradient(135deg, #F0F4FF 0%, #FAF5FF 50%, #FFFFFF 100%);
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    }
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background: rgba(139, 92, 246, 0.15);
+      color: #A78BFA;
+      border: 1px solid rgba(139, 92, 246, 0.35);
+    }
+    body.day-theme .hero-pill-badge {
+      background: #F5F3FF;
+      color: #7C3AED;
+      border-color: #DDD6FE;
+    }
+    .hero-privacy-badge {
+      font-size: 0.73rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .hero-heading {
+      font-size: 2.1rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin: 0 0 10px 0;
+      color: var(--text);
+    }
+    .hero-description {
+      font-size: 0.94rem;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      max-width: 780px;
+      margin: 0 0 20px 0;
+    }
+    .hero-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .hero-main-cta {
+      width: auto !important;
+      padding: 10px 20px !important;
+      font-size: 0.92rem !important;
+      font-weight: 700 !important;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35) !important;
+    }
+    .hero-demo-picker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .demo-label {
+      font-size: 0.80rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .demo-pill-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .demo-pill-btn {
+      background: var(--surface-elevated);
+      border: 1px solid var(--borders);
+      color: var(--text);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-family: inherit;
+    }
+    .demo-pill-btn:hover {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    body.day-theme .demo-pill-btn {
+      background: #FFFFFF;
+      border-color: #CBD5E1;
+      color: #1E293B;
+    }
+    body.day-theme .demo-pill-btn:hover {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-color: #2563EB;
+    }
+    .hero-supported-formats {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    body.day-theme .hero-supported-formats {
+      border-top-color: #E2E8F0;
+    }
+    .landing-hero-card.has-data {
+      padding: 16px 22px;
+      margin-bottom: 20px;
+    }
+    .landing-hero-card.has-data .hero-heading {
+      font-size: 1.35rem;
+      margin-bottom: 4px;
+    }
+    .landing-hero-card.has-data .hero-description {
+      font-size: 0.84rem;
+      margin-bottom: 12px;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .landing-hero-card.has-data .hero-actions-row {
+      margin-bottom: 8px;
+    }
+    .landing-hero-card.has-data .hero-supported-formats {
+      display: none;
+    }
+
+    /* Responsive Queries */
+    @media (max-width: 900px) {
+      .mobile-menu-btn {
+        display: inline-flex !important;
+      }
+      .brand-tagline {
+        display: none !important;
+      }
+      .btn-text-desktop {
+        display: none !important;
+      }
+      .header-dataset-chip {
+        max-width: 150px !important;
+      }
+      .app-wrapper {
+        grid-template-columns: 1fr !important;
+      }
+      .sidebar {
+        position: fixed !important;
+        top: 64px !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        z-index: 1500 !important;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+      }
+      .sidebar.mobile-open {
+        transform: translateX(0) !important;
+      }
+      .sidebar-backdrop {
+        position: fixed;
+        top: 64px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: 1400;
+        display: none;
+      }
+      .sidebar-backdrop.active {
+        display: block;
+      }
+    }
+
   </style>
 </head>
 <body>
 
   <!-- Top Header -->
   <header class="header">
-    <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
-      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
-      <div>
-        <div class="brand-title">DataMind AI</div>
-        <div class="brand-subtitle">Analyze • Predict • Empower</div>
-        <div class="brand-tagline">AI Powered Data Analytics Platform</div>
+    <div style="display:flex; align-items:center; gap:12px;">
+      <!-- Mobile Drawer Hamburger Toggle -->
+      <button id="mobileMenuToggleBtn" class="mobile-menu-btn" onclick="toggleMobileSidebar()" aria-label="Toggle Navigation Menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Brand Logo & Wordmark -->
+      <div class="brand" onclick="resetAppToNew()" title="Click DataMind AI to Reset Application &amp; Start Fresh Page">
+        <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" />
+        <div class="brand-text">
+          <div class="brand-title">DataMind AI</div>
+          <div class="brand-tagline">Analyze • Predict • Empower</div>
+        </div>
       </div>
     </div>
 
-    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;margin-left:auto;">
-      <!-- Fullscreen Restore Sidebar Button (appears when sidebar is hidden) -->
-      <button id="headerSidebarRestoreBtn" class="btn btn-outline" onclick="toggleSidebarFullscreen()" style="display:none; padding:6px 12px; font-size:0.78rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold); background:rgba(212,175,55,0.12); border-radius:8px; align-items:center; gap:6px; cursor:pointer; font-weight:700; white-space:nowrap; box-shadow:0 0 12px rgba(212,175,55,0.18);" title="Show Sidebar Column">
+    <!-- Header Actions & Controls -->
+    <div class="header-actions">
+      <!-- Fullscreen Restore Sidebar Button -->
+      <button id="headerSidebarRestoreBtn" class="btn btn-outline header-btn" onclick="toggleSidebarFullscreen()" style="display:none;" title="Show Sidebar Column">
         <span>⮞</span>
         <span>Show Sidebar</span>
       </button>
-      <span id="activeDatasetTag" class="badge badge-info" style="font-size:0.80rem;padding:6px 12px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:20px;white-space:nowrap;">Dataset: None</span>
-      <button class="btn btn-primary" style="width:auto;margin:0;padding:7px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(99,102,241,0.35);font-weight:600;font-size:0.80rem;white-space:nowrap;" onclick="exportCurrentCSV()">
-        <span>📥</span>
-        <span>Download Active CSV</span>
-      </button>
 
-      <!-- Simple Day / Night Theme Toggle Logo Button -->
-      <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
-        <svg id="themeToggleLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
-          <!-- Sun Rays (Day Side) -->
+      <!-- Active Dataset Status Chip -->
+      <div class="header-dataset-chip" title="Current Active Dataset">
+        <span class="dataset-status-dot" id="headerDatasetDot"></span>
+        <span id="activeDatasetTag">Dataset: None</span>
+      </div>
+
+      <!-- Dataset Action Buttons Group -->
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button class="btn btn-outline header-btn" onclick="document.getElementById('csvInput').click()" title="Upload CSV, Excel, or JSON dataset file">
+          <span>📤</span>
+          <span class="btn-text-desktop">Upload</span>
+        </button>
+
+        <!-- Quick Demo Menu Dropdown -->
+        <div class="header-dropdown" id="headerDemoDropdown">
+          <button class="btn btn-outline header-btn" onclick="toggleHeaderDemoMenu(event)" title="Load a curated demo dataset">
+            <span>⚡</span>
+            <span class="btn-text-desktop">Demo ▾</span>
+          </button>
+          <div class="header-dropdown-menu" id="headerDemoMenu" style="display:none;">
+            <div class="dropdown-item" onclick="loadSampleSales(); closeHeaderDemoMenu();">
+              <span class="dropdown-icon">🛒</span>
+              <div>
+                <div class="dropdown-title">E-Commerce Sales</div>
+                <div class="dropdown-sub">1,000 transactions • Revenue &amp; MBA</div>
+              </div>
+            </div>
+            <div class="dropdown-item" onclick="loadSampleChurn(); closeHeaderDemoMenu();">
+              <span class="dropdown-icon">📊</span>
+              <div>
+                <div class="dropdown-title">Telecom Customer Churn</div>
+                <div class="dropdown-sub">Classification &amp; retention metrics</div>
+              </div>
+            </div>
+            <div class="dropdown-item" onclick="loadSampleHousing(); closeHeaderDemoMenu();">
+              <span class="dropdown-icon">🏡</span>
+              <div>
+                <div class="dropdown-title">Real Estate Housing</div>
+                <div class="dropdown-sub">Regression &amp; price prediction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary header-btn" id="headerDownloadCsvBtn" onclick="exportCurrentCSV()" title="Download Active Dataset CSV">
+          <span>📥</span>
+          <span class="btn-text-desktop">Download CSV</span>
+        </button>
+      </div>
+
+      <!-- Theme Toggle Icon Button -->
+      <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Switch Light / Dark Theme" aria-label="Toggle Light and Dark Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
+        <svg id="themeToggleLogoSvg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
           <path d="M12 2.5V4.5M6.34 6.34L4.58 4.58M4.5 12H2M6.34 17.66L4.58 19.42M12 19.5V21.5" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
-          <!-- Sun Body (Day Side) -->
           <path d="M12 7A5 5 0 0 0 12 17V7Z" fill="#F59E0B"/>
-          <!-- Moon Crescent (Night Side) -->
           <path d="M12 7A5 5 0 0 1 12 17Q15 12 12 7Z" fill="#38BDF8"/>
-          <!-- Night Celestial Stars -->
           <circle cx="18.5" cy="6.5" r="1.1" fill="#E0F2FE"/>
           <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
         </svg>
-        <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
+        <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:9px; height:9px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
       </div>
     </div>
   </header>
@@ -1988,32 +2746,32 @@
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar">
 
-      <!-- PINNED UPPER SIDEBAR CONTROLS (UNDO, REDO & SIDEBAR HIDDEN TOGGLE) -->
+      <!-- PINNED UPPER SIDEBAR CONTROLS (UNDO, REDO & SIDEBAR FULLSCREEN TOGGLE) -->
       <div class="sidebar-pinned-header" id="sidebarPinnedHeader">
-        <div class="sidebar-pinned-left" style="display:flex; align-items:center; gap:6px;">
-          <!-- Undo Logo & Button -->
+        <div style="display:flex; align-items:center; gap:6px;">
+          <!-- Undo Button -->
           <button id="sidebarUndoBtn" class="sidebar-ctrl-btn" onclick="undoCleaningStep()" title="Undo Last Transformation / Ingestion (Ctrl+Z)" aria-label="Undo" disabled>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M3 7v6h6"></path>
               <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
             </svg>
-            <span style="font-size:0.73rem; font-weight:700; letter-spacing:0.02em;">Undo</span>
+            <span>Undo</span>
           </button>
 
-          <!-- Redo Logo & Button -->
+          <!-- Redo Button -->
           <button id="sidebarRedoBtn" class="sidebar-ctrl-btn" onclick="redoCleaningStep()" title="Redo Last Transformation / Ingestion (Ctrl+Y)" aria-label="Redo" disabled>
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 7v6h-6"></path>
               <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"></path>
             </svg>
-            <span style="font-size:0.73rem; font-weight:700; letter-spacing:0.02em;">Redo</span>
+            <span>Redo</span>
           </button>
         </div>
 
-        <div class="sidebar-pinned-right" style="display:flex; align-items:center; gap:6px;">
-          <!-- Sidebar Hidden Button -->
-          <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Sidebar Hidden (Click to Toggle Fullscreen Workspace)" aria-label="Sidebar Hidden">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <!-- Desktop Collapse Button -->
+          <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Collapse Sidebar (Fullscreen Mode)" aria-label="Collapse Sidebar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
               <line x1="9" y1="3" x2="9" y2="21"></line>
               <path d="M14 9l-3 3 3 3"></path>
@@ -2022,229 +2780,269 @@
         </div>
       </div>
 
-      <!-- SECTION 1: DATA INGESTION (PUSHED DOWN BELOW PINNED CONTROLS) -->
-      <div class="sidebar-section" id="sidebarDataIngestionSection" style="margin-top:14px;">
-        <div class="sidebar-title">
-          <span>📂 1. Data Ingestion</span>
-        </div>
-
-        <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
-          <div style="font-size:24px;margin-bottom:6px;">📂</div>
-          <div style="font-weight:600;font-size:0.88rem;">Upload Dataset File</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">CSV, XLSX, JSON, TSV, TXT</div>
+      <!-- COMPACT DATA INGESTION CARD -->
+      <div class="sidebar-section" id="sidebarDataIngestionSection" style="margin-top:6px;">
+        <div class="drop-zone" onclick="document.getElementById('csvInput').click()" style="padding:16px 10px; border-radius:10px;">
+          <div style="font-size:20px; margin-bottom:4px;">📂</div>
+          <div style="font-weight:600; font-size:0.83rem;">Upload Dataset</div>
+          <div style="font-size:0.70rem; color:var(--text-muted); margin-top:2px;">CSV, XLSX, JSON, TSV, TXT</div>
           <input type="file" id="csvInput" accept=".csv,.xlsx,.xls,.json,.tsv,.txt" style="display:none;" onchange="handleFileUpload(event)" />
         </div>
-
-        <button class="btn btn-outline" style="margin-top:10px;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
       </div>
 
-      <!-- SECTION 2: CATEGORIZED MODULE NAVIGATION -->
+      <!-- 8 CATEGORIZED COLLAPSIBLE MODULE NAVIGATION GROUPS -->
       <div class="sidebar-section">
-        <div class="sidebar-title">
-          <span>🧭 Navigation</span>
-        </div>
         <nav class="nav-list">
 
-          <!-- 1. DATA PREPARATION & ENGINEERING -->
-          <div class="nav-group-header">
-            <span class="category-title">🛠️ Data Engineering</span>
+          <!-- 1. WORKSPACE & DATA -->
+          <div class="nav-category-group" id="navGroup1">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>📁</span>
+                <span>Workspace &amp; Data</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item active" id="navBtnOverview" onclick="switchModule('moduleOverview')">
+                <span class="nav-item-content">
+                  <span>📋</span>
+                  <span>Data Preview &amp; Schema</span>
+                </span>
+                <span class="badge badge-info" id="navBadgeRows" style="display:none;">0 Rows</span>
+              </button>
+              <button class="nav-item" id="navBtnInsertCol" onclick="switchModule('moduleInsertCol')">
+                <span class="nav-item-content">
+                  <span>➕</span>
+                  <span>Insert New Column</span>
+                </span>
+                <span class="badge badge-info" id="sidebarColCount" style="display:none;">0 Cols</span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item active" id="navBtnOverview" onclick="switchModule('moduleOverview')">
-            <span class="nav-item-content">
-              <span>📋</span>
-              <span>Data Preview &amp; Schema</span>
-            </span>
-            <span class="badge badge-info" id="navBadgeRows" style="display:none;">0 Rows</span>
-          </button>
-
-          <button class="nav-item" id="navBtnCleaning" onclick="switchModule('moduleCleaning')">
-            <span class="nav-item-content">
-              <span>🧹</span>
-              <span>1. Data Cleaning &amp; Audit</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
-            <span class="nav-item-content">
-              <span>🔍</span>
-              <span>2. Data Quality Audit</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnProcessing" onclick="switchModule('moduleProcessing')">
-            <span class="nav-item-content">
-              <span>🔄</span>
-              <span>3. Data Processing &amp; Transform</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnFE" onclick="switchModule('moduleFE')">
-            <span class="nav-item-content">
-              <span>⚙️</span>
-              <span>4. Feature Engineering</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnInsertCol" onclick="switchModule('moduleInsertCol')">
-            <span class="nav-item-content">
-              <span>➕</span>
-              <span>5. Insert New Column</span>
-            </span>
-            <span class="badge badge-info" id="sidebarColCount" style="display:none;">0 Cols</span>
-          </button>
-
-          <!-- 2. ANALYTICS & BUSINESS INTELLIGENCE -->
-          <div class="nav-group-header">
-            <span class="category-title">📊 Analytics &amp; BI</span>
+          <!-- 2. DATA PREPARATION -->
+          <div class="nav-category-group" id="navGroup2">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>🧹</span>
+                <span>Data Preparation</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnCleaning" onclick="switchModule('moduleCleaning')">
+                <span class="nav-item-content">
+                  <span>✨</span>
+                  <span>Data Cleaning &amp; Audit</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
+                <span class="nav-item-content">
+                  <span>🛡️</span>
+                  <span>Data Quality Audit</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnProcessing" onclick="switchModule('moduleProcessing')">
+                <span class="nav-item-content">
+                  <span>🔄</span>
+                  <span>Data Processing &amp; Transform</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnFE" onclick="switchModule('moduleFE')">
+                <span class="nav-item-content">
+                  <span>⚙️</span>
+                  <span>Feature Engineering</span>
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item" id="navBtnEDA" onclick="switchModule('moduleEDA')">
-            <span class="nav-item-content">
-              <span>📊</span>
-              <span>6. Exploratory Analysis (EDA)</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnDashboard" onclick="switchModule('moduleDashboard')">
-            <span class="nav-item-content">
-              <span>📈</span>
-              <span>7. Interactive BI Dashboard</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnDashboardBuilder" onclick="switchModule('moduleDashboardBuilder')">
-            <span class="nav-item-content">
-              <span>🎨</span>
-              <span>8. Dashboard Builder</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnVisualization" onclick="switchModule('moduleVisualization')">
-            <span class="nav-item-content">
-              <span>🤖</span>
-              <span>10. AI Chart Recommender</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnInsights" onclick="switchModule('moduleInsights')">
-            <span class="nav-item-content">
-              <span>💡</span>
-              <span>11. Strategic Business Insights</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnStats" onclick="switchModule('moduleStats')">
-            <span class="nav-item-content">
-              <span>📐</span>
-              <span>12. Statistical Analysis</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnAB" onclick="switchModule('moduleABTesting')">
-            <span class="nav-item-content">
-              <span>🧪</span>
-              <span>13. Experimentation &amp; A/B Testing</span>
-            </span>
-          </button>
-
-          <!-- 3. QUERY & DEVELOPMENT ENGINES -->
-          <div class="nav-group-header">
-            <span class="category-title">💻 Query &amp; Code Engines</span>
+          <!-- 3. EXPLORATORY DATA ANALYSIS -->
+          <div class="nav-category-group" id="navGroup3">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>📊</span>
+                <span>Exploratory Analysis</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnEDA" onclick="switchModule('moduleEDA')">
+                <span class="nav-item-content">
+                  <span>📈</span>
+                  <span>Exploratory Analysis (EDA)</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnStats" onclick="switchModule('moduleStats')">
+                <span class="nav-item-content">
+                  <span>📐</span>
+                  <span>Statistical Analysis</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnAB" onclick="switchModule('moduleABTesting')">
+                <span class="nav-item-content">
+                  <span>🧪</span>
+                  <span>Experimentation &amp; A/B Testing</span>
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item" id="navBtnSql" onclick="switchModule('moduleSql')">
-            <span class="nav-item-content">
-              <span>🗄️</span>
-              <span>14. SQL &amp; Database Studio</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnPython" onclick="switchModule('modulePython')">
-            <span class="nav-item-content">
-              <span>🐍</span>
-              <span>15. Python Analytics Sandbox</span>
-            </span>
-          </button>
-
-          <!-- 4. ARTIFICIAL INTELLIGENCE & MACHINE LEARNING -->
-          <div class="nav-group-header">
-            <span class="category-title">🤖 AI &amp; Machine Learning</span>
+          <!-- 4. BUSINESS INTELLIGENCE -->
+          <div class="nav-category-group" id="navGroup4">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>📊</span>
+                <span>Business Intelligence</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnDashboard" onclick="switchModule('moduleDashboard')">
+                <span class="nav-item-content">
+                  <span>📉</span>
+                  <span>Interactive BI Dashboard</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnDashboardBuilder" onclick="switchModule('moduleDashboardBuilder')">
+                <span class="nav-item-content">
+                  <span>🎨</span>
+                  <span>Dashboard Builder</span>
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item" id="navBtnML" onclick="switchModule('moduleML')">
-            <span class="nav-item-content">
-              <span>🤖</span>
-              <span>16. Machine Learning Models</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnPredictive" onclick="switchModule('modulePredictive')">
-            <span class="nav-item-content">
-              <span>🎯</span>
-              <span>17. Predictive Analytics</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnForecasting" onclick="switchModule('moduleForecasting')">
-            <span class="nav-item-content">
-              <span>🔮</span>
-              <span>18. Forecasting</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnEvaluation" onclick="switchModule('moduleEvaluation')">
-            <span class="nav-item-content">
-              <span>📏</span>
-              <span>19. Model Evaluation</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
-            <span class="nav-item-content">
-              <span>🏆</span>
-              <span>20. Model Registry</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
-            <span class="nav-item-content">
-              <span>🧠</span>
-              <span>21. NLP &amp; Text Analytics</span>
-            </span>
-          </button>
-
-          <button class="nav-item" id="navBtnAI" onclick="switchModule('moduleAI')">
-            <span class="nav-item-content">
-              <span>✨</span>
-              <span>22. AI Assistant</span>
-            </span>
-          </button>
-
-          <!-- 5. REPORTING & EXECUTIVE DELIVERABLES -->
-          <div class="nav-group-header">
-            <span class="category-title">📑 Reporting &amp; Deliverables</span>
+          <!-- 5. SQL & PYTHON -->
+          <div class="nav-category-group" id="navGroup5">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>💻</span>
+                <span>SQL &amp; Python</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnSql" onclick="switchModule('moduleSql')">
+                <span class="nav-item-content">
+                  <span>🗄️</span>
+                  <span>SQL &amp; Database Studio</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnPython" onclick="switchModule('modulePython')">
+                <span class="nav-item-content">
+                  <span>🐍</span>
+                  <span>Python Analytics Sandbox</span>
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item" id="navBtnReport" onclick="switchModule('moduleReport')">
-            <span class="nav-item-content">
-              <span>📑</span>
-              <span>23. Executive Report Studio</span>
-            </span>
-          </button>
-
-
-          <!-- 7. PLATFORM SETTINGS & PREFERENCES -->
-          <div class="nav-group-header">
-            <span class="category-title">⚙️ System &amp; Settings</span>
+          <!-- 6. AI & MACHINE LEARNING -->
+          <div class="nav-category-group" id="navGroup6">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>🤖</span>
+                <span>AI &amp; Machine Learning</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnML" onclick="switchModule('moduleML')">
+                <span class="nav-item-content">
+                  <span>🧠</span>
+                  <span>Machine Learning Models</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnPredictive" onclick="switchModule('modulePredictive')">
+                <span class="nav-item-content">
+                  <span>🎯</span>
+                  <span>Predictive Analytics</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnAI" onclick="switchModule('moduleAI')">
+                <span class="nav-item-content">
+                  <span>✨</span>
+                  <span>AI Assistant</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnVisualization" onclick="switchModule('moduleVisualization')">
+                <span class="nav-item-content">
+                  <span>🎨</span>
+                  <span>AI Chart Recommender</span>
+                </span>
+              </button>
+            </div>
           </div>
 
-          <button class="nav-item" id="navBtnSettings" onclick="switchModule('moduleSettings')">
-            <span class="nav-item-content">
-              <span>⚙️</span>
-              <span>24. Platform Settings</span>
-            </span>
-          </button>
+          <!-- 7. FORECASTING & MODEL EVALUATION -->
+          <div class="nav-category-group" id="navGroup7">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>🔮</span>
+                <span>Forecasting &amp; Evaluation</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnForecasting" onclick="switchModule('moduleForecasting')">
+                <span class="nav-item-content">
+                  <span>🔮</span>
+                  <span>Forecasting</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnEvaluation" onclick="switchModule('moduleEvaluation')">
+                <span class="nav-item-content">
+                  <span>📏</span>
+                  <span>Model Evaluation</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
+                <span class="nav-item-content">
+                  <span>🏆</span>
+                  <span>Model Registry</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
+                <span class="nav-item-content">
+                  <span>💬</span>
+                  <span>NLP &amp; Text Analytics</span>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 8. REPORTS & SETTINGS -->
+          <div class="nav-category-group" id="navGroup8">
+            <button class="nav-group-header" onclick="toggleNavGroup(this)" aria-expanded="true">
+              <span class="category-title">
+                <span>📑</span>
+                <span>Reports &amp; Settings</span>
+              </span>
+              <span class="category-chevron">▾</span>
+            </button>
+            <div class="nav-group-items">
+              <button class="nav-item" id="navBtnInsights" onclick="switchModule('moduleInsights')">
+                <span class="nav-item-content">
+                  <span>💡</span>
+                  <span>Strategic Business Insights</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnReport" onclick="switchModule('moduleReport')">
+                <span class="nav-item-content">
+                  <span>📄</span>
+                  <span>Executive Report Studio</span>
+                </span>
+              </button>
+              <button class="nav-item" id="navBtnSettings" onclick="switchModule('moduleSettings')">
+                <span class="nav-item-content">
+                  <span>⚙️</span>
+                  <span>Platform Settings</span>
+                </span>
+              </button>
+            </div>
+          </div>
 
         </nav>
       </div>
@@ -2256,29 +3054,84 @@
       <!-- TOP METRICS CARDS -->
       <div class="metrics-grid">
         <div class="metric-card">
-          <div class="metric-title">Dataset Shape</div>
-          <div class="metric-val" id="metricShape">0 × 0</div>
+          <div class="metric-header">
+            <span class="metric-title">Dataset Dimensions</span>
+            <span class="metric-icon">📐</span>
+          </div>
+          <div class="metric-val" id="metricShape">--</div>
+          <div class="metric-subtext">Total rows × columns</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">Data Health Score</div>
-          <div class="metric-val" id="metricHealth" style="color:var(--success);">100 / 100</div>
+          <div class="metric-header">
+            <span class="metric-title">Data Quality Score</span>
+            <span class="metric-icon">🛡️</span>
+          </div>
+          <div class="metric-val" id="metricHealth">--</div>
+          <div class="metric-subtext">Overall hygiene &amp; validity</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">Missing Cells</div>
-          <div class="metric-val" id="metricMissing">0 (0%)</div>
+          <div class="metric-header">
+            <span class="metric-title">Missing Values</span>
+            <span class="metric-icon">⚠️</span>
+          </div>
+          <div class="metric-val" id="metricMissing">--</div>
+          <div class="metric-subtext">Null or empty cells</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">Duplicate Rows</div>
-          <div class="metric-val" id="metricDuplicates">0</div>
+          <div class="metric-header">
+            <span class="metric-title">Duplicate Rows</span>
+            <span class="metric-icon">📑</span>
+          </div>
+          <div class="metric-val" id="metricDuplicates">--</div>
+          <div class="metric-subtext">Identical record count</div>
         </div>
         <div class="metric-card">
-          <div class="metric-title">Active Columns</div>
-          <div class="metric-val" id="metricCols">0</div>
+          <div class="metric-header">
+            <span class="metric-title">Active Columns</span>
+            <span class="metric-icon">🗂️</span>
+          </div>
+          <div class="metric-val" id="metricCols">--</div>
+          <div class="metric-subtext">Feature dimensions in memory</div>
         </div>
       </div>
 
       <!-- MODULE 1: DATA PREVIEW -->
       <div id="moduleOverview" class="module-view active">
+
+        <!-- Modern SaaS Landing Hero Card -->
+        <div class="landing-hero-card" id="landingHeroCard">
+          <div class="landing-hero-content">
+            <div class="hero-eyebrow">
+              <span class="hero-pill-badge">✨ Next-Generation AI Analytics</span>
+              <span class="hero-privacy-badge">🔒 100% In-Browser Privacy</span>
+            </div>
+            <h1 class="hero-heading">Turn data into decisions.</h1>
+            <p class="hero-description">
+              DataMind AI transforms raw tabular datasets into automated statistical audits, predictive intelligence, machine learning models, and executive BI dashboards — instantly and effortlessly.
+            </p>
+            <div class="hero-actions-row">
+              <button class="btn btn-primary hero-main-cta" onclick="document.getElementById('csvInput').click()">
+                <span>📂</span>
+                <span>Upload Dataset</span>
+              </button>
+              <div class="hero-demo-picker">
+                <span class="demo-label">or explore demo:</span>
+                <div class="demo-pill-group">
+                  <button class="demo-pill-btn" onclick="loadSampleSales()">🛒 E-Commerce Sales</button>
+                  <button class="demo-pill-btn" onclick="loadSampleChurn()">📊 Telecom Churn</button>
+                  <button class="demo-pill-btn" onclick="loadSampleHousing()">🏡 Housing Market</button>
+                </div>
+              </div>
+            </div>
+            <div class="hero-supported-formats">
+              <span>Supports CSV, XLSX, JSON, TSV, TXT</span>
+              <span>•</span>
+              <span>Up to 500MB client-side processing</span>
+              <span>•</span>
+              <span>No cloud data egress required</span>
+            </div>
+          </div>
+        </div>
 
         <!-- Hero Banner -->
         <div class="banner-box" style="border-left-color:var(--champagne-gold); margin-bottom:18px;">
@@ -11732,7 +12585,21 @@ result = df.describe()
       // UNIVERSAL INSTANT ACTIVE BUTTON HIGHLIGHT (Fixes modules 20-25 lag & active highlight)
       const targetNavBtn = document.querySelector(`.nav-item[onclick*="'${moduleId}'"]`) ||
                            document.getElementById('navBtn' + moduleId.replace(/^module/, ''));
-      if (targetNavBtn) targetNavBtn.classList.add('active');
+      if (targetNavBtn) {
+        targetNavBtn.classList.add('active');
+        const parentGroup = targetNavBtn.closest('.nav-category-group');
+        if (parentGroup && parentGroup.classList.contains('is-collapsed')) {
+          parentGroup.classList.remove('is-collapsed');
+          const headerBtn = parentGroup.querySelector('.nav-group-header');
+          if (headerBtn) headerBtn.setAttribute('aria-expanded', 'true');
+        }
+      }
+      if (window.innerWidth <= 900) {
+        const sb = document.querySelector('.sidebar');
+        if (sb && sb.classList.contains('mobile-open')) {
+          toggleMobileSidebar();
+        }
+      }
       const specificNavBtn = document.getElementById('navBtn' + moduleId.replace(/^module/, ''));
       if (specificNavBtn) specificNavBtn.classList.add('active');
 
@@ -12723,18 +13590,31 @@ result = df.describe()
       const score = stats.healthScore;
 
       const metricShape = document.getElementById("metricShape");
-      if (metricShape) metricShape.textContent = `${rows.toLocaleString()} × ${cols}`;
+      if (metricShape) metricShape.textContent = rows > 0 ? `${rows.toLocaleString()} × ${cols}` : `--`;
       const metricHealth = document.getElementById("metricHealth");
       if (metricHealth) {
-        metricHealth.textContent = rows > 0 ? `${score} / 100` : `- / 100`;
+        metricHealth.textContent = rows > 0 ? `${score} / 100` : `--`;
         metricHealth.style.color = rows > 0 ? (score >= 80 ? 'var(--success)' : score >= 60 ? 'var(--warning)' : 'var(--danger)') : 'var(--text-muted)';
       }
       const metricMissing = document.getElementById("metricMissing");
-      if (metricMissing) metricMissing.textContent = `${nullCount.toLocaleString()} (${rows > 0 ? ((nullCount / (totalCells || 1)) * 100).toFixed(1) : 0}%)`;
+      if (metricMissing) metricMissing.textContent = rows > 0 ? `${nullCount.toLocaleString()} (${((nullCount / (totalCells || 1)) * 100).toFixed(1)}%)` : `--`;
       const metricDuplicates = document.getElementById("metricDuplicates");
-      if (metricDuplicates) metricDuplicates.textContent = dupCount.toLocaleString();
+      if (metricDuplicates) metricDuplicates.textContent = rows > 0 ? dupCount.toLocaleString() : `--`;
       const metricCols = document.getElementById("metricCols");
-      if (metricCols) metricCols.textContent = cols;
+      if (metricCols) metricCols.textContent = rows > 0 ? cols.toLocaleString() : `--`;
+
+      // Update landing hero card state (collapse or expand)
+      const heroCard = document.getElementById("landingHeroCard");
+      if (heroCard) {
+        if (rows > 0) heroCard.classList.add("has-data");
+        else heroCard.classList.remove("has-data");
+      }
+
+      // Update header active dataset status dot
+      const headerDot = document.getElementById("headerDatasetDot");
+      if (headerDot) {
+        headerDot.style.background = rows > 0 ? "var(--success)" : "var(--text-muted)";
+      }
 
       const navBadgeRows = document.getElementById("navBadgeRows");
       if (navBadgeRows) navBadgeRows.textContent = `${rows.toLocaleString()} Rows`;
@@ -22442,6 +23322,57 @@ result = df.describe()
       const textToSpeak = bubble ? (bubble.innerText || bubble.textContent) : "";
       speakText(textToSpeak, btn);
     }
+
+    
+    // -----------------------------------------------------------------
+    // MODERN SAAS UI INTERACTION HELPERS
+    // -----------------------------------------------------------------
+    function toggleNavGroup(btn) {
+      const group = btn.closest('.nav-category-group');
+      if (group) {
+        const isCollapsed = group.classList.toggle('is-collapsed');
+        btn.setAttribute('aria-expanded', isCollapsed ? 'false' : 'true');
+      }
+    }
+    window.toggleNavGroup = toggleNavGroup;
+
+    function toggleHeaderDemoMenu(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('headerDemoMenu');
+      if (menu) {
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      }
+    }
+    window.toggleHeaderDemoMenu = toggleHeaderDemoMenu;
+
+    function closeHeaderDemoMenu() {
+      const menu = document.getElementById('headerDemoMenu');
+      if (menu) menu.style.display = 'none';
+    }
+    window.closeHeaderDemoMenu = closeHeaderDemoMenu;
+
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#headerDemoDropdown')) {
+        closeHeaderDemoMenu();
+      }
+    });
+
+    function toggleMobileSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      let backdrop = document.getElementById('sidebarMobileBackdrop');
+      if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'sidebarMobileBackdrop';
+        backdrop.className = 'sidebar-backdrop';
+        backdrop.onclick = toggleMobileSidebar;
+        document.body.appendChild(backdrop);
+      }
+      if (sidebar) {
+        const isOpen = sidebar.classList.toggle('mobile-open');
+        backdrop.classList.toggle('active', isOpen);
+      }
+    }
+    window.toggleMobileSidebar = toggleMobileSidebar;
 
     window.onload = init;
 
