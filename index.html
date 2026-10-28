@@ -187,9 +187,23 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Top Header */
+    /* Whole-Body 3D Perspective Canvas */
+    #global3dCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.90;
+    }
+
+    /* Top Header with Frosted Glass */
     .header {
-      background: var(--header-bg);
+      background: rgba(11, 14, 22, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 10px 24px;
       border-bottom: 1px solid var(--header-border);
       box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
@@ -205,21 +219,6 @@
       width: 100%;
       box-sizing: border-box;
       transition: background-color 0.16s ease, border-color 0.16s ease;
-      overflow: hidden;
-    }
-    #header3dCanvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0.85;
-    }
-    .header > *:not(#header3dCanvas) {
-      position: relative;
-      z-index: 2;
     }
     .brand {
       display: flex;
@@ -478,8 +477,11 @@
 
     /* Top Navigation Header & Brand */
     body.day-theme .header,
+    body.day-theme .header,
     body.light-theme .header {
-      background: #FFFFFF !important;
+      background: rgba(255, 255, 255, 0.85) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
       border-bottom: 1px solid #D1D5DB !important;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
@@ -514,8 +516,11 @@
 
     /* Left Sidebar Column */
     body.day-theme .sidebar,
+    body.day-theme .sidebar,
     body.light-theme .sidebar {
-      background: #FFFFFF !important;
+      background: rgba(255, 255, 255, 0.88) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
       border-right: 1px solid #D1D5DB !important;
     }
     body.day-theme .sidebar-pinned-header,
@@ -991,6 +996,7 @@
       max-width: 100vw;
       box-sizing: border-box;
       position: relative;
+      z-index: 1;
     }
     @media (max-width: 1200px) {
       .app-wrapper {
@@ -1032,7 +1038,9 @@
       min-width: 340px;
       max-width: 340px;
       flex-shrink: 0;
-      background: var(--sidebar-bg);
+      background: rgba(9, 11, 17, 0.78);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-right: 1px solid var(--card-border);
       padding: 0 18px 24px 18px;
       display: flex;
@@ -1858,10 +1866,11 @@
   </style>
 </head>
 <body>
+  <!-- Whole-Body 3D Cosmic Neural Matrix Background Canvas -->
+  <canvas id="global3dCanvas"></canvas>
 
   <!-- Top Header -->
   <header class="header">
-    <canvas id="header3dCanvas"></canvas>
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
       <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
       <div>
@@ -33770,12 +33779,12 @@ LIMIT 10;</pre>
     }
 
     // =========================================================================
-    // 3D HOLOGRAPHIC NEURAL MATRIX HEADER BACKGROUND ANIMATION
+// =========================================================================
+    // 3D HOLOGRAPHIC NEURAL MATRIX WHOLE-BODY BACKGROUND ANIMATION
     // =========================================================================
-    function initHeader3DBackground() {
-      const header = document.querySelector('header.header');
-      let canvas = document.getElementById('header3dCanvas');
-      if (!header || !canvas) return;
+    function initGlobal3DBackground() {
+      let canvas = document.getElementById('global3dCanvas');
+      if (!canvas) return;
 
       const ctx = canvas.getContext('2d');
       if (!ctx) return;
@@ -33783,10 +33792,9 @@ LIMIT 10;</pre>
       let width = 0, height = 0, dpr = 1;
 
       function resize() {
-        const rect = header.getBoundingClientRect();
         dpr = Math.min(window.devicePixelRatio || 1, 2);
-        width = rect.width;
-        height = rect.height;
+        width = window.innerWidth;
+        height = window.innerHeight;
         canvas.width = Math.floor(width * dpr);
         canvas.height = Math.floor(height * dpr);
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -33794,39 +33802,39 @@ LIMIT 10;</pre>
       resize();
       window.addEventListener('resize', resize);
 
-      // 3D Nodes Setup (Floating matrix nodes in 3D perspective space)
-      const NUM_NODES = 46;
+      // 88 Floating Neural Constellation Nodes across the entire 3D volume
+      const NUM_NODES = 88;
       const nodes = [];
       for (let i = 0; i < NUM_NODES; i++) {
         nodes.push({
-          x: (Math.random() - 0.5) * 1100,
-          y: (Math.random() - 0.5) * 75,
-          z: Math.random() * 500 - 250,
-          vx: (Math.random() - 0.5) * 0.35,
-          vy: (Math.random() - 0.5) * 0.2,
-          vz: (Math.random() - 0.5) * 0.45,
-          type: (i % 4 === 0) ? 1 : 0
+          x: (Math.random() - 0.5) * 1600,
+          y: (Math.random() - 0.5) * 1000,
+          z: Math.random() * 800 - 400,
+          vx: (Math.random() - 0.5) * 0.45,
+          vy: (Math.random() - 0.5) * 0.35,
+          vz: (Math.random() - 0.5) * 0.55,
+          type: (i % 4 === 0) ? 1 : 0 // 1: secondary accent, 0: primary
         });
       }
 
-      // 3D Orbital Rings (Dual rotating depth rings)
+      // Concentric 3D Perspective Orbital Rings
       const rings = [
-        { radius: 140, rotX: 0.6, rotY: 0.3, speedY: 0.005 },
-        { radius: 220, rotX: -0.5, rotY: -0.2, speedY: -0.003 }
+        { radius: 340, rotX: 0.55, rotY: 0.2, speedY: 0.003 },
+        { radius: 540, rotX: -0.45, rotY: -0.15, speedY: -0.002 },
+        { radius: 740, rotX: 0.70, rotY: 0.4, speedY: 0.0018 }
       ];
 
       let mouseX = 0, mouseY = 0;
       let targetMouseX = 0, targetMouseY = 0;
 
-      header.addEventListener('mousemove', (e) => {
-        const rect = header.getBoundingClientRect();
-        const mx = (e.clientX - rect.left) / (rect.width || 1) - 0.5;
-        const my = (e.clientY - rect.top) / (rect.height || 1) - 0.5;
-        targetMouseX = mx * 0.45;
-        targetMouseY = my * 0.35;
+      window.addEventListener('mousemove', (e) => {
+        const mx = e.clientX / (window.innerWidth || 1) - 0.5;
+        const my = e.clientY / (window.innerHeight || 1) - 0.5;
+        targetMouseX = mx * 0.55;
+        targetMouseY = my * 0.45;
       });
 
-      header.addEventListener('mouseleave', () => {
+      window.addEventListener('mouseleave', () => {
         targetMouseX = 0;
         targetMouseY = 0;
       });
@@ -33840,33 +33848,33 @@ LIMIT 10;</pre>
                       document.body.classList.contains('day-theme') ||
                       document.body.classList.contains('light-theme');
 
-        // Rolls-Royce Champagne Gold & Cyan vs Daylight Royal Sapphire & Navy
+        // Rolls-Royce Champagne Gold & Electric Cyan vs Daylight Royal Sapphire & Deep Navy
         const colorPrimary = isDay ? '37, 99, 235' : '212, 175, 55';
         const colorSecondary = isDay ? '22, 44, 79' : '56, 189, 248';
 
-        baseAngleY += 0.0025;
-        mouseX += (targetMouseX - mouseX) * 0.05;
-        mouseY += (targetMouseY - mouseY) * 0.05;
+        baseAngleY += 0.002;
+        mouseX += (targetMouseX - mouseX) * 0.04;
+        mouseY += (targetMouseY - mouseY) * 0.04;
 
         const curAngleY = baseAngleY + mouseX;
-        const curAngleX = Math.sin(baseAngleY * 0.7) * 0.12 + mouseY;
+        const curAngleX = Math.sin(baseAngleY * 0.6) * 0.15 + mouseY;
 
-        const fov = 360;
+        const fov = 450;
         const cx = width / 2;
         const cy = height / 2;
 
-        // 1. Draw 3D Orbiting Rings
+        // 1. Draw 3D Orbiting Rings across the body
         for (let r = 0; r < rings.length; r++) {
           const ring = rings[r];
           ring.rotY += ring.speedY;
           ctx.beginPath();
-          const segments = 48;
+          const segments = 64;
           let first = true;
           for (let s = 0; s <= segments; s++) {
             const theta = (s / segments) * Math.PI * 2;
             const rx = Math.cos(theta) * ring.radius;
-            const ry = Math.sin(theta) * (ring.radius * 0.28);
-            const rz = Math.sin(theta) * (ring.radius * 0.4);
+            const ry = Math.sin(theta) * (ring.radius * 0.32);
+            const rz = Math.sin(theta) * (ring.radius * 0.5);
 
             const cosY = Math.cos(ring.rotY + curAngleY * 0.5);
             const sinY = Math.sin(ring.rotY + curAngleY * 0.5);
@@ -33878,7 +33886,7 @@ LIMIT 10;</pre>
             const y2 = ry * cosX - z1 * sinX;
             const z2 = z1 * cosX + ry * sinX;
 
-            const scale = fov / (fov + z2 + 360);
+            const scale = fov / (fov + z2 + 420);
             const px = x1 * scale + cx;
             const py = y2 * scale + cy;
 
@@ -33891,15 +33899,15 @@ LIMIT 10;</pre>
           }
           ctx.closePath();
           ctx.strokeStyle = r === 0 
-            ? `rgba(${colorPrimary}, ${isDay ? 0.20 : 0.16})` 
-            : `rgba(${colorSecondary}, ${isDay ? 0.14 : 0.11})`;
+            ? `rgba(${colorPrimary}, ${isDay ? 0.22 : 0.18})` 
+            : `rgba(${colorSecondary}, ${isDay ? 0.16 : 0.12})`;
           ctx.lineWidth = 1.0;
-          ctx.setLineDash([6, 8]);
+          ctx.setLineDash([8, 10]);
           ctx.stroke();
           ctx.setLineDash([]);
         }
 
-        // 2. Project Nodes with 3D Rotation
+        // 2. Project Nodes with 3D Matrix Rotation
         const projected = [];
         for (let i = 0; i < nodes.length; i++) {
           const n = nodes[i];
@@ -33907,12 +33915,12 @@ LIMIT 10;</pre>
           n.y += n.vy;
           n.z += n.vz;
 
-          if (n.x < -600) n.x = 600;
-          if (n.x > 600) n.x = -600;
-          if (n.y < -45) n.y = 45;
-          if (n.y > 45) n.y = -45;
-          if (n.z < -250) n.z = 250;
-          if (n.z > 250) n.z = -250;
+          if (n.x < -900) n.x = 900;
+          if (n.x > 900) n.x = -900;
+          if (n.y < -550) n.y = 550;
+          if (n.y > 550) n.y = -550;
+          if (n.z < -400) n.z = 400;
+          if (n.z > 400) n.z = -400;
 
           // Rotate Y
           const cosY = Math.cos(curAngleY);
@@ -33926,7 +33934,7 @@ LIMIT 10;</pre>
           const y2 = n.y * cosX - z1 * sinX;
           const z2 = z1 * cosX + n.y * sinX;
 
-          const scale = fov / (fov + z2 + 340);
+          const scale = fov / (fov + z2 + 400);
           const px = x1 * scale + cx;
           const py = y2 * scale + cy;
 
@@ -33935,12 +33943,12 @@ LIMIT 10;</pre>
             y: py,
             z: z2,
             scale: scale,
-            alpha: Math.min(1, Math.max(0.12, (z2 + 250) / 500)),
+            alpha: Math.min(1, Math.max(0.12, (z2 + 400) / 800)),
             type: n.type
           });
         }
 
-        // 3. Draw 3D Matrix Connection Lines
+        // 3. Draw 3D Dynamic Filaments / Connection Lines
         for (let i = 0; i < projected.length; i++) {
           for (let j = i + 1; j < projected.length; j++) {
             const p1 = projected[i];
@@ -33949,10 +33957,10 @@ LIMIT 10;</pre>
             const dy = p1.y - p2.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
 
-            if (dist < 105) {
-              const lineAlpha = (1 - dist / 105) * 0.28 * Math.min(p1.alpha, p2.alpha);
+            if (dist < 135) {
+              const lineAlpha = (1 - dist / 135) * 0.26 * Math.min(p1.alpha, p2.alpha);
               ctx.strokeStyle = `rgba(${colorPrimary}, ${lineAlpha})`;
-              ctx.lineWidth = (p1.scale + p2.scale) * 0.65;
+              ctx.lineWidth = (p1.scale + p2.scale) * 0.6;
               ctx.beginPath();
               ctx.moveTo(p1.x, p1.y);
               ctx.lineTo(p2.x, p2.y);
@@ -33961,10 +33969,10 @@ LIMIT 10;</pre>
           }
         }
 
-        // 4. Draw 3D Depth Nodes & Sparkling Core
+        // 4. Draw 3D Depth Nodes & Sparkling Cores
         for (let i = 0; i < projected.length; i++) {
           const p = projected[i];
-          const radius = Math.max(1.2, p.scale * 3.4);
+          const radius = Math.max(1.2, p.scale * 3.6);
           const col = p.type === 1 ? colorSecondary : colorPrimary;
 
           // Outer Glow
@@ -33974,10 +33982,10 @@ LIMIT 10;</pre>
           ctx.fill();
 
           // Core Sparkle
-          if (p.scale > 0.62) {
+          if (p.scale > 0.58) {
             ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha * 0.95})`;
             ctx.beginPath();
-            ctx.arc(p.x, p.y, radius * 0.42, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, radius * 0.44, 0, Math.PI * 2);
             ctx.fill();
           }
         }
@@ -33989,9 +33997,9 @@ LIMIT 10;</pre>
     }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initHeader3DBackground);
+      document.addEventListener('DOMContentLoaded', initGlobal3DBackground);
     } else {
-      initHeader3DBackground();
+      initGlobal3DBackground();
     }
 
   </script>
