@@ -167,14 +167,17 @@
     /* Top Header */
     .header {
       background: var(--header-bg);
-      padding: 10px 24px;
+      padding: 6px 20px;
+      height: 52px;
+      min-height: 52px;
+      max-height: 52px;
       border-bottom: 1px solid var(--header-border);
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: nowrap;
-      gap: 16px;
+      gap: 14px;
       position: sticky;
       top: 0;
       z-index: 1000;
@@ -237,13 +240,13 @@
 
     /* Sidebar Logo Icon Toggle Button (Icon Only, No Plain Text) */
     .sidebar-hide-btn {
-      background: rgba(212, 175, 55, 0.08);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      background: rgba(212, 175, 55, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.25);
       color: var(--champagne-gold);
-      width: 28px;
-      height: 26px;
+      width: 25px;
+      height: 25px;
       padding: 0;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
@@ -355,7 +358,11 @@
     body.light-theme .header {
       background: #FFFFFF !important;
       border-bottom: 1px solid #D1D5DB !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+      padding: 6px 20px !important;
+      height: 52px !important;
+      min-height: 52px !important;
+      max-height: 52px !important;
     }
     body.day-theme .brand-title,
     body.light-theme .brand-title {
@@ -392,47 +399,61 @@
       background: #FFFFFF !important;
       border-right: 1px solid #D1D5DB !important;
     }
+    body.day-theme .sidebar,
+    body.light-theme .sidebar {
+      background: #FFFFFF !important;
+      border-right: 1px solid #E5E7EB !important;
+      width: 250px !important;
+      min-width: 250px !important;
+      max-width: 250px !important;
+      padding: 0 10px 18px 10px !important;
+    }
     body.day-theme .sidebar-pinned-header,
     body.light-theme .sidebar-pinned-header {
       background: #FFFFFF !important;
-      border-bottom: 1.5px solid #D1D5DB !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+      border-bottom: 1px solid #E5E7EB !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+      margin: 0 -10px 0 -10px !important;
+      padding: 8px 10px !important;
     }
     body.day-theme .sidebar-title,
     body.light-theme .sidebar-title {
-      color: #4B5563 !important;
-      border-bottom-color: #E5E7EB !important;
+      color: #6B7280 !important;
+      border-bottom-color: #F3F4F6 !important;
     }
     body.day-theme .nav-group-header,
     body.light-theme .nav-group-header {
-      color: #4B5563 !important;
-      border-bottom-color: #E5E7EB !important;
+      color: #6B7280 !important;
+      border-bottom-color: #F3F4F6 !important;
     }
     body.day-theme .nav-group-header span.category-title,
     body.light-theme .nav-group-header span.category-title {
-      color: #4B5563 !important;
+      color: #6B7280 !important;
     }
     body.day-theme .nav-item,
     body.light-theme .nav-item {
-      background: #FFFFFF !important;
-      border: 1px solid #E5E7EB !important;
-      border-left: 3.5px solid transparent !important;
-      color: #111827 !important;
+      background: transparent !important;
+      border: 1px solid transparent !important;
+      border-left: 2.5px solid transparent !important;
+      color: #374151 !important;
+      padding: 6px 9px !important;
+      font-size: 0.80rem !important;
+      font-weight: 500 !important;
     }
     body.day-theme .nav-item:hover,
     body.light-theme .nav-item:hover {
-      background: #E9EEF5 !important;
-      border-color: #D1D5DB !important;
+      background: #F3F4F6 !important;
+      border-color: #E5E7EB !important;
       color: #111827 !important;
     }
     body.day-theme .nav-item.active,
     body.light-theme .nav-item.active {
-      background: #E9EEF5 !important;
-      border-color: #D1D5DB !important;
-      border-left: 3.5px solid #162C4F !important;
+      background: #F1F5F9 !important;
+      border-color: #E2E8F0 !important;
+      border-left: 2.5px solid #162C4F !important;
       color: #162C4F !important;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
-      font-weight: 700 !important;
+      box-shadow: none !important;
+      font-weight: 600 !important;
     }
     body.day-theme .drop-zone,
     body.light-theme .drop-zone {
@@ -840,9 +861,9 @@
     /* App Shell Layout - Fixed Space Sidebar Column Architecture */
     .app-wrapper {
       display: grid;
-      grid-template-columns: 340px minmax(0, 1fr);
+      grid-template-columns: 250px minmax(0, 1fr);
       flex: 1;
-      height: calc(100vh - 84px);
+      height: calc(100vh - 52px);
       min-height: 0;
       overflow-x: hidden;
       overflow-y: hidden;
@@ -853,32 +874,32 @@
     }
     @media (max-width: 1200px) {
       .app-wrapper {
-        grid-template-columns: 300px minmax(0, 1fr);
+        grid-template-columns: 240px minmax(0, 1fr);
       }
       .sidebar {
-        width: 300px !important;
-        min-width: 300px !important;
-        max-width: 300px !important;
-        padding: 0 14px 20px 14px !important;
+        width: 240px !important;
+        min-width: 240px !important;
+        max-width: 240px !important;
+        padding: 0 8px 16px 8px !important;
       }
       .sidebar-pinned-header {
-        margin: 0 -14px 0 -14px !important;
-        padding: 10px 14px !important;
+        margin: 0 -8px 0 -8px !important;
+        padding: 8px 10px !important;
       }
     }
     @media (max-width: 768px) {
       .app-wrapper {
-        grid-template-columns: 280px minmax(0, 1fr);
+        grid-template-columns: 230px minmax(0, 1fr);
       }
       .sidebar {
-        width: 280px !important;
-        min-width: 280px !important;
-        max-width: 280px !important;
-        padding: 0 10px 18px 10px !important;
+        width: 230px !important;
+        min-width: 230px !important;
+        max-width: 230px !important;
+        padding: 0 8px 14px 8px !important;
       }
       .sidebar-pinned-header {
-        margin: 0 -10px 0 -10px !important;
-        padding: 10px 10px !important;
+        margin: 0 -8px 0 -8px !important;
+        padding: 8px 8px !important;
       }
     }
 
@@ -887,16 +908,16 @@
       position: sticky;
       left: 0;
       top: 0;
-      width: 340px;
-      min-width: 340px;
-      max-width: 340px;
+      width: 250px;
+      min-width: 250px;
+      max-width: 250px;
       flex-shrink: 0;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--card-border);
-      padding: 0 18px 24px 18px;
+      padding: 0 10px 18px 10px;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 10px;
       height: 100%;
       max-height: 100%;
       min-height: 0;
@@ -905,7 +926,7 @@
       box-sizing: border-box;
       scrollbar-width: thin;
       scrollbar-gutter: stable;
-      scrollbar-color: rgba(212, 175, 55, 0.25) transparent;
+      scrollbar-color: rgba(212, 175, 55, 0.20) transparent;
       transition: background-color 0.16s ease, border-color 0.16s ease;
       z-index: 100;
       transform: none !important;
@@ -919,32 +940,33 @@
       right: 0;
       z-index: 200;
       background: var(--sidebar-bg, #07080B);
-      margin: 0 -18px 0 -18px;
-      padding: 12px 18px;
-      border-bottom: 1.5px solid rgba(212, 175, 55, 0.24);
+      margin: 0 -10px 0 -10px;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+      gap: 6px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
     }
 
     /* Upper Sidebar Action Controls (Undo & Redo) */
     .sidebar-ctrl-btn {
-      background: rgba(212, 175, 55, 0.08);
-      border: 1px solid rgba(212, 175, 55, 0.35);
+      background: rgba(212, 175, 55, 0.06);
+      border: 1px solid rgba(212, 175, 55, 0.25);
       color: var(--champagne-gold, #D4AF37);
-      height: 28px;
-      padding: 0 10px;
-      border-radius: 6px;
+      height: 25px;
+      padding: 0 8px;
+      border-radius: 5px;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
+      gap: 4px;
       transition: all 0.18s ease;
       user-select: none;
       flex-shrink: 0;
-      font-size: 0.74rem;
+      font-size: 0.70rem;
+      font-weight: 600;
       font-family: inherit;
     }
     .sidebar-ctrl-btn:hover:not(:disabled) {
@@ -993,33 +1015,34 @@
       justify-content: space-between;
     }
 
-    /* Left Navigation Items */
+    /* Left Navigation Items - Lightweight & Clean */
     .nav-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 2px;
     }
     .nav-group-header {
-      font-size: 0.70rem;
+      font-size: 0.67rem;
       text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: #8E929E;
-      font-weight: 700;
-      margin-top: 14px;
-      margin-bottom: 4px;
-      padding: 4px 6px;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      opacity: 0.85;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 2px;
+      padding: 3px 6px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.08);
     }
     .nav-group-header:first-of-type {
-      margin-top: 2px;
+      margin-top: 0;
     }
     .nav-group-header span.category-title {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       color: var(--text-muted);
     }
     .nav-item {
@@ -1027,32 +1050,33 @@
       align-items: center;
       justify-content: space-between;
       width: 100%;
-      padding: 11px 14px;
-      background: rgba(16, 20, 30, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-left: 3.5px solid transparent;
-      border-radius: 8px;
+      padding: 6px 9px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-left: 2.5px solid transparent;
+      border-radius: 5px;
       color: var(--text);
-      font-size: 0.89rem;
-      font-weight: 600;
+      font-size: 0.80rem;
+      font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+      transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
       text-align: left;
       transform: none !important;
     }
     .nav-item:hover {
-      background: rgba(212, 175, 55, 0.08);
-      border-color: rgba(212, 175, 55, 0.35);
+      background: rgba(212, 175, 55, 0.06);
+      border-color: rgba(212, 175, 55, 0.20);
       transform: none !important;
       color: #FFFFFF;
     }
     .nav-item.active {
-      background: linear-gradient(90deg, rgba(212, 175, 55, 0.18) 0%, rgba(212, 175, 55, 0.04) 100%);
+      background: rgba(212, 175, 55, 0.10);
       color: #FFFFFF;
-      border-color: rgba(212, 175, 55, 0.55);
-      border-left: 3.5px solid var(--champagne-gold);
+      border-color: rgba(212, 175, 55, 0.30);
+      border-left: 2.5px solid var(--champagne-gold);
       border-left-color: var(--champagne-gold);
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), inset 0 0 12px rgba(212, 175, 55, 0.08);
+      box-shadow: none;
+      font-weight: 600;
       transform: none !important;
     }
     /* Steady Sidebar Column Buttons - zero shift on hover, tap, or click */
@@ -1083,15 +1107,15 @@
       margin-bottom: 0;
     }
 
-    /* Drop Zone */
+    /* Drop Zone - Lightweight & Compact */
     .drop-zone {
-      border: 2px dashed rgba(212, 175, 55, 0.32);
-      border-radius: 12px;
-      padding: 22px 14px;
+      border: 1.5px dashed rgba(212, 175, 55, 0.25);
+      border-radius: 8px;
+      padding: 12px 8px;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-      background: rgba(14, 17, 26, 0.92);
+      background: rgba(14, 17, 26, 0.65);
     }
     .drop-zone:hover {
       border-color: var(--champagne-gold);
@@ -1623,11 +1647,10 @@
   <!-- Top Header -->
   <header class="header">
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
-      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
-      <div>
-        <div class="brand-title">DataMind AI</div>
-        <div class="brand-subtitle">Analyze • Predict • Empower</div>
-        <div class="brand-tagline">AI Powered Data Analytics Platform</div>
+      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:34px;height:34px;border-radius:8px;object-fit:cover;border:1px solid rgba(212,175,55,0.35);flex-shrink:0;" />
+      <div style="display:flex; flex-direction:column; justify-content:center;">
+        <div class="brand-title" style="font-size:1.15rem; line-height:1.15; font-weight:700;">DataMind AI</div>
+        <div class="brand-subtitle" style="font-size:0.68rem; line-height:1.1; margin-top:1px;">Analyze • Predict • Empower</div>
       </div>
     </div>
 
@@ -2028,14 +2051,14 @@
           <span>📂 1. Data Ingestion</span>
         </div>
 
-        <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
-          <div style="font-size:24px;margin-bottom:6px;">📂</div>
-          <div style="font-weight:600;font-size:0.88rem;">Upload Dataset File</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">CSV, XLSX, JSON, TSV, TXT</div>
+        <div class="drop-zone" onclick="document.getElementById('csvInput').click()" style="padding:10px 8px; border-radius:8px;">
+          <div style="font-size:18px; margin-bottom:2px;">📂</div>
+          <div style="font-weight:600; font-size:0.78rem;">Upload Dataset File</div>
+          <div style="font-size:0.67rem; color:var(--text-muted); margin-top:1px;">CSV, XLSX, JSON, TSV, TXT</div>
           <input type="file" id="csvInput" accept=".csv,.xlsx,.xls,.json,.tsv,.txt" style="display:none;" onchange="handleFileUpload(event)" />
         </div>
 
-        <button class="btn btn-outline" style="margin-top:10px;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
+        <button class="btn btn-outline" style="margin-top:6px; padding:5px 8px; font-size:0.74rem;" onclick="resetToRaw()">🔄 Reset to Raw Data</button>
       </div>
 
       <!-- SECTION 2: CATEGORIZED MODULE NAVIGATION -->
