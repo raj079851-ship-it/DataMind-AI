@@ -548,13 +548,28 @@
     body.day-theme .drop-zone,
     body.light-theme .drop-zone {
       background: #FFFFFF !important;
-      border: 2px dashed #D1D5DB !important;
-      color: #374151 !important;
+      border: 6px solid transparent !important;
+      border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M0,8 L4,1 L8,8 L12,1 L16,8 L12,15 L8,8 L4,15 Z' fill='%23162C4F' stroke='%23162C4F' stroke-width='0.5'/%3E%3C/svg%3E") 6 round !important;
+      color: #111827 !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 14px rgba(22, 44, 79, 0.12) !important;
     }
     body.day-theme .drop-zone:hover,
     body.light-theme .drop-zone:hover {
-      border-color: #162C4F !important;
       background: #F9FAFB !important;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14), 0 0 22px rgba(22, 44, 79, 0.22) !important;
+    }
+    body.day-theme .drop-zone::before,
+    body.light-theme .drop-zone::before {
+      background: linear-gradient(
+        55deg,
+        transparent 42%,
+        rgba(22, 44, 79, 0.08) 50%,
+        transparent 58%
+      );
+    }
+    body.day-theme .drop-zone .drop-icon-anim,
+    body.light-theme .drop-zone .drop-icon-anim {
+      filter: drop-shadow(0 2px 6px rgba(22, 44, 79, 0.25));
     }
     body.day-theme .insert-col-box,
     body.light-theme .insert-col-box {
@@ -1194,20 +1209,74 @@
       margin-bottom: 0;
     }
 
-    /* Drop Zone */
+    /* Upload Dataset Drop Zone with Zigzag Border & Box Animations */
     .drop-zone {
-      border: 2px dashed rgba(212, 175, 55, 0.32);
+      position: relative;
+      overflow: hidden;
+      border: 6px solid transparent !important;
+      border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M0,8 L4,1 L8,8 L12,1 L16,8 L12,15 L8,8 L4,15 Z' fill='%23D4AF37' stroke='%23D4AF37' stroke-width='0.5'/%3E%3C/svg%3E") 6 round !important;
       border-radius: 12px;
-      padding: 22px 14px;
+      padding: 24px 16px;
       text-align: center;
       cursor: pointer;
-      transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
-      background: rgba(14, 17, 26, 0.92);
+      background: rgba(14, 18, 28, 0.95);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(212, 175, 55, 0.14);
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, background-color 0.22s ease;
+      animation: uploadBoxPulse 3.8s ease-in-out infinite;
+      user-select: none;
+    }
+    @keyframes uploadBoxPulse {
+      0%, 100% {
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4), 0 0 12px rgba(212, 175, 55, 0.12);
+        transform: translateY(0);
+      }
+      50% {
+        box-shadow: 0 6px 26px rgba(0, 0, 0, 0.55), 0 0 24px rgba(212, 175, 55, 0.30);
+        transform: translateY(-2px);
+      }
     }
     .drop-zone:hover {
-      border-color: var(--champagne-gold);
-      background: rgba(212, 175, 55, 0.06);
-      box-shadow: 0 0 16px rgba(212, 175, 55, 0.12);
+      transform: translateY(-4px) scale(1.018);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.65), 0 0 28px rgba(212, 175, 55, 0.45);
+      background: rgba(18, 24, 38, 0.98);
+    }
+    /* Floating animated upload icon */
+    .drop-zone .drop-icon-anim {
+      display: inline-block;
+      animation: uploadIconFloat 2.4s ease-in-out infinite;
+      transform-origin: center;
+    }
+    @keyframes uploadIconFloat {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+      }
+      50% {
+        transform: translateY(-5px) scale(1.12);
+        filter: drop-shadow(0 8px 16px rgba(212, 175, 55, 0.55));
+      }
+    }
+    /* Subtle diagonal shimmer sweep inside the box */
+    .drop-zone::before {
+      content: '';
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: linear-gradient(
+        55deg,
+        transparent 42%,
+        rgba(212, 175, 55, 0.12) 50%,
+        transparent 58%
+      );
+      transform: rotate(25deg);
+      animation: uploadShimmerSweep 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes uploadShimmerSweep {
+      0% { transform: translateX(-120%) rotate(25deg); }
+      100% { transform: translateX(120%) rotate(25deg); }
     }
 
     /* Standard Production Buttons & Inputs */
@@ -2139,10 +2208,10 @@
           </button>
         </div>
 
-        <div class="drop-zone" onclick="document.getElementById('csvInput').click()">
-          <div style="font-size:24px;margin-bottom:6px;">📂</div>
-          <div style="font-weight:600;font-size:0.88rem;">Upload Dataset File</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">CSV, XLSX, JSON, TSV, TXT</div>
+        <div class="drop-zone" onclick="document.getElementById('csvInput').click()" title="Click or Drag &amp; Drop to Ingest Dataset File">
+          <div class="drop-icon-anim" style="font-size:28px;margin-bottom:6px;">📂</div>
+          <div style="font-weight:700;font-size:0.88rem;letter-spacing:-0.01em;">Upload Dataset File</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">CSV, XLSX, JSON, TSV, TXT</div>
           <input type="file" id="csvInput" accept=".csv,.xlsx,.xls,.json,.tsv,.txt" style="display:none;" onchange="handleFileUpload(event)" />
         </div>
 
