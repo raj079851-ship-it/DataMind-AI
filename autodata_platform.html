@@ -240,6 +240,11 @@
       line-height: 1.15;
       color: var(--text);
     }
+    .brand-mind {
+      color: #38BDF8 !important;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+      transition: color 0.16s ease, text-shadow 0.16s ease;
+    }
     .brand-subtitle {
       font-size: 0.74rem;
       font-weight: 700;
@@ -473,6 +478,11 @@
     body.day-theme .brand-title,
     body.light-theme .brand-title {
       color: #111827 !important;
+    }
+    body.day-theme .brand-mind,
+    body.light-theme .brand-mind {
+      color: #2563EB !important;
+      text-shadow: none !important;
     }
     body.day-theme .brand-subtitle,
     body.light-theme .brand-subtitle {
@@ -1859,7 +1869,7 @@
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
       <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" style="width:64px;height:64px;border-radius:12px;object-fit:cover;box-shadow:0 0 20px rgba(212,175,55,0.4);border:1.5px solid rgba(212,175,55,0.45);flex-shrink:0;" />
       <div>
-        <div class="brand-title">DataMind AI</div>
+        <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
         <div class="brand-subtitle">Analyze • Predict • Empower</div>
         <div class="brand-tagline">AI Powered Data Analytics Platform</div>
       </div>
@@ -1927,7 +1937,7 @@
         <div style="display:flex; align-items:center; gap:10px;">
           <span style="font-size:1.3rem;">🛡️</span>
           <div>
-            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">DataMind AI Security Gate</div>
+            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">Data<span class="brand-mind">Mind</span> AI Security Gate</div>
             <div style="font-size:0.72rem; color:#94a3b8;">Authentication &amp; Enterprise Access</div>
           </div>
         </div>
