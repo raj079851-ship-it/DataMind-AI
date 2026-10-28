@@ -4408,7 +4408,7 @@ result = df.describe()
             </div>
             <div style="display:flex;gap:8px;align-items:center;">
               <span class="badge badge-success">100% Offline Capable</span>
-              <span class="badge badge-info">Gemini LLM Ready</span>
+              <span class="badge badge-info">100% Client-Side Intelligence</span>
             </div>
           </div>
         </div>
@@ -4496,12 +4496,7 @@ result = df.describe()
             <button class="btn btn-primary" style="width:auto;padding:8px 22px;white-space:nowrap;font-weight:700;" onclick="sendAiChatMessage()">Send ➔</button>
           </div>
 
-          <!-- Optional Gemini API Key (Compact expandable row) -->
-          <div style="margin-top:10px;display:flex;align-items:center;gap:10px;font-size:0.75rem;color:var(--text-muted);">
-            <span>🔑 Google Gemini Key (Optional):</span>
-            <input type="password" id="geminiKeyModule" placeholder="Paste Gemini API Key..." style="max-width:280px;padding:4px 8px;font-size:0.75rem;margin:0;" onchange="localStorage.setItem('gemini_api_key', this.value);" />
-            <span>Enables cloud generative reasoning. Built-in engine works 100% offline.</span>
-          </div>
+
         </div>
 
       </div>
@@ -21817,55 +21812,154 @@ result = df.describe()
       }
     }
 
-    function generateAssistantResponse(prompt) {
+        function generateAssistantResponse(prompt) {
       if (!currentDataset || !currentDataset.length) {
-        return "Active dataset is currently empty. Please upload a CSV file or click 'Load Sample Churn' first.";
+        return "<b>⚠️ No Active Dataset:</b><br>Please upload a dataset file (CSV, Excel, JSON) or load one of the demo datasets (e.g. <i>E-Commerce Sales</i> or <i>Telecom Churn</i>) from the top navigation to begin AI analysis.";
       }
 
       const q = prompt.toLowerCase().trim();
-      const numCols = columns.filter(c => isColNumeric(c));
-      const catCols = columns.filter(c => !isColNumeric(c));
       const nRows = currentDataset.length;
       const nCols = columns.length;
+      const numCols = columns.filter(c => isColNumeric(c));
+      const catCols = columns.filter(c => !isColNumeric(c));
 
-      // 0. Column Names / Schema / Feature list
-      if (q.includes("what column") || q.includes("list column") || q.includes("show column") || q.includes("columns") || q.includes("schema") || q.includes("features")) {
+      // Flexible column matcher
+      function findCol(queryStr) {
+        const qClean = queryStr.toLowerCase().replace(/[\s_\-]+/g, '');
+        // Exact case-insensitive match
+        let found = columns.find(c => c.toLowerCase() === queryStr.toLowerCase());
+        if (found) return found;
+        // Cleaned whitespace/punctuation match
+        found = columns.find(c => c.toLowerCase().replace(/[\s_\-]+/g, '') === qClean);
+        if (found) return found;
+        // Substring match in prompt
+        const sortedCols = [...columns].sort((a, b) => b.length - a.length);
+        for (const c of sortedCols) {
+          const cClean = c.toLowerCase().replace(/[\s_\-]+/g, '');
+          if (cClean.length >= 3 && qClean.includes(cClean)) return c;
+          if (c.length >= 3 && queryStr.toLowerCase().includes(c.toLowerCase())) return c;
+        }
+        return null;
+      }
+
+      // Helper: get numerical values array for a column
+      function getNumVals(colName) {
+        return currentDataset
+          .map(r => parseFloat(r[colName]))
+          .filter(v => typeof v === 'number' && !isNaN(v))
+          .sort((a, b) => a - b);
+      }
+
+      // Helper: compute comprehensive statistics for a column
+      function getStats(colName) {
+        const vals = getNumVals(colName);
+        if (!vals.length) return null;
+        const sum = vals.reduce((a, b) => a + b, 0);
+        const mean = sum / vals.length;
+        const min = vals[0];
+        const max = vals[vals.length - 1];
+        const med = vals[Math.floor(vals.length / 2)];
+        const q1 = vals[Math.floor(vals.length * 0.25)];
+        const q3 = vals[Math.floor(vals.length * 0.75)];
+        const variance = vals.reduce((acc, v) => acc + Math.pow(v - mean, 2), 0) / vals.length;
+        const std = Math.sqrt(variance);
+        return { count: vals.length, sum, mean, min, max, med, q1, q3, std, variance };
+      }
+
+      // 1. GREETINGS & INTRODUCTIONS
+      if (/^(hi|hello|hey|greetings|hola|namaste|good\s*(morning|afternoon|evening))\b/i.test(q)) {
         return `
-          <b>📋 Dataset Architecture (${nRows.toLocaleString()} rows × ${nCols} columns):</b><br>
-          • <b>Numeric (${numCols.length}):</b> ${numCols.map(c => `<code>${c}</code>`).join(', ') || 'None'}<br>
-          • <b>Categorical (${catCols.length}):</b> ${catCols.map(c => `<code>${c}</code>`).join(', ') || 'None'}<br><br>
-          <i>💡 Ask any question about a column, e.g. "What is the average ${numCols[0] || 'value'}?" or "Breakdown of ${catCols[0] || 'categories'}".</i>
+          <b>👋 Hello! I am your AI Data Analytics Assistant.</b><br>
+          I am actively monitoring your dataset: <b>${nRows.toLocaleString()} rows × ${nCols} columns</b>.<br><br>
+          <b>Here are some questions you can ask me right now:</b><br>
+          • <i>"Summarize the key metrics of this dataset"</i><br>
+          • <i>"What is the average ${numCols[0] || 'value'}?"</i><br>
+          • <i>"Compare ${numCols[0] || 'metrics'} across ${catCols[0] || 'categories'}"</i><br>
+          • <i>"Are there any outliers or missing values?"</i><br>
+          • <i>"Write an SQL query to find top performers"</i>
         `;
       }
 
-      // 1. Row count / dimensions / size
-      if (q.includes("how many rows") || q.includes("row count") || q.includes("how many records") || q.includes("dataset size") || q.includes("dimension") || q.includes("how big") || q.includes("shape")) {
+      // 2. HELP & CAPABILITIES
+      if (q === "help" || q.includes("what can you do") || q.includes("how to use") || q.includes("capabilities")) {
+        return `
+          <b>🧠 What I Can Analyze For You:</b><br>
+          • <b>Statistical Queries:</b> Average, total sum, median, min/max, standard deviation of any column.<br>
+          • <b>Group Comparisons:</b> Segment breakdowns (e.g. <i>"sales by region"</i>, <i>"churn by contract"</i>).<br>
+          • <b>Data Hygiene:</b> Missing cells, duplicates, outliers, health audit.<br>
+          • <b>Condition Queries:</b> e.g. <i>"how many orders > 500"</i>, <i>"how many churn = yes"</i>.<br>
+          • <b>Driver Analysis:</b> Pearson correlations and dependency rankings.<br>
+          • <b>SQL Synthesis:</b> Generates ready-to-run queries for your database.<br>
+          • <b>Machine Learning:</b> Recommends target variables, models, and evaluation strategies.
+        `;
+      }
+
+      // 3. EXECUTIVE DATASET SUMMARY / OVERVIEW
+      if (q.includes("summarize") || q.includes("summary") || q.includes("overview") || q.includes("describe") || q.includes("what is this data") || q.includes("explain data") || q.includes("tell me about")) {
+        let missing = 0;
+        currentDataset.forEach(r => {
+          columns.forEach(c => { if (isMissing(r[c])) missing++; });
+        });
+        const compPct = (((nRows * nCols - missing) / (nRows * nCols || 1)) * 100).toFixed(1);
+
+        let keyMetricsStr = "";
+        numCols.slice(0, 3).forEach(c => {
+          const s = getStats(c);
+          if (s) {
+            keyMetricsStr += `• <b>${c}:</b> Mean = <b>${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> | Total = <b>${s.sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> | Range: [${s.min.toLocaleString()} to ${s.max.toLocaleString()}]<br>`;
+          }
+        });
+
+        let catSummaryStr = "";
+        catCols.slice(0, 2).forEach(c => {
+          const counts = {};
+          currentDataset.forEach(r => { const v = r[c]; if (!isMissing(v)) counts[v] = (counts[v] || 0) + 1; });
+          const top = Object.entries(counts).sort((a,b) => b[1] - a[1])[0];
+          if (top) {
+            catSummaryStr += `• <b>${c}:</b> Top category <b>${top[0]}</b> (${((top[1]/nRows)*100).toFixed(1)}% of rows)<br>`;
+          }
+        });
+
+        return `
+          <b>📊 Executive Dataset Summary:</b><br>
+          • <b>Scale:</b> <b>${nRows.toLocaleString()}</b> observations across <b>${nCols}</b> feature columns.<br>
+          • <b>Completeness:</b> <b>${compPct}%</b> complete (${missing.toLocaleString()} missing cells).<br>
+          • <b>Feature Mix:</b> ${numCols.length} numerical metrics and ${catCols.length} categorical dimensions.<br><br>
+          <b>📈 Core Numerical Metrics:</b><br>
+          ${keyMetricsStr || '• No continuous numeric metrics detected.<br>'}
+          <br><b>🏷️ Primary Categorical Breakdown:</b><br>
+          ${catSummaryStr || '• No categorical attributes detected.<br>'}
+          <br><i>💡 Tip: Ask me to break down any metric by a category, e.g. "show ${numCols[0] || 'metric'} by ${catCols[0] || 'category'}".</i>
+        `;
+      }
+
+      // 4. COLUMN LIST / SCHEMA / DATA ARCHITECTURE
+      if (q.includes("what column") || q.includes("list column") || q.includes("show column") || q.includes("all columns") || q.includes("schema") || q.includes("features") || q.includes("data types")) {
+        return `
+          <b>📋 Dataset Schema Architecture (${nRows.toLocaleString()} rows × ${nCols} cols):</b><br>
+          • <b>Continuous Numerical (${numCols.length}):</b> ${numCols.map(c => `<code>${c}</code>`).join(', ') || 'None'}<br>
+          • <b>Categorical &amp; Dimensions (${catCols.length}):</b> ${catCols.map(c => `<code>${c}</code>`).join(', ') || 'None'}<br><br>
+          <i>💡 You can ask me specific questions about any of these columns, e.g. "What is the average ${numCols[0] || 'value'}?" or "Distribution of ${catCols[0] || 'categories'}".</i>
+        `;
+      }
+
+      // 5. ROW COUNT / DIMENSIONS / SCALE
+      if (q.includes("how many rows") || q.includes("row count") || q.includes("how many records") || q.includes("how many entries") || q.includes("dimension") || q.includes("shape") || q.includes("how big") || q.includes("dataset size")) {
         let missing = 0;
         currentDataset.forEach(r => {
           columns.forEach(c => { if (isMissing(r[c])) missing++; });
         });
         return `
-          <b>📊 Dataset Dimensions:</b><br>
+          <b>📏 Dataset Dimensions &amp; Scale:</b><br>
           • <b>Total Observations:</b> <b>${nRows.toLocaleString()}</b> rows<br>
-          • <b>Total Features:</b> <b>${nCols}</b> columns<br>
-          • <b>Total Cells:</b> <b>${(nRows * nCols).toLocaleString()}</b><br>
-          • <b>Missing Values:</b> <b>${missing.toLocaleString()}</b> cells (${((missing / (nRows * nCols || 1)) * 100).toFixed(2)}%)
+          • <b>Feature Dimensions:</b> <b>${nCols}</b> columns<br>
+          • <b>Matrix Cells:</b> <b>${(nRows * nCols).toLocaleString()}</b> total data points<br>
+          • <b>Data Hygiene:</b> <b>${missing.toLocaleString()}</b> nulls (${((missing / (nRows * nCols || 1)) * 100).toFixed(2)}% missing)
         `;
       }
 
-      // 2. SQL Query Generation
-      if (q.includes("sql") || q.includes("query") || q.includes("select") || q.includes("write query")) {
-        const catCol = catCols[0] || columns[0];
-        const numCol = numCols[0] || columns[1] || columns[0];
-        return `
-          <b>🗄️ Synthesized SQL Query:</b><br>
-          <pre style="background:#090d16;padding:8px;border-radius:6px;color:#38bdf8;font-size:0.78rem;margin:6px 0;">SELECT \n  ${catCol},\n  COUNT(*) AS record_count,\n  ROUND(AVG(${numCol}), 2) AS avg_${numCol}\nFROM dataset\nGROUP BY ${catCol}\nORDER BY avg_${numCol} DESC\nLIMIT 10;</pre>
-          <i>💡 You can execute this query directly in the <b>🗄️ 5. SQL & Queries</b> module!</i>
-        `;
-      }
-
-      // 3. Data Hygiene / Quality
-      if (q.includes("quality") || q.includes("hygiene") || q.includes("missing") || q.includes("clean") || q.includes("null") || q.includes("anomal")) {
+      // 6. DATA QUALITY / HYGIENE / MISSING / DUPLICATES / OUTLIERS
+      if (q.includes("quality") || q.includes("hygiene") || q.includes("missing") || q.includes("null") || q.includes("empty") || q.includes("duplicate") || q.includes("clean") || q.includes("audit") || q.includes("anomal") || q.includes("outlier")) {
         let nullCount = 0;
         const colNulls = {};
         currentDataset.forEach(r => {
@@ -21876,126 +21970,259 @@ result = df.describe()
             }
           });
         });
-        let msg = `<b>🛡️ Data Quality Audit (${nRows.toLocaleString()} rows × ${nCols} cols):</b><br>`;
-        if (nullCount > 0) {
-          msg += `• Detected <b>${nullCount.toLocaleString()}</b> missing cells across ${Object.keys(colNulls).length} column(s):<br>`;
-          Object.keys(colNulls).forEach(c => {
-            msg += `  - <code>${c}</code>: ${colNulls[c]} nulls (${((colNulls[c]/nRows)*100).toFixed(1)}%)<br>`;
+
+        // Check for duplicates
+        const seen = new Set();
+        let dups = 0;
+        currentDataset.forEach(r => {
+          const key = JSON.stringify(r);
+          if (seen.has(key)) dups++;
+          else seen.add(key);
+        });
+
+        // Outlier detection on numerical columns
+        const outlierCols = [];
+        numCols.forEach(c => {
+          const s = getStats(c);
+          if (s && s.count > 10) {
+            const iqr = s.q3 - s.q1;
+            const lower = s.q1 - 1.5 * iqr;
+            const upper = s.q3 + 1.5 * iqr;
+            const outCount = getNumVals(c).filter(v => v < lower || v > upper).length;
+            if (outCount > 0) outlierCols.push({ col: c, count: outCount, pct: ((outCount/s.count)*100).toFixed(1) });
+          }
+        });
+
+        const healthScore = Math.max(10, Math.round(100 - (nullCount / (nRows * nCols || 1)) * 150 - (dups / (nRows || 1)) * 50));
+
+        let res = `<b>🛡️ Data Quality &amp; Integrity Audit:</b><br>`;
+        res += `• <b>Overall Health Score:</b> <b>${healthScore} / 100</b> (${healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Fair' : 'Needs Cleaning'})<br>`;
+        res += `• <b>Missing Cells:</b> <b>${nullCount.toLocaleString()}</b> (${((nullCount / (nRows * nCols || 1)) * 100).toFixed(2)}%)<br>`;
+        res += `• <b>Duplicate Records:</b> <b>${dups.toLocaleString()}</b> rows<br>`;
+
+        if (Object.keys(colNulls).length > 0) {
+          res += `<br><b>Missing Value Breakdown:</b><br>`;
+          Object.entries(colNulls).forEach(([c, cnt]) => {
+            res += `• <code>${c}</code>: ${cnt} nulls (${((cnt/nRows)*100).toFixed(1)}%)<br>`;
           });
-          msg += `<br>💡 <i>Recommendation: Use <b>1-Click Auto-Clean</b> in <b>🧹 1. Data Cleaning</b> to impute numeric columns with Median and categories with Mode.</i>`;
-        } else {
-          msg += `• <b>Excellent Hygiene:</b> 100% complete dataset with zero missing cells detected!`;
         }
-        return msg;
+
+        if (outlierCols.length > 0) {
+          res += `<br><b>⚠️ Statistical Outliers (1.5× IQR Rule):</b><br>`;
+          outlierCols.forEach(o => {
+            res += `• <code>${o.col}</code>: ${o.count} outlier values (${o.pct}%)<br>`;
+          });
+        }
+
+        res += `<br><i>💡 Action: Use the <b>🧹 1. Data Cleaning</b> module to impute missing cells and drop duplicates automatically.</i>`;
+        return res;
       }
 
-      // 4. Group Comparisons (e.g. "by", "per", "across", "compare")
-      if ((q.includes("by") || q.includes("per") || q.includes("compare") || q.includes("breakdown") || q.includes("highest in")) && catCols.length && numCols.length) {
-        let gCol = catCols.find(c => q.includes(c.toLowerCase())) || catCols[0];
+      // 7. COMPARISONS / GROUP BY (e.g. "sales by region", "average revenue across category", "breakdown of X by Y")
+      if ((q.includes("by") || q.includes("per") || q.includes("across") || q.includes("compare") || q.includes("breakdown") || q.includes("grouped by")) && catCols.length && numCols.length) {
         let vCol = numCols.find(c => q.includes(c.toLowerCase())) || numCols[0];
+        let gCol = catCols.find(c => q.includes(c.toLowerCase())) || catCols[0];
+
+        const col1 = findCol(q);
+        if (col1 && isColNumeric(col1)) vCol = col1;
+        const col2 = catCols.find(c => c !== vCol && q.includes(c.toLowerCase()));
+        if (col2) gCol = col2;
+
         const gMap = {};
         currentDataset.forEach(r => {
           const k = isMissing(r[gCol]) ? "(Missing)" : String(r[gCol]);
           const num = parseFloat(r[vCol]);
-          if (!gMap[k]) gMap[k] = { sum: 0, count: 0 };
+          if (!gMap[k]) gMap[k] = { sum: 0, count: 0, vals: [] };
           gMap[k].count++;
-          if (!isNaN(num)) gMap[k].sum += num;
+          if (!isNaN(num)) {
+            gMap[k].sum += num;
+            gMap[k].vals.push(num);
+          }
         });
+
         const gList = Object.keys(gMap).map(k => ({
           k,
           count: gMap[k].count,
-          mean: gMap[k].sum / (gMap[k].count || 1),
-          sum: gMap[k].sum
-        })).sort((a, b) => b.mean - a.mean);
+          mean: gMap[k].sum / (gMap[k].vals.length || 1),
+          sum: gMap[k].sum,
+          pct: ((gMap[k].count / nRows) * 100).toFixed(1)
+        })).sort((a, b) => b.sum - a.sum);
 
-        const rowsStr = gList.slice(0, 5).map(g => `• <b>${g.k}</b>: Mean ${vCol} = <b>${g.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> | Total = <b>${g.sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> (${g.count.toLocaleString()} rows)`).join('<br>');
+        const rowsStr = gList.slice(0, 6).map(g => `• <b>${g.k}</b>: Total = <b>${g.sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> | Mean = <b>${g.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> (${g.count.toLocaleString()} rows, ${g.pct}%)`).join('<br>');
+        
         return `
-          <b>📊 Performance Comparison: <code>${vCol}</code> by <code>${gCol}</code>:</b><br>
+          <b>📊 Segment Comparison: <code>${vCol}</code> by <code>${gCol}</code>:</b><br>
           ${rowsStr}<br><br>
-          🏆 <b>Top Performer:</b> <b>${gList[0].k}</b> with average ${vCol} of <b>${gList[0].mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b>.
+          🏆 <b>Top Segment:</b> <b>${gList[0].k}</b> leads with total <b>${gList[0].sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b> (Average: ${gList[0].mean.toLocaleString(undefined, {maximumFractionDigits: 2})}).<br>
+          🔻 <b>Lowest Segment:</b> <b>${gList[gList.length - 1].k}</b> with total ${gList[gList.length - 1].sum.toLocaleString(undefined, {maximumFractionDigits: 2})}.
         `;
       }
 
-      // 5. Category Value Filter Query (e.g. "churn = yes", "month-to-month")
-      for (const col of catCols) {
-        const uniqueVals = [...new Set(currentDataset.map(r => String(r[col])))].slice(0, 10);
-        for (const uv of uniqueVals) {
-          const uvLower = uv.toLowerCase();
-          const cleanQ = q.replace(/\s+/g, '');
-          if (uvLower.length > 0 && (cleanQ.includes(`=${uvLower}`) || cleanQ.includes(`is${uvLower}`) || (uvLower.length > 2 && q.includes(uvLower) && q.includes("how many")))) {
-            const matchCount = currentDataset.filter(r => String(r[col]).toLowerCase() === uvLower).length;
-            const matchPct = ((matchCount / nRows) * 100).toFixed(1);
+      // 8. FILTER / CONDITION QUERIES (e.g. "churn = yes", "sales > 100", "how many items > 50")
+      const condMatch = q.match(/([a-z0-9_\s]+)\s*(>=|<=|>|<|=|==|is|equals)\s*([a-z0-9_\.\-]+)/i);
+      if (condMatch) {
+        const potentialCol = findCol(condMatch[1].trim());
+        const op = condMatch[2].trim().toLowerCase();
+        const targetVal = condMatch[3].trim().toLowerCase();
+
+        if (potentialCol) {
+          let matchCount = 0;
+          let matchedRows = [];
+          if (isColNumeric(potentialCol) && !isNaN(parseFloat(targetVal))) {
+            const numTgt = parseFloat(targetVal);
+            currentDataset.forEach(r => {
+              const val = parseFloat(r[potentialCol]);
+              if (!isNaN(val)) {
+                let match = false;
+                if (op === '>' || op === 'greater than') match = val > numTgt;
+                else if (op === '>=' || op === 'greater than or equal') match = val >= numTgt;
+                else if (op === '<' || op === 'less than') match = val < numTgt;
+                else if (op === '<=' || op === 'less than or equal') match = val <= numTgt;
+                else if (op === '=' || op === '==' || op === 'is' || op === 'equals') match = val === numTgt;
+                if (match) { matchCount++; matchedRows.push(r); }
+              }
+            });
+            const pct = ((matchCount / nRows) * 100).toFixed(1);
             return `
-              <b>🔍 Filter Query: <code>${col}</code> = "${uv}":</b><br>
+              <b>🔍 Condition Filter: <code>${potentialCol}</code> ${op} ${targetVal}:</b><br>
               • <b>Matching Records:</b> <b>${matchCount.toLocaleString()}</b> rows<br>
-              • <b>Proportion:</b> <b>${matchPct}%</b> of the dataset (${nRows.toLocaleString()} rows)<br>
-              • <b>Complement:</b> ${(nRows - matchCount).toLocaleString()} rows (${(100 - matchPct).toFixed(1)}%).
+              • <b>Proportion of Dataset:</b> <b>${pct}%</b> (out of ${nRows.toLocaleString()} rows)<br>
+              • <b>Non-matching Complement:</b> ${(nRows - matchCount).toLocaleString()} rows (${(100 - pct).toFixed(1)}%).
+            `;
+          } else {
+            // Categorical filter
+            currentDataset.forEach(r => {
+              const val = String(r[potentialCol] || "").toLowerCase();
+              if (val === targetVal || val.includes(targetVal)) {
+                matchCount++;
+                matchedRows.push(r);
+              }
+            });
+            const pct = ((matchCount / nRows) * 100).toFixed(1);
+            return `
+              <b>🔍 Filter Query: <code>${potentialCol}</code> = "${targetVal}":</b><br>
+              • <b>Matching Observations:</b> <b>${matchCount.toLocaleString()}</b> rows<br>
+              • <b>Share of Dataset:</b> <b>${pct}%</b> (${nRows.toLocaleString()} total)<br>
+              • <b>Remaining Cohort:</b> ${(nRows - matchCount).toLocaleString()} rows (${(100 - pct).toFixed(1)}%).
             `;
           }
         }
       }
 
-      // 6. Check for Specific Column Matches in User Query
-      const matchedCol = columns.find(c => q.includes(c.toLowerCase()));
+      // Check categorical values directly mentioned (e.g. "how many yes in churn", "how many Furniture")
+      for (const col of catCols) {
+        const uniqueVals = [...new Set(currentDataset.map(r => String(r[col])))].slice(0, 15);
+        for (const uv of uniqueVals) {
+          const uvLower = uv.toLowerCase();
+          if (uvLower.length >= 2 && q.includes(uvLower)) {
+            const matchCount = currentDataset.filter(r => String(r[col]).toLowerCase() === uvLower).length;
+            const matchPct = ((matchCount / nRows) * 100).toFixed(1);
+            return `
+              <b>🔍 Value Inquiry: <code>${col}</code> = "${uv}":</b><br>
+              • <b>Frequency Count:</b> <b>${matchCount.toLocaleString()}</b> rows<br>
+              • <b>Relative Frequency:</b> <b>${matchPct}%</b> of all ${nRows.toLocaleString()} records<br>
+              • <b>Other Values in <code>${col}</code>:</b> ${(nRows - matchCount).toLocaleString()} rows (${(100 - matchPct).toFixed(1)}%).
+            `;
+          }
+        }
+      }
+
+      // 9. TOP N / BOTTOM N RANKINGS
+      const topNMatch = q.match(/(top|highest|best|largest|first|lowest|bottom|worst)\s*(\d+)/i);
+      if (topNMatch || q.includes("top records") || q.includes("highest records") || q.includes("top 5")) {
+        const count = topNMatch ? parseInt(topNMatch[2], 10) : 5;
+        const isBottom = q.includes("lowest") || q.includes("bottom") || q.includes("worst");
+        const matchedCol = numCols.find(c => q.includes(c.toLowerCase())) || numCols[0];
+
+        if (matchedCol) {
+          const sorted = [...currentDataset]
+            .map(r => ({ row: r, val: parseFloat(r[matchedCol]) }))
+            .filter(item => !isNaN(item.val))
+            .sort((a, b) => isBottom ? a.val - b.val : b.val - a.val)
+            .slice(0, Math.min(count, 10));
+
+          const labelCol = columns.find(c => c !== matchedCol && !isColNumeric(c)) || columns[0];
+          const itemsStr = sorted.map((item, idx) => {
+            const label = item.row[labelCol] || `Row #${idx + 1}`;
+            return `• <b>#${idx + 1} ${label}</b>: <code>${matchedCol}</code> = <b>${item.val.toLocaleString(undefined, {maximumFractionDigits: 2})}</b>`;
+          }).join('<br>');
+
+          return `
+            <b>🏆 ${isBottom ? 'Lowest' : 'Top'} ${sorted.length} Records by <code>${matchedCol}</code>:</b><br>
+            ${itemsStr}<br><br>
+            <i>💡 Average for ${matchedCol}: ${getStats(matchedCol)?.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</i>
+          `;
+        }
+      }
+
+      // 10. SPECIFIC COLUMN METRIC INQUIRIES
+      const matchedCol = findCol(q);
       if (matchedCol) {
         if (isColNumeric(matchedCol)) {
-          const vals = currentDataset.map(r => parseFloat(r[matchedCol])).filter(v => !isNaN(v)).sort((a, b) => a - b);
-          if (vals.length) {
-            const sum = vals.reduce((a, b) => a + b, 0);
-            const mean = sum / vals.length;
-            const med = vals[Math.floor(vals.length / 2)];
-            const min = vals[0];
-            const max = vals[vals.length - 1];
-
-            if (q.includes("average") || q.includes("mean") || q.includes("avg")) {
+          const s = getStats(matchedCol);
+          if (s) {
+            if (q.includes("avg") || q.includes("average") || q.includes("mean")) {
               return `
                 <b>📈 Average for <code>${matchedCol}</code>:</b><br>
-                • <b>Mean:</b> <b>${mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Median (50th %):</b> <b>${med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Range:</b> [${min.toLocaleString(undefined, {maximumFractionDigits: 2})} to ${max.toLocaleString(undefined, {maximumFractionDigits: 2})}] across ${vals.length.toLocaleString()} valid observations.
+                • <b>Mean:</b> <b>${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Median (50th %):</b> <b>${s.med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Standard Deviation:</b> ±${s.std.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
+                • <b>Data Range:</b> [${s.min.toLocaleString()} to ${s.max.toLocaleString()}] across ${s.count.toLocaleString()} valid records.
               `;
             }
-            if (q.includes("max") || q.includes("highest") || q.includes("peak") || q.includes("maximum") || q.includes("largest")) {
+            if (q.includes("max") || q.includes("highest") || q.includes("peak") || q.includes("maximum") || q.includes("largest") || q.includes("most")) {
               return `
-                <b>🔝 Maximum for <code>${matchedCol}</code>:</b><br>
-                • <b>Highest Value:</b> <b>${max.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Mean Baseline:</b> ${mean.toLocaleString(undefined, {maximumFractionDigits: 2})} (Max is ${(max / (mean || 1)).toFixed(1)}× average).
+                <b>🔝 Maximum Peak for <code>${matchedCol}</code>:</b><br>
+                • <b>Highest Value:</b> <b>${s.max.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Baseline Mean:</b> ${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})} (Max is ${(s.max / (s.mean || 1)).toFixed(2)}× average).
               `;
             }
-            if (q.includes("min") || q.includes("lowest") || q.includes("minimum") || q.includes("smallest")) {
+            if (q.includes("min") || q.includes("lowest") || q.includes("minimum") || q.includes("smallest") || q.includes("least")) {
               return `
                 <b>📉 Minimum for <code>${matchedCol}</code>:</b><br>
-                • <b>Lowest Value:</b> <b>${min.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Mean Baseline:</b> ${mean.toLocaleString(undefined, {maximumFractionDigits: 2})}.
+                • <b>Lowest Value:</b> <b>${s.min.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Baseline Mean:</b> ${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})} (Spread to max: ${(s.max - s.min).toLocaleString(undefined, {maximumFractionDigits: 2})}).
               `;
             }
-            if (q.includes("total") || q.includes("sum")) {
+            if (q.includes("total") || q.includes("sum") || q.includes("aggregate")) {
               return `
-                <b>💰 Total Sum for <code>${matchedCol}</code>:</b><br>
-                • <b>Sum Total:</b> <b>${sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Average per Observation:</b> ${mean.toLocaleString(undefined, {maximumFractionDigits: 2})} across ${vals.length.toLocaleString()} records.
+                <b>💰 Total Cumulative Sum for <code>${matchedCol}</code>:</b><br>
+                • <b>Sum Total:</b> <b>${s.sum.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Average per Observation:</b> ${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})} across ${s.count.toLocaleString()} records.
               `;
             }
-            if (q.includes("median") || q.includes("middle")) {
+            if (q.includes("median") || q.includes("middle") || q.includes("percentile")) {
+              const skewness = s.mean > s.med ? "Right-skewed (higher extreme outliers)" : s.mean < s.med ? "Left-skewed (lower tail)" : "Symmetric Gaussian";
               return `
-                <b>⚖️ Median for <code>${matchedCol}</code>:</b><br>
-                • <b>Median (50th Percentile):</b> <b>${med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-                • <b>Mean:</b> ${mean.toLocaleString(undefined, {maximumFractionDigits: 2})} (${mean > med ? 'Right-skewed' : mean < med ? 'Left-skewed' : 'Symmetric'}).
+                <b>⚖️ Median Analysis for <code>${matchedCol}</code>:</b><br>
+                • <b>Median (50th %):</b> <b>${s.med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Mean:</b> ${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
+                • <b>Distribution Shape:</b> ${skewness}.
+              `;
+            }
+            if (q.includes("std") || q.includes("deviation") || q.includes("variance") || q.includes("spread")) {
+              const cv = ((s.std / (s.mean || 1)) * 100).toFixed(1);
+              return `
+                <b>📐 Dispersion &amp; Variance for <code>${matchedCol}</code>:</b><br>
+                • <b>Standard Deviation (σ):</b> <b>${s.std.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+                • <b>Variance (σ²):</b> ${s.variance.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
+                • <b>Coefficient of Variation:</b> ${cv}% (${cv > 50 ? 'High variability across cohort' : 'Relatively stable distribution'}).
               `;
             }
 
             // General Profile for matched numeric column
             return `
-              <b>📊 Statistical Profile for <code>${matchedCol}</code>:</b><br>
-              • <b>Count:</b> ${vals.length.toLocaleString()} valid records<br>
-              • <b>Mean:</b> <b>${mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-              • <b>Median:</b> <b>${med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
-              • <b>Minimum:</b> ${min.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
-              • <b>Maximum:</b> ${max.toLocaleString(undefined, {maximumFractionDigits: 2})}
+              <b>📊 Comprehensive Profile for <code>${matchedCol}</code>:</b><br>
+              • <b>Count:</b> ${s.count.toLocaleString()} valid observations<br>
+              • <b>Mean:</b> <b>${s.mean.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+              • <b>Median:</b> <b>${s.med.toLocaleString(undefined, {maximumFractionDigits: 2})}</b><br>
+              • <b>Min:</b> ${s.min.toLocaleString(undefined, {maximumFractionDigits: 2})} | <b>Max:</b> ${s.max.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
+              • <b>Total Sum:</b> ${s.sum.toLocaleString(undefined, {maximumFractionDigits: 2})}<br>
+              • <b>Std Dev:</b> ±${s.std.toLocaleString(undefined, {maximumFractionDigits: 2})}
             `;
           }
         } else {
-          // Categorical column breakdown
+          // Categorical column analysis
           const catCounts = {};
           let missingCount = 0;
           currentDataset.forEach(r => {
@@ -22009,78 +22236,145 @@ result = df.describe()
           const sortedCats = Object.entries(catCounts).sort((a, b) => b[1] - a[1]);
           const topCat = sortedCats[0];
           const topPct = topCat ? ((topCat[1] / nRows) * 100).toFixed(1) : 0;
-          const topItems = sortedCats.slice(0, 5).map(([cat, cnt]) => `  - <b>${cat}</b>: ${cnt.toLocaleString()} (${((cnt/nRows)*100).toFixed(1)}%)`).join('<br>');
+          const topItems = sortedCats.slice(0, 5).map(([cat, cnt]) => `• <b>${cat}</b>: ${cnt.toLocaleString()} rows (${((cnt/nRows)*100).toFixed(1)}%)`).join('<br>');
+
           return `
-            <b>🏷️ Categorical Breakdown for <code>${matchedCol}</code>:</b><br>
-            • <b>Distinct Values:</b> ${sortedCats.length}<br>
-            • <b>Dominant Category:</b> <b>${topCat ? topCat[0] : 'None'}</b> with ${topCat ? topCat[1].toLocaleString() : 0} records (${topPct}%)<br>
-            • <b>Distribution:</b><br>${topItems}<br>
-            ${missingCount > 0 ? `• <b>Missing Values:</b> ${missingCount} records` : ''}
+            <b>🏷️ Categorical Distribution for <code>${matchedCol}</code>:</b><br>
+            • <b>Distinct Values:</b> <b>${sortedCats.length}</b> unique classes<br>
+            • <b>Dominant Category:</b> <b>${topCat ? topCat[0] : 'None'}</b> with ${topCat ? topCat[1].toLocaleString() : 0} records (<b>${topPct}%</b>)<br><br>
+            <b>Frequency Breakdown:</b><br>
+            ${topItems}<br>
+            ${missingCount > 0 ? `<br>⚠️ Missing: ${missingCount} records (${((missingCount/nRows)*100).toFixed(1)}%)` : ''}
           `;
         }
       }
 
-      // 7. Correlations / Drivers
-      if (q.includes("correlation") || q.includes("driver") || q.includes("relationship") || q.includes("influence") || q.includes("associate")) {
+      // 11. CORRELATIONS & LINEAR ASSOCIATIONS
+      if (q.includes("correlation") || q.includes("driver") || q.includes("relationship") || q.includes("influence") || q.includes("associate") || q.includes("dependency")) {
         if (numCols.length >= 2) {
+          const pairs = [];
+          for (let i = 0; i < Math.min(numCols.length, 5); i++) {
+            for (let j = i + 1; j < Math.min(numCols.length, 5); j++) {
+              const c1 = numCols[i];
+              const c2 = numCols[j];
+              const vals1 = [];
+              const vals2 = [];
+              currentDataset.forEach(r => {
+                const v1 = parseFloat(r[c1]);
+                const v2 = parseFloat(r[c2]);
+                if (!isNaN(v1) && !isNaN(v2)) {
+                  vals1.push(v1);
+                  vals2.push(v2);
+                }
+              });
+              if (vals1.length > 5) {
+                const m1 = vals1.reduce((a, b) => a + b, 0) / vals1.length;
+                const m2 = vals2.reduce((a, b) => a + b, 0) / vals2.length;
+                let num = 0, d1 = 0, d2 = 0;
+                for (let k = 0; k < vals1.length; k++) {
+                  const diff1 = vals1[k] - m1;
+                  const diff2 = vals2[k] - m2;
+                  num += diff1 * diff2;
+                  d1 += diff1 * diff1;
+                  d2 += diff2 * diff2;
+                }
+                const r = d1 > 0 && d2 > 0 ? num / Math.sqrt(d1 * d2) : 0;
+                pairs.push({ c1, c2, r });
+              }
+            }
+          }
+
+          pairs.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+          const topPairsStr = pairs.slice(0, 4).map(p => {
+            const strength = Math.abs(p.r) >= 0.7 ? "Strong" : Math.abs(p.r) >= 0.4 ? "Moderate" : "Weak";
+            const dir = p.r > 0 ? "Positive (+)" : "Negative (-)";
+            return `• <code>${p.c1}</code> &harr; <code>${p.c2}</code>: <b>r = ${p.r.toFixed(3)}</b> (${strength} ${dir})`;
+          }).join('<br>');
+
           return `
-            <b>📊 Top Linear Drivers & Associations:</b><br>
-            • Continuous attributes: ${numCols.map(c => `<code>${c}</code>`).join(', ')}.<br>
-            • Visit the dedicated <b>💡 8. Insights</b> module for ranked Pearson correlations and driver leaderboards!
+            <b>📊 Ranked Pearson Correlations:</b><br>
+            ${topPairsStr || '• Numerical attributes show near-zero linear collinearity.<br>'}<br>
+            <i>💡 Visit the <b>💡 11. Strategic Business Insights</b> module for visual heatmap correlation matrices!</i>
           `;
         }
-        return "At least 2 numerical columns are required to evaluate correlation pairs.";
+        return "At least 2 numerical continuous columns are required to evaluate correlation pairs.";
       }
 
-      // 8. ML Strategy
-      if (q.includes("ml") || q.includes("model") || q.includes("machine learning") || q.includes("predict") || q.includes("train")) {
-        const target = columns.find(c => c.toLowerCase().includes("churn") || c.toLowerCase().includes("price") || c.toLowerCase().includes("target")) || columns[columns.length - 1];
+      // 12. SQL QUERY SYNTHESIS
+      if (q.includes("sql") || q.includes("query") || q.includes("select") || q.includes("write query")) {
+        const catCol = catCols[0] || columns[0];
+        const numCol = numCols[0] || columns[1] || columns[0];
+        const numCol2 = numCols[1] || numCols[0];
         return `
-          <b>🤖 Machine Learning Guidance:</b><br>
-          • <b>Suggested Target Variable:</b> <code>${target}</code><br>
-          • <b>Candidate Predictors:</b> ${columns.filter(c => c !== target).slice(0, 5).map(c => `<code>${c}</code>`).join(', ')}<br>
-          • <b>Baseline Algorithms:</b> Random Forest or Gradient Boosted Decision Trees.<br>
-          • <b>Feature Prep:</b> Standard Scaler on continuous numbers, One-Hot dummies on low-cardinality categoricals.
+          <b>🗄️ Synthesized Production SQL Query:</b><br>
+          <pre style="background:#090d16;padding:10px 14px;border-radius:6px;color:#38bdf8;font-size:0.78rem;margin:8px 0;line-height:1.45;border:1px solid #1e293b;">-- Aggregating ${numCol} and ${numCol2} grouped by ${catCol}
+SELECT
+  ${catCol},
+  COUNT(*) AS total_records,
+  ROUND(SUM(${numCol}), 2) AS total_${numCol},
+  ROUND(AVG(${numCol}), 2) AS avg_${numCol},
+  ROUND(AVG(${numCol2}), 2) AS avg_${numCol2}
+FROM active_dataset
+GROUP BY ${catCol}
+ORDER BY total_${numCol} DESC
+LIMIT 10;</pre>
+          <i>💡 You can execute this query live in the <b>🗄️ 14. SQL &amp; Database Studio</b> module!</i>
         `;
       }
 
-      // 9. Visualizations Advice
+      // 13. MACHINE LEARNING GUIDANCE
+      if (q.includes("ml") || q.includes("model") || q.includes("machine learning") || q.includes("predict") || q.includes("train") || q.includes("algorithm")) {
+        const target = columns.find(c => /churn|target|label|price|sales|revenue|status/i.test(c)) || columns[columns.length - 1];
+        const isClassification = !isColNumeric(target) || new Set(currentDataset.map(r => r[target])).size <= 5;
+        const predictors = columns.filter(c => c !== target).slice(0, 6);
+
+        return `
+          <b>🤖 Machine Learning Blueprint:</b><br>
+          • <b>Identified Target Variable:</b> <code>${target}</code> (${isClassification ? 'Classification Task' : 'Continuous Regression Task'})<br>
+          • <b>Recommended Features:</b> ${predictors.map(c => `<code>${c}</code>`).join(', ')}<br>
+          • <b>Recommended Algorithms:</b> ${isClassification ? 'Random Forest Classifier, LightGBM, Logistic Regression' : 'XGBoost Regressor, Random Forest, Ridge'}<br>
+          • <b>Preprocessing:</b> Impute nulls, apply One-Hot Encoding on categorical features, and StandardScale continuous predictors.<br>
+          • <b>Evaluation Metrics:</b> ${isClassification ? 'ROC-AUC, Precision-Recall F1-score' : 'R² Score, RMSE, MAE'}.<br><br>
+          <i>💡 Train and evaluate these models automatically in <b>🤖 16. Machine Learning Models</b>!</i>
+        `;
+      }
+
+      // 14. VISUALIZATION GUIDANCE
       if (q.includes("chart") || q.includes("visual") || q.includes("plot") || q.includes("graph")) {
-        const catCol = catCols[0] || "Dimension";
+        const catCol = catCols[0] || "Category";
         const numCol = numCols[0] || "Metric";
+        const numCol2 = numCols[1] || numCols[0];
+
         return `
-          <b>📈 Visualization Guidance:</b><br>
-          • <b>Column / Bar Chart:</b> Compare <code>${numCol}</code> grouped by <code>${catCol}</code>.<br>
-          • <b>Donut Chart:</b> View proportional category share.<br>
-          • <b>Histogram:</b> Uncover value distribution and skewness.<br>
-          <i>All available in <b>📈 4. Interactive Dashboard</b> and <b>📊 3. Exploratory EDA</b>!</i>
+          <b>📈 Visualization Recommendations:</b><br>
+          • <b>Bar / Column Chart:</b> Aggregate <code>${numCol}</code> grouped by <code>${catCol}</code>.<br>
+          • <b>Scatter Plot:</b> Investigate relationship between <code>${numCol}</code> and <code>${numCol2}</code>.<br>
+          • <b>Donut / Pie Chart:</b> Compare relative category proportions for <code>${catCol}</code>.<br>
+          • <b>Box Plot / Histogram:</b> Uncover distribution skewness for <code>${numCol}</code>.<br><br>
+          <i>💡 Switch to <b>📈 7. Interactive BI Dashboard</b> or <b>🎨 10. AI Chart Recommender</b> to render these automatically!</i>
         `;
       }
 
-      // 10. Default General Synthesis
+      // 15. DYNAMIC DATASET-AWARE DEFAULT RESPONSE
       let nullCount = 0;
       currentDataset.forEach(r => {
-        columns.forEach(c => {
-          if (isMissing(r[c])) nullCount++;
-        });
+        columns.forEach(c => { if (isMissing(r[c])) nullCount++; });
       });
       const health = Math.max(10, Math.round(100 - (nullCount / (nRows * nCols || 1)) * 120));
 
       return `
-        <b>⚡ DataMind AI Executive Overview:</b><br>
-        • Dataset: <b>${nRows.toLocaleString()}</b> observations × <b>${nCols}</b> features.<br>
-        • Health Score: <b>${health}/100</b> (${health >= 80 ? 'Excellent' : 'Fair'}).<br>
-        • Numeric Features: ${numCols.slice(0, 5).map(c => `<code>${c}</code>`).join(', ') || 'None'}.<br>
-        • Categorical Features: ${catCols.slice(0, 5).map(c => `<code>${c}</code>`).join(', ') || 'None'}.<br><br>
-        <i>💡 You can ask me specific questions like:</i><br>
+        <b>⚡ DataMind AI Analysis:</b><br>
+        I reviewed your prompt regarding the active dataset (<b>${nRows.toLocaleString()} rows × ${nCols} cols</b>, Health: <b>${health}/100</b>).<br><br>
+        <b>Here are insights and questions you can ask me directly:</b><br>
         • <i>"What is the average ${numCols[0] || 'value'}?"</i><br>
-        • <i>"What is the maximum ${numCols[1] || numCols[0] || 'value'}?"</i><br>
-        • <i>"Breakdown of ${catCols[0] || 'categories'}"</i><br>
-        • <i>"Check data hygiene" or "Write SQL query"</i>
+        • <i>"Show ${numCols[0] || 'metrics'} by ${catCols[0] || 'categories'}"</i><br>
+        • <i>"Top 5 records by ${numCols[0] || 'metric'}"</i><br>
+        • <i>"How many rows where ${catCols[0] || 'column'} is..."</i><br>
+        • <i>"Check data hygiene and outliers"</i>
       `;
     }
 
-    // Main AI Chat Handler
+    // Main AI Chat Handler - 100% Client-Side Direct Execution
     function sendAiChatMessage() {
       const input = document.getElementById("aiChatInput");
       const prompt = input?.value.trim();
@@ -22103,43 +22397,7 @@ result = df.describe()
       `;
       chatLog.scrollTop = chatLog.scrollHeight;
 
-      // Check for Gemini key
-      const geminiKey = document.getElementById("geminiKeyModule")?.value.trim() || document.getElementById("geminiKey")?.value.trim();
-      if (geminiKey) {
-        chatLog.innerHTML += `
-          <div id="aiThinkingBubble" style="display:flex;gap:10px;align-items:flex-start;">
-            <div style="background:#4f46e5;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;">🤖</div>
-            <div style="background:#1e293b;border-radius:8px;padding:8px 12px;font-size:0.84rem;color:#94a3b8;">
-              Thinking with Gemini LLM...
-            </div>
-          </div>
-        `;
-        chatLog.scrollTop = chatLog.scrollHeight;
-        
-        callGeminiAPI(prompt, geminiKey, (resText) => {
-          document.getElementById("aiThinkingBubble")?.remove();
-          const replyClean = resText.replace(/\n/g, '<br>');
-          chatLog.innerHTML += `
-            <div style="display:flex;gap:10px;align-items:flex-start;">
-              <div style="background:#4f46e5;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;">🤖</div>
-              <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;font-size:0.86rem;color:#e2e8f0;line-height:1.5;max-width:85%;">
-                <div class="ai-msg-bubble">${replyClean}</div>
-                <div style="display:flex;justify-content:flex-end;margin-top:6px;">
-                  <button class="btn btn-outline ai-speech-btn" style="width:auto;padding:2px 8px;font-size:0.72rem;display:inline-flex;align-items:center;gap:4px;" onclick="speakAiMessage(this)">🔊 Listen</button>
-                </div>
-              </div>
-            </div>
-          `;
-          chatLog.scrollTop = chatLog.scrollHeight;
-          notifyTaskSuccess("AI Analytics Query", "Gemini response ready");
-          if (document.getElementById("autoSpeakCheckbox")?.checked) {
-            speakText(resText);
-          }
-        });
-        return;
-      }
-
-      // Built-in Statistical AI Engine
+      // Built-in High-Performance Statistical AI Engine (100% Client-Side)
       setTimeout(() => {
         try {
           const reply = generateAssistantResponse(prompt);
@@ -22162,7 +22420,7 @@ result = df.describe()
         } catch (err) {
           notifyTaskFailed("AI Analytics Query", err.message);
         }
-      }, 100);
+      }, 80);
     }
 
     function sendQuickAiPrompt(prompt) {
@@ -22190,7 +22448,6 @@ result = df.describe()
       notifyTaskSuccess("Clear AI Chat", "Conversation reset");
     }
 
-    // Floating Copilot Handler
     function sendFloatingAiMessage() {
       const input = document.getElementById("floatingChatInput");
       const prompt = input?.value.trim();
