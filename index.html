@@ -414,31 +414,31 @@
        ========================================================================= */
     html.day-theme, html.light-theme, [data-theme="light"],
     body.day-theme, body.light-theme {
-      --bg: #F5F7FA;
-      --bg-ambient: #F5F7FA;
-      --card-bg: #FFFFFF;
-      --card-border: #D1D5DB;
-      --card-hover-border: #9CA3AF;
-      --sidebar-bg: #FFFFFF;
-      --header-bg: #FFFFFF;
-      --header-border: #D1D5DB;
+      --bg: #E2E8F0;
+      --bg-ambient: #E2E8F0;
+      --card-bg: rgba(255, 255, 255, 0.52);
+      --card-border: rgba(0, 0, 0, 0.08);
+      --card-hover-border: #94A3B8;
+      --sidebar-bg: rgba(255, 255, 255, 0.55);
+      --header-bg: rgba(255, 255, 255, 0.55);
+      --header-border: rgba(0, 0, 0, 0.08);
       --primary: #162C4F;
       --primary-hover: #1E3A66;
-      --text: #111827;
-      --text-secondary: #374151;
-      --text-muted: #4B5563;
-      --table-bg: #FFFFFF;
-      --table-header: #F9FAFB;
-      --table-border: #D1D5DB;
-      --input-bg: #FFFFFF;
-      --input-border: #D1D5DB;
+      --text: #0F172A;
+      --text-secondary: #334155;
+      --text-muted: #475569;
+      --table-bg: rgba(255, 255, 255, 0.52);
+      --table-header: rgba(226, 232, 240, 0.70);
+      --table-border: rgba(0, 0, 0, 0.08);
+      --input-bg: rgba(255, 255, 255, 0.60);
+      --input-border: rgba(0, 0, 0, 0.12);
       --success: #065F46;
       --warning: #92400E;
       --danger: #991B1B;
       --info: #1D4ED8;
-      background-color: #F5F7FA !important;
+      background-color: #E2E8F0 !important;
       background-image: none !important;
-      color: #111827 !important;
+      color: #0F172A !important;
     }
 
     /* Universal Typography & Headings in Day Mode */
@@ -461,12 +461,14 @@
       color: #1E40AF !important;
     }
 
-    /* Top Navigation Header & Brand */
+    /* Top Navigation Header & Brand (50% Softened White Light) */
     body.day-theme .header,
     body.light-theme .header {
-      background: #FFFFFF !important;
-      border-bottom: 1px solid #D1D5DB !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      background: rgba(255, 255, 255, 0.55) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
     }
     body.day-theme .brand-title,
     body.light-theme .brand-title {
@@ -497,17 +499,21 @@
       border-color: #FFFFFF !important;
     }
 
-    /* Left Sidebar Column */
+    /* Left Sidebar Column (50% Softened White Light) */
     body.day-theme .sidebar,
     body.light-theme .sidebar {
-      background: #FFFFFF !important;
-      border-right: 1px solid #D1D5DB !important;
+      background: rgba(255, 255, 255, 0.55) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-right: 1px solid rgba(0, 0, 0, 0.08) !important;
     }
     body.day-theme .sidebar-pinned-header,
     body.light-theme .sidebar-pinned-header {
-      background: #FFFFFF !important;
-      border-bottom: 1.5px solid #D1D5DB !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+      background: rgba(255, 255, 255, 0.65) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+      border-bottom: 1.5px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
     }
     body.day-theme .sidebar-title,
     body.light-theme .sidebar-title {
@@ -525,21 +531,21 @@
     }
     body.day-theme .nav-item,
     body.light-theme .nav-item {
-      background: #FFFFFF !important;
-      border: 1px solid #E5E7EB !important;
+      background: rgba(255, 255, 255, 0.48) !important;
+      border: 1px solid rgba(0, 0, 0, 0.06) !important;
       border-left: 3.5px solid transparent !important;
-      color: #111827 !important;
+      color: #0F172A !important;
     }
     body.day-theme .nav-item:hover,
     body.light-theme .nav-item:hover {
-      background: #E9EEF5 !important;
-      border-color: #D1D5DB !important;
-      color: #111827 !important;
+      background: rgba(255, 255, 255, 0.75) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
+      color: #0F172A !important;
     }
     body.day-theme .nav-item.active,
     body.light-theme .nav-item.active {
-      background: #E9EEF5 !important;
-      border-color: #D1D5DB !important;
+      background: rgba(255, 255, 255, 0.88) !important;
+      border-color: rgba(0, 0, 0, 0.12) !important;
       border-left: 3.5px solid #162C4F !important;
       color: #162C4F !important;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
@@ -547,11 +553,13 @@
     }
     body.day-theme .drop-zone,
     body.light-theme .drop-zone {
-      background: #FFFFFF !important;
+      background: rgba(255, 255, 255, 0.52) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
       border: 6px solid transparent !important;
       border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M0,8 L4,1 L8,8 L12,1 L16,8 L12,15 L8,8 L4,15 Z' fill='%23162C4F' stroke='%23162C4F' stroke-width='0.5'/%3E%3C/svg%3E") 6 round !important;
-      color: #111827 !important;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 14px rgba(22, 44, 79, 0.12) !important;
+      color: #0F172A !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06), 0 0 12px rgba(22, 44, 79, 0.10) !important;
     }
     body.day-theme .drop-zone:hover,
     body.light-theme .drop-zone:hover {
@@ -578,15 +586,17 @@
       color: #111827 !important;
     }
 
-    /* Cards, Panels, KPI Tiles, Banners & Containers */
+    /* Cards, Panels, KPI Tiles, Banners & Containers (50% Softened White Light) */
     body.day-theme .card, body.day-theme .panel, body.day-theme .metric-card,
     body.day-theme .chart-box, body.day-theme .feature-box, body.day-theme .step-card,
     body.light-theme .card, body.light-theme .panel, body.light-theme .metric-card,
     body.light-theme .chart-box, body.light-theme .feature-box, body.light-theme .step-card {
-      background: #FFFFFF !important;
-      border: 1px solid #D1D5DB !important;
-      color: #111827 !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      background: rgba(255, 255, 255, 0.52) !important;
+      backdrop-filter: blur(8px) !important;
+      -webkit-backdrop-filter: blur(8px) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      color: #0F172A !important;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
     }
     body.day-theme .metric-card:hover, body.day-theme .panel:hover, body.day-theme .card:hover,
     body.light-theme .metric-card:hover, body.light-theme .panel:hover, body.light-theme .card:hover {
@@ -671,7 +681,7 @@
       color: #FFFFFF !important;
     }
 
-    /* Forms, Inputs, Dropdowns, Textareas */
+    /* Forms, Inputs, Dropdowns, Textareas (50% Softened White Light) */
     body.day-theme input[type="text"], body.day-theme input[type="number"],
     body.day-theme input[type="password"], body.day-theme input[type="search"],
     body.day-theme input[type="file"], body.day-theme select, body.day-theme textarea,
@@ -680,9 +690,9 @@
     body.light-theme input[type="password"], body.light-theme input[type="search"],
     body.light-theme input[type="file"], body.light-theme select, body.light-theme textarea,
     body.light-theme .form-control {
-      background: #FFFFFF !important;
-      color: #111827 !important;
-      border: 1px solid #D1D5DB !important;
+      background: rgba(255, 255, 255, 0.60) !important;
+      color: #0F172A !important;
+      border: 1px solid rgba(0, 0, 0, 0.12) !important;
     }
     body.day-theme input::placeholder, body.day-theme textarea::placeholder,
     body.light-theme input::placeholder, body.light-theme textarea::placeholder {
@@ -700,34 +710,34 @@
       color: #111827 !important;
     }
 
-    /* Data Tables & Previews */
+    /* Data Tables & Previews (50% Softened White Light) */
     body.day-theme .table-container,
     body.light-theme .table-container {
-      background: #FFFFFF !important;
-      border: 1px solid #D1D5DB !important;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      background: rgba(255, 255, 255, 0.52) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
     }
     body.day-theme table,
     body.light-theme table {
-      background: #FFFFFF !important;
-      color: #374151 !important;
+      background: transparent !important;
+      color: #334155 !important;
     }
     body.day-theme th,
     body.light-theme th {
-      background: #F9FAFB !important;
-      color: #111827 !important;
-      border-bottom: 2px solid #D1D5DB !important;
+      background: rgba(226, 232, 240, 0.70) !important;
+      color: #0F172A !important;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.08) !important;
       font-weight: 600 !important;
     }
     body.day-theme td,
     body.light-theme td {
-      background: #FFFFFF !important;
-      color: #374151 !important;
-      border-bottom: 1px solid #E5E7EB !important;
+      background: transparent !important;
+      color: #334155 !important;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
     }
     body.day-theme tr:hover td,
     body.light-theme tr:hover td {
-      background: #F3F4F6 !important;
+      background: rgba(255, 255, 255, 0.65) !important;
     }
 
     /* Indicators & Badges */
@@ -906,7 +916,7 @@
       border: 1px solid #D1D5DB !important;
     }
 
-    /* Universal Override for Inline Dark Background Styles in Day Mode */
+    /* Universal Override for Inline Dark Background Styles in Day Mode (50% Softened White Light) */
     body.day-theme [style*="background: #0"], body.day-theme [style*="background:#0"],
     body.day-theme [style*="background: #1"], body.day-theme [style*="background:#1"],
     body.day-theme [style*="background: rgba(1"], body.day-theme [style*="background:rgba(1"],
@@ -917,9 +927,9 @@
     body.light-theme [style*="background: rgba(1"], body.light-theme [style*="background:rgba(1"],
     body.light-theme [style*="background: rgba(0"], body.light-theme [style*="background:rgba(0"],
     body.light-theme [style*="background: rgba(2"], body.light-theme [style*="background:rgba(2"] {
-      background: #FFFFFF !important;
-      border-color: #D1D5DB !important;
-      color: #111827 !important;
+      background: rgba(255, 255, 255, 0.52) !important;
+      border-color: rgba(0, 0, 0, 0.08) !important;
+      color: #0F172A !important;
     }
 
     /* Universal Override for Inline Light Text Colors in Day Mode */
