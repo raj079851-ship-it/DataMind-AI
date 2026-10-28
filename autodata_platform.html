@@ -241,9 +241,13 @@
       color: var(--text);
     }
     .brand-mind {
-      color: #2563EB !important;
-      text-shadow: 0 0 8px rgba(37, 99, 235, 0.40);
-      transition: color 0.16s ease, text-shadow 0.16s ease;
+      background: linear-gradient(180deg, #FFFFFF 10%, #38BDF8 45%, #0284C7 75%, #0047AB 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-block;
+      filter: drop-shadow(0 0 7px rgba(14, 144, 238, 0.40));
+      transition: filter 0.16s ease;
     }
     .brand-logo-img {
       width: 64px;
@@ -491,8 +495,11 @@
     }
     body.day-theme .brand-mind,
     body.light-theme .brand-mind {
-      color: #1E3A8A !important;
-      text-shadow: none !important;
+      background: linear-gradient(180deg, #E0F2FE 5%, #3B82F6 40%, #1D4ED8 70%, #1E3A8A 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12)) !important;
     }
     body.day-theme .brand-logo-img,
     body.light-theme .brand-logo-img {
