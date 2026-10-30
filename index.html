@@ -3111,14 +3111,20 @@
       color: #FFFFFF !important;
       font-size: 0.62rem !important;
       font-weight: 800 !important;
-      display: flex !important;
+      display: flex;
       align-items: center !important;
       justify-content: center !important;
       padding: 0 4px !important;
       border: 1.8px solid #0B0F14 !important;
       line-height: 1 !important;
       box-shadow: 0 0 8px rgba(239, 68, 68, 0.5) !important;
-      transition: transform 0.2s ease, opacity 0.2s ease !important;
+      transition: transform 0.2s ease, opacity 0.2s ease, display 0.2s ease !important;
+    }
+    .header-notif-badge.is-hidden {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
     }
     body.day-theme .header-notif-badge, body.light-theme .header-notif-badge {
       border-color: #FFFFFF !important;
@@ -14531,6 +14537,7 @@ result = df.describe()
     window.initIntentPrefetching = initIntentPrefetching;
 
     function init() {
+      try { if (typeof window.updateNotifBadge === 'function') window.updateNotifBadge(); } catch(e){}
       try { restoreUserSession(); } catch(e) { console.warn("Restore session init:", e); }
       try { initAuthDatabase(); } catch(e) {}
       initBrightnessTheme();
@@ -37260,17 +37267,28 @@ LIMIT 10;</pre>
       ];
 
       window.updateNotifBadge = function() {
-        const unreadCount = (window.platformNotifications || []).filter(n => !n.read).length;
+        const notifs = window.platformNotifications || [];
+        const unreadCount = notifs.filter(n => !n.read).length;
+        const totalCount = notifs.length;
+        
         const badge = document.getElementById("headerNotifBadge");
         const countBadge = document.getElementById("notifUnreadCountBadge");
         const filterCount = document.getElementById("notifFilterUnreadCount");
+        const filterAll = document.getElementById("notifFilterAll");
         
         if (badge) {
           if (unreadCount > 0) {
-            badge.style.display = "flex";
-            badge.textContent = unreadCount > 9 ? "9+" : unreadCount;
+            badge.classList.remove("is-hidden");
+            badge.style.setProperty("display", "flex", "important");
+            badge.style.setProperty("opacity", "1", "important");
+            badge.style.setProperty("visibility", "visible", "important");
+            badge.textContent = unreadCount > 9 ? "9+" : String(unreadCount);
           } else {
-            badge.style.display = "none";
+            badge.classList.add("is-hidden");
+            badge.style.setProperty("display", "none", "important");
+            badge.style.setProperty("opacity", "0", "important");
+            badge.style.setProperty("visibility", "hidden", "important");
+            badge.textContent = "0";
           }
         }
         if (countBadge) {
@@ -37278,15 +37296,17 @@ LIMIT 10;</pre>
           countBadge.style.display = unreadCount > 0 ? "inline-block" : "none";
         }
         if (filterCount) {
-          filterCount.textContent = unreadCount;
+          filterCount.textContent = String(unreadCount);
+        }
+        if (filterAll) {
+          filterAll.textContent = `All (${totalCount})`;
         }
       };
 
       window.renderNotifications = function() {
         const container = document.getElementById("notifListContainer");
-        if (!container) return;
-        
         window.updateNotifBadge();
+        if (!container) return;
         
         const list = window.activeNotifFilter === 'unread' 
           ? (window.platformNotifications || []).filter(n => !n.read) 
@@ -37307,10 +37327,12 @@ LIMIT 10;</pre>
         list.forEach(item => {
           const unreadClass = item.read ? '' : 'is-unread';
           const unreadDot = item.read ? '' : '<span class="notif-unread-dot" title="Unread notification"></span>';
+          const toggleTitle = item.read ? "Mark as unread" : "Mark as read";
+          const toggleIcon = item.read ? "⚪" : "✓";
           html += `
             <div class="notif-item ${unreadClass}" onclick="handleNotificationClick('${item.id}')" title="Click to view details / open workspace" role="button" tabindex="0">
               <span style="font-size:1.1rem; line-height:1; flex-shrink:0;">${item.icon || 'ℹ️'}</span>
-              <div style="overflow:hidden; flex:1; padding-right:16px;">
+              <div style="overflow:hidden; flex:1; padding-right:12px;">
                 <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
                   <div style="font-weight:600; color:var(--text-primary, #F5F5F2); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>
                   <span style="font-size:0.62rem; color:var(--text-secondary, #A7B0BA); flex-shrink:0;">${item.time}</span>
@@ -37318,6 +37340,7 @@ LIMIT 10;</pre>
                 <div style="font-size:0.68rem; color:var(--text-secondary, #A7B0BA); line-height:1.3; margin-top:2px;">${item.desc}</div>
               </div>
               ${unreadDot}
+              <button class="notif-item-action-btn" onclick="event.stopPropagation(); toggleSingleNotificationRead('${item.id}')" title="${toggleTitle}" aria-label="${toggleTitle}" style="background:none;border:none;cursor:pointer;font-size:0.75rem;padding:2px 4px;color:var(--champagne-gold, #C5A46D);opacity:0.8;margin-right:2px;">${toggleIcon}</button>
               <button class="notif-item-dismiss-btn" onclick="event.stopPropagation(); dismissNotification('${item.id}')" title="Dismiss notification" aria-label="Dismiss">✕</button>
             </div>
           `;
@@ -37351,6 +37374,7 @@ LIMIT 10;</pre>
         if (item) {
           item.read = true;
           window.updateNotifBadge();
+          window.renderNotifications();
           window.closeNotificationDropdown();
           if (item.module && typeof window.switchModule === 'function') {
             window.switchModule(item.module);
@@ -37361,8 +37385,18 @@ LIMIT 10;</pre>
         }
       };
 
+      window.toggleSingleNotificationRead = function(id) {
+        const item = (window.platformNotifications || []).find(n => n.id === id);
+        if (item) {
+          item.read = !item.read;
+          window.updateNotifBadge();
+          window.renderNotifications();
+        }
+      };
+
       window.dismissNotification = function(id) {
         window.platformNotifications = (window.platformNotifications || []).filter(n => n.id !== id);
+        window.updateNotifBadge();
         window.renderNotifications();
       };
 
@@ -37377,6 +37411,7 @@ LIMIT 10;</pre>
 
       window.markAllNotificationsAsRead = function() {
         (window.platformNotifications || []).forEach(n => n.read = true);
+        window.updateNotifBadge();
         window.renderNotifications();
         if (typeof window.showToast === 'function') {
           window.showToast("All notifications marked as read", "success");
@@ -37385,11 +37420,15 @@ LIMIT 10;</pre>
 
       window.clearAllNotifications = function() {
         window.platformNotifications = [];
+        window.updateNotifBadge();
         window.renderNotifications();
         if (typeof window.showToast === 'function') {
           window.showToast("All notifications cleared", "info");
         }
       };
+
+      // Call update immediately on script execution
+      try { window.updateNotifBadge(); } catch(e){}
 
       // Real-time Event Notification Dispatcher
       window.addAppNotification = function({ title, desc, icon = "ℹ️", type = "info", module = null }) {
