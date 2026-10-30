@@ -2711,12 +2711,45 @@
 
 
     /* Header 3-Column Balanced Layout: Brand Left, Search Middle, Controls Right */
-    .header .brand {
+    .header-left-col {
       flex: 1 1 0 !important;
       display: flex !important;
       align-items: center !important;
       justify-content: flex-start !important;
       min-width: 0 !important;
+      pointer-events: none !important;
+    }
+    .header .brand,
+    .brand {
+      flex: 0 0 auto !important;
+      width: auto !important;
+      max-width: max-content !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      cursor: default !important;
+      user-select: none !important;
+      pointer-events: none !important;
+    }
+    .brand-logo-img {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+      transition: transform 0.18s ease, box-shadow 0.18s ease !important;
+      flex-shrink: 0 !important;
+    }
+    .brand-logo-img:hover {
+      transform: scale(1.06) !important;
+      box-shadow: 0 0 18px rgba(197, 164, 109, 0.60), 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+    }
+    .brand-logo-img:active {
+      transform: scale(0.95) !important;
+    }
+    .brand-text-block {
+      display: flex !important;
+      flex-direction: column !important;
+      cursor: default !important;
+      user-select: none !important;
+      pointer-events: none !important;
     }
     .header-global-search-container {
       position: relative !important;
@@ -3570,12 +3603,14 @@
   <!-- Top Header -->
     <!-- Top Header -->
   <header class="header">
-    <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
-      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" />
-      <div>
-        <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
-        <div class="brand-subtitle">Analyze • Predict • Empower</div>
-        <div class="brand-tagline">AI Powered Data Analytics Platform</div>
+    <div class="header-left-col">
+      <div class="brand">
+        <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" onclick="resetAppToNew()" onkeydown="if(event.key==='Enter'||event.key===' ')resetAppToNew();" title="⚡ Click Logo to Reset Application &amp; Start Fresh Page" role="button" tabindex="0" />
+        <div class="brand-text-block">
+          <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
+          <div class="brand-subtitle">Analyze • Predict • Empower</div>
+          <div class="brand-tagline">AI Powered Data Analytics Platform</div>
+        </div>
       </div>
     </div>
 
