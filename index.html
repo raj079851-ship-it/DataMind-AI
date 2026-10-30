@@ -2813,7 +2813,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="globalHeaderSearchInput" class="header-search-input" placeholder="Search... (⌘K)" autocomplete="off" spellcheck="false" oninput="handleGlobalHeaderSearch(this.value)" onfocus="handleGlobalHeaderSearch(this.value)" onkeydown="if(event.key==='Escape'){closeGlobalSearchDropdown();}" />
+        <input type="text" id="globalHeaderSearchInput" class="header-search-input" placeholder="Search modules, analytics, data... (⌘K)" autocomplete="off" spellcheck="false" oninput="handleGlobalHeaderSearch(this.value)" onfocus="handleGlobalHeaderSearch(this.value)" onkeydown="handleGlobalSearchKeydown(event)" />
         <span class="header-search-kbd-shortcut" title="Press Ctrl+K or ⌘K to search">⌘K</span>
       </div>
       <!-- Global Search Dropdown Menu -->
@@ -2837,7 +2837,7 @@
         <span>Export CSV</span>
       </button>
 
-      <!-- Simple Day / Night Theme Toggle Logo Button -->
+      <!-- Simple Day / Night Theme Toggle Logo Button (Pure Clean Circle, Blue Activator Removed) -->
       <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
         <svg id="themeToggleLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
           <path d="M12 2.5V4.5M6.34 6.34L4.58 4.58M4.5 12H2M6.34 17.66L4.58 19.42M12 19.5V21.5" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
@@ -2846,12 +2846,12 @@
           <circle cx="18.5" cy="6.5" r="1.1" fill="#E0F2FE"/>
           <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
         </svg>
-        <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
       </div>
 
-      <!-- 3. Circular Login Button with Green Active Denotator (Matching Theme Adjuster) -->
+      <!-- 3. Circular Login Button with Login Logo Image & Green Active Denotator -->
       <div id="headerLoginBtn" class="header-login-circle-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAuthModal('user');}">
-        <svg class="header-login-circle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <img src="assets/login_logo.png" alt="Login Logo" class="header-login-logo-img" style="width:26px; height:26px; border-radius:50%; object-fit:cover; display:block; pointer-events:none;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <svg class="header-login-circle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
@@ -34712,32 +34712,241 @@ LIMIT 10;</pre>
 
   </script>
 
-  <!-- ==========================================================================
-       ENTERPRISE GLOBAL SEARCH & USER PROFILE SCRIPTS
+    <!-- ==========================================================================
+       ENTERPRISE FULLY FUNCTIONAL GLOBAL SEARCH & NAVIGATION ENGINE
        ========================================================================== -->
   <script>
     (function() {
-      const enterpriseSearchIndex = [
-        { category: "Platform Overview", name: "Overview Dashboard", desc: "System KPIs, real-time metrics & health", icon: "📊", tabId: "tab-overview" },
-        { category: "Data Management", name: "Data Ingestion & Upload", desc: "Upload CSV, Excel, SQL database connectors", icon: "📥", tabId: "tab-upload" },
-        { category: "Data Management", name: "Data Quality & Health Audit", desc: "Missing values, duplicate scan, type anomalies", icon: "🛡️", tabId: "tab-quality" },
-        { category: "Data Management", name: "Data Cleaning & Transformation", desc: "Smart imputation, outlier handling, feature prep", icon: "✨", tabId: "tab-cleaning" },
-        { category: "Analysis & Insights", name: "Exploratory Data Analysis (EDA)", desc: "Distributions, correlations, summary statistics", icon: "🔍", tabId: "tab-eda" },
-        { category: "Analysis & Insights", name: "Statistical Hypothesis Testing", desc: "T-tests, ANOVA, Chi-square, regression analytics", icon: "📐", tabId: "tab-stats" },
-        { category: "Machine Learning", name: "Machine Learning Models", desc: "Automated ML classifiers, regressors & feature tuning", icon: "🤖", tabId: "tab-ml" },
-        { category: "Machine Learning", name: "Predictive Analytics Studio", desc: "Run what-if scenario testing and predictions", icon: "🔮", tabId: "tab-predictive" },
-        { category: "Machine Learning", name: "Time Series Forecasting", desc: "Prophet, ARIMA, trend and seasonality models", icon: "📈", tabId: "tab-forecasting" },
-        { category: "Machine Learning", name: "NLP & Text Analytics", desc: "Sentiment analysis, keywords, entity recognition", icon: "💬", tabId: "tab-nlp" },
-        { category: "Machine Learning", name: "Experimentation & A/B Testing", desc: "Variant split comparisons & significance testing", icon: "🧪", tabId: "tab-abtest" },
-        { category: "MLOps & Governance", name: "Model Evaluation & Metrics", desc: "Confusion matrices, ROC curves, PR curves", icon: "🎯", tabId: "tab-modeleval" },
-        { category: "MLOps & Governance", name: "Enterprise Model Registry", desc: "Production staging, version tracking & lineage", icon: "🏛️", tabId: "tab-registry" },
-        { category: "Reporting & Export", name: "Automated Reports & Insights", desc: "Executive briefing export (PDF/HTML)", icon: "📄", tabId: "tab-reports" },
-        { category: "System & Config", name: "Settings & Preferences", desc: "API endpoint, engine configurations & themes", icon: "⚙️", tabId: "tab-settings" },
-        { category: "Quick Actions", name: "Upload New CSV Dataset", desc: "Browse local CSV or Excel files", icon: "📁", action: "triggerUpload" },
-        { category: "Quick Actions", name: "Download Active CSV", desc: "Export currently active dataset to CSV", icon: "💾", action: "triggerExport" },
-        { category: "Quick Actions", name: "Toggle Bright / Night Mode", desc: "Switch UI between Dark Champagne and Pearl Light", icon: "🌓", action: "toggleTheme" },
-        { category: "Quick Actions", name: "Enterprise Security Access", desc: "Open authentication gate, roles & API settings", icon: "🔐", action: "openSecurity" }
+      // Complete Catalog of Platform Modules & Tools
+      const platformSearchCatalog = [
+        {
+          name: "Data Preview & Schema",
+          category: "Data Engineering",
+          desc: "Inspect ingested rows, column schemas, data types & shapes",
+          icon: "📋",
+          moduleId: "moduleOverview",
+          keywords: ["preview", "schema", "table", "dataset", "rows", "columns", "head", "tail", "shape", "data", "records", "overview"]
+        },
+        {
+          name: "Data Cleaning & Audit",
+          category: "Data Engineering",
+          desc: "Smart imputation, drop duplicates, handle missing values & nulls",
+          icon: "🧹",
+          moduleId: "moduleCleaning",
+          keywords: ["clean", "cleaning", "impute", "null", "missing", "nan", "duplicate", "dedup", "drop", "replace", "pipeline"]
+        },
+        {
+          name: "Data Quality & Health Audit",
+          category: "Data Engineering",
+          desc: "Health score, completeness, integrity check & anomaly scan",
+          icon: "🛡️",
+          moduleId: "moduleDataQuality",
+          keywords: ["quality", "health", "audit", "score", "integrity", "anomaly", "anomalies", "validation", "drift", "outliers"]
+        },
+        {
+          name: "Data Processing & Transformation",
+          category: "Data Engineering",
+          desc: "Filter, normalize, standardize, scale & mathematical transforms",
+          icon: "⚙️",
+          moduleId: "moduleProcessing",
+          keywords: ["processing", "transform", "normalize", "standardize", "scale", "filter", "math", "convert", "type"]
+        },
+        {
+          name: "Feature Engineering",
+          category: "Data Engineering",
+          desc: "One-hot encoding, binning, interaction terms & PCA dimensionality",
+          icon: "🧬",
+          moduleId: "moduleFE",
+          keywords: ["feature", "engineering", "encode", "one-hot", "binning", "pca", "polynomial", "interaction", "dimension"]
+        },
+        {
+          name: "Insert & Modify Columns",
+          category: "Data Engineering",
+          desc: "Create calculated columns, formulas and transformations",
+          icon: "➕",
+          moduleId: "moduleInsertCol",
+          keywords: ["insert", "column", "calculate", "formula", "add column", "computed"]
+        },
+        {
+          name: "Exploratory Data Analysis (EDA)",
+          category: "Analytics & Insights",
+          desc: "Correlation heatmap, distributions, histograms, pairplots & scatter",
+          icon: "🔍",
+          moduleId: "moduleEDA",
+          keywords: ["eda", "explore", "correlation", "heatmap", "distribution", "histogram", "scatter", "pairplot", "summary", "skew", "univariate", "bivariate", "multivariate", "charts", "graphs"]
+        },
+        {
+          name: "Interactive BI Dashboard",
+          category: "Analytics & Insights",
+          desc: "Interactive visual analytical dashboards and KPI monitors",
+          icon: "📊",
+          moduleId: "moduleDashboard",
+          keywords: ["dashboard", "bi", "visuals", "kpi", "cards", "widgets", "executive"]
+        },
+        {
+          name: "Custom Dashboard Builder",
+          category: "Analytics & Insights",
+          desc: "Drag-and-drop dashboard canvas, custom charts and slicers",
+          icon: "🏗️",
+          moduleId: "moduleDashboardBuilder",
+          keywords: ["builder", "canvas", "custom chart", "slicer", "drag", "drop", "layout"]
+        },
+        {
+          name: "AI Chart Recommender",
+          category: "Analytics & Insights",
+          desc: "Intelligent chart recommendations based on column distributions",
+          icon: "💡",
+          moduleId: "moduleInsights",
+          keywords: ["chart", "recommender", "ai chart", "visualization", "plot", "graph"]
+        },
+        {
+          name: "Strategic Business Insights",
+          category: "Analytics & Insights",
+          desc: "Executive narrative insights, drivers and strategic highlights",
+          icon: "💼",
+          moduleId: "moduleStats",
+          keywords: ["insights", "strategic", "narrative", "business", "summary", "drivers"]
+        },
+        {
+          name: "Statistical Hypothesis Testing",
+          category: "Advanced Analytics",
+          desc: "T-Tests, ANOVA, Chi-Square, p-values, regression and variance",
+          icon: "📐",
+          moduleId: "moduleStats",
+          keywords: ["stats", "statistical", "hypothesis", "t-test", "anova", "chi-square", "p-value", "significance", "variance", "f-test", "normality", "regression"]
+        },
+        {
+          name: "A/B Testing & Experimentation",
+          category: "Advanced Analytics",
+          desc: "Split test variant evaluation, conversion lift and confidence bounds",
+          icon: "🧪",
+          moduleId: "moduleABTesting",
+          keywords: ["ab test", "a/b", "experiment", "variant", "conversion", "lift", "confidence", "significance", "split test"]
+        },
+        {
+          name: "SQL & Database Studio",
+          category: "Database & Code",
+          desc: "Execute in-browser SQL queries, join tables and filter data",
+          icon: "🗄️",
+          moduleId: "moduleSql",
+          keywords: ["sql", "query", "database", "select", "join", "where", "group by", "studio", "sqlite"]
+        },
+        {
+          name: "Python Code Studio & REPL",
+          category: "Database & Code",
+          desc: "Write and execute custom Python/Pandas transformation scripts",
+          icon: "🐍",
+          moduleId: "modulePython",
+          keywords: ["python", "pandas", "numpy", "code", "script", "repl", "run python", "terminal"]
+        },
+        {
+          name: "Machine Learning Models (AutoML)",
+          category: "Machine Learning",
+          desc: "Train Random Forest, XGBoost, Classifiers, Regressors and evaluate",
+          icon: "🤖",
+          moduleId: "moduleML",
+          keywords: ["ml", "machine learning", "train", "automl", "random forest", "xgboost", "logistic", "classifier", "regressor", "hyperparameter", "fit", "model"]
+        },
+        {
+          name: "Predictive Analytics Studio",
+          category: "Machine Learning",
+          desc: "Run inferences, what-if simulations, score new data instances",
+          icon: "🔮",
+          moduleId: "modulePredictive",
+          keywords: ["predict", "predictive", "what-if", "scenario", "inference", "simulation", "score"]
+        },
+        {
+          name: "Time Series Forecasting",
+          category: "Machine Learning",
+          desc: "Prophet, ARIMA, trend detection, seasonal cycles and projections",
+          icon: "📈",
+          moduleId: "moduleForecasting",
+          keywords: ["forecast", "forecasting", "time series", "prophet", "arima", "trend", "seasonality", "future", "date", "interval", "predict future"]
+        },
+        {
+          name: "Model Evaluation & Metrics",
+          category: "MLOps & Governance",
+          desc: "Confusion matrix, ROC-AUC, Precision-Recall, F1 and SHAP values",
+          icon: "🎯",
+          moduleId: "moduleEvaluation",
+          keywords: ["eval", "evaluation", "roc", "auc", "confusion matrix", "precision", "recall", "f1", "shap", "residual", "performance", "metric"]
+        },
+        {
+          name: "Enterprise Model Registry",
+          category: "MLOps & Governance",
+          desc: "Model versioning, staging, production deployment and lineage",
+          icon: "🏛️",
+          moduleId: "moduleRegistry",
+          keywords: ["registry", "version", "staging", "production", "deploy", "lineage", "governance", "store", "artifact"]
+        },
+        {
+          name: "NLP & Text Analytics",
+          category: "Cognitive AI",
+          desc: "Sentiment analysis, TF-IDF, word cloud, keyword & entity extractor",
+          icon: "💬",
+          moduleId: "moduleNLP",
+          keywords: ["nlp", "text", "sentiment", "word cloud", "vocabulary", "token", "sentiment score", "entity", "keywords", "language"]
+        },
+        {
+          name: "Automated Executive Reports",
+          category: "Reporting & Export",
+          desc: "Generate professional analytical summary reports and PDF export",
+          icon: "📄",
+          moduleId: "moduleReport",
+          keywords: ["report", "executive", "briefing", "summary", "pdf", "export report", "print", "document"]
+        },
+        {
+          name: "Platform Settings & Preferences",
+          category: "Administration",
+          desc: "Backend API URL, visual themes, connection health & credentials",
+          icon: "⚙️",
+          moduleId: "moduleSettings",
+          keywords: ["settings", "preferences", "config", "api", "url", "backend", "connection", "server", "theme", "setup"]
+        },
+        {
+          name: "Upload New Dataset (CSV / Excel)",
+          category: "Quick Actions",
+          desc: "Select a CSV, TSV, or XLSX file from your computer",
+          icon: "📥",
+          action: "triggerUpload",
+          keywords: ["upload", "import", "open file", "browse", "new dataset", "csv", "excel", "file"]
+        },
+        {
+          name: "Export Active Dataset as CSV",
+          category: "Quick Actions",
+          desc: "Download the currently transformed dataset to your device",
+          icon: "💾",
+          action: "triggerExport",
+          keywords: ["export", "download", "save", "csv", "export csv", "download csv"]
+        },
+        {
+          name: "Toggle Day / Night Brightness Theme",
+          category: "Quick Actions",
+          desc: "Switch between Rolls-Royce Night Mode and Daylight Enterprise Light Mode",
+          icon: "🌓",
+          action: "toggleTheme",
+          keywords: ["theme", "day", "night", "dark", "light", "mode", "brightness", "toggle theme"]
+        },
+        {
+          name: "Enterprise Security & Login",
+          category: "Quick Actions",
+          desc: "Open authentication security gate, user login & registration",
+          icon: "🔐",
+          action: "openSecurity",
+          keywords: ["login", "sign in", "auth", "authentication", "security", "register", "password", "user", "admin"]
+        },
+        {
+          name: "Reset Application to Fresh State",
+          category: "Quick Actions",
+          desc: "Clear workspace memory and start clean analysis",
+          icon: "🔄",
+          action: "resetApp",
+          keywords: ["reset", "new", "fresh", "clear", "restart", "clean page"]
+        }
       ];
+
+      window.__currentSearchMatches = [];
+      window.__searchHighlightIndex = -1;
 
       function escapeSearchHtml(str) {
         if (!str) return '';
@@ -34756,38 +34965,75 @@ LIMIT 10;</pre>
         let matched = [];
 
         if (!q) {
-          matched = enterpriseSearchIndex.slice(0, 6);
+          // Show top recommendations on empty/focus
+          matched = [
+            platformSearchCatalog[0], // Preview
+            platformSearchCatalog[1], // Cleaning
+            platformSearchCatalog[2], // Quality
+            platformSearchCatalog[6], // EDA
+            platformSearchCatalog[15], // ML
+            platformSearchCatalog[24]  // Export CSV
+          ];
         } else {
-          matched = enterpriseSearchIndex.filter(function(item) {
-            return item.name.toLowerCase().includes(q) ||
-                   item.category.toLowerCase().includes(q) ||
-                   item.desc.toLowerCase().includes(q);
+          // Match static catalog
+          matched = platformSearchCatalog.filter(function(item) {
+            if (item.name.toLowerCase().includes(q)) return true;
+            if (item.category.toLowerCase().includes(q)) return true;
+            if (item.desc.toLowerCase().includes(q)) return true;
+            if (item.keywords && item.keywords.some(k => k.toLowerCase().includes(q))) return true;
+            return false;
           });
+
+          // Dynamic Column Search if a dataset is currently loaded
+          const activeRows = (typeof window.rawDataset !== 'undefined' && window.rawDataset && window.rawDataset.length) ? window.rawDataset : (window.dataset || []);
+          if (activeRows && activeRows.length > 0) {
+            const cols = Object.keys(activeRows[0] || {});
+            cols.forEach(function(col) {
+              if (col.toLowerCase().includes(q)) {
+                matched.push({
+                  name: `Feature: ${col}`,
+                  category: "Dataset Columns",
+                  desc: `Inspect and profile column "${col}" in Exploratory Data Analysis`,
+                  icon: "📊",
+                  action: "exploreColumn",
+                  colName: col,
+                  keywords: [col.toLowerCase(), "column", "feature", "field"]
+                });
+              }
+            });
+          }
         }
 
+        window.__currentSearchMatches = matched;
+        window.__searchHighlightIndex = -1;
+
         if (matched.length === 0) {
-          dropdown.innerHTML = '<div style="padding:16px; text-align:center; color:var(--text-secondary, #A7B0BA); font-size:0.80rem;">No results found for "<strong>' + escapeSearchHtml(query) + '</strong>"</div>';
+          dropdown.innerHTML = '<div style="padding:16px; text-align:center; color:var(--text-secondary, #A7B0BA); font-size:0.80rem;">No modules, tools, or columns matching "<strong>' + escapeSearchHtml(query) + '</strong>"</div>';
           dropdown.style.display = "block";
           return;
         }
 
+        // Group matches by category
         const groups = {};
-        matched.forEach(function(item) {
+        matched.forEach(function(item, idx) {
           if (!groups[item.category]) groups[item.category] = [];
-          groups[item.category].push(item);
+          groups[item.category].push({ item: item, index: idx });
         });
 
         let html = '';
         for (const cat in groups) {
           html += '<div class="search-group-title">' + escapeSearchHtml(cat) + '</div>';
-          groups[cat].forEach(function(item) {
-            const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
-            html += '<div class="search-result-item" onclick="executeSearchResult(' + itemJson + ')">';
-            html += '<span class="search-result-icon">' + item.icon + '</span>';
-            html += '<div style="overflow:hidden;">';
-            html += '<div class="search-result-title">' + escapeSearchHtml(item.name) + '</div>';
-            html += '<div class="search-result-desc">' + escapeSearchHtml(item.desc) + '</div>';
-            html += '</div></div>';
+          groups[cat].forEach(function(entry) {
+            const it = entry.item;
+            const i = entry.index;
+            html += '<div class="search-result-item" id="searchResultItem_' + i + '" onmouseover="window.highlightSearchIndex(' + i + ')" onclick="window.executeSearchResultByIndex(' + i + ')">';
+            html += '<span class="search-result-icon">' + it.icon + '</span>';
+            html += '<div style="overflow:hidden; flex:1;">';
+            html += '<div class="search-result-title">' + escapeSearchHtml(it.name) + '</div>';
+            html += '<div class="search-result-desc">' + escapeSearchHtml(it.desc) + '</div>';
+            html += '</div>';
+            html += '<span style="font-size:0.65rem; color:var(--champagne-gold, #C5A46D); font-weight:600; flex-shrink:0;">Jump ↵</span>';
+            html += '</div>';
           });
         }
 
@@ -34795,21 +35041,79 @@ LIMIT 10;</pre>
         dropdown.style.display = "block";
       };
 
+      window.highlightSearchIndex = function(idx) {
+        window.__searchHighlightIndex = idx;
+        const allItems = document.querySelectorAll(".search-result-item");
+        allItems.forEach((el, i) => {
+          if (i === idx) {
+            el.classList.add("active-item");
+            el.style.background = "rgba(197, 164, 109, 0.16)";
+          } else {
+            el.classList.remove("active-item");
+            el.style.background = "transparent";
+          }
+        });
+      };
+
+      window.navigateSearchHighlight = function(step) {
+        if (!window.__currentSearchMatches || window.__currentSearchMatches.length === 0) return;
+        const total = window.__currentSearchMatches.length;
+        let next = window.__searchHighlightIndex + step;
+        if (next < 0) next = total - 1;
+        if (next >= total) next = 0;
+        window.highlightSearchIndex(next);
+        const activeEl = document.getElementById("searchResultItem_" + next);
+        if (activeEl) {
+          activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      };
+
+      window.activateCurrentSearchHighlight = function() {
+        if (!window.__currentSearchMatches || window.__currentSearchMatches.length === 0) return;
+        const target = window.__searchHighlightIndex >= 0 ? window.__searchHighlightIndex : 0;
+        window.executeSearchResultByIndex(target);
+      };
+
+      window.handleGlobalSearchKeydown = function(e) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          window.navigateSearchHighlight(1);
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          window.navigateSearchHighlight(-1);
+        } else if (e.key === "Enter") {
+          e.preventDefault();
+          window.activateCurrentSearchHighlight();
+        } else if (e.key === "Escape") {
+          window.closeGlobalSearchDropdown();
+        }
+      };
+
       window.closeGlobalSearchDropdown = function() {
         const dropdown = document.getElementById("globalHeaderSearchResults");
         if (dropdown) dropdown.style.display = "none";
       };
 
-      window.executeSearchResult = function(item) {
+      // Fully Functional Result Execution
+      window.executeSearchResultByIndex = function(index) {
+        const item = window.__currentSearchMatches[index];
+        if (!item) return;
+
         window.closeGlobalSearchDropdown();
         const inp = document.getElementById("globalHeaderSearchInput");
         if (inp) inp.value = "";
 
-        if (item.tabId) {
-          if (typeof window.switchTab === 'function') {
-            window.switchTab(item.tabId);
+        // 1. Navigation by Module ID
+        if (item.moduleId) {
+          if (typeof window.switchModule === 'function') {
+            window.switchModule(item.moduleId);
+            if (typeof window.showToast === 'function') {
+              window.showToast("Navigated to " + item.name, "info");
+            }
           }
-        } else if (item.action) {
+        }
+        // 2. Action Execution
+        else if (item.action) {
           if (item.action === 'triggerUpload') {
             const fi = document.getElementById('fileInput');
             if (fi) fi.click();
@@ -34819,53 +35123,35 @@ LIMIT 10;</pre>
             if (typeof window.toggleBrightnessTheme === 'function') window.toggleBrightnessTheme();
           } else if (item.action === 'openSecurity') {
             if (typeof window.openAuthModal === 'function') window.openAuthModal('user');
+          } else if (item.action === 'resetApp') {
+            if (typeof window.resetAppToNew === 'function') window.resetAppToNew();
+          } else if (item.action === 'exploreColumn') {
+            if (typeof window.switchModule === 'function') {
+              window.switchModule('moduleEDA');
+              setTimeout(() => {
+                const sel = document.getElementById('edaUniFeatureSelect');
+                if (sel && item.colName) {
+                  sel.value = item.colName;
+                  if (typeof window.renderEdaUnivariate === 'function') window.renderEdaUnivariate();
+                }
+              }, 150);
+              if (typeof window.showToast === 'function') {
+                window.showToast("Profiling column: " + item.colName, "info");
+              }
+            }
           }
         }
       };
 
-      window.toggleUserProfileDropdown = function() {
-        const dropdown = document.getElementById("headerUserProfileDropdown");
-        if (!dropdown) return;
-        const isOpen = dropdown.style.display === "block";
-        window.closeGlobalSearchDropdown();
-        dropdown.style.display = isOpen ? "none" : "block";
-
-        if (typeof window.currentAuthUser !== 'undefined' && window.currentAuthUser && (window.currentAuthUser.username || window.currentAuthUser.email)) {
-          const nameEl = document.getElementById("dropdownProfileName");
-          const emailEl = document.getElementById("dropdownProfileEmail");
-          const hdrName = document.getElementById("headerProfileName");
-          const hdrRole = document.getElementById("headerProfileRole");
-          const avatarEl = document.getElementById("headerProfileAvatarInitials");
-
-          if (nameEl) nameEl.textContent = window.currentAuthUser.full_name || window.currentAuthUser.username;
-          const loginBtnTxt = document.getElementById("headerLoginBtnText");
-          if (loginBtnTxt) loginBtnTxt.textContent = (window.currentAuthUser.full_name || window.currentAuthUser.username).split(' ')[0] || "Account";
-          if (emailEl) emailEl.textContent = window.currentAuthUser.email || window.currentAuthUser.username;
-          if (hdrName) hdrName.textContent = (window.currentAuthUser.full_name || window.currentAuthUser.username).split(' ')[0];
-          if (hdrRole) hdrRole.textContent = window.currentAuthUser.role || "Enterprise";
-          if (avatarEl) {
-            const initials = (window.currentAuthUser.full_name || window.currentAuthUser.username).substring(0, 2).toUpperCase();
-            avatarEl.textContent = initials;
-          }
-        }
-      };
-
-      window.closeUserProfileDropdown = function() {
-        const dropdown = document.getElementById("headerUserProfileDropdown");
-        if (dropdown) dropdown.style.display = "none";
-      };
-
+      // Close on Outside Click
       document.addEventListener("click", function(e) {
         const searchContainer = document.getElementById("headerGlobalSearchContainer");
         if (searchContainer && !searchContainer.contains(e.target)) {
           window.closeGlobalSearchDropdown();
         }
-        const profileCorner = document.getElementById("headerUserProfileCorner");
-        if (profileCorner && !profileCorner.contains(e.target)) {
-          window.closeUserProfileDropdown();
-        }
       });
 
+      // Global Keyboard Shortcut (⌘K / Ctrl+K)
       document.addEventListener("keydown", function(e) {
         if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
           e.preventDefault();
@@ -34879,6 +35165,7 @@ LIMIT 10;</pre>
       });
     })();
   </script>
+
 
 </body>
 </html>
