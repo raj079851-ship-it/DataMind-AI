@@ -2268,10 +2268,10 @@
        ========================================================================== */
     .header-global-search-container {
       position: relative;
-      flex: 1 1 360px;
-      max-width: 440px;
-      min-width: 200px;
-      margin: 0 16px;
+      flex: 0 1 260px;
+      max-width: 270px;
+      min-width: 170px;
+      margin: 0 12px;
     }
     .header-search-input-box {
       position: relative;
@@ -2662,6 +2662,53 @@
       background: #E3E7EC;
     }
 
+
+    /* Sleek Top Header Login Button: Login Icon & Text Only */
+    .header-login-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.80rem;
+      background: rgba(197, 164, 109, 0.12);
+      border: 1px solid rgba(197, 164, 109, 0.40);
+      color: #C5A46D;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .header-login-btn:hover {
+      background: rgba(197, 164, 109, 0.22);
+      border-color: #C5A46D;
+      color: #F5F5F2;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(197, 164, 109, 0.25);
+    }
+    .header-login-icon {
+      color: currentColor;
+      flex-shrink: 0;
+    }
+    .header-login-text {
+      color: currentColor;
+      font-weight: 600;
+      line-height: 1;
+    }
+    body.day-theme .header-login-btn, body.light-theme .header-login-btn {
+      background: rgba(168, 134, 79, 0.10);
+      border: 1px solid rgba(168, 134, 79, 0.35);
+      color: #A8864F;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    body.day-theme .header-login-btn:hover, body.light-theme .header-login-btn:hover {
+      background: rgba(168, 134, 79, 0.18);
+      border-color: #A8864F;
+      color: #171B22;
+      box-shadow: 0 4px 12px rgba(168, 134, 79, 0.15);
+    }
+
 </style>
 </head>
 <body>
@@ -2678,14 +2725,14 @@
       </div>
     </div>
 
-    <!-- 1. Global Search -->
+    <!-- 1. Global Search (Shorter Compact Bar) -->
     <div class="header-global-search-container" id="headerGlobalSearchContainer">
       <div class="header-search-input-box">
         <svg class="header-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="globalHeaderSearchInput" class="header-search-input" placeholder="Search modules, analytics, datasets..." autocomplete="off" spellcheck="false" oninput="handleGlobalHeaderSearch(this.value)" onfocus="handleGlobalHeaderSearch(this.value)" onkeydown="if(event.key==='Escape'){closeGlobalSearchDropdown();}" />
+        <input type="text" id="globalHeaderSearchInput" class="header-search-input" placeholder="Search... (⌘K)" autocomplete="off" spellcheck="false" oninput="handleGlobalHeaderSearch(this.value)" onfocus="handleGlobalHeaderSearch(this.value)" onkeydown="if(event.key==='Escape'){closeGlobalSearchDropdown();}" />
         <span class="header-search-kbd-shortcut" title="Press Ctrl+K or ⌘K to search">⌘K</span>
       </div>
       <!-- Global Search Dropdown Menu -->
@@ -2699,110 +2746,34 @@
         <span>Show Sidebar</span>
       </button>
 
-      <!-- Seamless Segmented Undo & Redo Controls in Top Header -->
-      <div class="header-undo-redo-cluster" id="headerUndoRedoCluster" role="toolbar" aria-label="Undo and Redo actions">
-        <!-- Undo Button -->
-        <button id="headerUndoBtn" class="header-ctrl-btn" onclick="handleUniversalUndo()" title="Undo (Ctrl+Z) - No actions to undo" aria-label="Undo">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;">
-            <path d="M9 14L4 9l5-5"/>
-            <path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>
-          </svg>
-          <span>Undo</span>
-        </button>
-
-        <span class="header-ctrl-divider" aria-hidden="true"></span>
-
-        <!-- Redo Button -->
-        <button id="headerRedoBtn" class="header-ctrl-btn" onclick="handleUniversalRedo()" title="Redo (Ctrl+Y) - No actions to redo" aria-label="Redo">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;">
-            <path d="M15 14l5-5-5-5"/>
-            <path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/>
-          </svg>
-          <span>Redo</span>
-        </button>
-      </div>
-
       <span id="activeDatasetTag" class="badge badge-info" style="font-size:0.80rem;padding:6px 12px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:20px;white-space:nowrap;">Dataset: None</span>
+      
+      <!-- Export CSV Button -->
       <button class="btn btn-primary" style="width:auto;margin:0;padding:7px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(99,102,241,0.35);font-weight:600;font-size:0.80rem;white-space:nowrap;" onclick="exportCurrentCSV()">
         <span>📥</span>
-        <span>Download Active CSV</span>
+        <span>Export CSV</span>
       </button>
 
       <!-- Simple Day / Night Theme Toggle Logo Button -->
       <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
         <svg id="themeToggleLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
-          <!-- Sun Rays (Day Side) -->
           <path d="M12 2.5V4.5M6.34 6.34L4.58 4.58M4.5 12H2M6.34 17.66L4.58 19.42M12 19.5V21.5" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
-          <!-- Sun Body (Day Side) -->
           <path d="M12 7A5 5 0 0 0 12 17V7Z" fill="#F59E0B"/>
-          <!-- Moon Crescent (Night Side) -->
           <path d="M12 7A5 5 0 0 1 12 17Q15 12 12 7Z" fill="#38BDF8"/>
-          <!-- Night Celestial Stars -->
           <circle cx="18.5" cy="6.5" r="1.1" fill="#E0F2FE"/>
           <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
         </svg>
         <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
       </div>
 
-      <!-- 2. User Profile Icon in Right Corner -->
-      <div class="header-user-profile-corner" id="headerUserProfileCorner">
-        <button id="headerUserProfileBtn" onclick="toggleUserProfileDropdown()" class="header-profile-icon-btn" title="Enterprise Profile &amp; Role Access" aria-label="User Profile">
-          <div class="header-profile-avatar-circle">
-            <span id="headerProfileAvatarInitials">DM</span>
-            <span class="header-profile-online-indicator"></span>
-          </div>
-          <div class="header-profile-meta">
-            <span class="header-profile-title" id="headerProfileName">Analyst</span>
-            <span class="header-profile-subtitle" id="headerProfileRole">Enterprise</span>
-          </div>
-          <svg class="header-profile-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </button>
-
-        <!-- User Profile Dropdown Popover -->
-        <div id="headerUserProfileDropdown" class="header-profile-dropdown-card" style="display:none;">
-          <div class="header-profile-dropdown-header">
-            <div class="header-profile-dropdown-avatar">DM</div>
-            <div class="header-profile-dropdown-userinfo">
-              <div class="header-profile-dropdown-name" id="dropdownProfileName">Enterprise Analyst</div>
-              <div class="header-profile-dropdown-email" id="dropdownProfileEmail">analyst@datamind.ai</div>
-              <div class="header-profile-dropdown-badge">Role: Enterprise Administrator</div>
-            </div>
-          </div>
-          <div class="header-profile-dropdown-menu">
-            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); openAuthModal('user');" class="header-profile-dropdown-item">
-              <span class="profile-item-icon">🛡️</span>
-              <div class="profile-item-content">
-                <div class="profile-item-text">Account Security &amp; Access</div>
-                <div class="profile-item-sub">Manage credentials &amp; permissions</div>
-              </div>
-            </a>
-            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); openAuthModal('admin');" class="header-profile-dropdown-item">
-              <span class="profile-item-icon">👑</span>
-              <div class="profile-item-content">
-                <div class="profile-item-text">Admin Control Center</div>
-                <div class="profile-item-sub">Access key management &amp; audit</div>
-              </div>
-            </a>
-            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); promptConfigureBackendUrl();" class="header-profile-dropdown-item">
-              <span class="profile-item-icon">⚙️</span>
-              <div class="profile-item-content">
-                <div class="profile-item-text">Backend API Endpoint</div>
-                <div class="profile-item-sub">Configure server environment URL</div>
-              </div>
-            </a>
-            <div class="header-profile-dropdown-divider"></div>
-            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); resetAppToNew();" class="header-profile-dropdown-item header-profile-dropdown-item-danger">
-              <span class="profile-item-icon">🔄</span>
-              <div class="profile-item-content">
-                <div class="profile-item-text">Reset &amp; Start Fresh Page</div>
-                <div class="profile-item-sub">Clear workspace memory</div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
+      <!-- Login Button: Login Icon & Text Only -->
+      <button id="headerLoginBtn" class="header-login-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login">
+        <svg class="header-login-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span id="headerLoginBtnText" class="header-login-text">Login</span>
+      </button>
     </div>
   </header>
 
@@ -34784,6 +34755,8 @@ LIMIT 10;</pre>
           const avatarEl = document.getElementById("headerProfileAvatarInitials");
 
           if (nameEl) nameEl.textContent = window.currentAuthUser.full_name || window.currentAuthUser.username;
+          const loginBtnTxt = document.getElementById("headerLoginBtnText");
+          if (loginBtnTxt) loginBtnTxt.textContent = (window.currentAuthUser.full_name || window.currentAuthUser.username).split(' ')[0] || "Account";
           if (emailEl) emailEl.textContent = window.currentAuthUser.email || window.currentAuthUser.username;
           if (hdrName) hdrName.textContent = (window.currentAuthUser.full_name || window.currentAuthUser.username).split(' ')[0];
           if (hdrRole) hdrRole.textContent = window.currentAuthUser.role || "Enterprise";
