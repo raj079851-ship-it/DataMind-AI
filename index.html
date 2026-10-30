@@ -2742,7 +2742,15 @@
       box-shadow: 0 0 18px rgba(197, 164, 109, 0.60), 0 2px 8px rgba(0, 0, 0, 0.4) !important;
     }
     .brand-logo-img:active {
-      transform: scale(0.95) !important;
+      transform: scale(0.93) !important;
+    }
+    @keyframes logoTapPulse {
+      0% { transform: scale(0.92); }
+      50% { transform: scale(1.12) rotate(4deg); }
+      100% { transform: scale(1); }
+    }
+    .brand-logo-img.tap-active {
+      animation: logoTapPulse 0.4s ease-out !important;
     }
     .brand-text-block {
       display: flex !important;
@@ -3605,7 +3613,7 @@
   <header class="header">
     <div class="header-left-col">
       <div class="brand">
-        <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" onclick="resetAppToNew()" onkeydown="if(event.key==='Enter'||event.key===' ')resetAppToNew();" title="⚡ Click Logo to Reset Application &amp; Start Fresh Page" role="button" tabindex="0" />
+        <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" onclick="resetAppToNew(event)" ontouchend="resetAppToNew(event)" onkeydown="if(event.key==='Enter'||event.key===' ')resetAppToNew(event);" title="⚡ Tap Logo to Reset All Data &amp; Platform State" role="button" tabindex="0" />
         <div class="brand-text-block">
           <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
           <div class="brand-subtitle">Analyze • Predict • Empower</div>
@@ -13351,45 +13359,228 @@ result = df.describe()
     // -----------------------------------------------------------------
     // RESET APPLICATION & CLEAR ALL FILES (BRAND LOGO CLICK)
     // -----------------------------------------------------------------
-    function resetAppToNew() {
-      // Clear memory datasets and state
+    let _lastLogoResetTimestamp = 0;
+
+    function resetAppToNew(e) {
+      if (e) {
+        if (Date.now() - _lastLogoResetTimestamp < 350) {
+          if (e.preventDefault) e.preventDefault();
+          if (e.stopPropagation) e.stopPropagation();
+          return;
+        }
+        _lastLogoResetTimestamp = Date.now();
+        if (e.preventDefault) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+      }
+
+      // 1. Tactile feedback animation on logo
+      const logoImg = document.querySelector('.brand-logo-img');
+      if (logoImg) {
+        logoImg.classList.remove('tap-active');
+        void logoImg.offsetWidth;
+        logoImg.classList.add('tap-active');
+        setTimeout(() => logoImg.classList.remove('tap-active'), 450);
+      }
+
+      // 2. Clear memory datasets and all state variables
       rawDataset = [];
       rawColumns = [];
       rawCSVText = "";
       currentDataset = [];
       columns = [];
       cleaningLogList = [];
-      activeModuleId = 'moduleOverview';
+      window.currentDataset = [];
+      window.rawDataset = [];
+      window.columns = [];
+      window.rawColumns = [];
+      window.rawCSVText = "";
+      window.cleanedDataset = [];
+      window.activeDatasetName = null;
+      window.activeFileName = null;
+      window.isBigDataset = false;
+      window.actualTotalRows = 0;
+      window.currentDatasetStatsCache = null;
+      window.datasetRenderVersion = (window.datasetRenderVersion || 0) + 1;
+      if (typeof invalidateModuleRenders === 'function') invalidateModuleRenders();
 
-      // Clear local storage and session storage
+      // 3. Clear storage but preserve user theme and auth session
       try {
+        const savedTheme = localStorage.getItem("datamind_theme") || localStorage.getItem("theme");
+        const savedUser = localStorage.getItem("datamind_user") || localStorage.getItem("currentUser");
         sessionStorage.clear();
         localStorage.clear();
-      } catch (e) {}
+        if (savedTheme) localStorage.setItem("datamind_theme", savedTheme);
+        if (savedUser) localStorage.setItem("datamind_user", savedUser);
+      } catch (err) {}
 
-      // Reset file input
-      const csvInput = document.getElementById("csvInput");
-      if (csvInput) csvInput.value = "";
+      // 4. Reset file upload inputs
+      try {
+        const csvInput = document.getElementById("csvInput");
+        if (csvInput) csvInput.value = "";
+        document.querySelectorAll('input[type="file"]').forEach(inp => { try { inp.value = ""; } catch (err) {} });
+      } catch (err) {}
 
-      // Reset active dataset tag in top navigation
-      const tag = document.getElementById("activeDatasetTag");
-      if (tag) tag.textContent = "Dataset: None (Upload CSV)";
-      window.activeDatasetName = null;
-      if (typeof updateDropZoneDisplay === "function") updateDropZoneDisplay();
+      // 5. Reset drop zone display & file name
+      try {
+        if (typeof updateDropZoneDisplay === "function") updateDropZoneDisplay();
+        const dropZoneFileName = document.getElementById("dropZoneFileName");
+        if (dropZoneFileName) dropZoneFileName.textContent = "";
+        const dropZoneSub = document.getElementById("dropZoneSub");
+        if (dropZoneSub) dropZoneSub.textContent = "Supported formats: CSV, TSV (UTF-8, ASCII)";
+      } catch (err) {}
 
-      // Reset UI modules and tables
+      // 6. Reset top navigation active dataset tag & badges
+      const activeTag = document.getElementById("activeDatasetTag");
+      if (activeTag) activeTag.textContent = "Dataset: None (Upload CSV)";
+      const navBadgeRows = document.getElementById("navBadgeRows");
+      if (navBadgeRows) navBadgeRows.textContent = "0 Rows";
+      const navBadgeCols = document.getElementById("navBadgeCols");
+      if (navBadgeCols) navBadgeCols.textContent = "0 Cols";
+
+      // 7. Explicitly reset all 5 top KPI cards to pristine empty state
+      // Card 1: Dataset Shape
+      const metricShape = document.getElementById("metricShape");
+      if (metricShape) metricShape.textContent = "0 × 0";
+      const shapeSubDesc = document.getElementById("kpiShapeSubDesc");
+      if (shapeSubDesc) shapeSubDesc.textContent = "Dataset Dimensions";
+
+      // Card 2: Data Health Score
+      const metricHealth = document.getElementById("metricHealth");
+      if (metricHealth) {
+        metricHealth.textContent = "— / 100";
+        metricHealth.style.color = "inherit";
+      }
+      const healthBar = document.getElementById("kpiHealthProgressBar");
+      if (healthBar) healthBar.style.width = "0%";
+      const healthBadge = document.getElementById("kpiHealthStatusBadge");
+      if (healthBadge) {
+        healthBadge.textContent = "Awaiting Data";
+        healthBadge.className = "kpi-status-badge kpi-status-neutral";
+      }
+
+      // Card 3: Missing Cells
+      const metricMissing = document.getElementById("metricMissing");
+      if (metricMissing) metricMissing.textContent = "0 (0.0%)";
+      const missingBar = document.getElementById("kpiMissingProgressBar");
+      if (missingBar) {
+        missingBar.style.width = "0%";
+        missingBar.style.background = "transparent";
+      }
+      const missingBadge = document.getElementById("kpiMissingStatusBadge");
+      if (missingBadge) {
+        missingBadge.textContent = "Awaiting Data";
+        missingBadge.className = "kpi-status-badge kpi-status-neutral";
+      }
+      const missingPctLabel = document.getElementById("kpiMissingPctLabel");
+      if (missingPctLabel) missingPctLabel.textContent = "0.0% Rate";
+
+      // Card 4: Duplicate Rows
+      const metricDuplicates = document.getElementById("metricDuplicates");
+      if (metricDuplicates) metricDuplicates.textContent = "0";
+      const dupBadge = document.getElementById("kpiDuplicatesStatusBadge");
+      if (dupBadge) {
+        dupBadge.textContent = "Awaiting Data";
+        dupBadge.className = "kpi-status-badge kpi-status-neutral";
+      }
+
+      // Card 5: Active Columns
+      const metricCols = document.getElementById("metricCols");
+      if (metricCols) metricCols.textContent = "0";
+      const colsSubDesc = document.getElementById("kpiColsSubDesc");
+      if (colsSubDesc) colsSubDesc.textContent = "Available Features";
+
+      // 8. Explicitly reset dataset preview table & schema container
+      const previewRows = document.getElementById("previewRowsCount");
+      if (previewRows) previewRows.textContent = "0 Rows";
+      const previewCols = document.getElementById("previewColsCount");
+      if (previewCols) previewCols.textContent = "0 Cols";
+
+      const previewContainer = document.getElementById("previewTableContainer");
+      if (previewContainer) {
+        previewContainer.innerHTML = `
+          <div style="text-align:center;padding:46px 20px;background:var(--card-bg);border:1px dashed var(--card-border);border-radius:12px;margin:8px 0;">
+            <div style="font-size:3rem;margin-bottom:12px;">📂</div>
+            <h3 style="color:var(--text);margin-bottom:6px;font-size:1.2rem;font-weight:700;">No Dataset Uploaded Yet</h3>
+            <p style="color:var(--text-muted);font-size:0.88rem;max-width:480px;margin:0 auto 18px auto;line-height:1.6;">
+              Please upload your CSV file to begin data cleaning, feature engineering, exploratory analysis, and BI dashboards.
+            </p>
+            <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+              <button class="btn btn-primary" style="width:auto;padding:8px 22px;font-size:0.84rem;" onclick="document.getElementById('csvInput').click()">
+                📁 Upload Your CSV Dataset
+              </button>
+              <button class="btn btn-outline" style="width:auto;padding:8px 18px;font-size:0.84rem;" onclick="loadSampleChurn()">
+                📊 Explore Demo Dataset
+              </button>
+            </div>
+          </div>`;
+      }
+
+      const schemaContainer = document.getElementById("schemaTableContainer");
+      if (schemaContainer) {
+        schemaContainer.innerHTML = `
+          <div style="text-align:center;padding:32px 16px;color:var(--text-muted);font-size:0.88rem;">
+            No schema available. Upload a dataset to inspect column data types and null distributions.
+          </div>`;
+      }
+
+      // 9. Reset search inputs across platform
+      ['headerSearchInput', 'globalSearchInput', 'previewSearchInput', 'edaSearchInput'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      // 10. Reset module state safely without any modal confirm() prompts
+      try {
+        cleaningLogList = [];
+        if (typeof renderCleaningLog === 'function') renderCleaningLog();
+      } catch (err) {}
+      try {
+        if (typeof registryData !== 'undefined') registryData = [];
+        if (typeof renderRegistry === 'function') renderRegistry([]);
+      } catch (err) {}
+      try {
+        if (typeof clearSqlEditor === 'function') clearSqlEditor();
+      } catch (err) {}
+      try {
+        if (typeof dbResetToStarterLayout === 'function') dbResetToStarterLayout();
+      } catch (err) {}
+      try {
+        if (typeof resetPredictiveDefaults === 'function') resetPredictiveDefaults();
+      } catch (err) {}
+
+      // Clear preview containers
+      const cleaningPreview = document.getElementById("cleaningPreviewContainer");
+      if (cleaningPreview) cleaningPreview.innerHTML = "";
+      const fePreview = document.getElementById("fePreviewContainer");
+      if (fePreview) fePreview.innerHTML = "";
+      const feFormula = document.getElementById("feFormulaInput");
+      if (feFormula) feFormula.value = "";
+
+      // 11. Clear backend dataset sync
+      try { if (typeof syncDatasetToBackend === 'function') syncDatasetToBackend([]); } catch (err) {}
+
+      // 12. Reset dropdowns
+      try { if (typeof populateDropdowns === 'function') populateDropdowns(); } catch (err) {}
+
+      // 13. Switch to Overview module & scroll smoothly to top
       try {
         switchModule("moduleOverview");
         updateUI();
-      } catch (e) {}
+      } catch (err) {}
 
-      // Act as fresh new page by reloading
-      try {
-        window.location.reload();
-      } catch (e) {
-        console.warn("Reload prevented in sandbox, UI state cleared manually:", e);
+      const contentArea = document.querySelector(".content-area");
+      if (contentArea) contentArea.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 14. Dispatch user notification
+      if (typeof notifyTaskSuccess === "function") {
+        notifyTaskSuccess("Platform Reset", "All data, metrics, and module state have been reset to blank.");
+      }
+      if (typeof showToast === "function") {
+        showToast("⚡ All data has been reset to blank.", "info");
       }
     }
+    window.resetAppToNew = resetAppToNew;
 
     // -----------------------------------------------------------------
     // BOTTOM-LEFT TASK EXECUTION MONITOR (RUNNING / SUCCESS / FAILED)
