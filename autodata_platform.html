@@ -4584,7 +4584,7 @@
             <div class="metric-val kpi-value" id="metricDuplicates">0</div>
             <div class="kpi-sub-row">
               <span class="kpi-sub-label">Duplicate Records</span>
-              <span class="kpi-status-badge kpi-status-neutral" id="kpiDuplicatesStatusBadge">Clean</span>
+              <span class="kpi-status-badge kpi-status-success" id="kpiDuplicatesStatusBadge">Clean</span>
             </div>
           </div>
         </div>
@@ -13725,8 +13725,8 @@ result = df.describe()
       if (metricDuplicates) metricDuplicates.textContent = "0";
       const dupBadge = document.getElementById("kpiDuplicatesStatusBadge");
       if (dupBadge) {
-        dupBadge.textContent = "Awaiting Data";
-        dupBadge.className = "kpi-status-badge kpi-status-neutral";
+        dupBadge.textContent = "Clean";
+        dupBadge.className = "kpi-status-badge kpi-status-success";
       }
 
       // Card 5: Active Columns
@@ -15658,10 +15658,7 @@ result = df.describe()
         metricDuplicates.textContent = hasData ? dupCount.toLocaleString() : "0";
       }
       if (dupBadge) {
-        if (!hasData) {
-          dupBadge.textContent = "Awaiting Data";
-          dupBadge.className = "kpi-status-badge kpi-status-neutral";
-        } else if (dupCount === 0) {
+        if (!hasData || dupCount === 0) {
           dupBadge.textContent = "Clean";
           dupBadge.className = "kpi-status-badge kpi-status-success";
         } else {
