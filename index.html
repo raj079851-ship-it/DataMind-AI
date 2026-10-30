@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DataMind AI | Next-Gen Data Analytics Platform</title>
-  <link rel="icon" type="image/jpeg" href="assets/datamind_logo_thumb.jpg" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="alternate icon" type="image/png" href="assets/datamind_logo_thumb.png" />
+  <link rel="apple-touch-icon" href="assets/datamind_logo_thumb.png" />
   <!-- Multi-Format Parsing & PDF Generation Engines -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -3563,6 +3565,109 @@
       background: rgba(168, 134, 79, 0.55) !important;
     }
 
+
+    /* =========================================================================
+       DATAMIND AI — REFINED BRAND IDENTITY STYLES
+       ========================================================================= */
+    .brand {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      text-decoration: none !important;
+      transition: opacity 0.18s ease !important;
+    }
+    .brand:hover {
+      opacity: 0.94 !important;
+    }
+    .brand-logo-img {
+      width: 44px !important;
+      height: 44px !important;
+      border-radius: 11px !important;
+      object-fit: contain !important;
+      box-shadow: 0 0 16px rgba(197, 164, 109, 0.35), 0 2px 8px rgba(0, 0, 0, 0.4) !important;
+      border: 1px solid rgba(197, 164, 109, 0.45) !important;
+      transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+      flex-shrink: 0 !important;
+    }
+    .brand:hover .brand-logo-img {
+      transform: scale(1.03) !important;
+      box-shadow: 0 0 20px rgba(197, 164, 109, 0.50), 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+    }
+    .brand-logo-dark {
+      display: block !important;
+    }
+    .brand-logo-light {
+      display: none !important;
+    }
+    .brand-title {
+      font-size: 1.25rem !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.025em !important;
+      line-height: 1.15 !important;
+      color: #F5F5F2 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: 3px !important;
+    }
+    .brand-ai-badge {
+      color: #C5A46D !important;
+      font-weight: 900 !important;
+      background: linear-gradient(135deg, #E8D1A7 0%, #C5A46D 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: drop-shadow(0 1px 2px rgba(197, 164, 109, 0.3)) !important;
+    }
+    .brand-subtitle {
+      font-size: 0.64rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.22em !important;
+      text-transform: uppercase !important;
+      color: #9CA8B5 !important;
+      line-height: 1.2 !important;
+      margin-top: 3px !important;
+    }
+    .brand-tagline {
+      display: none !important;
+    }
+
+    /* Day Mode Adaptation for Brand Identity */
+    body.day-theme .brand-logo-dark,
+    body.light-theme .brand-logo-dark {
+      display: none !important;
+    }
+    body.day-theme .brand-logo-light,
+    body.light-theme .brand-logo-light {
+      display: block !important;
+    }
+    body.day-theme .brand-logo-img,
+    body.light-theme .brand-logo-img {
+      box-shadow: 0 2px 8px rgba(16, 24, 40, 0.08), 0 0 1px rgba(168, 134, 79, 0.3) !important;
+      border: 1px solid #D5DAE1 !important;
+    }
+    body.day-theme .brand:hover .brand-logo-img,
+    body.light-theme .brand:hover .brand-logo-img {
+      box-shadow: 0 4px 14px rgba(168, 134, 79, 0.18) !important;
+    }
+    body.day-theme .brand-title,
+    body.light-theme .brand-title {
+      color: #111827 !important;
+    }
+    body.day-theme .brand-ai-badge,
+    body.light-theme .brand-ai-badge {
+      color: #A8864F !important;
+      background: linear-gradient(135deg, #C5A46D 0%, #A8864F 100%) !important;
+      -webkit-background-clip: text !important;
+      -webkit-text-fill-color: transparent !important;
+      background-clip: text !important;
+      filter: none !important;
+    }
+    body.day-theme .brand-subtitle,
+    body.light-theme .brand-subtitle {
+      color: #475467 !important;
+    }
 </style>
 </head>
 <body>
@@ -3571,11 +3676,11 @@
     <!-- Top Header -->
   <header class="header">
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
-      <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" />
+      <img src="assets/datamind_logo_icon.svg" onerror="this.onerror=null; this.src='assets/datamind_logo_thumb.png';" alt="DataMind AI Logo" class="brand-logo-img brand-logo-dark" />
+      <img src="assets/datamind_logo_icon_light.svg" onerror="this.onerror=null; this.src='assets/datamind_logo_thumb.png';" alt="DataMind AI Logo" class="brand-logo-img brand-logo-light" style="display:none;" />
       <div>
-        <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
-        <div class="brand-subtitle">Analyze • Predict • Empower</div>
-        <div class="brand-tagline">AI Powered Data Analytics Platform</div>
+        <div class="brand-title">DataMind <span class="brand-ai-badge">AI</span></div>
+        <div class="brand-subtitle">ANALYZE • PREDICT • EMPOWER</div>
       </div>
     </div>
 
@@ -3676,9 +3781,9 @@
       <!-- Modal Header -->
       <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; background:#1e293b; border-bottom:1px solid rgba(255,255,255,0.08);">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:1.3rem;">🛡️</span>
+          <img src="assets/datamind_logo_icon.svg" width="34" height="34" style="border-radius:8px; box-shadow:0 0 10px rgba(197,164,109,0.3); border:1px solid rgba(197,164,109,0.4);" alt="DataMind AI" />
           <div>
-            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">Data<span class="brand-mind">Mind</span> AI Security Gate</div>
+            <div style="font-weight:800; font-size:1.02rem; color:#f8fafc;">DataMind <span class="brand-ai-badge">AI</span> Security Gate</div>
             <div style="font-size:0.72rem; color:#94a3b8;">Authentication &amp; Enterprise Access</div>
           </div>
         </div>
@@ -19940,7 +20045,7 @@ result = df.describe()
           <div style="border-bottom:3px solid #4f46e5; padding-bottom:18px; margin-bottom:28px; display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:12px;">
             <div>
               <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
-                <span style="background:#4f46e5; color:white; font-weight:800; font-size:12px; padding:3px 8px; border-radius:6px; letter-spacing:0.05em;">DATAMIND AI</span>
+                <span style="display:inline-flex; align-items:center; gap:6px; background:#10243A; color:white; font-weight:800; font-size:12px; padding:3px 10px; border-radius:6px; letter-spacing:0.05em; border:1px solid rgba(197,164,109,0.4);"><img src="assets/datamind_logo_icon.svg" width="16" height="16" style="border-radius:3px;" alt="Logo" /> DATAMIND <span style="color:#C5A46D;">AI</span></span>
                 <span style="font-size:10px; font-weight:700; color:#4338ca; background:#e0e7ff; padding:2px 8px; border-radius:4px;">${classification}</span>
               </div>
               <h1 style="margin:0; font-size:24px; color:#1e1b4b; font-weight:800; letter-spacing:-0.02em;">${title}</h1>
