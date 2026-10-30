@@ -2827,7 +2827,7 @@
       opacity: 0.85 !important;
     }
 
-    /* Centered Search Bar in Executive Header */
+    /* Centered Search Bar in Executive Header with Luxury Border Animation as in KPI Cards */
     .header-global-search-container {
       position: relative !important;
       flex: 0 0 350px !important;
@@ -2835,21 +2835,138 @@
       width: 350px !important;
       margin: 0 auto !important;
     }
+    .header-search-input-box {
+      position: relative !important;
+      display: flex !important;
+      align-items: center !important;
+      width: 100% !important;
+      border-radius: 9px !important;
+    }
+    /* Champagne-gold accent line at top border (exact match to KPI card .kpi-card-luxe::before) */
+    .header-search-input-box::before {
+      content: "" !important;
+      position: absolute !important;
+      top: 0 !important;
+      left: 10px !important;
+      right: 10px !important;
+      height: 1.5px !important;
+      background: linear-gradient(90deg, transparent 0%, rgba(197, 164, 109, 0.2) 20%, rgba(197, 164, 109, 0.90) 50%, rgba(197, 164, 109, 0.2) 80%, transparent 100%) !important;
+      background-size: 200% 100% !important;
+      opacity: 0.65 !important;
+      border-radius: 9px 9px 0 0 !important;
+      pointer-events: none !important;
+      z-index: 3 !important;
+      animation: searchBorderSweep 4s ease-in-out infinite !important;
+      transition: opacity 0.25s ease, background 0.25s ease !important;
+    }
+    .header-search-input-box:hover::before {
+      opacity: 1 !important;
+      background: linear-gradient(90deg, transparent 0%, rgba(197, 164, 109, 0.95) 50%, transparent 100%) !important;
+    }
     .header-search-input {
       height: 38px !important;
       padding: 0 46px 0 40px !important;
       font-size: 0.82rem !important;
       border-radius: 9px !important;
+      border: 1px solid rgba(197, 164, 109, 0.35) !important;
+      box-shadow: 0 0 0 1px rgba(197, 164, 109, 0.08), inset 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+      animation: searchBorderPulse 3.5s ease-in-out infinite alternate !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, transform 0.25s ease !important;
+    }
+    .header-search-input:hover {
+      border-color: rgba(197, 164, 109, 0.65) !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), 0 0 14px rgba(197, 164, 109, 0.22) !important;
+    }
+    .header-search-input:focus {
+      border-color: #C5A46D !important;
+      box-shadow: 0 0 0 3px rgba(197, 164, 109, 0.25), 0 0 16px rgba(197, 164, 109, 0.20) !important;
+      animation: none !important;
     }
     .header-search-icon {
       left: 12px !important;
       width: 15px !important;
       height: 15px !important;
+      z-index: 4 !important;
     }
     .header-search-kbd-shortcut {
       right: 9px !important;
       font-size: 0.65rem !important;
       padding: 2px 6px !important;
+      z-index: 4 !important;
+    }
+
+    /* Keyframe Animations for Search Bar Border */
+    @keyframes searchBorderSweep {
+      0% {
+        background-position: 100% 0;
+        opacity: 0.55;
+      }
+      50% {
+        background-position: 0% 0;
+        opacity: 0.95;
+      }
+      100% {
+        background-position: -100% 0;
+        opacity: 0.55;
+      }
+    }
+
+    @keyframes searchBorderPulse {
+      0% {
+        border-color: rgba(197, 164, 109, 0.25);
+        box-shadow: 0 0 0 1px rgba(197, 164, 109, 0.05), inset 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+      50% {
+        border-color: rgba(197, 164, 109, 0.55);
+        box-shadow: 0 0 12px rgba(197, 164, 109, 0.18), 0 0 0 1px rgba(197, 164, 109, 0.12), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      100% {
+        border-color: rgba(197, 164, 109, 0.25);
+        box-shadow: 0 0 0 1px rgba(197, 164, 109, 0.05), inset 0 1px 3px rgba(0, 0, 0, 0.25);
+      }
+    }
+
+    /* Day Mode Adaptation for Search Bar Border Animation */
+    body.day-theme .header-search-input-box::before,
+    body.light-theme .header-search-input-box::before {
+      background: linear-gradient(90deg, transparent 0%, rgba(168, 134, 79, 0.25) 20%, rgba(168, 134, 79, 0.85) 50%, rgba(168, 134, 79, 0.25) 80%, transparent 100%) !important;
+      background-size: 200% 100% !important;
+    }
+    body.day-theme .header-search-input-box:hover::before,
+    body.light-theme .header-search-input-box:hover::before {
+      background: linear-gradient(90deg, transparent 0%, rgba(168, 134, 79, 0.95) 50%, transparent 100%) !important;
+    }
+    body.day-theme .header-search-input,
+    body.light-theme .header-search-input {
+      background: #FFFFFF !important;
+      color: #171B22 !important;
+      border: 1px solid rgba(168, 134, 79, 0.30) !important;
+      animation: searchBorderPulseDay 3.5s ease-in-out infinite alternate !important;
+    }
+    @keyframes searchBorderPulseDay {
+      0% {
+        border-color: rgba(168, 134, 79, 0.25);
+        box-shadow: 0 0 0 1px rgba(168, 134, 79, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      50% {
+        border-color: rgba(168, 134, 79, 0.55);
+        box-shadow: 0 0 10px rgba(168, 134, 79, 0.16), 0 0 0 1px rgba(168, 134, 79, 0.12), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      100% {
+        border-color: rgba(168, 134, 79, 0.25);
+        box-shadow: 0 0 0 1px rgba(168, 134, 79, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+    }
+    body.day-theme .header-search-input:hover,
+    body.light-theme .header-search-input:hover {
+      border-color: rgba(168, 134, 79, 0.65) !important;
+      box-shadow: 0 4px 12px rgba(168, 134, 79, 0.15) !important;
+    }
+    body.day-theme .header-search-input:focus,
+    body.light-theme .header-search-input:focus {
+      border-color: #A8864F !important;
+      box-shadow: 0 0 0 3px rgba(168, 134, 79, 0.20), 0 0 12px rgba(168, 134, 79, 0.15) !important;
+      animation: none !important;
     }
 
     /* Right Controls */
