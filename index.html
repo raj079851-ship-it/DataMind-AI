@@ -2262,11 +2262,412 @@
       transform: translateY(-1.5px) !important;
     }
 
+
+    /* ==========================================================================
+       ENTERPRISE TOP HEADER REDESIGN: GLOBAL SEARCH & USER PROFILE CORNER
+       ========================================================================== */
+    .header-global-search-container {
+      position: relative;
+      flex: 1 1 360px;
+      max-width: 440px;
+      min-width: 200px;
+      margin: 0 16px;
+    }
+    .header-search-input-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .header-search-icon {
+      position: absolute;
+      left: 12px;
+      color: #A7B0BA;
+      pointer-events: none;
+      transition: color 0.2s ease;
+    }
+    .header-search-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 54px 0 42px !important;
+      border-radius: 10px;
+      font-size: 0.82rem;
+      font-family: inherit;
+      background: #17212D;
+      color: #F5F5F2;
+      border: 1px solid #283442;
+      outline: none;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    .header-search-input:focus {
+      border-color: #C5A46D;
+      box-shadow: 0 0 0 3px rgba(197, 164, 109, 0.22), inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    .header-search-input::placeholder {
+      color: #718096;
+    }
+    .header-search-kbd-shortcut {
+      position: absolute;
+      right: 10px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid #283442;
+      color: #A7B0BA;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      pointer-events: none;
+      line-height: 1.2;
+    }
+    .header-search-dropdown {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      width: 100%;
+      min-width: 380px;
+      background: #17212D;
+      border: 1px solid #283442;
+      border-radius: 12px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+      z-index: 1005;
+      max-height: 420px;
+      overflow-y: auto;
+      padding: 8px 0;
+      animation: fadeInSearch 0.15s ease forwards;
+    }
+    @keyframes fadeInSearch {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .search-group-title {
+      padding: 6px 14px 4px 14px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #C5A46D;
+    }
+    .search-result-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 14px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s ease;
+    }
+    .search-result-item:hover, .search-result-item.active-item {
+      background: rgba(197, 164, 109, 0.12);
+    }
+    .search-result-icon {
+      font-size: 1.1rem;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .search-result-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #F5F5F2;
+    }
+    .search-result-desc {
+      font-size: 0.70rem;
+      color: #A7B0BA;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 270px;
+    }
+
+    /* Light Theme Global Search */
+    body.day-theme .header-search-icon, body.light-theme .header-search-icon {
+      color: #667085;
+    }
+    body.day-theme .header-search-input, body.light-theme .header-search-input {
+      background: #FFFFFF;
+      color: #171B22;
+      border: 1px solid #E3E7EC;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    body.day-theme .header-search-input:focus, body.light-theme .header-search-input:focus {
+      border-color: #A8864F;
+      box-shadow: 0 0 0 3px rgba(168, 134, 79, 0.18), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    body.day-theme .header-search-input::placeholder, body.light-theme .header-search-input::placeholder {
+      color: #94A3B8;
+    }
+    body.day-theme .header-search-kbd-shortcut, body.light-theme .header-search-kbd-shortcut {
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      color: #64748B;
+    }
+    body.day-theme .header-search-dropdown, body.light-theme .header-search-dropdown {
+      background: #FFFFFF;
+      border: 1px solid #E3E7EC;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    }
+    body.day-theme .search-group-title, body.light-theme .search-group-title {
+      color: #A8864F;
+    }
+    body.day-theme .search-result-item:hover, body.day-theme .search-result-item.active-item,
+    body.light-theme .search-result-item:hover, body.light-theme .search-result-item.active-item {
+      background: rgba(168, 134, 79, 0.08);
+    }
+    body.day-theme .search-result-title, body.light-theme .search-result-title {
+      color: #171B22;
+    }
+    body.day-theme .search-result-desc, body.light-theme .search-result-desc {
+      color: #667085;
+    }
+
+    /* User Profile Corner Button & Dropdown */
+    .header-user-profile-corner {
+      position: relative;
+      flex-shrink: 0;
+      margin-left: 6px;
+    }
+    .header-profile-icon-btn {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 4px 12px 4px 5px;
+      border-radius: 24px;
+      background: rgba(197, 164, 109, 0.09);
+      border: 1px solid rgba(197, 164, 109, 0.35);
+      color: #F5F5F2;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      height: 38px;
+    }
+    .header-profile-icon-btn:hover {
+      background: rgba(197, 164, 109, 0.18);
+      border-color: #C5A46D;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(197, 164, 109, 0.25);
+    }
+    .header-profile-avatar-circle {
+      position: relative;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #C5A46D 0%, #8A6E3E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.76rem;
+      color: #0B0F14;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+    .header-profile-online-indicator {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10B981;
+      border: 1.5px solid #17212D;
+    }
+    .header-profile-meta {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+      line-height: 1.15;
+    }
+    .header-profile-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #F5F5F2;
+      letter-spacing: -0.01em;
+    }
+    .header-profile-subtitle {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #C5A46D;
+    }
+    .header-profile-chevron {
+      color: #A7B0BA;
+      transition: transform 0.2s ease;
+      margin-left: 2px;
+    }
+    .header-profile-dropdown-card {
+      position: absolute;
+      right: 0;
+      top: 46px;
+      width: 270px;
+      background: #17212D;
+      border: 1px solid #283442;
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65);
+      z-index: 1005;
+      overflow: hidden;
+      animation: fadeInSearch 0.15s ease forwards;
+    }
+    .header-profile-dropdown-header {
+      padding: 12px 16px;
+      border-bottom: 1px solid #283442;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(11, 15, 20, 0.5);
+    }
+    .header-profile-dropdown-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #C5A46D 0%, #8A6E3E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #0B0F14;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+    .header-profile-dropdown-userinfo {
+      overflow: hidden;
+    }
+    .header-profile-dropdown-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #F5F5F2;
+    }
+    .header-profile-dropdown-email {
+      font-size: 0.70rem;
+      color: #A7B0BA;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .header-profile-dropdown-badge {
+      display: inline-block;
+      margin-top: 3px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #C5A46D;
+      background: rgba(197, 164, 109, 0.15);
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid rgba(197, 164, 109, 0.3);
+    }
+    .header-profile-dropdown-menu {
+      padding: 6px 0;
+    }
+    .header-profile-dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      text-decoration: none;
+      color: #F5F5F2;
+      transition: background 0.15s ease;
+    }
+    .header-profile-dropdown-item:hover {
+      background: rgba(197, 164, 109, 0.12);
+    }
+    .profile-item-icon {
+      font-size: 1.05rem;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .profile-item-text {
+      font-size: 0.79rem;
+      font-weight: 600;
+      color: #F5F5F2;
+    }
+    .profile-item-sub {
+      font-size: 0.68rem;
+      color: #A7B0BA;
+    }
+    .header-profile-dropdown-divider {
+      height: 1px;
+      background: #283442;
+      margin: 4px 0;
+    }
+    .header-profile-dropdown-item-danger:hover {
+      background: rgba(239, 68, 68, 0.12) !important;
+    }
+    .header-profile-dropdown-item-danger .profile-item-text {
+      color: #EF4444;
+    }
+
+    /* Light Theme Profile */
+    body.day-theme .header-profile-icon-btn, body.light-theme .header-profile-icon-btn {
+      background: rgba(168, 134, 79, 0.08);
+      border: 1px solid rgba(168, 134, 79, 0.30);
+      color: #171B22;
+    }
+    body.day-theme .header-profile-icon-btn:hover, body.light-theme .header-profile-icon-btn:hover {
+      background: rgba(168, 134, 79, 0.15);
+      border-color: #A8864F;
+      box-shadow: 0 4px 14px rgba(168, 134, 79, 0.20);
+    }
+    body.day-theme .header-profile-online-indicator, body.light-theme .header-profile-online-indicator {
+      border-color: #FFFFFF;
+    }
+    body.day-theme .header-profile-title, body.light-theme .header-profile-title {
+      color: #171B22;
+    }
+    body.day-theme .header-profile-subtitle, body.light-theme .header-profile-subtitle {
+      color: #A8864F;
+    }
+    body.day-theme .header-profile-chevron, body.light-theme .header-profile-chevron {
+      color: #667085;
+    }
+    body.day-theme .header-profile-dropdown-card, body.light-theme .header-profile-dropdown-card {
+      background: #FFFFFF;
+      border: 1px solid #E3E7EC;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
+    }
+    body.day-theme .header-profile-dropdown-header, body.light-theme .header-profile-dropdown-header {
+      background: #F8FAFC;
+      border-bottom: 1px solid #E3E7EC;
+    }
+    body.day-theme .header-profile-dropdown-name, body.light-theme .header-profile-dropdown-name {
+      color: #171B22;
+    }
+    body.day-theme .header-profile-dropdown-email, body.light-theme .header-profile-dropdown-email {
+      color: #667085;
+    }
+    body.day-theme .header-profile-dropdown-badge, body.light-theme .header-profile-dropdown-badge {
+      color: #A8864F;
+      background: rgba(168, 134, 79, 0.12);
+      border-color: rgba(168, 134, 79, 0.25);
+    }
+    body.day-theme .header-profile-dropdown-item, body.light-theme .header-profile-dropdown-item {
+      color: #171B22;
+    }
+    body.day-theme .header-profile-dropdown-item:hover, body.light-theme .header-profile-dropdown-item:hover {
+      background: rgba(168, 134, 79, 0.08);
+    }
+    body.day-theme .profile-item-text, body.light-theme .profile-item-text {
+      color: #171B22;
+    }
+    body.day-theme .profile-item-sub, body.light-theme .profile-item-sub {
+      color: #667085;
+    }
+    body.day-theme .header-profile-dropdown-divider, body.light-theme .header-profile-dropdown-divider {
+      background: #E3E7EC;
+    }
+
 </style>
 </head>
 <body>
 
   <!-- Top Header -->
+    <!-- Top Header -->
   <header class="header">
     <div class="brand" onclick="resetAppToNew()" title="⚡ Click DataMind AI to Reset Application &amp; Start Fresh Page">
       <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img" />
@@ -2275,6 +2676,20 @@
         <div class="brand-subtitle">Analyze • Predict • Empower</div>
         <div class="brand-tagline">AI Powered Data Analytics Platform</div>
       </div>
+    </div>
+
+    <!-- 1. Global Search -->
+    <div class="header-global-search-container" id="headerGlobalSearchContainer">
+      <div class="header-search-input-box">
+        <svg class="header-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="globalHeaderSearchInput" class="header-search-input" placeholder="Search modules, analytics, datasets..." autocomplete="off" spellcheck="false" oninput="handleGlobalHeaderSearch(this.value)" onfocus="handleGlobalHeaderSearch(this.value)" onkeydown="if(event.key==='Escape'){closeGlobalSearchDropdown();}" />
+        <span class="header-search-kbd-shortcut" title="Press Ctrl+K or ⌘K to search">⌘K</span>
+      </div>
+      <!-- Global Search Dropdown Menu -->
+      <div id="globalHeaderSearchResults" class="header-search-dropdown" style="display:none;"></div>
     </div>
 
     <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;margin-left:auto;">
@@ -2327,6 +2742,66 @@
           <circle cx="19" cy="16.5" r="0.8" fill="#93C5FD"/>
         </svg>
         <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
+      </div>
+
+      <!-- 2. User Profile Icon in Right Corner -->
+      <div class="header-user-profile-corner" id="headerUserProfileCorner">
+        <button id="headerUserProfileBtn" onclick="toggleUserProfileDropdown()" class="header-profile-icon-btn" title="Enterprise Profile &amp; Role Access" aria-label="User Profile">
+          <div class="header-profile-avatar-circle">
+            <span id="headerProfileAvatarInitials">DM</span>
+            <span class="header-profile-online-indicator"></span>
+          </div>
+          <div class="header-profile-meta">
+            <span class="header-profile-title" id="headerProfileName">Analyst</span>
+            <span class="header-profile-subtitle" id="headerProfileRole">Enterprise</span>
+          </div>
+          <svg class="header-profile-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        <!-- User Profile Dropdown Popover -->
+        <div id="headerUserProfileDropdown" class="header-profile-dropdown-card" style="display:none;">
+          <div class="header-profile-dropdown-header">
+            <div class="header-profile-dropdown-avatar">DM</div>
+            <div class="header-profile-dropdown-userinfo">
+              <div class="header-profile-dropdown-name" id="dropdownProfileName">Enterprise Analyst</div>
+              <div class="header-profile-dropdown-email" id="dropdownProfileEmail">analyst@datamind.ai</div>
+              <div class="header-profile-dropdown-badge">Role: Enterprise Administrator</div>
+            </div>
+          </div>
+          <div class="header-profile-dropdown-menu">
+            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); openAuthModal('user');" class="header-profile-dropdown-item">
+              <span class="profile-item-icon">🛡️</span>
+              <div class="profile-item-content">
+                <div class="profile-item-text">Account Security &amp; Access</div>
+                <div class="profile-item-sub">Manage credentials &amp; permissions</div>
+              </div>
+            </a>
+            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); openAuthModal('admin');" class="header-profile-dropdown-item">
+              <span class="profile-item-icon">👑</span>
+              <div class="profile-item-content">
+                <div class="profile-item-text">Admin Control Center</div>
+                <div class="profile-item-sub">Access key management &amp; audit</div>
+              </div>
+            </a>
+            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); promptConfigureBackendUrl();" class="header-profile-dropdown-item">
+              <span class="profile-item-icon">⚙️</span>
+              <div class="profile-item-content">
+                <div class="profile-item-text">Backend API Endpoint</div>
+                <div class="profile-item-sub">Configure server environment URL</div>
+              </div>
+            </a>
+            <div class="header-profile-dropdown-divider"></div>
+            <a href="javascript:void(0)" onclick="closeUserProfileDropdown(); resetAppToNew();" class="header-profile-dropdown-item header-profile-dropdown-item-danger">
+              <span class="profile-item-icon">🔄</span>
+              <div class="profile-item-content">
+                <div class="profile-item-text">Reset &amp; Start Fresh Page</div>
+                <div class="profile-item-sub">Clear workspace memory</div>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -34182,5 +34657,172 @@ LIMIT 10;</pre>
     }
 
   </script>
+
+  <!-- ==========================================================================
+       ENTERPRISE GLOBAL SEARCH & USER PROFILE SCRIPTS
+       ========================================================================== -->
+  <script>
+    (function() {
+      const enterpriseSearchIndex = [
+        { category: "Platform Overview", name: "Overview Dashboard", desc: "System KPIs, real-time metrics & health", icon: "📊", tabId: "tab-overview" },
+        { category: "Data Management", name: "Data Ingestion & Upload", desc: "Upload CSV, Excel, SQL database connectors", icon: "📥", tabId: "tab-upload" },
+        { category: "Data Management", name: "Data Quality & Health Audit", desc: "Missing values, duplicate scan, type anomalies", icon: "🛡️", tabId: "tab-quality" },
+        { category: "Data Management", name: "Data Cleaning & Transformation", desc: "Smart imputation, outlier handling, feature prep", icon: "✨", tabId: "tab-cleaning" },
+        { category: "Analysis & Insights", name: "Exploratory Data Analysis (EDA)", desc: "Distributions, correlations, summary statistics", icon: "🔍", tabId: "tab-eda" },
+        { category: "Analysis & Insights", name: "Statistical Hypothesis Testing", desc: "T-tests, ANOVA, Chi-square, regression analytics", icon: "📐", tabId: "tab-stats" },
+        { category: "Machine Learning", name: "Machine Learning Models", desc: "Automated ML classifiers, regressors & feature tuning", icon: "🤖", tabId: "tab-ml" },
+        { category: "Machine Learning", name: "Predictive Analytics Studio", desc: "Run what-if scenario testing and predictions", icon: "🔮", tabId: "tab-predictive" },
+        { category: "Machine Learning", name: "Time Series Forecasting", desc: "Prophet, ARIMA, trend and seasonality models", icon: "📈", tabId: "tab-forecasting" },
+        { category: "Machine Learning", name: "NLP & Text Analytics", desc: "Sentiment analysis, keywords, entity recognition", icon: "💬", tabId: "tab-nlp" },
+        { category: "Machine Learning", name: "Experimentation & A/B Testing", desc: "Variant split comparisons & significance testing", icon: "🧪", tabId: "tab-abtest" },
+        { category: "MLOps & Governance", name: "Model Evaluation & Metrics", desc: "Confusion matrices, ROC curves, PR curves", icon: "🎯", tabId: "tab-modeleval" },
+        { category: "MLOps & Governance", name: "Enterprise Model Registry", desc: "Production staging, version tracking & lineage", icon: "🏛️", tabId: "tab-registry" },
+        { category: "Reporting & Export", name: "Automated Reports & Insights", desc: "Executive briefing export (PDF/HTML)", icon: "📄", tabId: "tab-reports" },
+        { category: "System & Config", name: "Settings & Preferences", desc: "API endpoint, engine configurations & themes", icon: "⚙️", tabId: "tab-settings" },
+        { category: "Quick Actions", name: "Upload New CSV Dataset", desc: "Browse local CSV or Excel files", icon: "📁", action: "triggerUpload" },
+        { category: "Quick Actions", name: "Download Active CSV", desc: "Export currently active dataset to CSV", icon: "💾", action: "triggerExport" },
+        { category: "Quick Actions", name: "Toggle Bright / Night Mode", desc: "Switch UI between Dark Champagne and Pearl Light", icon: "🌓", action: "toggleTheme" },
+        { category: "Quick Actions", name: "Enterprise Security Access", desc: "Open authentication gate, roles & API settings", icon: "🔐", action: "openSecurity" }
+      ];
+
+      function escapeSearchHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      window.handleGlobalHeaderSearch = function(query) {
+        const dropdown = document.getElementById("globalHeaderSearchResults");
+        if (!dropdown) return;
+
+        const q = (query || "").trim().toLowerCase();
+        let matched = [];
+
+        if (!q) {
+          matched = enterpriseSearchIndex.slice(0, 6);
+        } else {
+          matched = enterpriseSearchIndex.filter(function(item) {
+            return item.name.toLowerCase().includes(q) ||
+                   item.category.toLowerCase().includes(q) ||
+                   item.desc.toLowerCase().includes(q);
+          });
+        }
+
+        if (matched.length === 0) {
+          dropdown.innerHTML = '<div style="padding:16px; text-align:center; color:var(--text-secondary, #A7B0BA); font-size:0.80rem;">No results found for "<strong>' + escapeSearchHtml(query) + '</strong>"</div>';
+          dropdown.style.display = "block";
+          return;
+        }
+
+        const groups = {};
+        matched.forEach(function(item) {
+          if (!groups[item.category]) groups[item.category] = [];
+          groups[item.category].push(item);
+        });
+
+        let html = '';
+        for (const cat in groups) {
+          html += '<div class="search-group-title">' + escapeSearchHtml(cat) + '</div>';
+          groups[cat].forEach(function(item) {
+            const itemJson = JSON.stringify(item).replace(/"/g, '&quot;');
+            html += '<div class="search-result-item" onclick="executeSearchResult(' + itemJson + ')">';
+            html += '<span class="search-result-icon">' + item.icon + '</span>';
+            html += '<div style="overflow:hidden;">';
+            html += '<div class="search-result-title">' + escapeSearchHtml(item.name) + '</div>';
+            html += '<div class="search-result-desc">' + escapeSearchHtml(item.desc) + '</div>';
+            html += '</div></div>';
+          });
+        }
+
+        dropdown.innerHTML = html;
+        dropdown.style.display = "block";
+      };
+
+      window.closeGlobalSearchDropdown = function() {
+        const dropdown = document.getElementById("globalHeaderSearchResults");
+        if (dropdown) dropdown.style.display = "none";
+      };
+
+      window.executeSearchResult = function(item) {
+        window.closeGlobalSearchDropdown();
+        const inp = document.getElementById("globalHeaderSearchInput");
+        if (inp) inp.value = "";
+
+        if (item.tabId) {
+          if (typeof window.switchTab === 'function') {
+            window.switchTab(item.tabId);
+          }
+        } else if (item.action) {
+          if (item.action === 'triggerUpload') {
+            const fi = document.getElementById('fileInput');
+            if (fi) fi.click();
+          } else if (item.action === 'triggerExport') {
+            if (typeof window.exportCurrentCSV === 'function') window.exportCurrentCSV();
+          } else if (item.action === 'toggleTheme') {
+            if (typeof window.toggleBrightnessTheme === 'function') window.toggleBrightnessTheme();
+          } else if (item.action === 'openSecurity') {
+            if (typeof window.openAuthModal === 'function') window.openAuthModal('user');
+          }
+        }
+      };
+
+      window.toggleUserProfileDropdown = function() {
+        const dropdown = document.getElementById("headerUserProfileDropdown");
+        if (!dropdown) return;
+        const isOpen = dropdown.style.display === "block";
+        window.closeGlobalSearchDropdown();
+        dropdown.style.display = isOpen ? "none" : "block";
+
+        if (typeof window.currentAuthUser !== 'undefined' && window.currentAuthUser && (window.currentAuthUser.username || window.currentAuthUser.email)) {
+          const nameEl = document.getElementById("dropdownProfileName");
+          const emailEl = document.getElementById("dropdownProfileEmail");
+          const hdrName = document.getElementById("headerProfileName");
+          const hdrRole = document.getElementById("headerProfileRole");
+          const avatarEl = document.getElementById("headerProfileAvatarInitials");
+
+          if (nameEl) nameEl.textContent = window.currentAuthUser.full_name || window.currentAuthUser.username;
+          if (emailEl) emailEl.textContent = window.currentAuthUser.email || window.currentAuthUser.username;
+          if (hdrName) hdrName.textContent = (window.currentAuthUser.full_name || window.currentAuthUser.username).split(' ')[0];
+          if (hdrRole) hdrRole.textContent = window.currentAuthUser.role || "Enterprise";
+          if (avatarEl) {
+            const initials = (window.currentAuthUser.full_name || window.currentAuthUser.username).substring(0, 2).toUpperCase();
+            avatarEl.textContent = initials;
+          }
+        }
+      };
+
+      window.closeUserProfileDropdown = function() {
+        const dropdown = document.getElementById("headerUserProfileDropdown");
+        if (dropdown) dropdown.style.display = "none";
+      };
+
+      document.addEventListener("click", function(e) {
+        const searchContainer = document.getElementById("headerGlobalSearchContainer");
+        if (searchContainer && !searchContainer.contains(e.target)) {
+          window.closeGlobalSearchDropdown();
+        }
+        const profileCorner = document.getElementById("headerUserProfileCorner");
+        if (profileCorner && !profileCorner.contains(e.target)) {
+          window.closeUserProfileDropdown();
+        }
+      });
+
+      document.addEventListener("keydown", function(e) {
+        if ((e.ctrlKey || e.metaKey) && (e.key === "k" || e.key === "K")) {
+          e.preventDefault();
+          const inp = document.getElementById("globalHeaderSearchInput");
+          if (inp) {
+            inp.focus();
+            inp.select();
+            window.handleGlobalHeaderSearch(inp.value);
+          }
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
