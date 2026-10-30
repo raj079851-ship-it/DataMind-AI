@@ -2709,6 +2709,87 @@
       box-shadow: 0 4px 12px rgba(168, 134, 79, 0.15);
     }
 
+
+    /* Header 3-Column Balanced Layout: Brand Left, Search Middle, Controls Right */
+    .header .brand {
+      flex: 1 1 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-start !important;
+      min-width: 0 !important;
+    }
+    .header-global-search-container {
+      position: relative !important;
+      flex: 0 0 340px !important;
+      max-width: 360px !important;
+      width: 340px !important;
+      margin: 0 auto !important;
+    }
+    .header-right-controls {
+      flex: 1 1 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 12px !important;
+    }
+
+    /* Circular Login Button with Green Active Denotator (Matching Theme Adjuster) */
+    .header-login-circle-btn {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      border: 1.8px solid rgba(212, 175, 55, 0.65);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease, border-color 0.3s ease;
+      position: relative;
+      box-shadow: 0 0 14px rgba(212, 175, 55, 0.28);
+      background: rgba(15, 23, 42, 0.85);
+      flex-shrink: 0;
+      user-select: none;
+      color: var(--champagne-gold, #D4AF37);
+    }
+    .header-login-circle-btn:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.55);
+      border-color: var(--champagne-gold, #D4AF37);
+      color: #F5F5F2;
+    }
+    .header-login-circle-icon {
+      color: inherit;
+      transition: transform 0.2s ease;
+      display: block;
+    }
+    .header-login-circle-btn:hover .header-login-circle-icon {
+      transform: scale(1.12);
+    }
+    .header-login-status-dot {
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 10px;
+      height: 10px;
+      background: #10B981;
+      border: 2px solid #0f172a;
+      border-radius: 50%;
+      transition: background 0.3s ease, border-color 0.3s ease;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.45);
+    }
+    body.day-theme .header-login-circle-btn,
+    body.light-theme .header-login-circle-btn {
+      background: #FFFFFF;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+      border-color: rgba(212, 175, 55, 0.65);
+      color: #A8864F;
+    }
+    body.day-theme .header-login-status-dot,
+    body.light-theme .header-login-status-dot {
+      border-color: #FFFFFF !important;
+    }
+
 </style>
 </head>
 <body>
@@ -2725,7 +2806,7 @@
       </div>
     </div>
 
-    <!-- 1. Global Search (Shorter Compact Bar) -->
+    <!-- 2. Global Search Adjusted in the Exact Middle -->
     <div class="header-global-search-container" id="headerGlobalSearchContainer">
       <div class="header-search-input-box">
         <svg class="header-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -2739,14 +2820,16 @@
       <div id="globalHeaderSearchResults" class="header-search-dropdown" style="display:none;"></div>
     </div>
 
-    <div style="display:flex;gap:10px;align-items:center;flex-shrink:0;margin-left:auto;">
+    <!-- Right Controls -->
+    <div class="header-right-controls">
       <!-- Fullscreen Restore Sidebar Button (appears when sidebar is hidden) -->
       <button id="headerSidebarRestoreBtn" class="btn btn-outline" onclick="toggleSidebarFullscreen()" style="display:none; padding:6px 12px; font-size:0.78rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold); background:rgba(212,175,55,0.12); border-radius:8px; align-items:center; gap:6px; cursor:pointer; font-weight:700; white-space:nowrap; box-shadow:0 0 12px rgba(212,175,55,0.18);" title="Show Sidebar Column">
         <span>⮞</span>
         <span>Show Sidebar</span>
       </button>
 
-      <span id="activeDatasetTag" class="badge badge-info" style="font-size:0.80rem;padding:6px 12px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:20px;white-space:nowrap;">Dataset: None</span>
+      <!-- Hidden Dataset Tag so existing JS logic never throws -->
+      <span id="activeDatasetTag" style="display:none;">Dataset: None</span>
       
       <!-- Export CSV Button -->
       <button class="btn btn-primary" style="width:auto;margin:0;padding:7px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(99,102,241,0.35);font-weight:600;font-size:0.80rem;white-space:nowrap;" onclick="exportCurrentCSV()">
@@ -2766,14 +2849,14 @@
         <span id="themeToggleStatusDot" style="position:absolute; bottom:-1px; right:-1px; width:10px; height:10px; background:#38bdf8; border:2px solid #0f172a; border-radius:50%; transition:background 0.3s ease, border-color 0.3s ease;" title="Night Mode Active"></span>
       </div>
 
-      <!-- Login Button: Login Icon & Text Only -->
-      <button id="headerLoginBtn" class="header-login-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login">
-        <svg class="header-login-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <!-- 3. Circular Login Button with Green Active Denotator (Matching Theme Adjuster) -->
+      <div id="headerLoginBtn" class="header-login-circle-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAuthModal('user');}">
+        <svg class="header-login-circle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        <span id="headerLoginBtnText" class="header-login-text">Login</span>
-      </button>
+        <span id="headerLoginStatusDot" class="header-login-status-dot" title="Active Session / Ready"></span>
+      </div>
     </div>
   </header>
 
