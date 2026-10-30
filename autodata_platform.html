@@ -2659,28 +2659,21 @@
     <!-- LEFT SIDEBAR: Premium Collapsible Executive Navigation -->
     <aside class="sidebar" role="navigation" aria-label="Main Navigation">
 
-      <!-- Premium Brand Header (Logo & Platform Name) -->
-      <div class="sidebar-brand-header">
-        <div class="sidebar-brand" onclick="resetAppToNew()" title="⚡ DataMind AI - Reset Workspace &amp; Fresh Page">
-          <img src="assets/datamind_logo_thumb.jpg" onerror="this.onerror=null; this.src='assets/datamind_logo.jpg';" alt="DataMind AI Logo" class="brand-logo-img sidebar-brand-logo" />
-          <div class="sidebar-brand-meta">
-            <div class="brand-title">Data<span class="brand-mind">Mind</span> AI</div>
-            <div class="brand-subtitle">Analyze • Predict • Empower</div>
-          </div>
-        </div>
-        <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Collapse Sidebar Workspace" aria-label="Toggle Fullscreen Workspace">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
-            <path d="M14 9l-3 3 3 3"></path>
-          </svg>
-        </button>
-      </div>
-
-      <!-- SECTION 1: DATA INGESTION & UPLOAD -->
-      <div class="sidebar-section" id="sidebarDataIngestionSection">
-        <div class="sidebar-title">
-          <span>Data Ingestion</span>
+      <!-- SECTION 1: DATA INGESTION -->
+      <div class="sidebar-section" id="sidebarDataIngestionSection" style="margin-top:10px;">
+        <div class="sidebar-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="display:inline-flex; align-items:center; gap:6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"/><polyline points="14 2 14 8 20 8"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg>
+            <span>1. Data Ingestion</span>
+          </span>
+          <!-- Sidebar Hidden Button (Near Data Ingestion) -->
+          <button id="sidebarHideBtn" class="sidebar-hide-btn" onclick="toggleSidebarFullscreen()" title="Sidebar Hidden (Click to Toggle Fullscreen Workspace)" aria-label="Sidebar Hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="display:block;">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+              <path d="M14 9l-3 3 3 3"></path>
+            </svg>
+          </button>
         </div>
 
         <div class="drop-zone" id="sidebarDropZone" onclick="document.getElementById('csvInput').click()" title="Click or Drag &amp; Drop to Ingest Dataset File">
@@ -2701,229 +2694,207 @@
       <!-- SECTION 2: CATEGORIZED MODULE NAVIGATION -->
       <div class="sidebar-section">
         <div class="sidebar-title">
-          <span>Enterprise Navigation</span>
+          <span>🧭 Navigation</span>
         </div>
         <nav class="nav-list">
 
-          <!-- Core Navigation Items -->
+          <!-- 1. DATA PREPARATION & ENGINEERING -->
           <div class="nav-group-header">
-            <span class="category-title">Core Workspace</span>
+            <span class="category-title">🛠️ Data Engineering</span>
           </div>
 
-          <!-- 1. Overview Dashboard -->
           <button class="nav-item active" id="navBtnOverview" onclick="switchModule('moduleOverview')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
-              <span>Overview Dashboard</span>
+              <span>Data Preview &amp; Schema</span>
             </span>
             <span class="badge badge-info" id="navBadgeRows" style="display:none;">0 Rows</span>
           </button>
 
-          <!-- 2. Data Upload -->
-          <button class="nav-item" id="navBtnUpload" onclick="document.getElementById('csvInput').click()">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              <span>Data Upload</span>
-            </span>
-          </button>
-
-          <!-- 3. Data Quality & Audit -->
-          <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-              <span>Data Quality &amp; Audit</span>
-            </span>
-          </button>
-
-          <!-- Companion: Data Cleaning -->
           <button class="nav-item" id="navBtnCleaning" onclick="switchModule('moduleCleaning')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-              <span>Data Cleaning &amp; Audit</span>
+              <span>1. Data Cleaning &amp; Audit</span>
             </span>
           </button>
 
-          <!-- 4. Data Processing & Transformation -->
+          <button class="nav-item" id="navBtnDataQuality" onclick="switchModule('moduleDataQuality')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              <span>2. Data Quality Audit</span>
+            </span>
+          </button>
+
           <button class="nav-item" id="navBtnProcessing" onclick="switchModule('moduleProcessing')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
-              <span>Data Processing &amp; Transformation</span>
+              <span>3. Data Processing &amp; Transform</span>
             </span>
           </button>
 
-          <!-- Companion: Feature Engineering -->
           <button class="nav-item" id="navBtnFE" onclick="switchModule('moduleFE')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              <span>Feature Engineering</span>
+              <span>4. Feature Engineering</span>
             </span>
           </button>
 
-          <!-- Companion: Insert New Column -->
           <button class="nav-item" id="navBtnInsertCol" onclick="switchModule('moduleInsertCol')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-              <span>Insert New Column</span>
+              <span>5. Insert New Column</span>
             </span>
             <span class="badge badge-info" id="sidebarColCount" style="display:none;">0 Cols</span>
           </button>
 
-          <!-- Analytics & Intelligence -->
+          <!-- 2. ANALYTICS & BUSINESS INTELLIGENCE -->
           <div class="nav-group-header">
-            <span class="category-title">Analytics &amp; Intelligence</span>
+            <span class="category-title">📊 Analytics &amp; BI</span>
           </div>
 
-          <!-- 5. Exploratory Data Analysis (EDA) -->
           <button class="nav-item" id="navBtnEDA" onclick="switchModule('moduleEDA')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-              <span>Exploratory Data Analysis (EDA)</span>
+              <span>6. Exploratory Analysis (EDA)</span>
             </span>
           </button>
 
-          <!-- 6. Statistical Analysis -->
-          <button class="nav-item" id="navBtnStats" onclick="switchModule('moduleStats')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"/><path d="M18 14v4"/><path d="M14 10v8"/><path d="M10 14v4"/><path d="M6 18v-2"/></svg>
-              <span>Statistical Analysis</span>
-            </span>
-          </button>
-
-          <!-- Companion: Interactive BI Dashboard -->
           <button class="nav-item" id="navBtnDashboard" onclick="switchModule('moduleDashboard')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-              <span>Interactive BI Dashboard</span>
+              <span>7. Interactive BI Dashboard</span>
             </span>
           </button>
 
-          <!-- Companion: Dashboard Builder -->
           <button class="nav-item" id="navBtnDashboardBuilder" onclick="switchModule('moduleDashboardBuilder')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 2 4 4-14 14H4v-4L18 2z"/><path d="m14.5 5.5 4 4"/></svg>
-              <span>Dashboard Builder</span>
+              <span>8. Dashboard Builder</span>
             </span>
           </button>
 
-          <!-- Companion: AI Chart Recommender -->
           <button class="nav-item" id="navBtnVisualization" onclick="switchModule('moduleVisualization')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.29 7 12 12 20.71 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg>
-              <span>AI Chart Recommender</span>
+              <span>10. AI Chart Recommender</span>
             </span>
           </button>
 
-          <!-- 7. Experimentation & A/B Testing -->
-          <button class="nav-item" id="navBtnAB" onclick="switchModule('moduleABTesting')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
-              <span>Experimentation &amp; A/B Testing</span>
-            </span>
-          </button>
-
-          <!-- Companion: SQL Studio -->
-          <button class="nav-item" id="navBtnSql" onclick="switchModule('moduleSql')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-              <span>SQL &amp; Database Studio</span>
-            </span>
-          </button>
-
-          <!-- Companion: Python Sandbox -->
-          <button class="nav-item" id="navBtnPython" onclick="switchModule('modulePython')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-              <span>Python Analytics Sandbox</span>
-            </span>
-          </button>
-
-          <!-- AI & Machine Learning -->
-          <div class="nav-group-header">
-            <span class="category-title">AI &amp; Machine Learning</span>
-          </div>
-
-          <!-- 8. Machine Learning Models -->
-          <button class="nav-item" id="navBtnML" onclick="switchModule('moduleML')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a4 4 0 0 0-4 4v1H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2v1a4 4 0 0 0 8 0v-1h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>
-              <span>Machine Learning Models</span>
-            </span>
-          </button>
-
-          <!-- 9. Predictive Analytics -->
-          <button class="nav-item" id="navBtnPredictive" onclick="switchModule('modulePredictive')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              <span>Predictive Analytics</span>
-            </span>
-          </button>
-
-          <!-- 10. Forecasting -->
-          <button class="nav-item" id="navBtnForecasting" onclick="switchModule('moduleForecasting')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Forecasting</span>
-            </span>
-          </button>
-
-          <!-- 11. NLP & Text Analytics -->
-          <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
-              <span>NLP &amp; Text Analytics</span>
-            </span>
-          </button>
-
-          <!-- 12. Model Evaluation -->
-          <button class="nav-item" id="navBtnEvaluation" onclick="switchModule('moduleEvaluation')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-              <span>Model Evaluation</span>
-            </span>
-          </button>
-
-          <!-- 13. Model Registry -->
-          <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
-              <span>Model Registry</span>
-            </span>
-          </button>
-
-          <!-- Companion: AI Assistant -->
-          <button class="nav-item" id="navBtnAI" onclick="switchModule('moduleAI')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/></svg>
-              <span>AI Assistant</span>
-            </span>
-          </button>
-
-          <!-- Reporting & Settings -->
-          <div class="nav-group-header">
-            <span class="category-title">Reporting &amp; Governance</span>
-          </div>
-
-          <!-- 14. Reports & Insights -->
-          <button class="nav-item" id="navBtnReport" onclick="switchModule('moduleReport')">
-            <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-              <span>Reports &amp; Insights</span>
-            </span>
-          </button>
-
-          <!-- Companion: Strategic Insights -->
           <button class="nav-item" id="navBtnInsights" onclick="switchModule('moduleInsights')">
             <span class="nav-item-content">
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2z"/></svg>
-              <span>Strategic Business Insights</span>
+              <span>11. Strategic Business Insights</span>
             </span>
           </button>
 
-          <!-- 15. Settings -->
+          <button class="nav-item" id="navBtnStats" onclick="switchModule('moduleStats')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2z"/><path d="M18 14v4"/><path d="M14 10v8"/><path d="M10 14v4"/><path d="M6 18v-2"/></svg>
+              <span>12. Statistical Analysis</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnAB" onclick="switchModule('moduleABTesting')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2v7.31"/><path d="M14 9.3V2"/><path d="M8.5 2h7"/><path d="M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+              <span>13. Experimentation &amp; A/B Testing</span>
+            </span>
+          </button>
+
+          <!-- 3. QUERY & DEVELOPMENT ENGINES -->
+          <div class="nav-group-header">
+            <span class="category-title">💻 Query &amp; Code Engines</span>
+          </div>
+
+          <button class="nav-item" id="navBtnSql" onclick="switchModule('moduleSql')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              <span>14. SQL &amp; Database Studio</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnPython" onclick="switchModule('modulePython')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>15. Python Analytics Sandbox</span>
+            </span>
+          </button>
+
+          <!-- 4. ARTIFICIAL INTELLIGENCE & MACHINE LEARNING -->
+          <div class="nav-group-header">
+            <span class="category-title">🤖 AI &amp; Machine Learning</span>
+          </div>
+
+          <button class="nav-item" id="navBtnML" onclick="switchModule('moduleML')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a4 4 0 0 0-4 4v1H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2v1a4 4 0 0 0 8 0v-1h2a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6a4 4 0 0 0-4-4z"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/></svg>
+              <span>16. Machine Learning Models</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnPredictive" onclick="switchModule('modulePredictive')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="2"/></svg>
+              <span>17. Predictive Analytics</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnForecasting" onclick="switchModule('moduleForecasting')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>18. Forecasting</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnEvaluation" onclick="switchModule('moduleEvaluation')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              <span>19. Model Evaluation</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnRegistry" onclick="switchModule('moduleRegistry')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+              <span>20. Model Registry</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnNLP" onclick="switchModule('moduleNLP')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01"/><path d="M12 10h.01"/><path d="M16 10h.01"/></svg>
+              <span>21. NLP &amp; Text Analytics</span>
+            </span>
+          </button>
+
+          <button class="nav-item" id="navBtnAI" onclick="switchModule('moduleAI')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/><path d="M5 3v4"/><path d="M3 5h4"/><path d="M19 17v4"/><path d="M17 19h4"/></svg>
+              <span>22. AI Assistant</span>
+            </span>
+          </button>
+
+          <!-- 5. REPORTING & EXECUTIVE DELIVERABLES -->
+          <div class="nav-group-header">
+            <span class="category-title">📑 Reporting &amp; Deliverables</span>
+          </div>
+
+          <button class="nav-item" id="navBtnReport" onclick="switchModule('moduleReport')">
+            <span class="nav-item-content">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>23. Executive Report Studio</span>
+            </span>
+          </button>
+
+          <!-- 6. PLATFORM SETTINGS & PREFERENCES -->
+          <div class="nav-group-header">
+            <span class="category-title">⚙️ System &amp; Settings</span>
+          </div>
+
           <button class="nav-item" id="navBtnSettings" onclick="switchModule('moduleSettings')">
             <span class="nav-item-content">
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              <span>Settings</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>24. Platform Settings</span>
             </span>
           </button>
 
