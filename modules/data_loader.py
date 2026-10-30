@@ -38,10 +38,14 @@ def load_dataset(
     elif hasattr(file_or_buffer, "read"):
         val = file_or_buffer.read()
         raw_bytes = val.encode("utf-8") if isinstance(val, str) else val
-    elif isinstance(file_or_buffer, (str, bytes, os.PathLike)):
-        if isinstance(file_or_buffer, (str, os.PathLike)) and os.path.exists(file_or_buffer):
+    elif isinstance(file_or_buffer, bytes):
+        raw_bytes = file_or_buffer
+    elif isinstance(file_or_buffer, (str, os.PathLike)):
+        if os.path.exists(file_or_buffer):
             with open(file_or_buffer, "rb") as f:
                 raw_bytes = f.read()
+        else:
+            raw_bytes = file_or_buffer.encode("utf-8")
 
     df = None
     used_encoding = encoding or "utf-8"
@@ -111,10 +115,14 @@ def load_csv_data(
     elif hasattr(file_or_buffer, "read"):
         val = file_or_buffer.read()
         raw_bytes = val.encode("utf-8") if isinstance(val, str) else val
-    elif isinstance(file_or_buffer, (str, bytes, os.PathLike)):
-        if isinstance(file_or_buffer, (str, os.PathLike)) and os.path.exists(file_or_buffer):
+    elif isinstance(file_or_buffer, bytes):
+        raw_bytes = file_or_buffer
+    elif isinstance(file_or_buffer, (str, os.PathLike)):
+        if os.path.exists(file_or_buffer):
             with open(file_or_buffer, "rb") as f:
                 raw_bytes = f.read()
+        else:
+            raw_bytes = file_or_buffer.encode("utf-8")
 
     for enc in encodings_to_try:
         for sep in delimiters_to_try:
@@ -158,7 +166,10 @@ def infer_column_metadata(df: pd.DataFrame) -> Dict[str, Dict[str, Any]]:
         series = df[col]
         null_count = int(series.isna().sum())
         null_pct = round((null_count / n_rows * 100), 2) if n_rows > 0 else 0.0
-        n_unique = int(series.nunique(dropna=True))
+        try:
+            n_unique = int(series.nunique(dropna=True))
+        except TypeError:
+            n_unique = int(series.astype(str).nunique(dropna=True))
         unique_pct = round((n_unique / n_rows * 100), 2) if n_rows > 0 else 0.0
 
         col_lower = str(col).lower()
@@ -251,7 +262,11 @@ def compute_dataset_health_score(df: pd.DataFrame) -> Dict[str, Any]:
     total_cells = df.shape[0] * df.shape[1] if df.shape[0] > 0 and df.shape[1] > 0 else 0
     missing_cells = int(df.isna().sum().sum())
     missing_pct = round((missing_cells / total_cells * 100), 2) if total_cells > 0 else 0.0
-    duplicated_rows = int(df.duplicated().sum())
+    try:
+        duplicated_rows = int(df.duplicated().sum())
+    except TypeError:
+        temp_df = df.map(lambda x: str(x) if isinstance(x, (dict, list)) else x)
+        duplicated_rows = int(temp_df.duplicated().sum())
     dup_pct = round((duplicated_rows / len(df) * 100), 2) if len(df) > 0 else 0.0
 
     score = 100.0
@@ -268,7 +283,14 @@ def compute_dataset_health_score(df: pd.DataFrame) -> Dict[str, Any]:
         score -= pen
         issues.append(f"{duplicated_rows:,} duplicate rows ({dup_pct}%)")
 
-    constant_cols = [c for c in df.columns if df[c].nunique(dropna=False) <= 1]
+    constant_cols = []
+    for c in df.columns:
+        try:
+            if df[c].nunique(dropna=False) <= 1:
+                constant_cols.append(c)
+        except TypeError:
+            if df[c].astype(str).nunique(dropna=False) <= 1:
+                constant_cols.append(c)
     if constant_cols:
         pen = min(15.0, len(constant_cols) * 5.0)
         score -= pen

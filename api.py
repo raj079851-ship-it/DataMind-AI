@@ -794,6 +794,60 @@ async def upload_dataset_file(file: UploadFile = File(...)):
         "sample": df.head(100).to_dict(orient="records")
     }
 
+@app.api_route("/datasets/fetch-url", methods=["GET", "POST"], tags=["Datasets"])
+async def fetch_dataset_url(url: str = Query(None), req_data: dict = Body(None)):
+    """Fetches a remote dataset from a URL (CSV, JSON, XLSX, TSV, TXT), parses it, and stores in active memory."""
+    target_url = url or (req_data.get("url") if isinstance(req_data, dict) else None)
+    if not target_url or not target_url.strip():
+        raise HTTPException(status_code=400, detail="Target dataset URL is required.")
+
+    target_url = target_url.strip()
+    import urllib.request
+    from urllib.parse import urlparse
+    import posixpath
+
+    parsed = urlparse(target_url)
+    raw_filename = posixpath.basename(parsed.path) or "dataset"
+    if "?" in raw_filename:
+        raw_filename = raw_filename.split("?")[0]
+
+    try:
+        req = urllib.request.Request(
+            target_url,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) DataMindAI/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            content = resp.read()
+            content_type = (resp.headers.get("Content-Type") or "").lower()
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Failed to fetch dataset from remote URL: {str(exc)}")
+
+    # Auto-detect format from content if not explicitly in extension
+    content_snip = content[:200].strip()
+    if "." not in raw_filename:
+        if "application/json" in content_type or content_snip.startswith((b"{", b"[")):
+            raw_filename += ".json"
+        elif "tab-separated" in content_type or (b"\t" in content_snip and b"," not in content_snip):
+            raw_filename += ".tsv"
+        elif content_snip.startswith(b"PK\x03\x04"):
+            raw_filename += ".xlsx"
+        else:
+            raw_filename += ".csv"
+
+    try:
+        df, meta = load_dataset(content, filename=raw_filename)
+        active_datasets["default"] = df
+        return {
+            "status": "success",
+            "filename": raw_filename,
+            "total_rows": len(df),
+            "columns": list(df.columns),
+            "metadata": meta,
+            "sample": df.head(100).to_dict(orient="records")
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f"Failed to parse remote dataset ({raw_filename}): {str(exc)}")
+
 @app.post("/datasets/load-hr-2m", tags=["Datasets"])
 def load_kaggle_hr_dataset_endpoint(rows: int = 2_000_000):
     """Loads or generates the 2,000,000-row Kaggle HR dataset directly into backend memory without browser freezing."""

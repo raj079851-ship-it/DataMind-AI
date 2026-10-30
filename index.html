@@ -3604,6 +3604,182 @@
       background: rgba(168, 134, 79, 0.55) !important;
     }
 
+
+    /* =========================================================================
+       URL LINK DATA INGESTION (CSV, JSON, XLSX, TSV, TXT)
+       ========================================================================= */
+    .url-ingest-box {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--card-bg, #101c2e);
+      border: 1px solid var(--card-border, rgba(197, 164, 109, 0.25));
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .url-ingest-box:focus-within {
+      border-color: var(--champagne-gold, #C5A46D);
+      box-shadow: 0 0 12px rgba(197, 164, 109, 0.22);
+    }
+    body.day-theme .url-ingest-box,
+    body.light-theme .url-ingest-box {
+      background: #FFFFFF !important;
+      border: 1px solid #E4E7EC !important;
+      box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04) !important;
+    }
+    body.day-theme .url-ingest-box:focus-within,
+    body.light-theme .url-ingest-box:focus-within {
+      border-color: #A8864F !important;
+      box-shadow: 0 0 12px rgba(168, 134, 79, 0.18) !important;
+    }
+    .url-ingest-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .url-ingest-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--text, #E2E8F0);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    body.day-theme .url-ingest-title,
+    body.light-theme .url-ingest-title {
+      color: #1F2937 !important;
+    }
+    .url-ingest-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(197, 164, 109, 0.15);
+      color: var(--champagne-gold, #C5A46D);
+      border: 1px solid rgba(197, 164, 109, 0.3);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    body.day-theme .url-ingest-badge,
+    body.light-theme .url-ingest-badge {
+      background: #F7F1E7 !important;
+      color: #927342 !important;
+      border-color: #E6D8BF !important;
+    }
+    .url-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .url-input-field {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 6px 28px 6px 8px;
+      font-size: 0.74rem;
+      border-radius: 6px;
+      border: 1px solid rgba(197, 164, 109, 0.25);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--text, #FFFFFF);
+      outline: none;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .url-input-field:focus {
+      border-color: var(--champagne-gold, #C5A46D);
+      background: rgba(0, 0, 0, 0.4);
+    }
+    body.day-theme .url-input-field,
+    body.light-theme .url-input-field {
+      background: #F8F9FB !important;
+      border: 1px solid #D0D5DD !important;
+      color: #1F2937 !important;
+    }
+    body.day-theme .url-input-field:focus,
+    body.light-theme .url-input-field:focus {
+      border-color: #A8864F !important;
+      background: #FFFFFF !important;
+    }
+    .url-paste-icon-btn {
+      position: absolute;
+      right: 4px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted, #94A3B8);
+      cursor: pointer;
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    .url-paste-icon-btn:hover {
+      color: var(--champagne-gold, #C5A46D);
+      background: rgba(197, 164, 109, 0.12);
+    }
+    .url-format-pills {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .url-format-chip {
+      font-size: 0.60rem;
+      font-weight: 700;
+      padding: 1.5px 5px;
+      border-radius: 3px;
+      background: rgba(197, 164, 109, 0.10);
+      color: var(--champagne-gold, #C5A46D);
+      border: 1px solid rgba(197, 164, 109, 0.25);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+    }
+    .url-format-chip:hover {
+      background: var(--champagne-gold, #C5A46D);
+      color: #0B0F14;
+    }
+    body.day-theme .url-format-chip,
+    body.light-theme .url-format-chip {
+      background: #F7F1E7 !important;
+      color: #927342 !important;
+      border-color: #E6D8BF !important;
+    }
+    body.day-theme .url-format-chip:hover,
+    body.light-theme .url-format-chip:hover {
+      background: #A8864F !important;
+      color: #FFFFFF !important;
+      border-color: #A8864F !important;
+    }
+    .url-load-btn {
+      width: 100% !important;
+      padding: 6px 10px !important;
+      font-size: 0.74rem !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 5px !important;
+    }
+
+    /* Main Overview URL Panel */
+    .overview-url-panel {
+      margin-bottom: 20px;
+      background: var(--card-bg, #101c2e);
+      border: 1px solid var(--card-border, rgba(197, 164, 109, 0.25));
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+      transition: border-color 0.18s ease;
+    }
+    body.day-theme .overview-url-panel,
+    body.light-theme .overview-url-panel {
+      background: #FFFFFF !important;
+      border: 1px solid #E4E7EC !important;
+      box-shadow: 0 4px 16px rgba(16, 24, 40, 0.04) !important;
+    }
 </style>
 </head>
 <body>
@@ -4071,6 +4247,37 @@
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M3 21v-5h5"/></svg>
           <span>Reset to Raw Data</span>
         </button>
+
+        <!-- URL LINK DATA INGESTION -->
+        <div class="url-ingest-box" id="sidebarUrlIngestContainer" title="Paste direct URL to import CSV, JSON, XLSX, TSV, or TXT datasets">
+          <div class="url-ingest-header">
+            <span class="url-ingest-title">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--champagne-gold, #C5A46D);"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <span>Paste Dataset Link</span>
+            </span>
+            <span class="url-ingest-badge">URL Link</span>
+          </div>
+
+          <div class="url-input-wrap">
+            <input type="url" id="datasetUrlInput" class="url-input-field" placeholder="Paste link (CSV, JSON, XLSX, TSV, TXT)..." onkeydown="if(event.key==='Enter')loadDatasetFromUrl();" title="Paste public link to CSV, JSON, XLSX, TSV, or TXT dataset" />
+            <button type="button" class="url-paste-icon-btn" onclick="pasteFromClipboardToUrlInput()" title="Paste from clipboard">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+            </button>
+          </div>
+
+          <div class="url-format-pills">
+            <span class="url-format-chip" onclick="setSampleUrlPreset('csv')" title="Click for sample CSV">.CSV</span>
+            <span class="url-format-chip" onclick="setSampleUrlPreset('json')" title="Click for sample JSON">.JSON</span>
+            <span class="url-format-chip" onclick="setSampleUrlPreset('xlsx')" title="Click for sample XLSX">.XLSX</span>
+            <span class="url-format-chip" onclick="setSampleUrlPreset('tsv')" title="Click for sample TSV">.TSV</span>
+            <span class="url-format-chip" onclick="setSampleUrlPreset('txt')" title="Click for sample TXT">.TXT</span>
+          </div>
+
+          <button class="btn btn-primary url-load-btn" id="btnLoadFromUrl" onclick="loadDatasetFromUrl()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Fetch &amp; Ingest Link</span>
+          </button>
+        </div>
       </div>
 
       <!-- SECTION 2: CATEGORIZED MODULE NAVIGATION -->
@@ -4429,6 +4636,41 @@
               <span class="badge badge-info" id="overviewColsBadge">0 Columns</span>
               <span class="badge badge-success" id="overviewRowsBadge">0 Rows</span>
             </div>
+          </div>
+        </div>
+
+        <!-- URL Link Dataset Ingestion Banner -->
+        <div class="overview-url-panel" id="overviewUrlPanel">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="width:28px; height:28px; border-radius:6px; background:rgba(197, 164, 109, 0.15); display:flex; align-items:center; justify-content:center; color:var(--champagne-gold, #C5A46D);">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              </div>
+              <div>
+                <span style="font-weight:700; font-size:0.92rem; color:var(--text);">Ingest Dataset from Link</span>
+                <span style="font-size:0.76rem; color:var(--text-muted); margin-left:8px;">Directly import web-hosted files</span>
+              </div>
+            </div>
+            <div class="url-format-pills">
+              <span class="url-format-chip" onclick="setSampleUrlPreset('csv')" title="Sample CSV">.CSV</span>
+              <span class="url-format-chip" onclick="setSampleUrlPreset('json')" title="Sample JSON">.JSON</span>
+              <span class="url-format-chip" onclick="setSampleUrlPreset('xlsx')" title="Sample XLSX">.XLSX</span>
+              <span class="url-format-chip" onclick="setSampleUrlPreset('tsv')" title="Sample TSV">.TSV</span>
+              <span class="url-format-chip" onclick="setSampleUrlPreset('txt')" title="Sample TXT">.TXT</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px; position:relative;">
+              <input type="url" id="overviewDatasetUrlInput" class="url-input-field" style="padding:9px 36px 9px 12px; font-size:0.82rem; border-radius:8px;" placeholder="Paste link (CSV, JSON, XLSX, TSV, TXT e.g. https://.../data.csv)..." onkeydown="if(event.key==='Enter')loadDatasetFromUrl();" />
+              <button type="button" class="url-paste-icon-btn" style="right:8px; top:50%; transform:translateY(-50%);" onclick="pasteFromClipboardToUrlInput()" title="Paste from clipboard">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+              </button>
+            </div>
+            <button class="btn btn-primary" id="btnOverviewLoadFromUrl" style="width:auto; padding:9px 20px; font-size:0.82rem; border-radius:8px;" onclick="loadDatasetFromUrl()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Fetch &amp; Ingest Link</span>
+            </button>
           </div>
         </div>
 
@@ -13416,6 +13658,10 @@ result = df.describe()
       // 4. Reset file upload inputs
       try {
         const csvInput = document.getElementById("csvInput");
+        const urlInp = document.getElementById("datasetUrlInput");
+        if (urlInp) urlInp.value = "";
+        const urlInp2 = document.getElementById("overviewDatasetUrlInput");
+        if (urlInp2) urlInp2.value = "";
         if (csvInput) csvInput.value = "";
         document.querySelectorAll('input[type="file"]').forEach(inp => { try { inp.value = ""; } catch (err) {} });
       } catch (err) {}
@@ -14449,6 +14695,242 @@ result = df.describe()
       renderCleaningPreviewTable();
       notifyTaskSuccess("Reset to Raw Data", `Reverted dataset to original raw state (${currentDataset.length.toLocaleString()} rows × ${columns.length} columns).`);
     }
+
+    
+    // =========================================================================
+    // URL LINK DATA INGESTION ENGINE (CSV, JSON, XLSX, TSV, TXT)
+    // =========================================================================
+    async function loadDatasetFromUrl(urlOverride) {
+      const urlInput = document.getElementById("datasetUrlInput");
+      const overviewInput = document.getElementById("overviewDatasetUrlInput");
+      let url = (urlOverride || (urlInput ? urlInput.value : "") || (overviewInput ? overviewInput.value : "")).trim();
+
+      if (!url) {
+        if (typeof showToast === "function") showToast("Please paste a dataset link (CSV, JSON, XLSX, TSV, TXT).", "warning");
+        if (urlInput) urlInput.focus();
+        return;
+      }
+
+      // Sync both input fields
+      if (urlInput) urlInput.value = url;
+      if (overviewInput) overviewInput.value = url;
+
+      // Extract filename & format
+      let rawFilename = "dataset.csv";
+      try {
+        const parsed = new URL(url);
+        const parts = parsed.pathname.split("/");
+        const last = parts[parts.length - 1];
+        if (last && last.trim()) {
+          rawFilename = decodeURIComponent(last.split("?")[0].split("#")[0]);
+        }
+      } catch (err) {
+        const clean = url.split("?")[0].split("#")[0];
+        const segs = clean.split("/");
+        if (segs.length) rawFilename = segs[segs.length - 1] || "dataset.csv";
+      }
+
+      let ext = (rawFilename.split(".").pop() || "").toLowerCase();
+      if (!ext || ext === rawFilename) {
+        ext = "csv";
+        rawFilename += ".csv";
+      }
+
+      const btnSidebar = document.getElementById("btnLoadFromUrl");
+      const btnOverview = document.getElementById("btnOverviewLoadFromUrl");
+      const setBtnLoading = (loading) => {
+        [btnSidebar, btnOverview].forEach(b => {
+          if (b) {
+            b.disabled = loading;
+            b.innerHTML = loading
+              ? `<span class="spinner-border spinner-border-sm" style="width:12px;height:12px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;display:inline-block;animation:spin 0.6s linear infinite;margin-right:4px;"></span> Ingesting...`
+              : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> <span>Fetch &amp; Ingest Link</span>`;
+          }
+        });
+      };
+
+      setBtnLoading(true);
+      notifyTaskStart(`Ingest ${ext.toUpperCase()}: ${rawFilename}`);
+
+      try {
+        let loadedRows = null;
+        let finalFilename = rawFilename;
+
+        // Try direct browser fetch first
+        let response = null;
+        let directFetchWorked = false;
+        try {
+          response = await fetch(url, { method: "GET", mode: "cors" });
+          if (response.ok) {
+            directFetchWorked = true;
+          }
+        } catch (fetchErr) {
+          console.warn("Direct browser fetch encountered CORS or network restriction. Using backend proxy:", fetchErr);
+        }
+
+        if (directFetchWorked && response) {
+          const contentType = (response.headers.get("content-type") || "").toLowerCase();
+
+          // 1. EXCEL (.xlsx, .xls)
+          if (ext === "xlsx" || ext === "xls" || contentType.includes("spreadsheet") || contentType.includes("excel")) {
+            if (typeof XLSX === "undefined") {
+              throw new Error("SheetJS Excel parser is loading. Please retry in a moment.");
+            }
+            const buf = await response.arrayBuffer();
+            const workbook = XLSX.read(new Uint8Array(buf), { type: "array" });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const rawJson = XLSX.utils.sheet_to_json(sheet, { defval: null });
+            loadedRows = rawJson.map(row => {
+              const item = {};
+              Object.keys(row).forEach(k => {
+                const cleanKey = String(k).trim() || "Column";
+                const v = row[k];
+                if (v === "" || v === undefined || v === null) item[cleanKey] = null;
+                else if (typeof v === "number") item[cleanKey] = v;
+                else {
+                  const num = Number(v);
+                  item[cleanKey] = (!isNaN(num) && isFinite(num) && String(v).trim() !== "") ? num : v;
+                }
+              });
+              return item;
+            });
+            rawCSVText = "";
+          }
+          // 2. JSON (.json)
+          else if (ext === "json" || contentType.includes("json")) {
+            const rawJson = await response.json();
+            let arr = [];
+            if (Array.isArray(rawJson)) arr = rawJson;
+            else if (rawJson && typeof rawJson === "object") {
+              if (Array.isArray(rawJson.data)) arr = rawJson.data;
+              else if (Array.isArray(rawJson.records)) arr = rawJson.records;
+              else if (Array.isArray(rawJson.results)) arr = rawJson.results;
+              else if (Array.isArray(rawJson.rows)) arr = rawJson.rows;
+              else arr = [rawJson];
+            }
+            if (!arr.length) throw new Error("JSON from URL contains no record arrays.");
+            loadedRows = arr.map(r => {
+              const item = {};
+              Object.keys(r).forEach(k => {
+                const v = r[k];
+                if (v === null || v === undefined || v === "") item[k] = null;
+                else if (typeof v === "number") item[k] = v;
+                else if (typeof v === "object") item[k] = JSON.stringify(v);
+                else {
+                  const num = Number(v);
+                  item[k] = (!isNaN(num) && isFinite(num) && typeof v === "string" && v.trim() !== "") ? num : v;
+                }
+              });
+              return item;
+            });
+            rawCSVText = "";
+          }
+          // 3. TSV / CSV / TXT
+          else {
+            const text = await response.text();
+            rawCSVText = text;
+            const delimiter = (ext === "tsv" || contentType.includes("tab-separated")) ? "\t" : "auto";
+            await parseCSVString(text, delimiter);
+            loadedRows = currentDataset;
+          }
+        } else {
+          // Fallback to high-speed backend fetch proxy
+          const proxyUrl = `${API_BASE_URL || "http://localhost:8000"}/datasets/fetch-url?url=${encodeURIComponent(url)}`;
+          const proxyRes = await fetch(proxyUrl);
+          if (!proxyRes.ok) {
+            const errJson = await proxyRes.json().catch(() => ({}));
+            throw new Error(errJson.detail || `Backend failed to fetch URL (HTTP ${proxyRes.status})`);
+          }
+          const proxyData = await proxyRes.json();
+          if (proxyData.status === "success" && proxyData.sample && proxyData.sample.length) {
+            finalFilename = proxyData.filename || rawFilename;
+            loadedRows = proxyData.sample;
+            if (proxyData.total_rows && proxyData.total_rows > loadedRows.length) {
+              window.isBigDataset = true;
+              window.actualTotalRows = proxyData.total_rows;
+            }
+          } else {
+            throw new Error(proxyData.detail || "Invalid dataset format received from remote link.");
+          }
+        }
+
+        if (!loadedRows || !loadedRows.length) {
+          throw new Error("No readable dataset rows found at the provided link.");
+        }
+
+        // Apply dataset to platform
+        window.activeDatasetName = finalFilename;
+        const tag = document.getElementById("activeDatasetTag");
+        if (tag) tag.textContent = `Dataset: ${finalFilename} (URL)`;
+        setDataset(loadedRows);
+
+        // Update drop zone banner if available
+        if (typeof updateDropZoneDisplay === "function") {
+          updateDropZoneDisplay(finalFilename);
+        }
+
+        // Switch to Overview module & scroll to preview
+        if (typeof switchModule === "function") switchModule("moduleOverview");
+
+        notifyTaskSuccess("Dataset Ingestion", `Ingested '${finalFilename}' from link (${loadedRows.length.toLocaleString()} rows × ${columns.length} columns).`);
+        if (typeof showToast === "function") {
+          showToast(`⚡ Ingested ${loadedRows.length.toLocaleString()} rows from link!`, "success");
+        }
+      } catch (err) {
+        console.error("URL Ingestion Error:", err);
+        notifyTaskFailed("Dataset Ingestion", `Failed to ingest link: ${err.message}`);
+        if (typeof showToast === "function") {
+          showToast(`❌ Error: ${err.message}`, "error");
+        }
+      } finally {
+        setBtnLoading(false);
+      }
+    }
+    window.loadDatasetFromUrl = loadDatasetFromUrl;
+
+    // Helper to set sample URL presets
+    function setSampleUrlPreset(format) {
+      const presets = {
+        csv: "https://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv",
+        json: "https://jsonplaceholder.typicode.com/users",
+        xlsx: "https://file-examples.com/storage/fe92518e9c66f54c9359fa8/2017/02/file_example_XLSX_50.xlsx",
+        tsv: "https://raw.githubusercontent.com/goxr3plus/java-stream-player/master/test.tsv",
+        txt: "https://raw.githubusercontent.com/datasets/gdp/master/data/gdp.csv"
+      };
+      const url = presets[format] || presets.csv;
+      const inp = document.getElementById("datasetUrlInput");
+      if (inp) {
+        inp.value = url;
+        inp.focus();
+      }
+      const inp2 = document.getElementById("overviewDatasetUrlInput");
+      if (inp2) inp2.value = url;
+      if (typeof showToast === "function") {
+        showToast(`Loaded sample ${format.toUpperCase()} link. Click 'Fetch & Ingest Link' to import!`, "info");
+      }
+    }
+    window.setSampleUrlPreset = setSampleUrlPreset;
+
+    // Helper to paste from clipboard
+    async function pasteFromClipboardToUrlInput() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          const inp = document.getElementById("datasetUrlInput");
+          if (inp) {
+            inp.value = text.trim();
+            inp.focus();
+          }
+          const inp2 = document.getElementById("overviewDatasetUrlInput");
+          if (inp2) inp2.value = text.trim();
+          if (typeof showToast === "function") showToast("Pasted link from clipboard!", "info");
+        }
+      } catch (err) {
+        const inp = document.getElementById("datasetUrlInput");
+        if (inp) inp.focus();
+      }
+    }
+    window.pasteFromClipboardToUrlInput = pasteFromClipboardToUrlInput;
 
     function handleFileUpload(e) {
       const file = e.target.files[0];
