@@ -2790,6 +2790,231 @@
       border-color: #FFFFFF !important;
     }
 
+
+    /* ==========================================================================
+       COMPACT ENTERPRISE HEADER (Reduced Height without Compromise)
+       ========================================================================== */
+    .header {
+      padding: 6px 20px !important;
+      min-height: 54px !important;
+      height: 54px !important;
+      box-sizing: border-box !important;
+    }
+    .brand {
+      gap: 10px !important;
+    }
+    .brand-logo-img {
+      width: 38px !important;
+      height: 38px !important;
+      border-radius: 9px !important;
+      box-shadow: 0 0 12px rgba(197, 164, 109, 0.40) !important;
+      border: 1.2px solid rgba(197, 164, 109, 0.50) !important;
+    }
+    .brand-title {
+      font-size: 1.12rem !important;
+      line-height: 1.1 !important;
+      font-weight: 800 !important;
+    }
+    .brand-subtitle {
+      font-size: 0.62rem !important;
+      line-height: 1.15 !important;
+      letter-spacing: 0.06em !important;
+      margin-top: 1px !important;
+    }
+    .brand-tagline {
+      font-size: 0.58rem !important;
+      line-height: 1.1 !important;
+      opacity: 0.85 !important;
+    }
+
+    /* Centered Search Bar in Compact Header */
+    .header-global-search-container {
+      position: relative !important;
+      flex: 0 0 320px !important;
+      max-width: 340px !important;
+      width: 320px !important;
+      margin: 0 auto !important;
+    }
+    .header-search-input {
+      height: 34px !important;
+      padding: 0 46px 0 38px !important;
+      font-size: 0.78rem !important;
+      border-radius: 8px !important;
+    }
+    .header-search-icon {
+      left: 11px !important;
+      width: 14px !important;
+      height: 14px !important;
+    }
+    .header-search-kbd-shortcut {
+      right: 8px !important;
+      font-size: 0.62rem !important;
+      padding: 1px 5px !important;
+    }
+
+    /* Right Controls in Compact Header */
+    .header-right-controls {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: flex-end !important;
+      gap: 8px !important;
+    }
+
+    /* Distinct Executive Theme for "Export CSV" */
+    .btn-export-luxe {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      height: 34px !important;
+      padding: 0 14px !important;
+      border-radius: 8px !important;
+      font-size: 0.78rem !important;
+      font-weight: 600 !important;
+      white-space: nowrap !important;
+      cursor: pointer !important;
+      background: linear-gradient(135deg, rgba(197, 164, 109, 0.16) 0%, rgba(168, 134, 79, 0.08) 100%) !important;
+      border: 1px solid rgba(197, 164, 109, 0.45) !important;
+      color: #F5F5F2 !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .btn-export-luxe:hover {
+      background: linear-gradient(135deg, rgba(197, 164, 109, 0.26) 0%, rgba(168, 134, 79, 0.16) 100%) !important;
+      border-color: #C5A46D !important;
+      color: #FFFFFF !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 16px rgba(197, 164, 109, 0.30) !important;
+    }
+    .btn-export-luxe svg {
+      color: #C5A46D !important;
+      transition: transform 0.2s ease !important;
+    }
+    .btn-export-luxe:hover svg {
+      transform: translateY(1px) !important;
+    }
+
+    /* Light Mode Export CSV Theme */
+    body.day-theme .btn-export-luxe, body.light-theme .btn-export-luxe {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%) !important;
+      border: 1.2px solid rgba(168, 134, 79, 0.50) !important;
+      color: #171B22 !important;
+      box-shadow: 0 2px 8px rgba(168, 134, 79, 0.12) !important;
+    }
+    body.day-theme .btn-export-luxe:hover, body.light-theme .btn-export-luxe:hover {
+      background: #FFFFFF !important;
+      border-color: #A8864F !important;
+      color: #A8864F !important;
+      box-shadow: 0 4px 14px rgba(168, 134, 79, 0.25) !important;
+    }
+    body.day-theme .btn-export-luxe svg, body.light-theme .btn-export-luxe svg {
+      color: #A8864F !important;
+    }
+
+    /* Compact 36px Circular Buttons (Notification, Theme, Login) */
+    .header-ctrl-circle-btn {
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      border-radius: 50% !important;
+      border: 1.5px solid rgba(212, 175, 55, 0.55) !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      cursor: pointer !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease, border-color 0.25s ease !important;
+      position: relative !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+      background: rgba(15, 23, 42, 0.85) !important;
+      flex-shrink: 0 !important;
+      user-select: none !important;
+      color: var(--champagne-gold, #D4AF37) !important;
+    }
+    .header-ctrl-circle-btn:hover {
+      transform: scale(1.08) !important;
+      box-shadow: 0 0 16px rgba(212, 175, 55, 0.45) !important;
+      border-color: var(--champagne-gold, #D4AF37) !important;
+    }
+    body.day-theme .header-ctrl-circle-btn, body.light-theme .header-ctrl-circle-btn {
+      background: #FFFFFF !important;
+      border-color: rgba(212, 175, 55, 0.55) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10) !important;
+      color: #A8864F !important;
+    }
+
+    /* Notification Badge */
+    .header-notif-badge {
+      position: absolute !important;
+      top: -2px !important;
+      right: -2px !important;
+      min-width: 15px !important;
+      height: 15px !important;
+      border-radius: 8px !important;
+      background: #EF4444 !important;
+      color: #FFFFFF !important;
+      font-size: 0.58rem !important;
+      font-weight: 800 !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 0 3px !important;
+      border: 1.5px solid #0B0F14 !important;
+      line-height: 1 !important;
+    }
+    body.day-theme .header-notif-badge, body.light-theme .header-notif-badge {
+      border-color: #FFFFFF !important;
+    }
+
+    /* Notification Dropdown Card */
+    .header-notif-dropdown {
+      position: absolute !important;
+      top: 44px !important;
+      right: 0 !important;
+      width: 320px !important;
+      background: #17212D !important;
+      border: 1px solid #283442 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65) !important;
+      z-index: 1005 !important;
+      overflow: hidden !important;
+      animation: fadeInSearch 0.15s ease forwards !important;
+    }
+    body.day-theme .header-notif-dropdown, body.light-theme .header-notif-dropdown {
+      background: #FFFFFF !important;
+      border: 1px solid #E3E7EC !important;
+      box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12) !important;
+    }
+    .notif-header {
+      padding: 10px 14px !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      border-bottom: 1px solid #283442 !important;
+      font-size: 0.78rem !important;
+      font-weight: 700 !important;
+      color: #F5F5F2 !important;
+    }
+    body.day-theme .notif-header, body.light-theme .notif-header {
+      border-bottom-color: #E3E7EC !important;
+      color: #171B22 !important;
+    }
+    .notif-item {
+      padding: 10px 14px !important;
+      display: flex !important;
+      gap: 10px !important;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      font-size: 0.74rem !important;
+      transition: background 0.15s ease !important;
+    }
+    .notif-item:hover {
+      background: rgba(197, 164, 109, 0.08) !important;
+    }
+    body.day-theme .notif-item {
+      border-bottom-color: #F1F5F9 !important;
+    }
+    body.day-theme .notif-item:hover {
+      background: rgba(168, 134, 79, 0.06) !important;
+    }
+
 </style>
 </head>
 <body>
@@ -2806,10 +3031,10 @@
       </div>
     </div>
 
-    <!-- 2. Global Search Adjusted in the Exact Middle -->
+    <!-- Centered Search Bar -->
     <div class="header-global-search-container" id="headerGlobalSearchContainer">
       <div class="header-search-input-box">
-        <svg class="header-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="header-search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
@@ -2823,23 +3048,69 @@
     <!-- Right Controls -->
     <div class="header-right-controls">
       <!-- Fullscreen Restore Sidebar Button (appears when sidebar is hidden) -->
-      <button id="headerSidebarRestoreBtn" class="btn btn-outline" onclick="toggleSidebarFullscreen()" style="display:none; padding:6px 12px; font-size:0.78rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold); background:rgba(212,175,55,0.12); border-radius:8px; align-items:center; gap:6px; cursor:pointer; font-weight:700; white-space:nowrap; box-shadow:0 0 12px rgba(212,175,55,0.18);" title="Show Sidebar Column">
+      <button id="headerSidebarRestoreBtn" class="btn btn-outline" onclick="toggleSidebarFullscreen()" style="display:none; padding:5px 10px; font-size:0.75rem; border-color:rgba(212,175,55,0.45); color:var(--champagne-gold); background:rgba(212,175,55,0.12); border-radius:8px; align-items:center; gap:6px; cursor:pointer; font-weight:700; white-space:nowrap;" title="Show Sidebar Column">
         <span>⮞</span>
-        <span>Show Sidebar</span>
+        <span>Sidebar</span>
       </button>
 
       <!-- Hidden Dataset Tag so existing JS logic never throws -->
       <span id="activeDatasetTag" style="display:none;">Dataset: None</span>
       
-      <!-- Export CSV Button -->
-      <button class="btn btn-primary" style="width:auto;margin:0;padding:7px 14px;display:flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(99,102,241,0.35);font-weight:600;font-size:0.80rem;white-space:nowrap;" onclick="exportCurrentCSV()">
-        <span>📥</span>
+      <!-- 2. "Export CSV" with Distinct Executive Luxe Theme -->
+      <button id="headerExportCsvBtn" class="btn-export-luxe" onclick="exportCurrentCSV()" title="Export transformed active dataset to CSV file">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
         <span>Export CSV</span>
       </button>
 
-      <!-- Simple Day / Night Theme Toggle Logo Button (Pure Clean Circle, Blue Activator Removed) -->
-      <div id="themeToggleBtn" class="theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
-        <svg id="themeToggleLogoSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
+      <!-- 1. Notification Button in the Neighbour of Export CSV -->
+      <div style="position:relative;">
+        <div id="headerNotificationBtn" class="header-ctrl-circle-btn" onclick="toggleNotificationDropdown()" title="System Notifications &amp; Platform Alerts" aria-label="Notifications" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleNotificationDropdown();}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="header-notif-badge" id="headerNotifBadge">3</span>
+        </div>
+
+        <!-- Notification Popover Card -->
+        <div id="headerNotificationDropdown" class="header-notif-dropdown" style="display:none;">
+          <div class="notif-header">
+            <span>Platform Alerts</span>
+            <span style="font-size:0.65rem; color:var(--champagne-gold, #C5A46D); cursor:pointer;" onclick="clearNotifications()">Clear All</span>
+          </div>
+          <div style="max-height:260px; overflow-y:auto;" id="notifListContainer">
+            <div class="notif-item">
+              <span style="font-size:1rem; line-height:1;">🟢</span>
+              <div style="overflow:hidden;">
+                <div style="font-weight:600; color:var(--text-primary, #F5F5F2);">Data Engine Active</div>
+                <div style="font-size:0.68rem; color:var(--text-secondary, #A7B0BA);">High-speed pipeline ready for ingestion and profiling.</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <span style="font-size:1rem; line-height:1;">🤖</span>
+              <div style="overflow:hidden;">
+                <div style="font-weight:600; color:var(--text-primary, #F5F5F2);">AutoML Models Ready</div>
+                <div style="font-size:0.68rem; color:var(--text-secondary, #A7B0BA);">Random Forest &amp; XGBoost suites available for training.</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <span style="font-size:1rem; line-height:1;">🛡️</span>
+              <div style="overflow:hidden;">
+                <div style="font-weight:600; color:var(--text-primary, #F5F5F2);">Quality Guard Active</div>
+                <div style="font-size:0.68rem; color:var(--text-secondary, #A7B0BA);">Zero-block RBAC and schema audit rules enabled.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simple Day / Night Theme Toggle Logo Button (No Blue Dot) -->
+      <div id="themeToggleBtn" class="header-ctrl-circle-btn theme-toggle-logo-btn" onclick="toggleBrightnessTheme()" title="Theme: Currently 🌙 Night Light (Click to switch to ☀️ Day)" aria-label="Toggle Day and Night Theme" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrightnessTheme();}">
+        <svg id="themeToggleLogoSvg" width="19" height="19" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="transition:transform 0.3s ease;">
           <path d="M12 2.5V4.5M6.34 6.34L4.58 4.58M4.5 12H2M6.34 17.66L4.58 19.42M12 19.5V21.5" stroke="#F59E0B" stroke-width="1.8" stroke-linecap="round"/>
           <path d="M12 7A5 5 0 0 0 12 17V7Z" fill="#F59E0B"/>
           <path d="M12 7A5 5 0 0 1 12 17Q15 12 12 7Z" fill="#38BDF8"/>
@@ -2848,14 +3119,14 @@
         </svg>
       </div>
 
-      <!-- 3. Circular Login Button with Login Logo Image & Green Active Denotator -->
-      <div id="headerLoginBtn" class="header-login-circle-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAuthModal('user');}">
-        <img src="assets/login_logo.png" alt="Login Logo" class="header-login-logo-img" style="width:26px; height:26px; border-radius:50%; object-fit:cover; display:block; pointer-events:none;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-        <svg class="header-login-circle-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+      <!-- Circular Login Button with Login Logo Image & Green Active Denotator -->
+      <div id="headerLoginBtn" class="header-ctrl-circle-btn header-login-circle-btn" onclick="openAuthModal('user')" title="Login / Account • Click to Sign In or Register" aria-label="Login" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openAuthModal('user');}">
+        <img src="assets/login_logo.png" alt="Login Logo" class="header-login-logo-img" style="width:23px; height:23px; border-radius:50%; object-fit:cover; display:block; pointer-events:none;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+        <svg class="header-login-circle-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
           <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        <span id="headerLoginStatusDot" class="header-login-status-dot" title="Active Session / Ready"></span>
+        <span id="headerLoginStatusDot" class="header-login-status-dot" style="position:absolute; bottom:-1px; right:-1px; width:9px; height:9px; background:#10B981; border:1.8px solid #0f172a; border-radius:50%;" title="Active Session / Ready"></span>
       </div>
     </div>
   </header>
@@ -35144,10 +35415,41 @@ LIMIT 10;</pre>
       };
 
       // Close on Outside Click
-      document.addEventListener("click", function(e) {
+      
+      window.toggleNotificationDropdown = function() {
+        const dd = document.getElementById("headerNotificationDropdown");
+        if (!dd) return;
+        const isOpen = dd.style.display === "block";
+        window.closeGlobalSearchDropdown();
+        dd.style.display = isOpen ? "none" : "block";
+      };
+
+      window.closeNotificationDropdown = function() {
+        const dd = document.getElementById("headerNotificationDropdown");
+        if (dd) dd.style.display = "none";
+      };
+
+      window.clearNotifications = function() {
+        const container = document.getElementById("notifListContainer");
+        const badge = document.getElementById("headerNotifBadge");
+        if (container) {
+          container.innerHTML = '<div style="padding:18px; text-align:center; color:var(--text-secondary, #A7B0BA); font-size:0.75rem;">No unread notifications</div>';
+        }
+        if (badge) badge.style.display = "none";
+        if (typeof window.showToast === 'function') {
+          window.showToast("Notifications cleared", "info");
+        }
+      };
+
+document.addEventListener("click", function(e) {
         const searchContainer = document.getElementById("headerGlobalSearchContainer");
         if (searchContainer && !searchContainer.contains(e.target)) {
           window.closeGlobalSearchDropdown();
+        }
+        const notifBtn = document.getElementById("headerNotificationBtn");
+        const notifDropdown = document.getElementById("headerNotificationDropdown");
+        if (notifBtn && notifDropdown && !notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+          window.closeNotificationDropdown();
         }
       });
 
